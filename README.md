@@ -1,24 +1,24 @@
 # NPL CLI
 
 The NPL CLI is a command line tool to support the development of projects written in NPL.
-It allows the interaction with NOUMENA PaaS from your terminal.
+It allows you to interact with NOUMENA PaaS from your terminal.
 
-## Main functionalities
+## Main functionality
 
 ### Noumena PaaS
 
-NPL CLI serves as PaaS API wrapper
+NPL CLI serves as a PaaS API wrapper
 
 - List organisations
 - List applications
-- Create application
-- Deploy NPL to application
-- Get detail of application
+- Create an application
+- Deploy NPL to an application
+- Get the detail of an application
 
-## Covered OS and architectures
+## Supported Operating Systems and architectures
 
 |         	| ARM 64 	| AMD 64 	|
 |---------	|--------	|--------	|
 | Windows 	| x      	| x      	|
-| Darwin  	| x      	| x      	|
+| MacOS  	| x      	| x      	|
 | Linux   	| x      	| x      	|
