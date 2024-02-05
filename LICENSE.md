@@ -21,10 +21,9 @@ runtime system for this language (NPL Runtime Environment) and
 development and devops tools to support the usage of said language and
 runtime.
 
-**The User (you, yours)** is licensed the NPL CLI to create, unit test
-and visualise NPL code, and run simulated usage scenarios in the sandbox
-runtime. You will also require a license to the NPL Runtime Environment
-(see **NPL Runtime Environment** below).\
+**The User (you, yours)** is licensed the NPL CLI to interact with NOUMENA
+runtimes licensed by you. You will also require a license to the NPL Runtime
+Environment (see **NPL Runtime Environment** below).\
 \
 The purpose of the NOUMENA Protocol Language (NPL) is to model
 multi-party agreements in terms of the roles and responsibilities
@@ -48,7 +47,7 @@ usage license (**NPL-RUNTIME ON-PREMISE**). An overview of the current
 license models and their terms of use can be found at
 [https://noumenadigital.com/product-licenses/](https://noumenadigital.com/product-licenses/). If you have questions
 about the license models you can contact us at
-[paas-support@noumenadigital.com](mailto:https://portal.noumena.cloud/tenants).
+[paas-support@noumenadigital.com](mailto:paas-support@noumenadigital.com).
 
 **DEVELOPMENT AND DEVOPS TOOLS**
 
@@ -74,7 +73,7 @@ NOUMENA Licensess:
 
     b.  NPL CLI. The CLI can be used in the context of your preferred
         terminal and can be licensed directly from
-        [https://brew.sh/](https://brew.sh/).
+        [https://brew.sh/](https://brew.sh/) or [https://github.com/NoumenaDigital/npl-cli](https://github.com/NoumenaDigital/npl-cli).
 
 The NPL CLI license, NPL-DEV license, the NPL-MAVEN-PLUGIN license, the NPL-RUNTIME
 ON-PREMISE license, the NPL-RUNTIME PAAS license and all other licenses
@@ -126,13 +125,13 @@ The terms "Controller", "Data Subject", "Personal Data", "Process", and
 documentation and diagrams, produced by the NPL CLI, whether in Source
 or Object form.
 
-**Development and DEVOPS Tools:** NPL-Dev for IntelliJ IDEA, available
+**Development and DevOps Tools:** NPL-Dev for IntelliJ IDEA, available
 for download on the JetBrains Marketplace
 [https://plugins.jetbrains.com/idea](https://plugins.jetbrains.com/idea),
 NPL Maven Plugin, available for download using Apache Maven from
 [https://github.com/orgs/NoumenaDigital/packages](https://github.com/orgs/NoumenaDigital/packages),
 and the NPL CLI, available for download at
-[brew.sh](https://brew.sh/).
+[https://brew.sh](https://brew.sh/) and [https://github.com/NoumenaDigital/npl-cli](https://github.com/NoumenaDigital/npl-cli).
 
 **Harmful Code**: viruses, worms or similar harmful code.
 
@@ -164,8 +163,8 @@ configuration files.
 
     2.  You may only create and store the Derivative Works on
         computers, or in source code repositories, owned by you. YOU
-        CANNOT PUBLICLY DEPLOY THE DERIVATIVE WORKS WHICH YOU HAVE
-        CREATED USING THE PLUG-IN LICENSE UNLESS YOU HAVE EITHER
+        CANNOT USE THE NLP CLI TO DEPLOY THE DERIVATIVE WORKS OR OTHERWISE
+        INTERACT WITH A NOUMENA RUNTIME USING THE NPL CLI UNLESS YOU HAVE EITHER
         AN **NPL-RUNTIME ON-PREMISE LICENSE** OR **NPL-RUNTIME
         PAAS LICENSE** OR ANOTHER **NOUMENA NPL RUNTIME LICENSE** FOR
         THE NPL RUNTIME THAT ALLOWS YOU TO PUBLICLY DEPLOY YOUR
