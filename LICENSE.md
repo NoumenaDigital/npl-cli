@@ -1,364 +1,201 @@
-**JANUARY 2024**
-
-**NPL COMMAND LINE INTERFACE**
-
-**LICENSE AND TERMS OF USE**
-
-**THESE TERMS AND CONDITIONS CONSTITUTE A BINDING CONTRACT ON YOU AND
-GOVERN YOUR LICENSE TO THE COMMAND LINE INTERFACE (NPL CLI LICENSE) (THE
-"AGREEMENT")**
-
-**BY USING THE NPL COMMAND LINE INTERFACE (NPL CLI) YOU AGREE TO BE
-BOUND BY THIS AGREEMENT.**
-
-1.  **BACKGROUND**
-
-**NOUMENA Digital AG** a company incorporated in Switzerland, with
-registered number 12639845 and registered address Oberdorfsrasse 9,
-Baar, CH-6340, Switzerland (**Licensor**, **we** or **us**) has
-developed a proprietary language, the NOUMENA Protocol Language (NPL), a
-runtime system for this language (NPL Runtime Environment) and
-development and devops tools to support the usage of said language and
-runtime.
-
-**The User (you, yours)** is licensed the NPL CLI to interact with NOUMENA
-runtimes licensed by you. You will also require a license to the NPL Runtime
-Environment (see **NPL Runtime Environment** below).\
-\
-The purpose of the NOUMENA Protocol Language (NPL) is to model
-multi-party agreements in terms of the roles and responsibilities
-(defined as permissions and obligations), of each of the parties to the
-agreement and to clearly define these directly in NPL code.
-
-NPL allows the actions and data, associated with these roles and
-responsibilities to be coded and then executed in the NPL Runtime
-Environment (see below for more details). The definitions, data and
-logic of such agreements are captured in source code as an NPL Protocol,
-(which is a formal description of the agreement) NPL itself, the NPL
-Runtime Environment , the development and devops tools and how to use
-all of these components are fully documented at
-[https://documentation.noumenadigital.com](https://documentation.noumenadigital.com).
-
-**NPL-RUNTIME ENVIRONMENT**
-
-You can license the NPL Runtime Environment as a cloud-based PaaS
-service (**NPL- RUNTIME PAAS**) or as self-managed on-premise software
-usage license (**NPL-RUNTIME ON-PREMISE**). An overview of the current
-license models and their terms of use can be found at
-[https://noumenadigital.com/product-licenses/](https://noumenadigital.com/product-licenses/). If you have questions
-about the license models you can contact us at
-[paas-support@noumenadigital.com](mailto:paas-support@noumenadigital.com).
-
-**DEVELOPMENT AND DEVOPS TOOLS**
-
-You should acquire the following development tools, to be used with the
-NOUMENA Licensess:
-
-1.  Development Tools: NPL-Dev for IntelliJ IDEA. The NPL-Dev can only
-    be used in the context of Jetbrains IntellIJ IDEA, licensed directly
-    from Jetbrains
-    [https://www.jetbrains.com/idea/](https://www.jetbrains.com/idea/).
-
-2.  DevOps Tools:
-
-    a.  NPL-maven-plugin. The NPL-maven-plugin can only be used in the
-        context of Apache Maven
-        [https://maven.apache.org/](https://maven.apache.org/),
-        which can be licensed by the Apache Foundation, separately
-        to any Noumena Licenses. Maven can be acquired through many
-        channels as described at
-        [https://maven.apache.org/](https://maven.apache.org/) organisations using Maven are
-        required to comply with the appropriate Maven license
-        [https://www.apache.org/licenses/](https://www.apache.org/licenses/).
-
-    b.  NPL CLI. The CLI can be used in the context of your preferred
-        terminal and can be licensed directly from
-        [https://brew.sh/](https://brew.sh/) or [https://github.com/NoumenaDigital/npl-cli](https://github.com/NoumenaDigital/npl-cli).
-
-The NPL CLI license, NPL-DEV license, the NPL-MAVEN-PLUGIN license, the NPL-RUNTIME
-ON-PREMISE license, the NPL-RUNTIME PAAS license and all other licenses
-for NOUMENA products (an overview of the current product offering you
-find at [https://noumenadigital.com/product-licenses/](https://noumenadigital.com/product-licenses/) ) are referred to
-as the **NOUMENA Product Licenses**.
-
-THE DEVELOPMENT AND DEVOPS TOOLS ARE AUTOMATICALLY AVAILABLE TO YOU ONCE
-YOU HAVE A INTELLIJ IDEA OR MAVEN LICENSE. PLEASE NOTE THAT THESE MAY BE
-DOWNLOADED WITHOUT YOU HAVING TO ACCEPT THEIR LICENSE TERMS IT IS YOUR
-RESPONSIBILITY TO REVIEW THE LICENSE TERMS IN THE HYPERLINKS ABOVE
-BEFORE USING THESE TOOLS.
-
-NOUMENA ACCEPTS NEITHER RESPONSIBILITY NOR LIABILITY FOR THE USAGE OF
-ANY THIRD PARTY TOOLS WHICH MAY BE NECESSARY FOR THE OPERATION OF THE
-NOUMENA LICENSES. THESE ARE LICENSED TO YOU SUBJECT TO THE TERMS OF THE
-RELEVANT SUPPLIER.
-
-The remainder of this license pertains specifically to the NPL CLI:
-
-**AGREED TERMS**
-
-2.  **Interpretation**
-
-The definitions and rules of interpretation in this section apply in
-this Agreement.
-
-**Applicable Law:** any law (including common law or other binding law),
-statute, regulation, code, ordinance, rule, judgement, order, decree or
-directive or any determination by or requirement of a competent
-authority, as amended from time to time and as applicable to each party
-in relation to its provision of services to the other party pursuant to
-this Agreement.
-
-**Data**: means the proprietary data which you may share with us,
-including Personal Data.
-
-**Data Protection Legislation**: any and all data protection or privacy
-law applicable anywhere in the world to the Processing of Personal Data
-including Regulation 2016/679/EU, Directive 95/46/EC (**GDPR**), any and
-all national implementations of that directive including the UK GDPR,
-Data Protection Act 2018 and any and all similar or comparable laws,
-legislation and/or regulations in force from time to time.
-
-The terms "Controller", "Data Subject", "Personal Data", "Process", and
-"Processor" shall have the meaning set out in the GDPR
-
-**Derivative Works**: the NPL code and any supporting
-documentation and diagrams, produced by the NPL CLI, whether in Source
-or Object form.
-
-**Development and DevOps Tools:** NPL-Dev for IntelliJ IDEA, available
-for download on the JetBrains Marketplace
-[https://plugins.jetbrains.com/idea](https://plugins.jetbrains.com/idea),
-NPL Maven Plugin, available for download using Apache Maven from
-[https://github.com/orgs/NoumenaDigital/packages](https://github.com/orgs/NoumenaDigital/packages),
-and the NPL CLI, available for download at
-[https://brew.sh](https://brew.sh/) and [https://github.com/NoumenaDigital/npl-cli](https://github.com/NoumenaDigital/npl-cli).
-
-**Harmful Code**: viruses, worms or similar harmful code.
-
-**Intellectual Property Rights**: all patents, copyrights, design
-rights, trademarks, service marks, trade secrets, know-how, database
-rights and other rights in the nature of intellectual property rights
-(whether registered or not), and all applications for the same which may
-now, or in the future, subsist anywhere in the world, including the
-right to sue for and recover damages for past infringements.
-
-**Object**: any form resulting from mechanical transformation or
-translation of a Source form, including but not limited to compiled
-object code, generated documentation, and conversions to other media
-types.
-
-**Source**: software source code, documentation source, and
-configuration files.
-
-**Website**:
-[https://noumenadigital.com/product-licenses/](https://noumenadigital.com/product-licenses/)
-
-3.  **Grant of License**
-
-    1.  Subject to the terms and conditions of this Agreement, we grant
-        you a perpetual, worldwide, non-exclusive, no-charge,
-        royalty-free, non-transferable, revocable license to use the
-        NPL CLI to prepare Derivative Works in Source or Object
-        form.
-
-    2.  You may only create and store the Derivative Works on
-        computers, or in source code repositories, owned by you. YOU
-        CANNOT USE THE NLP CLI TO DEPLOY THE DERIVATIVE WORKS OR OTHERWISE
-        INTERACT WITH A NOUMENA RUNTIME USING THE NPL CLI UNLESS YOU HAVE EITHER
-        AN **NPL-RUNTIME ON-PREMISE LICENSE** OR **NPL-RUNTIME
-        PAAS LICENSE** OR ANOTHER **NOUMENA NPL RUNTIME LICENSE** FOR
-        THE NPL RUNTIME THAT ALLOWS YOU TO PUBLICLY DEPLOY YOUR
-        DERIVATIVE WORK. An overview of the current license
-        models for the NOUMENA NPL RUNTIME and their terms of use can be
-        found at [https://noumenadigital.com/product-licenses/](https://noumenadigital.com/product-licenses/)
-
-    3.  You shall not, except as may be allowed by any Applicable Law
-        which is incapable of exclusion by agreement between the parties
-        and except to the extent expressly permitted under this
-        Agreement:
-
-        1.  license, sell, rent, lease, transfer, assign, distribute or
-            otherwise commercially exploit, or otherwise make the
-            Derivative Works available to any third party unless the
-            third-party has a Noumena License.
-
-        2.  attempt to reverse compile, disassemble, reverse engineer or
-            otherwise reduce to human-perceivable form all or any part
-            of the NPL CLI
-
-        3.  access all or any part of the NPL CLI in order to build a
-            competing product or service; or
-
-        4.  introduce any Harmful Code to the NPL Runtime Environment
-            using the NPL CLI.
-
-    4.  You shall use appropriate hardware and software to use the
-        NPL CLI and will take appropriate security precautions to
-        prevent unauthorised access to your own computer systems.
-
-    5.  You may not use the NPL CLI other than as specified in this
-        Agreement without our prior written consent.
-
-4.  **Intellectual Property Rights**
-
-    1.  All copyright, database rights and other Intellectual Property
-        Rights in the NPL CLI shall belong to us or our licensors and
-        you shall have no rights in respect of any of them except the
-        right, as expressly granted under this Agreement, to use them in
-        accordance with this Agreement.
-
-    2.  You agree not to remove, suppress or modify in any way any
-        proprietary marking, including any trade-mark or copyright
-        notice, on or in the NPL CLI.
-
-    3.  You shall own all right, title and interest in and to all of the
-        Derivative Works which you create using the NPL CLI and shall
-        have sole responsibility for the legality, reliability,
-        integrity, accuracy and quality of the Derivative Works.
-
-5.  **Your Obligations**
-
-    1.  You undertake:
-
-        1.  to comply with the acceptable usage policy and privacy
-            policy, which are on our Website;
-
-        2.  to use the latest versions of the NPL CLI; and
-
-        3.  to comply with all Applicable Laws and regulations in
-            relation to your activities under this Agreement.
-
-    2.  You confirm that we are not responsible for checking Data
-        (including for Harmful Code). We shall not be responsible or
-        liable for any loss, destruction, alteration or disclosure of
-        your Data.
-
-6.  **Our Obligations**
-
-    1.  We have and will maintain all necessary licenses, consents, and
-        permissions necessary for the performance of our obligations
-        under this Agreement.
-
-    2.  Unless required by Applicable Law or agreed to in writing,
-        Licensor provides the NPL CLI on an \"AS IS\" BASIS, WITHOUT
-        WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-        INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF
-        TITLE, NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A
-        PARTICULAR PURPOSE. YOU ARE SOLELY RESPONSIBLE FOR DETERMINING
-        THE APPROPRIATENESS OF USING OR REDISTRIBUTING THE DERIVATIVE
-        WORKS AND ASSUME ANY RISKS ASSOCIATED WITH YOUR EXERCISE OF
-        PERMISSIONS UNDER THIS AGREEMENT.
-
-7.  **Liability**
-
-    1.  In no event, whether in tort (including negligence), contract,
-        or otherwise, unless required by Applicable Law or agreed to in
-        writing, shall we be liable to you for damages, including any
-        direct, indirect, special, incidental, or consequential damages
-        arising as a result of this NPL CLI License or out of the use or
-        inability to use the Derivative Work (including but not limited
-        to damages for loss of goodwill, work stoppage, computer failure
-        or malfunction, or any and all other commercial damages or
-        losses), even if we have been advised of the possibility of such
-        damages.
-
-    2.  You will indemnify us and keep us indemnified against any loss,
-        damage, claim or expense arising out of any claim that the
-        storage of (a) your Data via the NPL CLI by us infringes the
-        Intellectual Property Rights of any third party; or (b) Personal
-        Data uploaded by you using the NPL CLI infringes Data Protection
-        Legislation.
-
-8.  **Termination**
-
-    1.  We may terminate this Agreement immediately if you fail to
-        comply with the terms of this Agreement.
-
-9.  **Assignment**
-
-    1.  We may assign, sub-contract or otherwise transfer any of our
-        rights or obligations under this Agreement without your consent.
-        You may only assign, sub-contract or otherwise transfer any of
-        your rights or obligations with our prior written consent.
-
-10. **Severability**
-
-    1.  If any provision of this Agreement is judged to be illegal or
-        unenforceable, the continuation in full force and effect of the
-        remainder of the provisions shall not be prejudiced.
-
-11. **Waiver**
-
-    1.  No forbearance or delay by either party in enforcing its rights
-        shall prejudice or restrict the rights of that party and no
-        waiver of any such rights or of any breach of any contractual
-        terms shall be deemed to be a waiver of any other right or of
-        any later breach.
-
-12. **Entire Agreement**
-
-    1.  Each party acknowledges that in entering into this Agreement, it
-        has not relied on any representation, undertaking, promise or
-        statement whether oral or in writing which is not expressly set
-        out in this Agreement. Except as expressly provided in this
-        Agreement all conditions, warranties, stipulations and other
-        statements whatsoever that would otherwise be implied or imposed
-        by statute, at common law, or otherwise howsoever are excluded
-        to the fullest extent permitted by law. Nothing in the foregoing
-        shall however affect any liability for fraudulent
-        misrepresentation. This Agreement and, if applicable, the
-        Commercial Terms of Use contain the only agreement(s) between
-        the parties.
-
-    2.  You will be notified of any changes to this Agreement on our
-        Website. Changes to the Agreement will take effect immediately
-        upon such publication.
-
-13. **Third Party Rights**
-
-    1.  A person who is not party to this Agreement shall have no right
-        under the Contracts (Rights of Third Parties) Act 1999 to
-        enforce any term of this Agreement.
-
-14. **Data Protection**
-
-    1.  Each party shall comply with its obligations under the Data
-        Protection Legislation Neither party shall by any act or
-        omission, deliberately put the other party in breach of the Data
-        Protection Legislation and each party shall use all necessary
-        measures to ensure that it does not put the other party in
-        breach of the Data Protection Legislation.
-
-    2.  We will use your Personal Data and any information we obtain
-        from you to provide you with our services, for administration
-        and customer services. We may keep your information for a
-        reasonable period for these purposes.
-
-    3.  We may transfer Personal Data outside the European Economic Area
-        (EEA) if necessary for the above purposes and you acknowledge
-        that if the receiving country is outside the EEA, it may not
-        have the same standards of data protection.
-
-    4.  You confirm that you have all necessary licenses and consents to
-        enable us to use your or a relevant third party's Personal Data
-        as set out in this clause and you shall indemnify us against any
-        liability that we may incur as a result of Your failure to
-        obtain such consents.
-
-15. **No Partnership or Agency**
-
-    1.  Nothing in this agreement is intended to, or shall be deemed to,
-        establish any partnership or joint venture between any of the
-        parties, constitute any party the agent of another party, or
-        authorise any party to make or enter into any commitments for or
-        on behalf of any other party.
-
-    2.  Each party confirms it is acting on its own behalf and not for
-        the benefit of any other person.
-
-16. **Governing Law**
-
-    1.  This Agreement shall be construed in accordance with and
-        governed by the law of England and Wales and each party agrees
-        to submit to the exclusive jurisdiction of the courts of England
-        and Wales.
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+   Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+   stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+   that You distribute, all copyright, patent, trademark, and
+   attribution notices from the Source form of the Work,
+   excluding those notices that do not pertain to any part of
+   the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+   distribution, then any Derivative Works that You distribute must
+   include a readable copy of the attribution notices contained
+   within such NOTICE file, excluding those notices that do not
+   pertain to any part of the Derivative Works, in at least one
+   of the following places: within a NOTICE text file distributed
+   as part of the Derivative Works; within the Source form or
+   documentation, if provided along with the Derivative Works; or,
+   within a display generated by the Derivative Works, if and
+   wherever such third-party notices normally appear. The contents
+   of the NOTICE file are for informational purposes only and
+   do not modify the License. You may add Your own attribution
+   notices within Derivative Works that You distribute, alongside
+   or as an addendum to the NOTICE text from the Work, provided
+   that such additional attribution notices cannot be construed
+   as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+Copyright [2025] [Noumena Digital AG](https://noumenadigital.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

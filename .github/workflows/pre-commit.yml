@@ -1,0 +1,25 @@
+name: "Pre-commit hooks"
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: "Pre-commit hooks"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - uses: pre-commit/action@v3.0.1
