@@ -18,6 +18,7 @@ class NplCommandExecutorTest : FunSpec({
     lateinit var commandExecutorOutput: ICommandExecutorOutput
     lateinit var writer: OutputStreamWriter
     lateinit var commandSuccess: Command
+    lateinit var commandFailed: Command
     lateinit var nplCommand: INplCommand
     lateinit var nplCommandEnum: NplCliCommandsEnum
     lateinit var executor: ICommandExecutor
@@ -27,6 +28,7 @@ class NplCommandExecutorTest : FunSpec({
         commandExecutorOutput = mockk()
         writer = mockk(relaxed = true)
         commandSuccess = mockk()
+        commandFailed = mockk()
         nplCommandEnum = mockk()
         executor = NplCommandExecutor(commandsParser)
     }
@@ -41,6 +43,7 @@ class NplCommandExecutorTest : FunSpec({
         every { commandsParser.parse(inputCommands) } returns listOf(failedCommand, successCommand)
         every { commandSuccess.nplCliCommandsEnum } returns nplCommandEnum
         every { nplCommandEnum.nplCommand } returns nplCommandFailed andThen nplCommandSuccess
+        every { nplCommandEnum.commandName } returns "commandName"
         every { commandExecutorOutput.get() } returns writer
 
         executor.process(inputCommands, commandExecutorOutput)
@@ -48,7 +51,7 @@ class NplCommandExecutorTest : FunSpec({
         verifySequence {
             commandExecutorOutput.get()
             commandsParser.parse(inputCommands)
-            writer.write(any<String>())
+            writer.write("Executing command: commandName...")
             writer.write("Test exception")
             writer.write("\n")
             writer.close()
@@ -62,13 +65,14 @@ class NplCommandExecutorTest : FunSpec({
         every { commandSuccess.nplCliCommandsEnum } returns nplCommandEnum
         every { nplCommandEnum.nplCommand } returns nplCommand
         every { commandExecutorOutput.get() } returns writer
+        every { nplCommandEnum.commandName } returns "commandName"
 
         executor.process(listOf("version"), commandExecutorOutput)
 
         verifySequence {
             commandExecutorOutput.get()
             commandsParser.parse(listOf("version"))
-            writer.write(any<String>())
+            writer.write("Executing command: commandName...")
             writer.write("test command")
             writer.write("\n")
             writer.close()

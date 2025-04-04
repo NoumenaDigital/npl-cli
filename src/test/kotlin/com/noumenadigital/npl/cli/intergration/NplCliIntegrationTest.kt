@@ -29,6 +29,7 @@ class NplCliIntegrationTest : FunSpec({
 
         verifySequence {
             nplWriter.get()
+            writer.write("Executing command: version...")
             writer.write(any<String>())
             writer.write("\n")
             writer.close()

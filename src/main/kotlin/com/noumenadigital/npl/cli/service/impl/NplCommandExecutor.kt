@@ -11,7 +11,7 @@ class NplCommandExecutor(private val commandsParser: ICommandsParser = NplComman
             try {
                 val commandsList = commandsParser.parse(commands)
                 commandsList.forEach { command ->
-                    out.write("Executing command: $command...")
+                    out.write("Executing command: ${command.nplCliCommandsEnum.commandName}...")
                     command.nplCliCommandsEnum.nplCommand?.execute(out)
                     out.write("\n")
                 }
