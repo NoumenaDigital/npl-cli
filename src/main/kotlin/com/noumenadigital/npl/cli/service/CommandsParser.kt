@@ -1,0 +1,20 @@
+package com.noumenadigital.npl.cli.service
+
+import com.noumenadigital.npl.cli.commands.NplCliCommandsEnum
+import com.noumenadigital.npl.cli.exception.CommandParsingException
+import com.noumenadigital.npl.cli.model.Command
+
+interface CommandsParser {
+    fun parse(command: List<String>): List<Command>
+}
+
+class NplCommandsParser : CommandsParser {
+    override fun parse(command: List<String>): List<Command> {
+        if (command.isEmpty()) {
+            throw CommandParsingException("No command to execute\n")
+        }
+        val commands =
+            command.map { stringCommand -> Command(NplCliCommandsEnum.commandFromString(stringCommand)) }.toList()
+        return commands
+    }
+}

@@ -8,18 +8,17 @@ import org.apache.commons.text.similarity.LevenshteinDistance
 
 enum class NplCliCommandsEnum(
     val commandName: String,
-    val nplCommand: INplCommand? = null
+    val nplCommand: NplCommand? = null,
 ) {
-
-    VERSION("version", VersionCommand()),
-    HELLO("hello", HelloCommand()),
-    HELP("help", HelpCommand());
+    VERSION("version", VersionCommand),
+    HELLO("hello", HelloCommand),
+    HELP("help", HelpCommand),
+    ;
 
     companion object {
-        fun commandFromString(command: String): NplCliCommandsEnum {
-            return entries.find { it.commandName.equals(command, ignoreCase = true) }
+        fun commandFromString(command: String): NplCliCommandsEnum =
+            entries.find { it.commandName.equals(command, ignoreCase = true) }
                 ?: throw CommandNotFoundException(buildErrorMessage(command))
-        }
 
         private fun buildErrorMessage(input: String): String {
             val suggestion = suggestClosestCommand(input)
