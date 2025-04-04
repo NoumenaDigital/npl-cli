@@ -5,7 +5,7 @@ import com.noumenadigital.npl.cli.commands.impl.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import org.apache.commons.text.similarity.LevenshteinDistance
 
-enum class CommandEnum(val commandName: String, nplCommand: INplCommand? = null) {
+enum class CommandEnum(val commandName: String, val nplCommand: INplCommand? = null) {
 
     VERSION("VERSION", VersionCommand()),
     HELLO("HELLO", HelloCommand());

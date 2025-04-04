@@ -5,7 +5,8 @@ import java.io.OutputStreamWriter
 
 
 fun main(args: Array<String>) {
-    NplCommandExecutor().process(args.toList(), OutputStreamWriter(System.out, Charsets.UTF_8))
+    val output = OutputStreamWriter(System.out, Charsets.UTF_8)
+    NplCommandExecutor().process(args.toList(), output)
 }
 
 

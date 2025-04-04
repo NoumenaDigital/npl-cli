@@ -2,14 +2,24 @@ package com.noumenadigital.npl.cli.service.impl
 
 import com.noumenadigital.npl.cli.service.ICommandExecutor
 import com.noumenadigital.npl.cli.service.ICommandsParser
-import java.io.OutputStream
 import java.io.Writer
 
 class NplCommandExecutor : ICommandExecutor {
 
-    val commandsParser: ICommandsParser = NplCommandsParser()
+    private val commandsParser: ICommandsParser = NplCommandsParser()
 
     override fun process(commands: List<String>, output: Writer) {
-        TODO("Not yet implemented")
+        output.use { out ->
+            try {
+                val commandsList = commandsParser.parse(commands)
+                commandsList.forEach { command ->
+                    command.command.nplCommand?.execute(out)
+                    out.write("\n")
+                }
+            } catch (ex: Exception) {
+                ex.message?.let { output.write(it) }
+                out.write("\n")
+            }
+        }
     }
 }
