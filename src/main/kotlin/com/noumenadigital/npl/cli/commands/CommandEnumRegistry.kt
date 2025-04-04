@@ -1,14 +1,19 @@
 package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.commands.impl.HelloCommand
+import com.noumenadigital.npl.cli.commands.impl.HelpCommand
 import com.noumenadigital.npl.cli.commands.impl.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import org.apache.commons.text.similarity.LevenshteinDistance
 
-enum class CommandEnumRegistry(val commandName: String, val nplCommand: INplCommand? = null) {
+enum class CommandEnumRegistry(
+    val commandName: String,
+    val nplCommand: INplCommand? = null
+) {
 
-    VERSION("VERSION", VersionCommand()),
-    HELLO("HELLO", HelloCommand());
+    VERSION("version", VersionCommand()),
+    HELLO("hello", HelloCommand()),
+    HELP("help", HelpCommand());
 
     companion object {
         fun commandFromString(command: String): CommandEnumRegistry {
