@@ -1,5 +1,5 @@
 package com.noumenadigital.npl.cli.model
 
-import com.noumenadigital.npl.cli.commands.CommandEnumRegistry
+import com.noumenadigital.npl.cli.commands.NplCliCommandsEnum
 
-class Command(val command: CommandEnumRegistry)
+class Command(val nplCliCommandsEnum: NplCliCommandsEnum)

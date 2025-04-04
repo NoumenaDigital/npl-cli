@@ -1,6 +1,6 @@
 package com.noumenadigital.npl.cli.commands.impl
 
-import com.noumenadigital.npl.cli.commands.CommandEnumRegistry
+import com.noumenadigital.npl.cli.commands.NplCliCommandsEnum
 import com.noumenadigital.npl.cli.commands.INplCommand
 import java.io.Writer
 
@@ -8,7 +8,7 @@ class HelpCommand : INplCommand {
     override val commandDescription = "Manual for npl-cli commands"
 
     override fun execute(output: Writer) {
-        val entries = CommandEnumRegistry.entries
+        val entries = NplCliCommandsEnum.entries
         val padding = entries.maxOf { it.commandName.length } + 4
 
         entries.forEach { entry ->
