@@ -1,13 +1,13 @@
-# NPL CLI
+# CLI (old version, for cloud deployment only)
 
-The NPL CLI is a command line tool to support the development of projects written in NPL. It allows you to interact with
-NOUMENA PaaS from your terminal.
+The old NPL CLI is a command line tool to support the development of projects written in NPL. It allows you to interact
+with NOUMENA Cloud from your terminal.
 
 ## Main functionality
 
-### Noumena PaaS
+### Noumena Cloud
 
-NPL CLI serves as a PaaS API wrapper
+NPL CLI serves as a Noumena Cloud API wrapper
 
 - List organisations
 - List applications
