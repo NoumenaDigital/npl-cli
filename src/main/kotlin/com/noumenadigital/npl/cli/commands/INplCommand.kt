@@ -4,8 +4,6 @@ import java.io.Writer
 
 interface INplCommand {
 
-    fun execute(output: Writer){
-        output.write("Not implemented yet")
-    }
+    fun execute(output: Writer)
 
 }
