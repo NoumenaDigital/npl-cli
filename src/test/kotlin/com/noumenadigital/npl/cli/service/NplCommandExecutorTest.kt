@@ -12,20 +12,12 @@ import io.mockk.verifySequence
 import java.io.OutputStreamWriter
 import java.io.Writer
 
-
-class TestCommand(override val commandDescription: String) : INplCommand {
-
-    override fun execute(output: Writer) {
-        output.write("test command")
-    }
-}
-
 class NplCommandExecutorTest : FunSpec({
 
     lateinit var commandsParser: ICommandsParser
     lateinit var commandExecutorOutput: ICommandExecutorOutput
     lateinit var writer: OutputStreamWriter
-    lateinit var command: Command
+    lateinit var commandSuccess: Command
     lateinit var nplCommand: INplCommand
     lateinit var nplCommandEnum: NplCliCommandsEnum
     lateinit var executor: ICommandExecutor
@@ -34,16 +26,40 @@ class NplCommandExecutorTest : FunSpec({
         commandsParser = mockk()
         commandExecutorOutput = mockk()
         writer = mockk(relaxed = true)
-        command = mockk()
+        commandSuccess = mockk()
         nplCommandEnum = mockk()
         executor = NplCommandExecutor(commandsParser)
     }
 
+    test("second command shouldn't be executed if first failed") {
+
+        val inputCommands = listOf("failed", "success")
+        val successCommand = Command(nplCommandEnum)
+        val failedCommand = Command(nplCommandEnum)
+        val nplCommandSuccess = SuccessCommand("test")
+        val nplCommandFailed = ExceptionCommand("failed")
+        every { commandsParser.parse(inputCommands) } returns listOf(failedCommand, successCommand)
+        every { commandSuccess.nplCliCommandsEnum } returns nplCommandEnum
+        every { nplCommandEnum.nplCommand } returns nplCommandFailed andThen nplCommandSuccess
+        every { commandExecutorOutput.get() } returns writer
+
+        executor.process(inputCommands, commandExecutorOutput)
+
+        verifySequence {
+            commandExecutorOutput.get()
+            commandsParser.parse(inputCommands)
+            writer.write(any<String>())
+            writer.write("Test exception")
+            writer.write("\n")
+            writer.close()
+        }
+    }
+
     test("should execute parsed commands and write output") {
 
-        nplCommand = TestCommand("test")
-        every { commandsParser.parse(any()) } returns listOf(command)
-        every { command.nplCliCommandsEnum } returns nplCommandEnum
+        nplCommand = SuccessCommand("test")
+        every { commandsParser.parse(any()) } returns listOf(commandSuccess)
+        every { commandSuccess.nplCliCommandsEnum } returns nplCommandEnum
         every { nplCommandEnum.nplCommand } returns nplCommand
         every { commandExecutorOutput.get() } returns writer
 
@@ -52,6 +68,7 @@ class NplCommandExecutorTest : FunSpec({
         verifySequence {
             commandExecutorOutput.get()
             commandsParser.parse(listOf("version"))
+            writer.write(any<String>())
             writer.write("test command")
             writer.write("\n")
             writer.close()
@@ -75,3 +92,17 @@ class NplCommandExecutorTest : FunSpec({
     }
 
 })
+
+class SuccessCommand(override val commandDescription: String) : INplCommand {
+
+    override fun execute(output: Writer) {
+        output.write("test command")
+    }
+}
+
+class ExceptionCommand(override val commandDescription: String) : INplCommand {
+
+    override fun execute(output: Writer) {
+        throw Exception("Test exception")
+    }
+}
