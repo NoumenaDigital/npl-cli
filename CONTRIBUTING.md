@@ -22,7 +22,7 @@ All contributions should be submitted as pull requests. To ensure your PR is acc
 3. **Include Test Coverage** - All new or modified functionality must include appropriate test coverage
 4. **Pass All Tests** - Your changes must pass all the tests.
 5. **Update the changelog** – If the diff added, changed, or removed user-facing features, add them to the
-   [CHANGELOG.md](CHANGELOG.md). See also [Versioning and Publishing](README.md#versioning-and-publishing).
+   [CHANGELOG.md](CHANGELOG.md).
 
 ### PR Validation
 
