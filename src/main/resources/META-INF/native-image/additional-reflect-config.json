@@ -1,0 +1,16 @@
+[
+  {
+    "name": "org.eclipse.lsp4j.**",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "queryAllDeclaredMethods": true
+  },
+  {
+    "name": "org.eclipse.lsp4j.jsonrpc.**",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "queryAllDeclaredMethods": true
+  }
+]
