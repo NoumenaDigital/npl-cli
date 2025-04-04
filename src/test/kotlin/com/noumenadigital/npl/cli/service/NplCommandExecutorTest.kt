@@ -18,7 +18,6 @@ class NplCommandExecutorTest : FunSpec({
     lateinit var commandExecutorOutput: ICommandExecutorOutput
     lateinit var writer: OutputStreamWriter
     lateinit var commandSuccess: Command
-    lateinit var commandFailed: Command
     lateinit var nplCommand: INplCommand
     lateinit var nplCommandEnum: NplCliCommandsEnum
     lateinit var executor: ICommandExecutor
@@ -28,7 +27,6 @@ class NplCommandExecutorTest : FunSpec({
         commandExecutorOutput = mockk()
         writer = mockk(relaxed = true)
         commandSuccess = mockk()
-        commandFailed = mockk()
         nplCommandEnum = mockk()
         executor = NplCommandExecutor(commandsParser)
     }
