@@ -1,0 +1,181 @@
+name: "Publish NPL CLI Binaries"
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Override the automatic tag name for the release"
+        required: false
+        type: string
+      release_name:
+        description: "Override the automatic name of the release"
+        required: false
+        type: string
+      draft:
+        description: "Whether to create a draft release"
+        required: false
+        type: boolean
+        default: true
+      prerelease:
+        description: "Whether to mark as prerelease"
+        required: false
+        type: boolean
+        default: false
+      force_release:
+        description: "Force release regardless of Release trailer"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: "publish"
+  cancel-in-progress: false
+
+jobs:
+  determine-version:
+    name: "Determine Release Version"
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.set-version.outputs.release_tag }}
+      release_name: ${{ steps.set-version.outputs.release_name }}
+      should_release: ${{ steps.check-release-flag.outputs.should_release }}
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Check Release Flag"
+        id: check-release-flag
+        run: |
+          # Set environment variable for force release
+          export FORCE_RELEASE="${{ github.event.inputs.force_release }}"
+
+          # Run the script and capture its output
+          OUTPUT=$(.github/scripts/check-release-flag.sh)
+
+          # Extract the should_release value and set as output
+          SHOULD_RELEASE=$(echo "$OUTPUT" | grep "should_release=" | cut -d= -f2)
+          echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
+
+          # Display the full output for debugging
+          echo "$OUTPUT"
+
+      - name: "Determine Release Version"
+        id: set-version
+        if: steps.check-release-flag.outputs.should_release == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Use manual inputs if provided
+          if [ -n "${{ github.event.inputs.release_tag }}" ]; then
+            echo "release_tag=${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
+            echo "release_name=${{ github.event.inputs.release_name || format('NPL CLI {0}', github.event.inputs.release_tag) }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Run the version determination script
+          source .github/scripts/determine-version.sh
+
+          # Copy the script output to GitHub Actions outputs
+          echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
+          echo "release_name=$release_name" >> $GITHUB_OUTPUT
+          echo "Using release tag: $release_tag"
+
+  build-native:
+    name: "Build ${{ matrix.os }}-${{ matrix.arch }} Native Binary"
+    needs: determine-version
+    if: needs.determine-version.outputs.should_release == 'true'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu
+            runner: ubuntu-latest
+            arch: x86_64
+            output_name: npl-cli-linux-x86_64
+          - os: ubuntu
+            runner: linux-arm-64
+            arch: aarch64
+            output_name: npl-cli-linux-aarch64
+          - os: macos
+            runner: macos-13
+            arch: x86_64
+            output_name: npl-cli-macos-x86_64
+          - os: macos
+            runner: macos-latest
+            arch: aarch64
+            output_name: npl-cli-macos-aarch64
+          - os: windows
+            runner: windows-latest
+            arch: x86_64
+            output_name: npl-cli-windows-x86_64.exe
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Set up Maven"
+        uses: actions/setup-java@v4
+        with:
+          distribution: "graalvm"
+          java-version: "21"
+          cache: "maven"
+
+      - name: "Build npl-cli native binary"
+        run: mvn -Pnative package -DskipTests
+
+      - name: "Prepare binary for upload (Linux/macOS)"
+        if: matrix.os != 'windows'
+        run: |
+          mkdir -p dist
+          if [ -f target/npl-cli ]; then
+            cp target/npl-cli dist/${{ matrix.output_name }}
+            chmod +x dist/${{ matrix.output_name }}
+          fi
+
+      - name: "Prepare binary for upload (Windows)"
+        if: matrix.os == 'windows'
+        shell: pwsh
+        run: |
+          mkdir -p dist
+          if (Test-Path target/npl-cli.exe) {
+            Copy-Item target/npl-cli.exe -Destination dist/${{ matrix.output_name }}
+          }
+
+      - name: "Upload native binary artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output_name }}
+          path: dist/${{ matrix.output_name }}
+          if-no-files-found: error
+          retention-days: 30
+
+  create-release:
+    name: "Create GitHub Release"
+    needs: [determine-version, build-native]
+    if: needs.determine-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Download individual artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          path: ./individual-artifacts
+
+      - name: "Create Release"
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ needs.determine-version.outputs.release_tag }}
+          name: ${{ needs.determine-version.outputs.release_name }}
+          body: "NPL CLI release ${{ needs.determine-version.outputs.release_tag }}"
+          commit: ${{ github.sha }}
+          draft: ${{ github.event.inputs.draft || false }}
+          prerelease: ${{ github.event.inputs.prerelease || false }}
+          artifacts: "./individual-artifacts/*/*"
+          artifactErrorsFailBuild: true
