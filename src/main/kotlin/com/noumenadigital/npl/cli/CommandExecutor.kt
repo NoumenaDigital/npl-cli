@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.exception.NplCliException
 import com.noumenadigital.npl.cli.service.CommandExecutorOutput
 import com.noumenadigital.npl.cli.service.CommandsParser
 import com.noumenadigital.npl.cli.service.NplCommandsParser
@@ -24,10 +25,12 @@ class NplCommandExecutor(
                 commandsList.forEach { command ->
                     out.write("Executing command: ${command.nplCliCommandsEnum.commandName}...\n")
                     command.nplCliCommandsEnum.nplCommand?.execute(out)
-                    out.write("\n")
                 }
-            } catch (ex: Exception) {
+            } catch (ex: NplCliException) {
                 ex.message?.let { out.write(it) }
+            } catch (ex: Exception) {
+                ex.message?.let { out.write(ex.stackTraceToString()) }
+            } finally {
                 out.write("\n")
             }
         }
