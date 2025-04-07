@@ -10,7 +10,9 @@ import com.noumenadigital.npl.cli.commands.registry.NplCommand
 import com.noumenadigital.npl.cli.exception.CommandParsingException
 import com.noumenadigital.npl.cli.model.Command
 import io.kotest.core.spec.style.FunSpec
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verifySequence
 import java.io.OutputStreamWriter
