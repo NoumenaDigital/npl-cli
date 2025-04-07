@@ -4,11 +4,11 @@ import com.noumenadigital.npl.cli.commands.NplCliCommandsEnum
 import com.noumenadigital.npl.cli.exception.CommandParsingException
 import com.noumenadigital.npl.cli.model.Command
 
-interface CommandsParser {
+sealed interface CommandsParser {
     fun parse(command: List<String>): List<Command>
 }
 
-class NplCommandsParser : CommandsParser {
+data object NplCommandsParser : CommandsParser {
     override fun parse(command: List<String>): List<Command> {
         if (command.isEmpty()) {
             throw CommandParsingException("No command to execute\n")

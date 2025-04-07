@@ -1,4 +1,4 @@
-name: "Verify"
+name: "Verify and test"
 on:
   pull_request:
     types:

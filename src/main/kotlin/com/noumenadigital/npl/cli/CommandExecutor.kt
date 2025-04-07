@@ -5,7 +5,7 @@ import com.noumenadigital.npl.cli.service.CommandExecutorOutput
 import com.noumenadigital.npl.cli.service.CommandsParser
 import com.noumenadigital.npl.cli.service.NplCommandsParser
 
-interface CommandExecutor {
+sealed interface CommandExecutor {
     fun process(
         commands: List<String>,
         output: CommandExecutorOutput,
@@ -13,8 +13,15 @@ interface CommandExecutor {
 }
 
 class NplCommandExecutor(
-    private val commandsParser: CommandsParser = NplCommandsParser(),
+    private val commandsParser: CommandsParser = NplCommandsParser,
 ) : CommandExecutor {
+    companion object {
+        private const val BEFORE_RESOLUTION_PADDING = "\n\n"
+        private const val START_MESSAGE = "Executing command '%s'...\n"
+        private const val END_MESSAGE_SUCCESS = "${BEFORE_RESOLUTION_PADDING}Command '%s' finished SUCCESSFULLY."
+        private const val END_GENERIC_ERROR_WRAPPER = "Executing command FAILED with error %s"
+    }
+
     override fun process(
         commands: List<String>,
         output: CommandExecutorOutput,
@@ -23,13 +30,15 @@ class NplCommandExecutor(
             try {
                 val commandsList = commandsParser.parse(commands)
                 commandsList.forEach { command ->
-                    out.write("Executing command: ${command.nplCliCommandsEnum.commandName}...\n")
+                    val commandName = command.nplCliCommandsEnum.commandName
+                    out.write(START_MESSAGE.format(commandName))
                     command.nplCliCommandsEnum.nplCommand?.execute(out)
+                    out.write(END_MESSAGE_SUCCESS.format(commandName))
                 }
             } catch (ex: NplCliException) {
                 ex.message?.let { out.write(it) }
             } catch (ex: Exception) {
-                ex.message?.let { out.write(ex.stackTraceToString()) }
+                ex.message?.let { out.write(END_GENERIC_ERROR_WRAPPER.format(ex.stackTraceToString())) }
             } finally {
                 out.write("\n")
             }

@@ -1,8 +1,8 @@
-package com.noumenadigital.npl.cli.commands
+package com.noumenadigital.npl.cli.commands.registry
 
 import java.io.Writer
 
-interface NplCommand {
+sealed interface NplCommand {
     val commandDescription: String
 
     fun execute(output: Writer)

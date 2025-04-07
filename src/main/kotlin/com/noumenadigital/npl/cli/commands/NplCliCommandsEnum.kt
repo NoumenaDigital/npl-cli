@@ -1,8 +1,9 @@
 package com.noumenadigital.npl.cli.commands
 
-import com.noumenadigital.npl.cli.commands.impl.HelloCommand
-import com.noumenadigital.npl.cli.commands.impl.HelpCommand
-import com.noumenadigital.npl.cli.commands.impl.VersionCommand
+import com.noumenadigital.npl.cli.commands.registry.HelloCommand
+import com.noumenadigital.npl.cli.commands.registry.HelpCommand
+import com.noumenadigital.npl.cli.commands.registry.NplCommand
+import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import org.apache.commons.text.similarity.LevenshteinDistance
 

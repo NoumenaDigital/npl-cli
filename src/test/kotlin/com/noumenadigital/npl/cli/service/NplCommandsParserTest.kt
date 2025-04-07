@@ -11,7 +11,7 @@ class NplCommandsParserTest :
     FunSpec({
 
         test("should parse a list of valid command strings into Command objects") {
-            val parser = NplCommandsParser()
+            val parser = NplCommandsParser
             val input = listOf("help")
 
             val result = parser.parse(input)
@@ -21,7 +21,7 @@ class NplCommandsParserTest :
         }
 
         test("should throw CommandParsingException when input list is empty") {
-            val parser = NplCommandsParser()
+            val parser = NplCommandsParser
             val input = emptyList<String>()
 
             shouldThrow<CommandParsingException> {

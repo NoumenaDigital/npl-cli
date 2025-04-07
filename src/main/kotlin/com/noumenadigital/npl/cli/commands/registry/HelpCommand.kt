@@ -1,10 +1,9 @@
-package com.noumenadigital.npl.cli.commands.impl
+package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.commands.NplCliCommandsEnum
-import com.noumenadigital.npl.cli.commands.NplCommand
 import java.io.Writer
 
-object HelpCommand : NplCommand {
+data object HelpCommand : NplCommand {
     override val commandDescription = "Manual for npl-cli commands"
 
     override fun execute(output: Writer) {
