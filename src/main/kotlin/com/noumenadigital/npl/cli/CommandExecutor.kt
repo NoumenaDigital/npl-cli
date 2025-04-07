@@ -18,7 +18,7 @@ class NplCommandExecutor(
     companion object {
         private const val BEFORE_RESOLUTION_PADDING = "\n\n"
         private const val START_MESSAGE = "Executing command '%s'...\n"
-        private const val END_MESSAGE_SUCCESS = "${BEFORE_RESOLUTION_PADDING}Command '%s' finished SUCCESSFULLY."
+        private const val END_MESSAGE_SUCCESS = "${BEFORE_RESOLUTION_PADDING}Command '%s' finished SUCCESSFULLY.\n"
         private const val END_GENERIC_ERROR_WRAPPER = "Executing command FAILED with error %s"
     }
 
