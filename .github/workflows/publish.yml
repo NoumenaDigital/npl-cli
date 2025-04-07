@@ -73,7 +73,13 @@ jobs:
           # Use manual inputs if provided
           if [ -n "${{ github.event.inputs.release_tag }}" ]; then
             echo "release_tag=${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
-            echo "release_name=${{ github.event.inputs.release_name || format('NPL CLI {0}', github.event.inputs.release_tag) }}" >> $GITHUB_OUTPUT
+
+            if [ -n "${{ github.event.inputs.release_name }}" ]; then
+              echo "release_name=${{ github.event.inputs.release_name }}" >> $GITHUB_OUTPUT
+            else
+              echo "release_name=NPL CLI ${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
+            fi
+
             exit 0
           fi
 
