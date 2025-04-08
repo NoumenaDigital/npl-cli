@@ -2,7 +2,7 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import java.io.Writer
 
-class VersionCommand : NplCommand {
+class VersionCommand : NplCommandExecutor {
     companion object {
         const val COMMAND_DESCRIPTION = "Command to return current npl cli version"
     }

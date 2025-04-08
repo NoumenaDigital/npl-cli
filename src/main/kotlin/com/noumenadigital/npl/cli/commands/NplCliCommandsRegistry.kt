@@ -2,7 +2,7 @@ package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.commands.registry.GenericCommand
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
-import com.noumenadigital.npl.cli.commands.registry.NplCommand
+import com.noumenadigital.npl.cli.commands.registry.NplCommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import org.apache.commons.text.similarity.LevenshteinDistance
@@ -17,9 +17,9 @@ object NplCliCommandsRegistry {
     fun commandFromString(
         command: String,
         params: List<String>? = null,
-    ): NplCommand {
+    ): NplCommandExecutor {
         val normalizedCommand = command.lowercase()
-        return commands[normalizedCommand]?.command?.invoke(params)
+        return commands[normalizedCommand]?.executor?.invoke(params)
             ?: throw CommandNotFoundException(buildErrorMessage(normalizedCommand))
     }
 

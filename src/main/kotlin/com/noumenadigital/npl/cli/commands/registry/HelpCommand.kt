@@ -5,7 +5,7 @@ import java.io.Writer
 
 data class HelpCommand(
     val params: List<String>?,
-) : NplCommand {
+) : NplCommandExecutor {
     companion object {
         const val COMMAND_DESCRIPTION = "Manual for npl-cli commands"
     }
@@ -18,7 +18,7 @@ data class HelpCommand(
 
         entries.forEach { entry ->
             val name = entry.key.padEnd(padding)
-            val description = entry.value.commandDescription ?: "No description available"
+            val description = entry.value.description ?: "No description available"
             output.write("$name$description\n")
         }
     }
