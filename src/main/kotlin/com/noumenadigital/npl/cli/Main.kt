@@ -1,7 +1,7 @@
 package com.noumenadigital.npl.cli
 
-import com.noumenadigital.npl.cli.service.NplWriterOutput
+import java.io.OutputStreamWriter
 
 fun main(args: Array<String>) {
-    NplCommandExecutor().process(args.toList(), NplWriterOutput)
+    NplCommandExecutor().process(args.toList(), OutputStreamWriter(System.out))
 }
