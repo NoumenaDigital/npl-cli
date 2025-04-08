@@ -11,7 +11,7 @@ object NplCliCommandsRegistry {
     private val commands: Map<String, GenericCommand> =
         mapOf(
             "version" to GenericCommand(VersionCommand.COMMAND_DESCRIPTION) { VersionCommand() },
-            "help" to GenericCommand(HelpCommand.COMMAND_DESCRIPTION) { a -> HelpCommand(a) },
+            "help" to GenericCommand(HelpCommand.COMMAND_DESCRIPTION) { param -> HelpCommand(param) },
         )
 
     fun commandFromString(
