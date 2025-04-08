@@ -1,62 +1,60 @@
 package com.noumenadigital.npl.cli.intergration
 
 import com.noumenadigital.npl.cli.NplCommandExecutor
-import com.noumenadigital.npl.cli.TestUtils.Companion.END_COMMAND_RESULT_SUCCESS
-import com.noumenadigital.npl.cli.TestUtils.Companion.START_COMMAND_MESSAGE
-import com.noumenadigital.npl.cli.commands.NplCliCommands
+import com.noumenadigital.npl.cli.service.NplCommandsParser
 import io.kotest.core.spec.style.FunSpec
-import io.mockk.mockk
-import io.mockk.verifySequence
-import java.io.OutputStreamWriter
+import io.kotest.matchers.shouldBe
+import java.io.StringWriter
+import java.io.Writer
 
 class NplCliIntegrationTest :
     FunSpec({
-
-        lateinit var writer: OutputStreamWriter
-        lateinit var nplCommandExecutor: NplCommandExecutor
+        lateinit var commandsParser: NplCommandsParser
+        lateinit var writer: Writer
+        lateinit var executor: NplCommandExecutor
 
         beforeTest {
-            writer = mockk(relaxed = true)
-            nplCommandExecutor = NplCommandExecutor()
+            commandsParser = NplCommandsParser
+            executor = NplCommandExecutor(commandsParser)
+            writer = StringWriter()
         }
 
-        test("Command executed successfully") {
-            val commandName = "version"
-            nplCommandExecutor.process(listOf(commandName), writer)
+        test("should execute parsed command and write output") {
 
-            verifySequence {
-                writer.write(START_COMMAND_MESSAGE.format(commandName))
-                writer.write(any<String>())
-                writer.write(END_COMMAND_RESULT_SUCCESS.format(commandName))
-                writer.close()
-            }
+            executor.process(listOf("version"), writer)
+
+            val expectedOutput =
+                """
+                Executing command 'version'...
+                I'm v1.0
+
+                Command 'version' finished SUCCESSFULLY.
+
+                """.trimIndent()
+            writer.toString() shouldBe expectedOutput
         }
 
-        test("Suggested command") {
-            nplCommandExecutor.process(listOf("vers"), writer)
+        test("only one command can be executed at the time") {
 
-            verifySequence {
-                writer.write("Command not supported: 'vers'. Did you mean 'version'?")
-                writer.close()
-            }
+            executor.process(listOf("version", "help"), writer)
+
+            val expectedOutput =
+                """
+                Invalid command line input. Only 1 command can be processed, but was [version, help]
+
+                """.trimIndent()
+            writer.toString() shouldBe expectedOutput
         }
 
-        test("No command found") {
-            nplCommandExecutor.process(listOf("foo"), writer)
+        test("null command cannot be executed") {
 
-            verifySequence {
-                writer.write("Command not supported: 'foo'.")
-                writer.close()
-            }
-        }
+            executor.process(emptyList(), writer)
 
-        test("Only command can be processed") {
-            val commandNames = NplCliCommands.entries.map { it.commandName }
-            nplCommandExecutor.process(commandNames, writer)
+            val expectedOutput =
+                """
+                Invalid command line input. No command to execute
 
-            verifySequence {
-                writer.write("Invalid command line input. Only 1 command can be processed, but was $commandNames\n")
-                writer.close()
-            }
+                """.trimIndent()
+            writer.toString() shouldBe expectedOutput
         }
     })
