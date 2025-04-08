@@ -36,7 +36,6 @@
         <kotest.version>5.9.1</kotest.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <commons-text.version>1.10.0</commons-text.version>
-        <org.eclipse.lsp4j.version>0.24.0</org.eclipse.lsp4j.version>
         <slf4j-api.version>2.0.16</slf4j-api.version>
         <logback-classic.version>1.4.14</logback-classic.version>
         <mockk-jvm.version>1.13.17</mockk-jvm.version>
