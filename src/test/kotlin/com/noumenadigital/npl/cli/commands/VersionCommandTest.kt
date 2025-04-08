@@ -11,7 +11,7 @@ class VersionCommandTest :
         test("should write version string to output") {
             // Given
             val writer = StringWriter()
-            val command = VersionCommand
+            val command = VersionCommand()
 
             // When
             command.execute(writer)
@@ -25,6 +25,6 @@ class VersionCommandTest :
             val command = VersionCommand
 
             // Then
-            command.commandDescription shouldBe "Command to return current npl cli version"
+            command.COMMAND_DESCRIPTION shouldBe "Command to return current npl cli version"
         }
     })
