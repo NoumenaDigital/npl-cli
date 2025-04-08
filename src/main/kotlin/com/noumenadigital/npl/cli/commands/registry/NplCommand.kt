@@ -1,9 +1,9 @@
 package com.noumenadigital.npl.cli.commands.registry
 
-import java.io.Writer
+import com.noumenadigital.npl.cli.model.CommandContext
 
 sealed interface NplCommand {
     val commandDescription: String
 
-    fun execute(output: Writer)
+    fun execute(commandContext: CommandContext)
 }

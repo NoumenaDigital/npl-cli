@@ -6,7 +6,7 @@ open class NplCliException(
 
 class CommandParsingException(
     s: String,
-) : NplCliException(s)
+) : NplCliException("Invalid command line input. $s")
 
 class CommandNotFoundException(
     s: String,

@@ -7,7 +7,7 @@ import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import org.apache.commons.text.similarity.LevenshteinDistance
 
-enum class NplCliCommandsEnum(
+enum class NplCliCommands(
     val commandName: String,
     val nplCommand: NplCommand? = null,
 ) {
@@ -17,7 +17,7 @@ enum class NplCliCommandsEnum(
     ;
 
     companion object {
-        fun commandFromString(command: String): NplCliCommandsEnum =
+        fun commandFromString(command: String): NplCliCommands =
             entries.find { it.commandName.equals(command, ignoreCase = true) }
                 ?: throw CommandNotFoundException(buildErrorMessage(command))
 
@@ -31,7 +31,7 @@ enum class NplCliCommandsEnum(
             }
         }
 
-        private fun suggestClosestCommand(input: String): NplCliCommandsEnum? {
+        private fun suggestClosestCommand(input: String): NplCliCommands? {
             val distanceCalc = LevenshteinDistance()
             return entries
                 .map { it to distanceCalc.apply(it.commandName.lowercase(), input.lowercase()) }

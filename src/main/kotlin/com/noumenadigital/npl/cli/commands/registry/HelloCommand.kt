@@ -1,11 +1,11 @@
 package com.noumenadigital.npl.cli.commands.registry
 
-import java.io.Writer
+import com.noumenadigital.npl.cli.model.CommandContext
 
 data object HelloCommand : NplCommand {
     override val commandDescription = "Command to return hello string"
 
-    override fun execute(output: Writer) {
-        output.write("Hello")
+    override fun execute(commandContext: CommandContext) {
+        commandContext.output.write("Hello")
     }
 }

@@ -1,10 +1,9 @@
 package com.noumenadigital.npl.cli.service
 
-import com.noumenadigital.npl.cli.commands.NplCliCommandsEnum
+import com.noumenadigital.npl.cli.commands.NplCliCommands
 import com.noumenadigital.npl.cli.exception.CommandParsingException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 
 class NplCommandsParserTest :
@@ -16,8 +15,7 @@ class NplCommandsParserTest :
 
             val result = parser.parse(input)
 
-            result shouldHaveSize 1
-            result[0].nplCliCommandsEnum shouldBe NplCliCommandsEnum.commandFromString("help")
+            result shouldBe NplCliCommands.commandFromString("help")
         }
 
         test("should throw CommandParsingException when input list is empty") {

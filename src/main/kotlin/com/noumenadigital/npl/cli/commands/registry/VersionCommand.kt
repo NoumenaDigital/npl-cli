@@ -1,11 +1,11 @@
 package com.noumenadigital.npl.cli.commands.registry
 
-import java.io.Writer
+import com.noumenadigital.npl.cli.model.CommandContext
 
 data object VersionCommand : NplCommand {
     override val commandDescription = "Command to return current npl cli version"
 
-    override fun execute(output: Writer) {
-        output.write("I'm v1.0")
+    override fun execute(commandContext: CommandContext) {
+        commandContext.output.write("I'm v1.0")
     }
 }
