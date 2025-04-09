@@ -1,8 +1,6 @@
 package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.commands.Commands
-import com.noumenadigital.npl.cli.exception.CommandParsingException
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -18,12 +16,11 @@ class CommandsParserTest :
             result shouldBe Commands.commandFromString("help")
         }
 
-        test("should throw CommandParsingException when input list is empty") {
+        test("should execute help command input list is empty") {
             val parser = CommandsParser
             val input = emptyList<String>()
 
-            shouldThrow<CommandParsingException> {
-                parser.parse(input)
-            }
+            val result = parser.parse(input)
+            result shouldBe Commands.commandFromString("help")
         }
     })

@@ -29,12 +29,38 @@ class CommandProcessorServiceTest :
                 writer.toString() shouldBe expectedOutput
             }
         }
-        test("null command cannot be executed") {
+        test("should execute 'help' command if not input provided") {
             withTestContext {
                 executor.process(emptyList(), writer)
                 val expectedOutput =
                     """
-                    No command provided
+                    Executing command 'help'...
+                    version    Display the current version of the NPL CLI
+                    help       Display the description for npl-cli commands
+
+                    Command 'help' finished SUCCESSFULLY.
+                    """.trimIndent()
+                writer.toString() shouldBe expectedOutput
+            }
+        }
+
+        test("should print error message if command cannot be found") {
+            withTestContext {
+                executor.process(listOf("nonExistingCommand"), writer)
+                val expectedOutput =
+                    """
+                    Command not supported: 'nonexistingcommand'.
+                    """.trimIndent()
+                writer.toString() shouldBe expectedOutput
+            }
+        }
+
+        test("should suggest another command if there is match with existing command") {
+            withTestContext {
+                executor.process(listOf("vers"), writer)
+                val expectedOutput =
+                    """
+                    Command not supported: 'vers'. Did you mean 'version'?
                     """.trimIndent()
                 writer.toString() shouldBe expectedOutput
             }
