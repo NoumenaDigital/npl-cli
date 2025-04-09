@@ -3,8 +3,7 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
 import com.noumenadigital.npl.cli.exception.InternalException
-import com.noumenadigital.npl.cli.exception.errorMessage
-import com.noumenadigital.npl.cli.exception.genericErrorMessage
+import com.noumenadigital.npl.cli.exception.buildOutputMessage
 import com.noumenadigital.npl.cli.service.CommandsParser
 import java.io.Writer
 
@@ -28,11 +27,11 @@ class CommandProcessor(
                 out.write(END_MESSAGE_SUCCESS.format(command.commandName))
             } catch (ex: InternalException) {
                 when (ex) {
-                    is CommandNotFoundException -> output.write(ex.errorMessage())
-                    is CommandParsingException -> output.write(ex.errorMessage())
+                    is CommandNotFoundException -> output.write(ex.buildOutputMessage())
+                    is CommandParsingException -> output.write(ex.buildOutputMessage())
                 }
             } catch (ex: Exception) {
-                ex.genericErrorMessage(inputArgs)
+                ex.buildOutputMessage(inputArgs)
             }
         }
     }

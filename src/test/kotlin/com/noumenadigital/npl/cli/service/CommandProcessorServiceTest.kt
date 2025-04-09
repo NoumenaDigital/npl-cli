@@ -34,7 +34,7 @@ class CommandProcessorServiceTest :
                 executor.process(emptyList(), writer)
                 val expectedOutput =
                     """
-                    Command [] cannot be parsed
+                    No command provided
                     """.trimIndent()
                 writer.toString() shouldBe expectedOutput
             }
