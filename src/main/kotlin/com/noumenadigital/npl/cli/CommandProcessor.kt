@@ -1,6 +1,11 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.exception.CommandNotFoundException
+import com.noumenadigital.npl.cli.exception.CommandParsingException
 import com.noumenadigital.npl.cli.exception.InternalException
+import com.noumenadigital.npl.cli.exception.buildCommandNotFoundErrorMessage
+import com.noumenadigital.npl.cli.exception.buildCommandParsingErrorMessage
+import com.noumenadigital.npl.cli.exception.buildGenericErrorMessage
 import com.noumenadigital.npl.cli.service.CommandsParser
 import java.io.Writer
 
@@ -10,7 +15,6 @@ class CommandProcessor(
     companion object {
         private const val START_MESSAGE = "Executing command '%s'...\n"
         private const val END_MESSAGE_SUCCESS = "\nCommand '%s' finished SUCCESSFULLY."
-        private const val END_GENERIC_ERROR_WRAPPER = "Executing command FAILED. %s"
     }
 
     fun process(
@@ -24,9 +28,19 @@ class CommandProcessor(
                 command.execute(out)
                 out.write(END_MESSAGE_SUCCESS.format(command.commandName))
             } catch (ex: InternalException) {
-                ex.message?.let { out.write(END_GENERIC_ERROR_WRAPPER.format(it)) }
+                when (ex) {
+                    is CommandNotFoundException ->
+                        output.write(
+                            buildCommandNotFoundErrorMessage(
+                                commandName = ex.commandName,
+                                suggestedCommandName = ex.suggestedCommand,
+                            ),
+                        )
+
+                    is CommandParsingException -> output.write(buildCommandParsingErrorMessage(ex.commands))
+                }
             } catch (ex: Exception) {
-                ex.message?.let { out.write(END_GENERIC_ERROR_WRAPPER.format(ex.stackTraceToString())) }
+                buildGenericErrorMessage(inputArgs, ex.stackTraceToString())
             }
         }
     }

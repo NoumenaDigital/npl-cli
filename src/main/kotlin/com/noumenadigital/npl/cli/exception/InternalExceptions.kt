@@ -1,13 +1,12 @@
 package com.noumenadigital.npl.cli.exception
 
-open class InternalException(
-    message: String,
-) : RuntimeException(message)
+sealed class InternalException : RuntimeException()
 
 class CommandParsingException(
-    message: String,
-) : InternalException(message)
+    val commands: List<String> = emptyList(),
+) : InternalException()
 
 class CommandNotFoundException(
-    message: String,
-) : InternalException(message)
+    val commandName: String,
+    val suggestedCommand: String? = null,
+) : InternalException()
