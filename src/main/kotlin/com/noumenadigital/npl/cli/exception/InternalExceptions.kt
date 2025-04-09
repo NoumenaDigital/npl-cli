@@ -8,5 +8,4 @@ class CommandParsingException(
 
 class CommandNotFoundException(
     val commandName: String,
-    val suggestedCommand: String? = null,
 ) : InternalException()
