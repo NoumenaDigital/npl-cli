@@ -1,24 +1,20 @@
 package com.noumenadigital.npl.cli.commands.registry
 
-import com.noumenadigital.npl.cli.commands.NplCliCommandsRegistry
+import com.noumenadigital.npl.cli.commands.CommandsRegistry
 import java.io.Writer
 
-data class HelpCommand(
-    val params: List<String>?,
-) : NplCommandExecutor {
-    companion object {
-        const val COMMAND_DESCRIPTION = "Manual for npl-cli commands"
-    }
+data object HelpCommand : CommandExecutor {
+    const val COMMAND_DESCRIPTION = "Display the description for npl-cli commands"
 
     override val commandName: String = "help"
 
     override fun execute(output: Writer) {
-        val entries = NplCliCommandsRegistry.registeredCommands
+        val entries = CommandsRegistry.registeredCommands
         val padding = entries.keys.maxOf { it.length } + 4
 
-        entries.forEach { entry ->
-            val name = entry.key.padEnd(padding)
-            val description = entry.value.description ?: "No description available"
+        entries.forEach { registeredCommand ->
+            val name = registeredCommand.key.padEnd(padding)
+            val description = registeredCommand.value
             output.write("$name$description\n")
         }
     }

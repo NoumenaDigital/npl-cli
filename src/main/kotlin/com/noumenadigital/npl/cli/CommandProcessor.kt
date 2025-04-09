@@ -1,16 +1,15 @@
 package com.noumenadigital.npl.cli
 
-import com.noumenadigital.npl.cli.exception.NplCliException
-import com.noumenadigital.npl.cli.service.NplCommandsParser
+import com.noumenadigital.npl.cli.exception.InternalException
+import com.noumenadigital.npl.cli.service.CommandsParser
 import java.io.Writer
 
-class NplCommandExecutor(
-    private val commandsParser: NplCommandsParser = NplCommandsParser,
+class CommandProcessor(
+    private val commandsParser: CommandsParser = CommandsParser,
 ) {
     companion object {
-        private const val BEFORE_RESOLUTION_PADDING = "\n\n"
         private const val START_MESSAGE = "Executing command '%s'...\n"
-        private const val END_MESSAGE_SUCCESS = "${BEFORE_RESOLUTION_PADDING}Command '%s' finished SUCCESSFULLY.\n"
+        private const val END_MESSAGE_SUCCESS = "\nCommand '%s' finished SUCCESSFULLY."
         private const val END_GENERIC_ERROR_WRAPPER = "Executing command FAILED. %s"
     }
 
@@ -24,7 +23,7 @@ class NplCommandExecutor(
                 out.write(START_MESSAGE.format(command.commandName))
                 command.execute(out)
                 out.write(END_MESSAGE_SUCCESS.format(command.commandName))
-            } catch (ex: NplCliException) {
+            } catch (ex: InternalException) {
                 ex.message?.let { out.write(END_GENERIC_ERROR_WRAPPER.format(it)) }
             } catch (ex: Exception) {
                 ex.message?.let { out.write(END_GENERIC_ERROR_WRAPPER.format(ex.stackTraceToString())) }
