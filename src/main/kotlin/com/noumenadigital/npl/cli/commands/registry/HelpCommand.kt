@@ -9,12 +9,12 @@ data object HelpCommand : CommandExecutor {
     override val commandName: String = "help"
 
     override fun execute(output: Writer) {
-        val entries = CommandsRegistry.registeredCommands
-        val padding = entries.keys.maxOf { it.length } + 4
+        val entries = Command.entries
+        val padding = entries.maxOf { it.commandName.length } + 4
 
-        entries.forEach { registeredCommand ->
-            val name = registeredCommand.key.padEnd(padding)
-            val description = registeredCommand.value
+        entries.forEach { command ->
+            val name = command.commandName.padEnd(padding)
+            val description = command.description
             output.write("$name$description\n")
         }
     }
