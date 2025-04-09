@@ -34,18 +34,6 @@ class NplIntegrationTest :
             writer.toString() shouldBe expectedOutput
         }
 
-        test("only one command can be executed at the time") {
-
-            executor.process(listOf("version", "help"), writer)
-
-            val expectedOutput =
-                """
-                Executing command FAILED. Only 1 command can be processed
-
-                """.trimIndent()
-            writer.toString() shouldBe expectedOutput
-        }
-
         test("null command cannot be executed") {
 
             executor.process(emptyList(), writer)

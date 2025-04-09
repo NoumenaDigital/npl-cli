@@ -9,9 +9,8 @@ object NplCommandsParser {
         if (command.isEmpty()) {
             throw CommandParsingException("No command to execute\n")
         }
-        if (command.size != 1) {
-            throw CommandParsingException("Only 1 command can be processed\n")
-        }
-        return NplCliCommandsRegistry.commandFromString(command.first(), null)
+        val commandName = command.first()
+        val arguments = if (command.size > 1) command.drop(1) else emptyList()
+        return NplCliCommandsRegistry.commandFromString(commandName, arguments)
     }
 }

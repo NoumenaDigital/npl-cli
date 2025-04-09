@@ -16,7 +16,7 @@ object NplCliCommandsRegistry {
 
     fun commandFromString(
         command: String,
-        params: List<String>? = null,
+        params: List<String>? = emptyList(),
     ): NplCommandExecutor {
         val normalizedCommand = command.lowercase()
         return commands[normalizedCommand]?.executor?.invoke(params)
