@@ -29,7 +29,7 @@ class CommandProcessorServiceTest :
                 writer.toString() shouldBe expectedOutput
             }
         }
-        test("should execute 'help' command if not input provided") {
+        test("should execute 'help' command if no input provided") {
             withTestContext {
                 executor.process(emptyList(), writer)
                 val expectedOutput =
