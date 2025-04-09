@@ -34,18 +34,6 @@ class NplCliIntegrationTest :
             writer.toString() shouldBe expectedOutput
         }
 
-        test("only one command can be executed at the time") {
-
-            executor.process(listOf("version", "help"), writer)
-
-            val expectedOutput =
-                """
-                Invalid command line input. Only 1 command can be processed, but was [version, help]
-
-                """.trimIndent()
-            writer.toString() shouldBe expectedOutput
-        }
-
         test("null command cannot be executed") {
 
             executor.process(emptyList(), writer)

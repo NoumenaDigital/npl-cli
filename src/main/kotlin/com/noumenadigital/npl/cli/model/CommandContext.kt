@@ -4,5 +4,5 @@ import java.io.Writer
 
 data class CommandContext(
     val output: Writer,
-    val params: List<String>? = null,
+    val params: List<String>? = emptyList(),
 )

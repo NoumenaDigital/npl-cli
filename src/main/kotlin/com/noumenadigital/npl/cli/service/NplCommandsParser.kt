@@ -8,9 +8,6 @@ data object NplCommandsParser {
         if (commands.isEmpty()) {
             throw CommandParsingException("No command to execute\n")
         }
-        if (commands.size != 1) {
-            throw CommandParsingException("Only 1 command can be processed, but was $commands\n")
-        }
         return NplCliCommands.commandFromString(commands.first())
     }
 }
