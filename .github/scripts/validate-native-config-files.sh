@@ -2,7 +2,7 @@
 set -e
 
 # Run the generate-native-configs.sh script
-printf "Running generate-native-configs.sh..."
+printf "\nRunning generate-native-configs.sh..."
 ./generate-native-configs.sh
 
 # Check for git diff
@@ -12,5 +12,5 @@ if [[ -n $(git diff --ignore-all-space) ]]; then
   exit 1
 fi
 
-printf "Validation passed: No changes detected after running generate-native-configs.sh."
+printf "\nValidation passed: No changes detected after running generate-native-configs.sh."
 exit 0
