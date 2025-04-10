@@ -7,7 +7,7 @@ printf "\nRunning generate-native-configs.sh..."
 
 # Check for git diff
 printf "\nValidating that there are no changes in the repository..."
-if [[ -n $(git diff --ignore-all-space) ]]; then
+if [[ -n $(git diff --ignore-blank-lines) ]]; then
   printf "\nError: Running generate-native-configs.sh resulted in changes to the repository."
   exit 1
 fi
