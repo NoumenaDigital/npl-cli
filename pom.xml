@@ -4,7 +4,7 @@
 
     <groupId>com.noumenadigital.platform</groupId>
     <artifactId>npl-cli</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>2025.1.2</version>
     <name>${project.artifactId}</name>
     <description>NPL CLI is a command-line tool designed to interact with the NPL Runtime and NOUMENA Cloud
     </description>
@@ -34,6 +34,8 @@
         <kotest.version>5.9.1</kotest.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <commons-text.version>1.10.0</commons-text.version>
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <native-maven-plugin.version>0.10.6</native-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -124,4 +126,78 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>${maven-jar-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>default-jar</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-maven-plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>npl</imageName>
+                            <buildArgs>
+                                <buildArg>--strict-image-heap</buildArg>
+                                <buildArg>--enable-sbom</buildArg>
+                            </buildArgs>
+                            <mainClass>com.noumenadigital.npl.cli.MainKt</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>buildFatjar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <finalName>npl-cli</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.noumenadigital.npl.cli.MainKt</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
