@@ -25,5 +25,51 @@ jobs:
           java-version: "21"
           cache: "maven"
 
-      - name: "Verify"
-        run: "mvn clean verify"
+      - name: "Validate native config diff"
+        run: .github/scripts/validate-native-config-files.sh
+
+      - name: "Validate CLI version matches latest platform release"
+        run: .github/scripts/validate-version.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  verify-native:
+    name: "Build and verify ${{ matrix.os }}-${{ matrix.arch }} Native Binary"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu
+            runner: ubuntu-latest
+            arch: x86_64
+            output_name: npl-cli-linux-x86_64
+          - os: ubuntu
+            runner: linux-arm-64
+            arch: aarch64
+            output_name: npl-cli-linux-aarch64
+          - os: macos
+            runner: macos-13
+            arch: x86_64
+            output_name: npl-cli-macos-x86_64
+          - os: macos
+            runner: macos-latest
+            arch: aarch64
+            output_name: npl-cli-macos-aarch64
+          - os: windows
+            runner: windows-latest
+            arch: x86_64
+            output_name: npl-cli-windows-x86_64.exe
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Set up Maven"
+        uses: actions/setup-java@v4
+        with:
+          distribution: "graalvm"
+          java-version: "21"
+          cache: "maven"
+
+      - name: "Build npl-cli native binary"
+        run: mvn -Pnative clean verify
