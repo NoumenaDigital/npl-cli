@@ -1,0 +1,12 @@
+package processes
+
+use objects.iou.Iou
+
+@api
+protocol[iouOwner, carOwner] Settle(var iou: Iou) {
+    @api
+    permission[iouOwner | carOwner] swap() {
+        // Transfer logic.
+        iou.forgive[iouOwner]();
+    };
+};

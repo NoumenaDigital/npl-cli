@@ -1,0 +1,15 @@
+package objects.car
+
+// Using a type from another package without importing it
+enum Color {
+    Red, Blue, Yellow, Green, Black
+};
+
+@api
+// Reference to non-existent variable type "Vehicle" from another package
+protocol[owner] Car(var model: Text, var color: Color, var details: Vehicle) {
+    @api
+    permission[owner] changeColor(newColor: Color) {
+        this.color = newColor;
+    };
+};

@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli.commands
 
+import com.noumenadigital.npl.cli.commands.registry.CheckCommand
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
@@ -19,6 +20,11 @@ enum class Commands(
         "help",
         HelpCommand.COMMAND_DESCRIPTION,
         { HelpCommand },
+    ),
+    CHECK(
+        "check",
+        CheckCommand.COMMAND_DESCRIPTION,
+        { CheckCommand },
     ),
     ;
 

@@ -1,0 +1,13 @@
+package objects.car
+
+enum Color {
+    Red, Blue, Yellow, Green, Black
+};
+
+@api
+protocol[owner] Car(var model: Text, var color: Color) {
+    @api
+    permission[owner] changeColor(newColor: Color) {
+        this.color = newColor;
+    };
+};
