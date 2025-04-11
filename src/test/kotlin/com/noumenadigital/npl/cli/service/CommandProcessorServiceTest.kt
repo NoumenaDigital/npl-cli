@@ -22,9 +22,7 @@ class CommandProcessorServiceTest :
                 executor.process(listOf("version"), writer)
                 val expectedOutput =
                     """
-                    Executing command 'version'...
                     I'm v1.0
-                    Command 'version' finished SUCCESSFULLY.
                     """.trimIndent()
                 writer.toString() shouldBe expectedOutput
             }
@@ -34,13 +32,11 @@ class CommandProcessorServiceTest :
                 executor.process(emptyList(), writer)
                 val expectedOutput =
                     """
-                    Executing command 'help'...
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
                     check      Validate the correctness of the NPL sources (excluding test sources) in the current directory.
+                    """.trimIndent() + "\n"
 
-                    Command 'help' finished SUCCESSFULLY.
-                    """.trimIndent()
                 writer.toString() shouldBe expectedOutput
             }
         }
