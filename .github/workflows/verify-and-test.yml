@@ -25,16 +25,14 @@ jobs:
           java-version: "21"
           cache: "maven"
 
-      - name: "Validate native config no diff"
-        run: mvn -Pnative package -DskipTests
+      - name: "Validate native config diff"
+        run: .github/scripts/validate-native-configs.sh
+
+      - name: "Validate CLI version matches latest platform release"
+        run: .github/scripts/validate-version.sh
 
       - name: "Validate cli tool"
         run: mvn -Pnative package -DskipTests
 
       - name: "Verify"
         run: "mvn clean verify"
-
-
-
-      - name: "Validate the version"
-        run: mvn -Pnative package -DskipTests

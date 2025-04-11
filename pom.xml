@@ -4,7 +4,7 @@
 
     <groupId>com.noumenadigital.platform</groupId>
     <artifactId>npl-cli</artifactId>
-    <version>2025.1.2</version>
+    <version>2025.1.2-3</version>
     <name>${project.artifactId}</name>
     <description>NPL CLI is a command-line tool designed to interact with the NPL Runtime and NOUMENA Cloud
     </description>
