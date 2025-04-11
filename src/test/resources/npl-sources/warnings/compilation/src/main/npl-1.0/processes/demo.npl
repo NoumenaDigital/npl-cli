@@ -1,0 +1,19 @@
+package processes
+
+use objects.car.Car
+use objects.car.Color
+use objects.iou.Iou
+
+const bob = 'Bob';
+const alice = 'Alice';
+
+function demoIou() -> {
+    Iou[bob, alice](100);
+};
+
+function demoSettle() -> {
+    var car = Car[bob]("VW Beetle", Color.Red);
+    var iou = Iou[bob, alice](5000);
+
+    Settle[alice, bob](iou, car);
+};
