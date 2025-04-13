@@ -32,14 +32,25 @@ data object CheckCommand : CommandExecutor, BaseDirectoryAware {
         var sourceDirectoryMissing = false
 
         try {
-            val mainSourceDir = "src/main/npl"
-            val mainSourceDirExists = resolveFile(mainSourceDir).exists()
+            val defaultSourceDir = "src/main/npl"
+            var sourceDir = defaultSourceDir
+            val defaultSourceDirExists = resolveFile(defaultSourceDir).exists()
 
-            output.write("Looking for NPL files in ${if (mainSourceDirExists) mainSourceDir else "src"}\n")
+            if (!defaultSourceDirExists) {
+                // Look for src/main/npl* directories and select the one with highest number
+                val nplDirs = findNplVersionDirectories()
+                if (nplDirs.isNotEmpty()) {
+                    sourceDir = nplDirs.last()
+                }
+            }
+
+            val sourceDirExists = resolveFile(sourceDir).exists()
+
+            output.write("Looking for NPL files in $sourceDir\n")
 
             val mainResult =
-                if (mainSourceDirExists) {
-                    checkDirectory(mainSourceDir, output)
+                if (sourceDirExists) {
+                    checkDirectory(sourceDir, output)
                 } else {
                     output.write("No NPL source files found\n\n")
                     sourceDirectoryMissing = true
@@ -47,7 +58,7 @@ data object CheckCommand : CommandExecutor, BaseDirectoryAware {
                 }
 
             // Make sure we have exactly ONE newline before the result message
-            if (mainSourceDirExists) {
+            if (sourceDirExists) {
                 output.write("\n")
             }
 
@@ -61,6 +72,24 @@ data object CheckCommand : CommandExecutor, BaseDirectoryAware {
             output.write("\nNPL check failed: ${e.message}\n")
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
         }
+    }
+
+    private fun findNplVersionDirectories(): List<String> {
+        val srcMainDir = resolveFile("src/main")
+        if (!srcMainDir.exists() || !srcMainDir.isDirectory) {
+            return emptyList()
+        }
+
+        val nplDirPattern = "npl.*".toRegex()
+        return srcMainDir
+            .listFiles()
+            ?.filter { it.isDirectory && nplDirPattern.matches(it.name) }
+            ?.map { "src/main/${it.name}" }
+            ?.sortedBy { dir ->
+                // Extract version number if present
+                val versionMatch = "npl-([0-9.]+)".toRegex().find(dir)
+                versionMatch?.groupValues?.get(1) ?: dir
+            } ?: emptyList()
     }
 
     private fun resolveFile(path: String): File = baseDirectory?.resolve(path)?.toFile() ?: File(path)

@@ -126,6 +126,23 @@ class CheckCommandTest :
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
                 }
             }
+
+            test("versioned npl directory fallback") {
+                withTestContext("success/versioned_dirs") {
+                    executor.process(listOf("check"), writer)
+                    val expectedOutput =
+                        normalizeOutput(
+                            """
+                            Looking for NPL files in src/main/npl-141.2
+                            Completed compilation for 1 file in XXX ms
+
+                            NPL check completed successfully.
+                            """.trimIndent() + "\n",
+                        )
+
+                    normalizeOutput(writer.toString()) shouldBe expectedOutput
+                }
+            }
         }
 
         context("failure") {
@@ -183,6 +200,27 @@ class CheckCommandTest :
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
                 }
             }
+
+            test("versioned directory with errors") {
+                withTestContext("failure/versioned_dir_errors") {
+                    executor.process(listOf("check"), writer)
+                    val expectedOutput =
+                        normalizeOutput(
+                            """
+                            Looking for NPL files in src/main/npl-141.1
+                            $ANSI_RED$absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 11) E0001: Syntax error: missing {<EOF>, ';'} at 'this'$ANSI_RESET
+                            $ANSI_RED$absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 16) E0001: Syntax error: missing {<EOF>, ';'} at 'will'$ANSI_RESET
+                            $ANSI_RED$absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 21) E0001: Syntax error: missing {<EOF>, ';'} at 'cause'$ANSI_RESET
+                            $ANSI_RED$absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 27) E0001: Syntax error: missing {<EOF>, ';'} at 'syntax'$ANSI_RESET
+                            $ANSI_RED$absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 34) E0001: Syntax error: missing {<EOF>, ';'} at 'error'$ANSI_RESET
+
+                            NPL check failed with errors.
+                            """.trimIndent() + "\n",
+                        )
+
+                    normalizeOutput(writer.toString()) shouldBe expectedOutput
+                }
+            }
         }
 
         context("warnings") {
@@ -212,7 +250,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src
+                            Looking for NPL files in src/main/npl
                             No NPL source files found
 
                             NPL check completed with warnings.
