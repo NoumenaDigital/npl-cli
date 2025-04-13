@@ -1,6 +1,5 @@
 package com.noumenadigital.npl.cli
 
-import com.noumenadigital.npl.cli.commands.registry.BaseDirectoryAware
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
@@ -20,12 +19,7 @@ class CommandProcessor(
     ) {
         output.use { out ->
             try {
-                val command = commandsParser.parse(inputArgs)
-
-                if (baseDir != null && command is BaseDirectoryAware) {
-                    command.setBaseDirectory(baseDir)
-                }
-
+                val command = commandsParser.parse(inputArgs, baseDir)
                 command.execute(out)
             } catch (ex: InternalException) {
                 when (ex) {

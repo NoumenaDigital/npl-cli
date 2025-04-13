@@ -5,30 +5,41 @@ import com.noumenadigital.npl.lang.CompileFailure
 import com.noumenadigital.npl.lang.CompilerConfiguration
 import com.noumenadigital.npl.lang.Loader
 import com.noumenadigital.npl.lang.Source
+import org.fusesource.jansi.Ansi
+import org.fusesource.jansi.AnsiConsole
 import java.io.File
 import java.io.Writer
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 
-data object CheckCommand : CommandExecutor, BaseDirectoryAware {
-    const val COMMAND_DESCRIPTION =
-        "Validate the correctness of the NPL sources (excluding test sources) in the current directory."
-    private const val NPL_EXTENSION = ".npl"
-
-    const val ANSI_RED = "\u001B[31m"
-    const val ANSI_YELLOW = "\u001B[33m"
-    const val ANSI_RESET = "\u001B[0m"
+data class CheckCommand(
+    private val useColor: Boolean = true,
+    private val baseDir: Path? = null,
+) : CommandExecutor {
+    companion object {
+        const val COMMAND_DESCRIPTION =
+            "Validate the correctness of the NPL sources (excluding test sources) in the current directory."
+        private const val NPL_EXTENSION = ".npl"
+    }
 
     override val commandName: String = "check"
 
-    private var baseDirectory: Path? = null
-
-    override fun setBaseDirectory(path: Path) {
-        baseDirectory = path
-    }
+    private fun formatWithColor(
+        text: String,
+        colorizer: (Ansi) -> Ansi,
+    ): String =
+        if (useColor) {
+            colorizer(Ansi.ansi()).a(text).reset().toString()
+        } else {
+            text
+        }
 
     override fun execute(output: Writer) {
+        if (useColor) {
+            AnsiConsole.systemInstall()
+        }
+
         var sourceDirectoryMissing = false
 
         try {
@@ -71,6 +82,10 @@ data object CheckCommand : CommandExecutor, BaseDirectoryAware {
         } catch (e: Exception) {
             output.write("\nNPL check failed: ${e.message}\n")
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
+        } finally {
+            if (useColor) {
+                AnsiConsole.systemUninstall()
+            }
         }
     }
 
@@ -92,7 +107,7 @@ data object CheckCommand : CommandExecutor, BaseDirectoryAware {
             } ?: emptyList()
     }
 
-    private fun resolveFile(path: String): File = baseDirectory?.resolve(path)?.toFile() ?: File(path)
+    private fun resolveFile(path: String): File = baseDir?.resolve(path)?.toFile() ?: File(path)
 
     private fun checkDirectory(
         directory: String,
@@ -178,23 +193,21 @@ data object CheckCommand : CommandExecutor, BaseDirectoryAware {
                 errorCount = compileResult.errors.size
                 warningCount = compileResult.warnings.size
 
-                // First show the errors in red
-                compileResult.errors.forEach { error ->
-                    output.write("$ANSI_RED${error.description}$ANSI_RESET\n")
-                }
-
-                // Then show warnings if present in yellow
                 if (warningCount > 0) {
                     compileResult.warnings.forEach { warning ->
-                        output.write("$ANSI_YELLOW${warning.description}$ANSI_RESET\n")
+                        output.write(formatWithColor(warning.description, Ansi::fgYellow) + "\n")
                     }
+                }
+
+                compileResult.errors.forEach { error ->
+                    output.write(formatWithColor(error.description, Ansi::fgRed) + "\n")
                 }
             }
             else -> {
                 // Only warnings, no errors
                 warningCount = compileResult.warnings.size
                 compileResult.warnings.forEach { warning ->
-                    output.write("$ANSI_YELLOW${warning.description}$ANSI_RESET\n")
+                    output.write(formatWithColor(warning.description, Ansi::fgYellow) + "\n")
                 }
             }
         }

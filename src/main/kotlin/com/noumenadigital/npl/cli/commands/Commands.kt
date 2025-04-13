@@ -5,26 +5,27 @@ import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
+import java.nio.file.Path
 
 enum class Commands(
     val commandName: String,
     val description: String,
-    val createExecutor: (List<String>) -> CommandExecutor,
+    val createExecutor: (List<String>, Path?) -> CommandExecutor,
 ) {
     VERSION(
         "version",
         VersionCommand.COMMAND_DESCRIPTION,
-        { VersionCommand },
+        { _, _ -> VersionCommand },
     ),
     HELP(
         "help",
         HelpCommand.COMMAND_DESCRIPTION,
-        { HelpCommand },
+        { _, _ -> HelpCommand },
     ),
     CHECK(
         "check",
         CheckCommand.COMMAND_DESCRIPTION,
-        { CheckCommand },
+        { _, baseDir -> CheckCommand(baseDir = baseDir) },
     ),
     ;
 
@@ -32,10 +33,14 @@ enum class Commands(
         fun commandFromString(
             command: String,
             params: List<String> = emptyList(),
+            baseDir: Path? = null,
         ): CommandExecutor {
             val normalizedCommand = command.lowercase()
-            return Commands.fromString(normalizedCommand)?.createExecutor?.invoke(params)
-                ?: throw CommandNotFoundException(normalizedCommand)
+            val matchedCommand =
+                Commands.fromString(normalizedCommand)
+                    ?: throw CommandNotFoundException(normalizedCommand)
+
+            return matchedCommand.createExecutor.invoke(params, baseDir)
         }
 
         private fun fromString(name: String): Commands? = entries.find { it.commandName.equals(name, ignoreCase = true) }
