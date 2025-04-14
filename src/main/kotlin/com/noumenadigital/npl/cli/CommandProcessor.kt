@@ -16,19 +16,32 @@ class CommandProcessor(
     fun process(
         inputArgs: List<String>,
         output: Writer,
-    ) {
+    ): ExitCode {
         output.use { out ->
             try {
-                val command = commandsParser.parse(inputArgs, baseDir)
-                command.execute(out)
+                return commandsParser.parse(inputArgs, baseDir).execute(out)
             } catch (ex: InternalException) {
                 when (ex) {
-                    is CommandNotFoundException -> output.write(ex.buildOutputMessage())
-                    is CommandParsingException -> output.write(ex.buildOutputMessage())
-                    is CommandExecutionException -> output.write(ex.buildOutputMessage(inputArgs))
+                    is CommandNotFoundException -> {
+                        output.write(ex.buildOutputMessage())
+                        return ExitCode.CONFIG_ERROR
+                    }
+                    is CommandParsingException -> {
+                        output.write(ex.buildOutputMessage())
+                        return ExitCode.USAGE_ERROR
+                    }
+                    is CommandExecutionException -> {
+                        output.write(ex.buildOutputMessage(inputArgs))
+                        return ExitCode.INTERNAL_ERROR
+                    }
                 }
             } catch (ex: Exception) {
-                ex.buildOutputMessage(inputArgs)
+                output.write(ex.buildOutputMessage(inputArgs))
+                return when {
+                    ex is java.io.IOException -> ExitCode.IO_ERROR
+                    ex.message?.contains("file", ignoreCase = true) == true -> ExitCode.NO_INPUT
+                    else -> ExitCode.INTERNAL_ERROR
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry
 
+import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.lang.CompileFailure
 import com.noumenadigital.npl.lang.CompilerConfiguration
@@ -35,7 +36,7 @@ data class CheckCommand(
             text
         }
 
-    override fun execute(output: Writer) {
+    override fun execute(output: Writer): ExitCode {
         if (useColor) {
             AnsiConsole.systemInstall()
         }
@@ -74,10 +75,18 @@ data class CheckCommand(
             }
 
             when {
-                mainResult.hasErrors -> output.write("NPL check failed with errors.\n")
-                mainResult.hasWarnings -> output.write("NPL check completed with warnings.\n")
-                sourceDirectoryMissing -> output.write("NPL check completed with warnings.\n") // Special case for no source files found
-                else -> output.write("NPL check completed successfully.\n")
+                mainResult.hasErrors -> {
+                    output.write("NPL check failed with errors.\n")
+                    return ExitCode.COMPILATION_ERROR
+                }
+                mainResult.hasWarnings || sourceDirectoryMissing -> {
+                    output.write("NPL check completed with warnings.\n")
+                    return ExitCode.GENERAL_ERROR
+                }
+                else -> {
+                    output.write("NPL check completed successfully.\n")
+                    return ExitCode.SUCCESS
+                }
             }
         } catch (e: Exception) {
             output.write("\nNPL check failed: ${e.message}\n")

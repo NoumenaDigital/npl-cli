@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli.commands
 
+import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.registry.CheckCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -48,7 +49,7 @@ class CheckCommandTest :
         context("success") {
             test("single file") {
                 withTestContext("success/single_file") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -60,12 +61,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.SUCCESS
                 }
             }
 
             test("multiple files") {
                 withTestContext("success/multiple_files") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -77,12 +79,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.SUCCESS
                 }
             }
 
             test("multiple packages") {
                 withTestContext("success/multiple_packages") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -94,12 +97,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.SUCCESS
                 }
             }
 
             test("both main and test sources") {
                 withTestContext("success/both_sources") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -111,12 +115,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.SUCCESS
                 }
             }
 
             test("failure in test sources should not lead to check failure") {
                 withTestContext("success/test_failure") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -128,12 +133,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.SUCCESS
                 }
             }
 
             test("versioned npl directory fallback") {
                 withTestContext("success/versioned_dirs") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -145,6 +151,7 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.SUCCESS
                 }
             }
         }
@@ -152,7 +159,7 @@ class CheckCommandTest :
         context("failure") {
             test("single file") {
                 withTestContext("failure/single_file") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -166,12 +173,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.COMPILATION_ERROR
                 }
             }
 
             test("multiple files") {
                 withTestContext("failure/multiple_files") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -183,12 +191,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.COMPILATION_ERROR
                 }
             }
 
             test("multiple packages") {
                 withTestContext("failure/multiple_packages") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -202,12 +211,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.COMPILATION_ERROR
                 }
             }
 
             test("versioned directory with errors") {
                 withTestContext("failure/versioned_dir_errors") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -223,6 +233,7 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.COMPILATION_ERROR
                 }
             }
         }
@@ -230,7 +241,7 @@ class CheckCommandTest :
         context("warnings") {
             test("warnings during compilation") {
                 withTestContext("warnings/compilation") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -245,12 +256,13 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.GENERAL_ERROR
                 }
             }
 
             test("no NPL sources") {
                 withTestContext("warnings/no_sources") {
-                    checkCommand.execute(writer)
+                    val exitCode = checkCommand.execute(writer)
                     val expectedOutput =
                         normalizeOutput(
                             """
@@ -262,6 +274,7 @@ class CheckCommandTest :
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.GENERAL_ERROR
                 }
             }
         }
@@ -275,10 +288,11 @@ class CheckCommandTest :
                     )
                 val writer = StringWriter()
 
-                coloredCheckCommand.execute(writer)
+                val exitCode = coloredCheckCommand.execute(writer)
 
                 // In a real TTY, this would include color codes, but in tests
                 // the StringWriter is not a TTY, so colors might be auto-disabled
+                exitCode shouldBe ExitCode.COMPILATION_ERROR
             }
         }
     })

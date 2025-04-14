@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry
 
+import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.Commands
 import java.io.Writer
 
@@ -8,7 +9,7 @@ data object HelpCommand : CommandExecutor {
 
     override val commandName: String = "help"
 
-    override fun execute(output: Writer) {
+    override fun execute(output: Writer): ExitCode {
         val entries = Commands.entries
         val padding = entries.maxOf { it.commandName.length } + 4
 
@@ -17,5 +18,7 @@ data object HelpCommand : CommandExecutor {
             val description = command.description
             output.write("$name$description\n")
         }
+
+        return ExitCode.SUCCESS
     }
 }
