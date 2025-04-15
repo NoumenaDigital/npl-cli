@@ -113,39 +113,73 @@ data class CheckCommand(
         directory: String,
         output: ColorWriter,
     ): CompilationResult {
+        val sources = collectSourcesFromDirectory(directory, output)
+
+        if (sources.isEmpty()) {
+            return CompilationResult(fileCount = 0, errorCount = 0, warningCount = 0, success = true)
+        }
+
+        return compileAndReport(sources = sources, output = output)
+    }
+
+    private fun collectSourcesFromDirectory(
+        directory: String,
+        output: ColorWriter,
+    ): List<Source> {
         val dir = resolveFile(directory)
         if (!dir.exists() || !dir.isDirectory) {
             output.writeln("No NPL source files found\n")
-            return CompilationResult(0, 0, 0, true)
+            return emptyList()
         }
 
         val sources = collectNplSources(dir)
 
         if (sources.isEmpty()) {
             output.writeln("No NPL source files found\n")
-            return CompilationResult(0, 0, 0, true)
         }
 
+        return sources
+    }
+
+    private fun compileAndReport(
+        sources: List<Source>,
+        output: ColorWriter,
+    ): CompilationResult {
+        val compileResult = compileSource(sources, output)
+        reportCompilationResults(sources.size, compileResult, output)
+        return compileResult
+    }
+
+    private fun compileSource(
+        sources: List<Source>,
+        output: ColorWriter,
+    ): CompilationResult {
         val startTime = System.nanoTime()
-
         val compileResult = compile(sources, output)
-
         val duration = Duration.ofNanos(System.nanoTime() - startTime).toMillis()
 
-        if (compileResult.hasErrors) {
-            return compileResult
-        } else {
+        compileResult.duration = duration
+        return compileResult
+    }
+
+    private fun reportCompilationResults(
+        sourceCount: Int,
+        result: CompilationResult,
+        output: ColorWriter,
+    ) {
+        if (!result.hasErrors) {
             val warningText =
-                if (compileResult.hasWarnings) {
-                    " with ${compileResult.warningCount} warning" +
-                        (if (compileResult.warningCount > 1) "s" else "")
+                if (result.hasWarnings) {
+                    " with ${result.warningCount} warning" +
+                        (if (result.warningCount > 1) "s" else "")
                 } else {
                     ""
                 }
             output.writeln(
-                "Completed compilation for ${sources.size} file" + (if (sources.size > 1) "s" else "") + "$warningText in $duration ms",
+                "Completed compilation for $sourceCount file" +
+                    (if (sourceCount > 1) "s" else "") +
+                    "$warningText in ${result.duration} ms",
             )
-            return compileResult
         }
     }
 
@@ -220,6 +254,7 @@ data class CheckCommand(
         val errorCount: Int,
         val warningCount: Int,
         val success: Boolean,
+        var duration: Long = 0,
     ) {
         val hasErrors: Boolean
             get() = errorCount > 0
