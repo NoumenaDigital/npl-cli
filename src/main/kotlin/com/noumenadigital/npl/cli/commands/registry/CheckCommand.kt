@@ -2,11 +2,11 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
+import com.noumenadigital.npl.cli.util.ColorWriter
 import com.noumenadigital.npl.lang.CompileFailure
 import com.noumenadigital.npl.lang.CompilerConfiguration
 import com.noumenadigital.npl.lang.Loader
 import com.noumenadigital.npl.lang.Source
-import org.fusesource.jansi.Ansi
 import org.fusesource.jansi.AnsiConsole
 import java.io.File
 import java.io.Writer
@@ -26,21 +26,12 @@ data class CheckCommand(
 
     override val commandName: String = "check"
 
-    private fun formatWithColor(
-        text: String,
-        colorizer: (Ansi) -> Ansi,
-    ): String =
-        if (useColor) {
-            colorizer(Ansi.ansi()).a(text).reset().toString()
-        } else {
-            text
-        }
-
     override fun execute(output: Writer): ExitCode {
         if (useColor) {
             AnsiConsole.systemInstall()
         }
 
+        val colorOutput = ColorWriter(output, useColor)
         var sourceDirectoryMissing = false
 
         try {
@@ -58,38 +49,38 @@ data class CheckCommand(
 
             val sourceDirExists = resolveFile(sourceDir).exists()
 
-            output.write("Looking for NPL files in $sourceDir\n")
+            colorOutput.writeln("Looking for NPL files in $sourceDir")
 
             val mainResult =
                 if (sourceDirExists) {
-                    checkDirectory(sourceDir, output)
+                    checkDirectory(sourceDir, colorOutput)
                 } else {
-                    output.write("No NPL source files found\n\n")
+                    colorOutput.writeln("No NPL source files found\n")
                     sourceDirectoryMissing = true
                     CompilationResult(0, 0, 0, true)
                 }
 
             // Make sure we have exactly ONE newline before the result message
             if (sourceDirExists) {
-                output.write("\n")
+                colorOutput.write("\n")
             }
 
             when {
                 mainResult.hasErrors -> {
-                    output.write("NPL check failed with errors.\n")
+                    colorOutput.writeln("NPL check failed with errors.")
                     return ExitCode.COMPILATION_ERROR
                 }
                 mainResult.hasWarnings || sourceDirectoryMissing -> {
-                    output.write("NPL check completed with warnings.\n")
+                    colorOutput.writeln("NPL check completed with warnings.")
                     return ExitCode.GENERAL_ERROR
                 }
                 else -> {
-                    output.write("NPL check completed successfully.\n")
+                    colorOutput.writeln("NPL check completed successfully.")
                     return ExitCode.SUCCESS
                 }
             }
         } catch (e: Exception) {
-            output.write("\nNPL check failed: ${e.message}\n")
+            colorOutput.writeln("\nNPL check failed: ${e.message}")
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
         } finally {
             if (useColor) {
@@ -120,18 +111,18 @@ data class CheckCommand(
 
     private fun checkDirectory(
         directory: String,
-        output: Writer,
+        output: ColorWriter,
     ): CompilationResult {
         val dir = resolveFile(directory)
         if (!dir.exists() || !dir.isDirectory) {
-            output.write("No NPL source files found\n\n")
+            output.writeln("No NPL source files found\n")
             return CompilationResult(0, 0, 0, true)
         }
 
         val sources = collectNplSources(dir)
 
         if (sources.isEmpty()) {
-            output.write("No NPL source files found\n\n")
+            output.writeln("No NPL source files found\n")
             return CompilationResult(0, 0, 0, true)
         }
 
@@ -151,8 +142,8 @@ data class CheckCommand(
                 } else {
                     ""
                 }
-            output.write(
-                "Completed compilation for ${sources.size} file" + (if (sources.size > 1) "s" else "") + "$warningText in $duration ms\n",
+            output.writeln(
+                "Completed compilation for ${sources.size} file" + (if (sources.size > 1) "s" else "") + "$warningText in $duration ms",
             )
             return compileResult
         }
@@ -175,7 +166,7 @@ data class CheckCommand(
 
     private fun compile(
         sources: List<Source>,
-        output: Writer,
+        output: ColorWriter,
     ): CompilationResult {
         if (sources.isEmpty()) {
             return CompilationResult(0, 0, 0, true)
@@ -204,19 +195,19 @@ data class CheckCommand(
 
                 if (warningCount > 0) {
                     compileResult.warnings.forEach { warning ->
-                        output.write(formatWithColor(warning.description, Ansi::fgYellow) + "\n")
+                        output.yellowln(warning.description)
                     }
                 }
 
                 compileResult.errors.forEach { error ->
-                    output.write(formatWithColor(error.description, Ansi::fgRed) + "\n")
+                    output.redln(error.description)
                 }
             }
             else -> {
                 // Only warnings, no errors
                 warningCount = compileResult.warnings.size
                 compileResult.warnings.forEach { warning ->
-                    output.write(formatWithColor(warning.description, Ansi::fgYellow) + "\n")
+                    output.yellowln(warning.description)
                 }
             }
         }
