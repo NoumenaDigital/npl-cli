@@ -3,15 +3,47 @@
 The NPL CLI is a command line tool to support the development of projects written in Noumena Protocol Language (NPL). It
 offers several useful commands for interacting with your NPL projects.
 
+## Setup
+
+TBD
+
 ## Commands
+
+- `npl version` - Displays the current version of the NPL CLI.
+- `npl help` - Displays help information for the NPL CLI.
+
+## Prerequisites
+
+You'll need Maven and Java 21 (graalvm if you want to build binaries) or later installed on your system.
+
+## Build project and run tests
+
+Build and run the tests on logic written in core module:
+
+```bash
+mvn clean install
+```
+
+Build native binary and run tests on native binary from e2e module:
+
+1. Generate native build optimization configs
+
+```bash
+   ./generate-native-configs.sh
+```
+
+2. Build native binary and run e2e tests:
+
+```bash
+mvn clean install -Pnative
+```
 
 ## Supported Operating Systems and architectures
 
-|         | ARM 64 | AMD 64 |
-| ------- | ------ | ------ |
-| MacOS   | Yes    | Yes    |
-| Windows | Beta   | No     |
-| Linux   | Yes    | Yes    |
+|       | ARM 64 | AMD 64 |
+| ----- | ------ | ------ |
+| MacOS | Yes    | Yes    |
+| Linux | Yes    | Yes    |
 
 ## Old CLI
 

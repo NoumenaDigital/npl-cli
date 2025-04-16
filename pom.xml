@@ -5,7 +5,7 @@
 
     <groupId>com.noumenadigital.platform</groupId>
     <artifactId>npl-cli-parent</artifactId>
-    <version>2025.1.2</version>
+    <version>2025.1.2</version> <!--keep in sync with platform.version-->
     <packaging>pom</packaging>
 
     <name>NPL CLI Parent</name>
