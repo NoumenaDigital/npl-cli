@@ -1,9 +1,9 @@
 name: "Publish NPL CLI Binaries"
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types:
+      - opened
   workflow_dispatch:
     inputs:
       release_tag:
@@ -27,7 +27,7 @@ jobs:
       release_tag: ${{ steps.set-version.outputs.version }}
       release_name: "NPL Cli release ${{ steps.set-version.outputs.version }}"
       version: ${{ steps.set-version.outputs.version }}
-      should_release: ${{ steps.validate-version.outputs.should_release }}
+      should_release: ${{ steps.validate-release-version.outputs.should_release }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
