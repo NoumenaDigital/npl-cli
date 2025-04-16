@@ -2,17 +2,12 @@
 set -e
 
 # Get current version from pom.xml
-CURRENT_VERSION=$(grep -m 1 "<version>" pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/' | sed -E 's/-.*//')
+CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 echo "Current version from pom.xml without patch part: $CURRENT_VERSION"
 
-# Get latest release tag (assuming tags are in the format 1.0.0)
-LATEST_VERSION=$(git describe --tags --match "*.*.*" --abbrev=0 2>/dev/null || echo "0.0.0")
-echo "Latest version: $LATEST_VERSION"
-
-# Check if version has changed
-if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
-  echo "Version changed from $LATEST_VERSION to $CURRENT_VERSION - will publish"
+# Check if the current version exists in the tags
+if git tag --list | grep -q "^$CURRENT_VERSION$"; then
+  echo "Current version ($CURRENT_VERSION) already exists in tags - skipping publication"
 else
-  echo "Version unchanged ($CURRENT_VERSION) - skipping publication"
-  exit 1
+  echo "Version changed from $LATEST_VERSION to $CURRENT_VERSION - will publish"
 fi

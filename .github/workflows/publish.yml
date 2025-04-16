@@ -14,21 +14,6 @@ on:
         description: "Override the automatic name of the release"
         required: false
         type: string
-      draft:
-        description: "Whether to create a draft release"
-        required: false
-        type: boolean
-        default: true
-      prerelease:
-        description: "Whether to mark as prerelease"
-        required: false
-        type: boolean
-        default: false
-      force_release:
-        description: "Force release regardless of Release trailer"
-        required: false
-        type: boolean
-        default: false
 
 concurrency:
   group: "publish"
@@ -41,44 +26,32 @@ jobs:
     outputs:
       release_tag: ${{ steps.set-version.outputs.version }}
       release_name: "NPL Cli release${{ steps.set-version.outputs.version }}"
-      should_release: ${{ steps.check-release-flag.outputs.should_release }}
       version: ${{ steps.set-version.outputs.version }}
+      should_release: ${{ steps.validate-version.outputs.should_release }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: "Check Release Flag"
-        id: check-release-flag
-        run: |
-          # Set environment variable for force release
-          export FORCE_RELEASE="${{ github.event.inputs.force_release }}"
+      - name: "Determine Release Version"
+        id: set-version
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
 
+      - name: "Validate the release version"
+        id: validate-release-version
+        run: |
           # Run the script and capture its output
-          OUTPUT=$(.github/scripts/check-release-flag.sh)
+          OUTPUT=$(.github/scripts/validate-version.sh)
 
           # Extract the should_release value and set as output
           SHOULD_RELEASE=$(echo "$OUTPUT" | grep "should_release=" | cut -d= -f2)
           echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
 
-          # Display the full output for debugging
-          echo "$OUTPUT"
-
-      - name: "Determine Release Version"
-        id: set-version
-        if: steps.check-release-flag.outputs.should_release == 'true'
-        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
-
-      - name: "Validate the version"
-        id: validate-version
-        if: steps.check-release-flag.outputs.should_release == 'true'
-        run: ./github/scripts/validate-version.sh
-
   build-native:
     name: "Build ${{ matrix.os }}-${{ matrix.arch }} Native Binary"
     needs: determine-version
-    if: needs.check-release-flag.outputs.should_release == 'true'
+    if: needs.determine-version.outputs.should_release == 'true'
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -116,7 +89,6 @@ jobs:
         run: mvn -Pnative package -DskipTests
 
       - name: "Prepare binary for upload (Linux/macOS)"
-        if: matrix.os != 'windows'
         run: |
           mkdir -p dist
           if [ -f target/npl-cli ]; then
@@ -135,7 +107,7 @@ jobs:
   create-release:
     name: "Create GitHub Release"
     needs: [determine-version, build-native]
-    if: needs.check-release-flag.outputs.should_release == 'true'
+    if: needs.determine-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: "Download individual artifacts"
