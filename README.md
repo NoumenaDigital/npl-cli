@@ -26,7 +26,7 @@ mvn clean install
 
 Build native binary and run tests on native binary from e2e module:
 
-1. Generate native build optimization configs
+1. Generate native build configs
 
 ```bash
    ./generate-native-configs.sh
