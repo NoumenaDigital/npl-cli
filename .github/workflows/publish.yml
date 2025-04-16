@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_tag: ${{ steps.set-version.outputs.version }}
-      release_name: "NPL Cli release${{ steps.set-version.outputs.version }}"
+      release_name: "NPL Cli release ${{ steps.set-version.outputs.version }}"
       version: ${{ steps.set-version.outputs.version }}
       should_release: ${{ steps.validate-version.outputs.should_release }}
     steps:
