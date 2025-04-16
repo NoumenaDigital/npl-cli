@@ -1,6 +1,9 @@
 name: "Publish NPL CLI Binaries"
 
 on:
+  push:
+    branches:
+      - ST-4518-publish-workflow-fix
   pull_request:
     types:
       - opened
