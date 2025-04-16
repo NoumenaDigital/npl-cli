@@ -97,8 +97,8 @@ jobs:
       - name: "Prepare binary for upload (Linux/macOS)"
         run: |
           mkdir -p dist
-          if [ -f npl-cli-core/target/npl-cli-${{needs.determine-version.outputs.version}} ]; then
-            cp npl-cli-core/target/npl-cli-${{needs.determine-version.outputs.version}} dist/${{ matrix.output_name }}
+          if [ -f npl-cli-core/target/npl-${{needs.determine-version.outputs.version}} ]; then
+            cp npl-cli-core/target/npl-${{needs.determine-version.outputs.version}} dist/${{ matrix.output_name }}
             chmod +x dist/${{ matrix.output_name }}
           fi
 
