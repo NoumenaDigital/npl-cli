@@ -3,10 +3,6 @@
 The NPL CLI is a command line tool to support the development of projects written in Noumena Protocol Language (NPL). It
 offers several useful commands for interacting with your NPL projects.
 
-## Setup
-
-TBD
-
 ## Commands
 
 - `npl version` - Displays the current version of the NPL CLI.
