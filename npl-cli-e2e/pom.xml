@@ -12,6 +12,12 @@
     <artifactId>npl-cli-e2e</artifactId>
     <name>npl-cli-e2e</name>
     <description>End-to-end tests for NPL CLI</description>
+    <properties>
+        <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
+        <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -55,8 +61,27 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>properties-maven-plugin</artifactId>
+                        <version>${properties-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>write-project-properties</goal>
+                                </goals>
+                                <configuration>
+                                    <outputFile>
+                                        ${project.build.outputDirectory}/npl.properties
+                                    </outputFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven-failsafe-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>e2e-tests</id>
@@ -71,6 +96,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
+                        <version>${maven-resources-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>copy-npl</id>
@@ -84,10 +110,32 @@
                                         <resource>
                                             <directory>../npl-cli-core/target</directory>
                                             <includes>
-                                                <include>npl*</include>
+                                                <include>npl-${project.version}</include>
                                             </includes>
                                         </resource>
                                     </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>create-symlink</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>ln</executable>
+                                    <arguments>
+                                        <argument>-sf</argument>
+                                        <argument>${project.build.directory}/npl-${project.version}</argument>
+                                        <argument>${project.build.directory}/npl</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>

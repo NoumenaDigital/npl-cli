@@ -1,25 +1,18 @@
 #!/bin/bash
 set -e
 
-# Extract the version from pom.xml
-NPL_CLI_VERSION=$(grep -m 1 "<version>" pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/' | sed -E 's/-.*//')
+# Get current version from pom.xml
+CURRENT_VERSION=$(grep -m 1 "<version>" pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/' | sed -E 's/-.*//')
+echo "Current version from pom.xml without patch part: $CURRENT_VERSION"
 
-# URL of the GitHub repository
-REPO_URL="https://$GITHUB_TOKEN@github.com/NoumenaDigital/platform.git"
+# Get latest release tag (assuming tags are in the format 1.0.0)
+LATEST_VERSION=$(git describe --tags --match "*.*.*" --abbrev=0 2>/dev/null || echo "0.0.0")
+echo "Latest version: $LATEST_VERSION"
 
-# Get the latest version
-PLATFORM_VERSION=$(git ls-remote --quiet --exit-code --tags --sort="-version:refname" $REPO_URL origin '????.*.*' | head -n1 | cut -d'/' -f3)
-# If we couldn't get a version, display an error
-if [ -z "$PLATFORM_VERSION" ]; then
-  echo "Could not determine latest version"
-  exit 1
-fi
-
-# Compare the versions
-if [[ "$NPL_CLI_VERSION" == "$PLATFORM_VERSION" ]]; then
-  echo "Versions match: $NPL_CLI_VERSION"
-  exit 0
+# Check if version has changed
+if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
+  echo "Version changed from $LATEST_VERSION to $CURRENT_VERSION - will publish"
 else
-  echo "Versions do not match. pom.xml version: $VERSION, platform version: $PLATFORM_VERSION"
+  echo "Version unchanged ($CURRENT_VERSION) - skipping publication"
   exit 1
 fi

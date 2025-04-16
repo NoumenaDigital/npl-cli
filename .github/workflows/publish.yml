@@ -39,9 +39,10 @@ jobs:
     name: "Determine Release Version"
     runs-on: ubuntu-latest
     outputs:
-      release_tag: ${{ steps.set-version.outputs.release_tag }}
-      release_name: ${{ steps.set-version.outputs.release_name }}
+      release_tag: ${{ steps.set-version.outputs.version }}
+      release_name: "NPL Cli release${{ steps.set-version.outputs.version }}"
       should_release: ${{ steps.check-release-flag.outputs.should_release }}
+      version: ${{ steps.set-version.outputs.version }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -67,34 +68,17 @@ jobs:
       - name: "Determine Release Version"
         id: set-version
         if: steps.check-release-flag.outputs.should_release == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Use manual inputs if provided
-          if [ -n "${{ github.event.inputs.release_tag }}" ]; then
-            echo "release_tag=${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
 
-            if [ -n "${{ github.event.inputs.release_name }}" ]; then
-              echo "release_name=${{ github.event.inputs.release_name }}" >> $GITHUB_OUTPUT
-            else
-              echo "release_name=NPL CLI ${{ github.event.inputs.release_tag }}" >> $GITHUB_OUTPUT
-            fi
-
-            exit 0
-          fi
-
-          # Run the version determination script
-          source .github/scripts/determine-version.sh
-
-          # Copy the script output to GitHub Actions outputs
-          echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
-          echo "release_name=$release_name" >> $GITHUB_OUTPUT
-          echo "Using release tag: $release_tag"
+      - name: "Validate the version"
+        id: validate-version
+        if: steps.check-release-flag.outputs.should_release == 'true'
+        run: ./github/scripts/validate-version.sh
 
   build-native:
     name: "Build ${{ matrix.os }}-${{ matrix.arch }} Native Binary"
     needs: determine-version
-    if: needs.determine-version.outputs.should_release == 'true'
+    if: needs.check-release-flag.outputs.should_release == 'true'
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -103,23 +87,19 @@ jobs:
           - os: ubuntu
             runner: ubuntu-latest
             arch: x86_64
-            output_name: npl-cli-linux-x86_64
+            output_name: npl-cli-linux-x86_64-${{needs.determine-version.outputs.version}}
           - os: ubuntu
             runner: linux-arm-64
             arch: aarch64
-            output_name: npl-cli-linux-aarch64
+            output_name: npl-cli-linux-aarch64-${{needs.determine-version.outputs.version}}
           - os: macos
             runner: macos-13
             arch: x86_64
-            output_name: npl-cli-macos-x86_64
+            output_name: npl-cli-macos-x86_64-${{needs.determine-version.outputs.version}}
           - os: macos
             runner: macos-latest
             arch: aarch64
-            output_name: npl-cli-macos-aarch64
-          - os: windows
-            runner: windows-latest
-            arch: x86_64
-            output_name: npl-cli-windows-x86_64.exe
+            output_name: npl-cli-macos-aarch64-${{needs.determine-version.outputs.version}}
 
     steps:
       - name: "Checkout"
@@ -144,15 +124,6 @@ jobs:
             chmod +x dist/${{ matrix.output_name }}
           fi
 
-      - name: "Prepare binary for upload (Windows)"
-        if: matrix.os == 'windows'
-        shell: pwsh
-        run: |
-          mkdir -p dist
-          if (Test-Path target/npl-cli.exe) {
-            Copy-Item target/npl-cli.exe -Destination dist/${{ matrix.output_name }}
-          }
-
       - name: "Upload native binary artifact"
         uses: actions/upload-artifact@v4
         with:
@@ -164,7 +135,7 @@ jobs:
   create-release:
     name: "Create GitHub Release"
     needs: [determine-version, build-native]
-    if: needs.determine-version.outputs.should_release == 'true'
+    if: needs.check-release-flag.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: "Download individual artifacts"

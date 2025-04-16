@@ -28,10 +28,6 @@ jobs:
       - name: "Validate native config diff"
         run: .github/scripts/validate-native-config-files.sh
 
-      - name: "Validate CLI version matches latest platform release"
-        run: .github/scripts/validate-version.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   verify-native:
     name: "Build and verify ${{ matrix.os }}-${{ matrix.arch }} Native Binary"
     runs-on: ${{ matrix.runner }}
@@ -55,10 +51,6 @@ jobs:
             runner: macos-latest
             arch: aarch64
             output_name: npl-cli-macos-aarch64
-          - os: windows
-            runner: windows-latest
-            arch: x86_64
-            output_name: npl-cli-windows-x86_64.exe
 
     steps:
       - name: "Checkout"
