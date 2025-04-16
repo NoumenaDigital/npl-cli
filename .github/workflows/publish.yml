@@ -48,6 +48,9 @@ jobs:
           SHOULD_RELEASE=$(echo "$OUTPUT" | grep "should_release=" | cut -d= -f2)
           echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
 
+          # Display the full output for debugging
+          echo "$OUTPUT"
+
   build-native:
     name: "Build ${{ matrix.os }}-${{ matrix.arch }} Native Binary"
     needs: determine-version
