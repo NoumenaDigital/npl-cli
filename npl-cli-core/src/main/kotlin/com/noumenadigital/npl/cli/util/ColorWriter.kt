@@ -31,6 +31,10 @@ class ColorWriter(
         write(formatWithColor(text, Ansi::fgRed))
     }
 
+    fun green(text: String) {
+        write(formatWithColor(text, Ansi::fgGreen))
+    }
+
     fun yellowln(text: String) {
         yellow(text)
         write("\n")
@@ -38,6 +42,11 @@ class ColorWriter(
 
     fun redln(text: String) {
         red(text)
+        write("\n")
+    }
+
+    fun greenln(text: String) {
+        green(text)
         write("\n")
     }
 

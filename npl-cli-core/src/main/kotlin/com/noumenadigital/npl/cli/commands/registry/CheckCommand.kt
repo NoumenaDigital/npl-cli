@@ -51,15 +51,15 @@ data class CheckCommand(
 
             when {
                 mainResult.hasErrors -> {
-                    colorOutput.writeln("NPL check failed with errors.")
+                    colorOutput.redln("NPL check failed with errors.")
                     return ExitCode.COMPILATION_ERROR
                 }
                 mainResult.hasWarnings || sourceDirectoryMissing -> {
-                    colorOutput.writeln("NPL check completed with warnings.")
+                    colorOutput.yellowln("NPL check completed with warnings.")
                     return ExitCode.GENERAL_ERROR
                 }
                 else -> {
-                    colorOutput.writeln("NPL check completed successfully.")
+                    colorOutput.greenln("NPL check completed successfully.")
                     return ExitCode.SUCCESS
                 }
             }
@@ -142,11 +142,17 @@ data class CheckCommand(
                 } else {
                     ""
                 }
-            output.writeln(
+
+            val successMessage =
                 "Completed compilation for $sourceCount file" +
                     (if (sourceCount > 1) "s" else "") +
-                    "$warningText in ${result.duration} ms",
-            )
+                    "$warningText in ${result.duration} ms"
+
+            if (result.hasWarnings) {
+                output.writeln(successMessage)
+            } else {
+                output.greenln(successMessage)
+            }
         }
     }
 
