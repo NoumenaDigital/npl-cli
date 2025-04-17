@@ -64,7 +64,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 0
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
 
@@ -84,7 +84,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 0
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
 
@@ -104,7 +104,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 0
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
 
@@ -124,7 +124,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 0
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
 
@@ -144,7 +144,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 0
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
         }
@@ -272,7 +272,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 1
+                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
 
@@ -293,7 +293,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 1
+                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
         }
@@ -318,7 +318,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 1
+                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
 
@@ -338,7 +338,7 @@ class ITCheckCommand :
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
-                    process.exitValue() shouldBe 1
+                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
         }
