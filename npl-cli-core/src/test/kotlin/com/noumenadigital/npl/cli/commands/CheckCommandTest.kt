@@ -17,7 +17,7 @@ class CheckCommandTest :
             val checkCommand: CheckCommand =
                 CheckCommand(
                     useColor = false,
-                    baseDir = Paths.get("src", "test", "resources", "npl-sources"),
+                    baseDir = testResourcesPath,
                 ),
         ) {
             val absolutePath: String get() = testResourcesPath.toAbsolutePath().toString()

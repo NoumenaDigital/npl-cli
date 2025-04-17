@@ -5,7 +5,7 @@
 
     <groupId>com.noumenadigital.platform</groupId>
     <artifactId>npl-cli-parent</artifactId>
-    <version>2025.1.2</version> <!--keep in sync with platform.version-->
+    <version>2025.1.3</version> <!--keep in sync with platform.version-->
     <packaging>pom</packaging>
 
     <name>NPL CLI Parent</name>
@@ -36,18 +36,36 @@
     </modules>
 
     <properties>
+        <platform.version>2025.1.3</platform.version> <!-- keep in sync with the parent version -->
         <kotlin.version>2.1.20</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <commons-text.version>1.10.0</commons-text.version>
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <native-maven-plugin.version>0.10.6</native-maven-plugin.version>
+        <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
+        <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.noumenadigital.platform</groupId>
+                <artifactId>language-compiler</artifactId>
+                <version>${platform.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib-jdk8</artifactId>
                 <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${commons-text.version}</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
@@ -143,6 +161,21 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>${properties-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
