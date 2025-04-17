@@ -14,7 +14,11 @@ class ITBinaryCommands :
                     .directory(File("."))
                     .redirectErrorStream(true)
                     .start(),
-            val output: String = process.inputStream.bufferedReader().readText(),
+            val output: String =
+                process.inputStream
+                    .bufferedReader()
+                    .readText()
+                    .trimIndent(),
         )
 
         fun runWithCommand(
@@ -47,8 +51,8 @@ class ITBinaryCommands :
                     """
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
-                    check      Validate the correctness of the NPL sources (excluding test sources) in the specified directory
-
+                    check      Validate the correctness of NPL sources
+                                 <directory>  Target directory containing NPL source files to check (defaults to current directory)
                     """.trimIndent()
 
                 output shouldBe expectedOutput

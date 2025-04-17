@@ -51,6 +51,7 @@ class CheckCommandTest :
                 .replace("\r\n", "\n")
                 // Normalize durations
                 .replace(Regex("in \\d+ ms"), "in XXX ms")
+                .trimIndent()
 
         context("success") {
             test("single file") {
@@ -62,8 +63,7 @@ class CheckCommandTest :
                             Completed compilation for 1 file in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -80,8 +80,7 @@ class CheckCommandTest :
                             Completed compilation for 4 files in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -98,8 +97,7 @@ class CheckCommandTest :
                             Completed compilation for 2 files in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -116,8 +114,7 @@ class CheckCommandTest :
                             Completed compilation for 2 files in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -134,8 +131,7 @@ class CheckCommandTest :
                             Completed compilation for 1 file in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -156,8 +152,7 @@ class CheckCommandTest :
                             $absolutePath/src/main/npl/objects/car/car.npl: (16, 5) E0001: Syntax error: extraneous input 'permission' expecting {'become', 'const', 'for', 'function', 'guard', 'if', 'match', 'notify', 'optional', 'private', 'require', 'return', 'this', 'var', 'vararg', 'with', TEXT_LITERAL, BOOLEAN_LITERAL, PARTY_LITERAL, TIME_LITERAL, NUMBER_LITERAL, IDENTIFIER, '(', '{', '}', '-', '!'}
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -174,8 +169,7 @@ class CheckCommandTest :
                             $absolutePath/src/main/npl/objects/iou/iou.npl: (9, 64) E0001: Syntax error: mismatched input ';' expecting {'->', '<'}
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -194,8 +188,7 @@ class CheckCommandTest :
                             $absolutePath/src/main/npl/objects/iou/iou.npl: (18, 47) E0002: Unknown 'calculateValue'
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -212,8 +205,7 @@ class CheckCommandTest :
                             $absolutePath/src/test/npl/objects/test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod'
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -234,8 +226,7 @@ class CheckCommandTest :
                             $absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 34) E0001: Syntax error: missing {<EOF>, ';'} at 'error'
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -257,8 +248,7 @@ class CheckCommandTest :
                             Completed compilation for 4 files with 3 warnings in XXX ms
 
                             NPL check completed with warnings.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -275,8 +265,7 @@ class CheckCommandTest :
                             No NPL source files found
 
                             NPL check completed with warnings.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(writer.toString()) shouldBe expectedOutput
@@ -314,7 +303,7 @@ class CheckCommandTest :
 
                 val exitCode = checkCommand.execute(writer)
 
-                normalizeOutput(writer.toString()) shouldBe "Target directory does not exist: $nonExistentPath\n"
+                normalizeOutput(writer.toString()) shouldBe "Target directory does not exist: $nonExistentPath"
                 exitCode shouldBe ExitCode.GENERAL_ERROR
             }
 
@@ -332,7 +321,7 @@ class CheckCommandTest :
 
                 val exitCode = checkCommand.execute(writer)
 
-                normalizeOutput(writer.toString()) shouldBe "Target path is not a directory: ${tempFile.absolutePath}\n"
+                normalizeOutput(writer.toString()) shouldBe "Target path is not a directory: ${tempFile.absolutePath}"
                 exitCode shouldBe ExitCode.GENERAL_ERROR
             }
         }

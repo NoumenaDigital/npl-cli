@@ -7,11 +7,9 @@ import com.noumenadigital.npl.cli.exception.InternalException
 import com.noumenadigital.npl.cli.exception.buildOutputMessage
 import com.noumenadigital.npl.cli.service.CommandsParser
 import java.io.Writer
-import java.nio.file.Path
 
 class CommandProcessor(
     private val commandsParser: CommandsParser = CommandsParser,
-    private val baseDir: Path? = null,
 ) {
     fun process(
         inputArgs: List<String>,
@@ -19,7 +17,7 @@ class CommandProcessor(
     ): ExitCode {
         output.use { out ->
             try {
-                return commandsParser.parse(inputArgs, baseDir).execute(out)
+                return commandsParser.parse(inputArgs).execute(out)
             } catch (ex: InternalException) {
                 when (ex) {
                     is CommandNotFoundException -> {

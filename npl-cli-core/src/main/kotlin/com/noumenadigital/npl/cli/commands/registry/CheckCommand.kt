@@ -18,12 +18,26 @@ data class CheckCommand(
     private val targetDir: String = ".",
 ) : CommandExecutor {
     companion object {
-        const val COMMAND_DESCRIPTION =
-            "Validate the correctness of the NPL sources (excluding test sources) in the specified directory"
         private const val NPL_EXTENSION = ".npl"
     }
 
     override val commandName: String = "check"
+    override val description: String = "Validate the correctness of NPL sources"
+
+    override val parameters: List<CommandParameter> =
+        listOf(
+            CommandParameter(
+                name = "directory",
+                description = "Target directory containing NPL source files to check",
+                defaultValue = ".",
+                isRequired = false,
+            ),
+        )
+
+    override fun createInstance(params: List<String>): CommandExecutor {
+        val targetDir = params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: "."
+        return CheckCommand(targetDir = targetDir)
+    }
 
     override fun execute(output: Writer): ExitCode {
         if (useColor) {

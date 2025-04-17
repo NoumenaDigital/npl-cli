@@ -13,7 +13,7 @@ class CommandsParserTest :
 
             val result = parser.parse(input)
 
-            result shouldBe Commands.commandFromString("help", emptyList(), null)
+            result shouldBe Commands.commandFromString("help", emptyList())
         }
 
         test("should execute help command when input list is empty") {
@@ -21,6 +21,6 @@ class CommandsParserTest :
             val input = emptyList<String>()
 
             val result = parser.parse(input)
-            result shouldBe Commands.commandFromString("help", emptyList(), null)
+            result shouldBe Commands.commandFromString("help", emptyList())
         }
     })

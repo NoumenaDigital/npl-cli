@@ -28,7 +28,11 @@ class ITCheckCommand :
                     .directory(File(getTestResourcesPath().toString()))
                     .redirectErrorStream(true)
                     .start(),
-            val output: String = process.inputStream.bufferedReader().readText(),
+            val output: String =
+                process.inputStream
+                    .bufferedReader()
+                    .readText()
+                    .trimIndent(),
         )
 
         fun runWithCommand(
@@ -46,6 +50,7 @@ class ITCheckCommand :
                 .replace(Regex("in \\d+ ms"), "in XXX ms")
                 // Remove any ANSI color codes
                 .replace(Regex("\\e\\[[0-9;]*m"), "")
+                .trimIndent()
 
         context("success") {
             test("single file") {
@@ -59,8 +64,7 @@ class ITCheckCommand :
                             Completed compilation for 1 file in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -79,8 +83,7 @@ class ITCheckCommand :
                             Completed compilation for 4 files in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -99,8 +102,7 @@ class ITCheckCommand :
                             Completed compilation for 2 files in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -119,8 +121,7 @@ class ITCheckCommand :
                             Completed compilation for 2 files in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -139,8 +140,7 @@ class ITCheckCommand :
                             Completed compilation for 1 file in XXX ms
 
                             NPL check completed successfully.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -163,8 +163,7 @@ class ITCheckCommand :
                             $testDirPath/src/main/npl/objects/car/car.npl: (16, 5) E0001: Syntax error: extraneous input 'permission' expecting {'become', 'const', 'for', 'function', 'guard', 'if', 'match', 'notify', 'optional', 'private', 'require', 'return', 'this', 'var', 'vararg', 'with', TEXT_LITERAL, BOOLEAN_LITERAL, PARTY_LITERAL, TIME_LITERAL, NUMBER_LITERAL, IDENTIFIER, '(', '{', '}', '-', '!'}
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -183,8 +182,7 @@ class ITCheckCommand :
                             $testDirPath/src/main/npl/objects/iou/iou.npl: (9, 64) E0001: Syntax error: mismatched input ';' expecting {'->', '<'}
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -205,8 +203,7 @@ class ITCheckCommand :
                             $testDirPath/src/main/npl/objects/iou/iou.npl: (18, 47) E0002: Unknown 'calculateValue'
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -225,8 +222,7 @@ class ITCheckCommand :
                             $testDirPath/src/test/npl/objects/test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod'
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -249,8 +245,7 @@ class ITCheckCommand :
                             $testDirPath/src/main/npl-141.1/objects/car/car.npl: (3, 34) E0001: Syntax error: missing {<EOF>, ';'} at 'error'
 
                             NPL check failed with errors.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -267,8 +262,7 @@ class ITCheckCommand :
                         normalizeOutput(
                             """
                             Target directory does not exist: $nonExistentPath
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -288,8 +282,7 @@ class ITCheckCommand :
                         normalizeOutput(
                             """
                             Target path is not a directory: ${tempFile.absolutePath}
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -313,8 +306,7 @@ class ITCheckCommand :
                             Completed compilation for 4 files with 3 warnings in XXX ms
 
                             NPL check completed with warnings.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput
@@ -333,8 +325,7 @@ class ITCheckCommand :
                             No NPL source files found
 
                             NPL check completed with warnings.
-
-                            """.trimIndent(),
+                            """,
                         )
 
                     normalizeOutput(output) shouldBe expectedOutput

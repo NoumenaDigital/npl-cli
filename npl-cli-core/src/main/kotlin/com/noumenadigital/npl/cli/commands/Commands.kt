@@ -5,47 +5,38 @@ import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
-import java.nio.file.Path
 
 enum class Commands(
-    val commandName: String,
-    val description: String,
-    val createExecutor: (List<String>, Path?) -> CommandExecutor,
+    private val commandExecutorFactory: () -> CommandExecutor,
 ) {
-    VERSION(
-        "version",
-        VersionCommand.COMMAND_DESCRIPTION,
-        { _, _ -> VersionCommand },
-    ),
-    HELP(
-        "help",
-        HelpCommand.COMMAND_DESCRIPTION,
-        { _, _ -> HelpCommand },
-    ),
-    CHECK(
-        "check",
-        CheckCommand.COMMAND_DESCRIPTION,
-        { params, _ ->
-            val targetDir = params.firstOrNull() ?: "."
-            CheckCommand(targetDir = targetDir)
-        },
-    ),
+    VERSION({ VersionCommand }),
+    HELP({ HelpCommand }),
+    CHECK({ CheckCommand() }),
     ;
+
+    val commandName: String
+        get() = commandExecutorFactory().commandName
+
+    val description: String
+        get() = commandExecutorFactory().description
+
+    /**
+     * Get the base executor for this command
+     */
+    fun getBaseExecutor(): CommandExecutor = commandExecutorFactory()
 
     companion object {
         fun commandFromString(
             command: String,
             params: List<String> = emptyList(),
-            baseDir: Path? = null,
         ): CommandExecutor {
             val normalizedCommand = command.lowercase()
             val matchedCommand =
-                Commands.fromString(normalizedCommand)
+                entries.find { it.commandName.equals(normalizedCommand, ignoreCase = true) }
                     ?: throw CommandNotFoundException(normalizedCommand)
 
-            return matchedCommand.createExecutor.invoke(params, baseDir)
+            val baseExecutor = matchedCommand.getBaseExecutor()
+            return baseExecutor.createInstance(params)
         }
-
-        private fun fromString(name: String): Commands? = entries.find { it.commandName.equals(name, ignoreCase = true) }
     }
 }
