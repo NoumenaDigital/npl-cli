@@ -25,7 +25,10 @@ enum class Commands(
     CHECK(
         "check",
         CheckCommand.COMMAND_DESCRIPTION,
-        { _, baseDir -> CheckCommand(baseDir = baseDir) },
+        { params, _ ->
+            val targetDir = params.firstOrNull() ?: "."
+            CheckCommand(targetDir = targetDir)
+        },
     ),
     ;
 

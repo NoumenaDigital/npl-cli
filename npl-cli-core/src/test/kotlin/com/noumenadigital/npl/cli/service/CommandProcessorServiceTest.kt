@@ -36,7 +36,7 @@ class CommandProcessorServiceTest :
                     """
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
-                    check      Validate the correctness of the NPL sources (excluding test sources) in the current directory
+                    check      Validate the correctness of the NPL sources (excluding test sources) in the specified directory
                     """.trimIndent() + "\n"
 
                 writer.toString() shouldBe expectedOutput

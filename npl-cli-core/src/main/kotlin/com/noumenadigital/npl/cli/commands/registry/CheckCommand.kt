@@ -11,16 +11,15 @@ import org.fusesource.jansi.AnsiConsole
 import java.io.File
 import java.io.Writer
 import java.nio.file.Files
-import java.nio.file.Path
 import java.time.Duration
 
 data class CheckCommand(
     private val useColor: Boolean = true,
-    private val baseDir: Path? = null,
+    private val targetDir: String = ".",
 ) : CommandExecutor {
     companion object {
         const val COMMAND_DESCRIPTION =
-            "Validate the correctness of the NPL sources (excluding test sources) in the current directory"
+            "Validate the correctness of the NPL sources (excluding test sources) in the specified directory"
         private const val NPL_EXTENSION = ".npl"
     }
 
@@ -35,33 +34,20 @@ data class CheckCommand(
         var sourceDirectoryMissing = false
 
         try {
-            val defaultSourceDir = "src/main/npl"
-            var sourceDir = defaultSourceDir
-            val defaultSourceDirExists = resolveFile(defaultSourceDir).exists()
+            checkDirectory(targetDir)
+            colorOutput.writeln("Looking for NPL files in $targetDir")
 
-            if (!defaultSourceDirExists) {
-                // Look for src/main/npl* directories and select the one with highest number
-                val nplDirs = findNplVersionDirectories()
-                if (nplDirs.isNotEmpty()) {
-                    sourceDir = nplDirs.last()
-                }
-            }
-
-            val sourceDirExists = resolveFile(sourceDir).exists()
-
-            colorOutput.writeln("Looking for NPL files in $sourceDir")
-
+            val sources = collectSourcesFromDirectory(targetDir, colorOutput)
             val mainResult =
-                if (sourceDirExists) {
-                    checkDirectory(sourceDir, colorOutput)
-                } else {
-                    colorOutput.writeln("No NPL source files found\n")
+                if (sources.isEmpty()) {
                     sourceDirectoryMissing = true
                     CompilationResult(0, 0, 0, true)
+                } else {
+                    compileAndReport(sources = sources, output = colorOutput)
                 }
 
             // Make sure we have exactly ONE newline before the result message
-            if (sourceDirExists) {
+            if (!sourceDirectoryMissing) {
                 colorOutput.write("\n")
             }
 
@@ -79,8 +65,10 @@ data class CheckCommand(
                     return ExitCode.SUCCESS
                 }
             }
+        } catch (e: CommandExecutionException) {
+            colorOutput.redln(e.message)
+            return ExitCode.GENERAL_ERROR
         } catch (e: Exception) {
-            colorOutput.writeln("\nNPL check failed: ${e.message}")
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
         } finally {
             if (useColor) {
@@ -89,37 +77,18 @@ data class CheckCommand(
         }
     }
 
-    private fun findNplVersionDirectories(): List<String> {
-        val srcMainDir = resolveFile("src/main")
-        if (!srcMainDir.exists() || !srcMainDir.isDirectory) {
-            return emptyList()
+    private fun resolveFile(path: String): File = File(path)
+
+    private fun checkDirectory(directory: String) {
+        val dir = resolveFile(directory)
+
+        if (!dir.exists()) {
+            throw CommandExecutionException("Target directory does not exist: $directory")
         }
 
-        val nplDirPattern = "npl.*".toRegex()
-        return srcMainDir
-            .listFiles()
-            ?.filter { it.isDirectory && nplDirPattern.matches(it.name) }
-            ?.map { "src/main/${it.name}" }
-            ?.sortedBy { dir ->
-                // Extract version number if present
-                val versionMatch = "npl-([0-9.]+)".toRegex().find(dir)
-                versionMatch?.groupValues?.get(1) ?: dir
-            } ?: emptyList()
-    }
-
-    private fun resolveFile(path: String): File = baseDir?.resolve(path)?.toFile() ?: File(path)
-
-    private fun checkDirectory(
-        directory: String,
-        output: ColorWriter,
-    ): CompilationResult {
-        val sources = collectSourcesFromDirectory(directory, output)
-
-        if (sources.isEmpty()) {
-            return CompilationResult(fileCount = 0, errorCount = 0, warningCount = 0, success = true)
+        if (!dir.isDirectory) {
+            throw CommandExecutionException("Target path is not a directory: $directory")
         }
-
-        return compileAndReport(sources = sources, output = output)
     }
 
     private fun collectSourcesFromDirectory(

@@ -34,7 +34,7 @@ class ITBinaryCommands :
                     """.trimIndent()
 
                 output shouldBeEqual expectedOutput
-                process.exitValue() shouldBe 0
+                process.exitValue() shouldBe ExitCode.SUCCESS.code
             }
         }
 
@@ -53,7 +53,7 @@ class ITBinaryCommands :
 
                 output shouldBe expectedOutput
 
-                process.exitValue() shouldBe 0
+                process.exitValue() shouldBe ExitCode.SUCCESS.code
             }
         }
 
@@ -67,7 +67,7 @@ class ITBinaryCommands :
                     """.trimIndent()
 
                 output shouldBeEqual expectedOutput
-                process.exitValue() shouldBe 78
+                process.exitValue() shouldBe ExitCode.CONFIG_ERROR.code
             }
         }
 
@@ -81,7 +81,7 @@ class ITBinaryCommands :
                     """.trimIndent()
 
                 output shouldBeEqual expectedOutput
-                process.exitValue() shouldBe 78
+                process.exitValue() shouldBe ExitCode.CONFIG_ERROR.code
             }
         }
     })

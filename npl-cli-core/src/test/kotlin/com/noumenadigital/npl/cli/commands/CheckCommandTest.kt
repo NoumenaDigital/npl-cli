@@ -23,7 +23,7 @@ class CheckCommandTest :
             val checkCommand: CheckCommand =
                 CheckCommand(
                     useColor = false,
-                    baseDir = testResourcesPath,
+                    targetDir = testResourcesPath.toAbsolutePath().toString(),
                 ),
         ) {
             val absolutePath: String get() = testResourcesPath.toAbsolutePath().toString()
@@ -39,7 +39,7 @@ class CheckCommandTest :
                     checkCommand =
                         CheckCommand(
                             useColor = false,
-                            baseDir = getTestResourcesPath(testDir),
+                            targetDir = getTestResourcesPath(testDir).toAbsolutePath().toString(),
                         ),
                 )
             context.apply(test)
@@ -59,7 +59,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
+                            Looking for NPL files in $absolutePath
                             Completed compilation for 1 file in XXX ms
 
                             NPL check completed successfully.
@@ -78,7 +78,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
+                            Looking for NPL files in $absolutePath
                             Completed compilation for 4 files in XXX ms
 
                             NPL check completed successfully.
@@ -97,7 +97,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
+                            Looking for NPL files in $absolutePath
                             Completed compilation for 2 files in XXX ms
 
                             NPL check completed successfully.
@@ -116,27 +116,8 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
-                            Completed compilation for 1 file in XXX ms
-
-                            NPL check completed successfully.
-
-                            """.trimIndent(),
-                        )
-
-                    normalizeOutput(writer.toString()) shouldBe expectedOutput
-                    exitCode shouldBe ExitCode.SUCCESS
-                }
-            }
-
-            test("failure in test sources should not lead to check failure") {
-                withTestContext("success/test_failure") {
-                    val exitCode = checkCommand.execute(writer)
-                    val expectedOutput =
-                        normalizeOutput(
-                            """
-                            Looking for NPL files in src/main/npl
-                            Completed compilation for 1 file in XXX ms
+                            Looking for NPL files in $absolutePath
+                            Completed compilation for 2 files in XXX ms
 
                             NPL check completed successfully.
 
@@ -154,7 +135,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl-141.2
+                            Looking for NPL files in $absolutePath
                             Completed compilation for 1 file in XXX ms
 
                             NPL check completed successfully.
@@ -175,7 +156,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
+                            Looking for NPL files in $absolutePath
                             $absolutePath/src/main/npl/objects/car/car.npl: (7, 1) E0001: Syntax error: rule statement failed predicate: {quirksMode}?
                             $absolutePath/src/main/npl/objects/car/car.npl: (8, 1) E0001: Syntax error: missing {<EOF>, ';'} at 'protocol'
                             $absolutePath/src/main/npl/objects/car/car.npl: (16, 5) E0001: Syntax error: extraneous input 'permission' expecting {'become', 'const', 'for', 'function', 'guard', 'if', 'match', 'notify', 'optional', 'private', 'require', 'return', 'this', 'var', 'vararg', 'with', TEXT_LITERAL, BOOLEAN_LITERAL, PARTY_LITERAL, TIME_LITERAL, NUMBER_LITERAL, IDENTIFIER, '(', '{', '}', '-', '!'}
@@ -196,7 +177,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
+                            Looking for NPL files in $absolutePath
                             $absolutePath/src/main/npl/objects/iou/iou.npl: (9, 64) E0001: Syntax error: mismatched input ';' expecting {'->', '<'}
 
                             NPL check failed with errors.
@@ -215,10 +196,29 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
+                            Looking for NPL files in $absolutePath
                             $absolutePath/src/main/npl/objects/car/car.npl: (10, 69) E0002: Unknown 'Vehicle'
                             $absolutePath/src/main/npl/objects/iou/iou.npl: (7, 12) E0002: Unknown 'Color'
                             $absolutePath/src/main/npl/objects/iou/iou.npl: (18, 47) E0002: Unknown 'calculateValue'
+
+                            NPL check failed with errors.
+
+                            """.trimIndent(),
+                        )
+
+                    normalizeOutput(writer.toString()) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.COMPILATION_ERROR
+                }
+            }
+
+            test("failure in test sources but not in main sources") {
+                withTestContext("success/test_failure") {
+                    val exitCode = checkCommand.execute(writer)
+                    val expectedOutput =
+                        normalizeOutput(
+                            """
+                            Looking for NPL files in $absolutePath
+                            $absolutePath/src/test/npl/objects/test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod'
 
                             NPL check failed with errors.
 
@@ -236,7 +236,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl-141.1
+                            Looking for NPL files in $absolutePath
                             $absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 11) E0001: Syntax error: missing {<EOF>, ';'} at 'this'
                             $absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 16) E0001: Syntax error: missing {<EOF>, ';'} at 'will'
                             $absolutePath/src/main/npl-141.1/objects/car/car.npl: (3, 21) E0001: Syntax error: missing {<EOF>, ';'} at 'cause'
@@ -261,7 +261,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
+                            Looking for NPL files in $absolutePath
                             $absolutePath/src/main/npl/objects.iou/iou.npl: (18, 5) W0019: Public property `payments` should be explicitly typed.
                             $absolutePath/src/main/npl/processes/demo.npl: (15, 5) W0016: Declared variable `car` unused
                             $absolutePath/src/main/npl/processes/demo.npl: (16, 5) W0016: Declared variable `iou` unused
@@ -283,7 +283,7 @@ class CheckCommandTest :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in src/main/npl
+                            Looking for NPL files in $absolutePath
                             No NPL source files found
 
                             NPL check completed with warnings.
@@ -302,7 +302,7 @@ class CheckCommandTest :
                 val coloredCheckCommand =
                     CheckCommand(
                         useColor = true,
-                        baseDir = getTestResourcesPath("failure/single_file"),
+                        targetDir = getTestResourcesPath("failure/single_file").toAbsolutePath().toString(),
                     )
                 val writer = StringWriter()
 
@@ -311,6 +311,41 @@ class CheckCommandTest :
                 // In a real TTY, this would include color codes, but in tests
                 // the StringWriter is not a TTY, so colors might be auto-disabled
                 exitCode shouldBe ExitCode.COMPILATION_ERROR
+            }
+        }
+
+        context("directory failures") {
+            test("directory does not exist") {
+                val nonExistentPath = getTestResourcesPath("non_existent_directory").toAbsolutePath()
+                val writer = StringWriter()
+                val checkCommand =
+                    CheckCommand(
+                        useColor = false,
+                        targetDir = nonExistentPath.toString(),
+                    )
+
+                val exitCode = checkCommand.execute(writer)
+
+                normalizeOutput(writer.toString()) shouldBe "Target directory does not exist: $nonExistentPath\n"
+                exitCode shouldBe ExitCode.GENERAL_ERROR
+            }
+
+            test("target is not a directory") {
+                // Create a temporary file to use as target
+                val tempFile = File.createTempFile("temp", ".txt")
+                tempFile.deleteOnExit()
+
+                val writer = StringWriter()
+                val checkCommand =
+                    CheckCommand(
+                        useColor = false,
+                        targetDir = tempFile.absolutePath,
+                    )
+
+                val exitCode = checkCommand.execute(writer)
+
+                normalizeOutput(writer.toString()) shouldBe "Target path is not a directory: ${tempFile.absolutePath}\n"
+                exitCode shouldBe ExitCode.GENERAL_ERROR
             }
         }
     })
