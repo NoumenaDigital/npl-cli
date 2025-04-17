@@ -157,6 +157,7 @@ data class CheckCommand(
             Files
                 .walk(directory.toPath())
                 .filter { Files.isRegularFile(it) && it.toString().endsWith(NPL_EXTENSION) }
+                .sorted()
                 .forEach { sources.add(Source.create(it.toUri().toURL())) }
         } catch (_: Exception) {
             // Just return what we have so far
