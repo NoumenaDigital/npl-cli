@@ -1,5 +1,65 @@
 {
   "types":[
+    {
+      "name":"byte[]"
+    },
+    {
+      "name":"java.lang.Double"
+    },
+    {
+      "name":"java.lang.Long"
+    },
+    {
+      "name":"java.lang.Number"
+    },
+    {
+      "name":"java.lang.String"
+    },
+    {
+      "name":"java.rmi.dgc.Lease"
+    },
+    {
+      "name":"java.rmi.dgc.VMID"
+    },
+    {
+      "name":"java.rmi.server.ObjID"
+    },
+    {
+      "name":"java.rmi.server.ObjID[]"
+    },
+    {
+      "name":"java.rmi.server.RemoteObject"
+    },
+    {
+      "name":"java.rmi.server.RemoteStub"
+    },
+    {
+      "name":"java.rmi.server.UID"
+    },
+    {
+      "name":"java.util.TreeMap"
+    },
+    {
+      "name":"javax.management.ObjectName"
+    },
+    {
+      "name":"javax.management.openmbean.CompositeDataSupport"
+    },
+    {
+      "name":"javax.management.openmbean.CompositeType"
+    },
+    {
+      "name":"javax.management.openmbean.OpenType"
+    },
+    {
+      "name":"javax.management.openmbean.SimpleType"
+    },
+    {
+      "name":"javax.management.remote.rmi.RMIConnectionImpl_Stub"
+    },
+    {
+      "name":"javax.management.remote.rmi.RMIServerImpl_Stub"
+    }
   ],
   "lambdaCapturingTypes":[
   ],

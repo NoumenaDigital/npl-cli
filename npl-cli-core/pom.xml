@@ -8,16 +8,10 @@
         <artifactId>npl-cli-parent</artifactId>
         <version>2025.1.3</version>
     </parent>
-    <packaging>${packaging.type}</packaging>
 
     <artifactId>npl-cli-core</artifactId>
     <name>npl-cli-core</name>
-    <description>NPL CLI Core is a command-line tool designed to interact with the NPL Runtime and NOUMENA Cloud
-    </description>
-
-    <properties>
-        <packaging.type>jar</packaging.type>
-    </properties>
+    <description>NPL CLI Core is a command-line tool designed to interact with the NPL Runtime and NOUMENA Cloud</description>
 
     <dependencies>
         <dependency>
@@ -62,9 +56,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-XX:+EnableDynamicAgentLoading
-                        -Dkotest.framework.classpath.scanning.autoscan.disable=true
-                    </argLine>
+                    <argLine>-XX:+EnableDynamicAgentLoading -Dkotest.framework.classpath.scanning.autoscan.disable=true</argLine>
                     <includes>
                         <include>**/*Test.*</include>
                     </includes>

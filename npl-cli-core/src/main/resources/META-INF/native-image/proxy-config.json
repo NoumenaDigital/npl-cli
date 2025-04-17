@@ -1,2 +1,8 @@
 [
+  {
+    "interfaces":["java.security.PrivilegedAction"]
+  },
+  {
+    "interfaces":["java.util.function.Consumer"]
+  }
 ]
