@@ -15,6 +15,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.noumenadigital.platform</groupId>
+            <artifactId>npl-cli-core</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-runner-junit5-jvm</artifactId>
             <scope>test</scope>
@@ -34,6 +40,7 @@
             <artifactId>kotlin-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
