@@ -4,6 +4,7 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.registry.CheckCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import java.io.File
 import java.io.StringWriter
 import java.io.Writer
 import java.nio.file.Path
@@ -11,9 +12,14 @@ import java.nio.file.Paths
 
 class CheckCommandTest :
     FunSpec({
+        fun getTestResourcesPath(subPath: String = ""): Path {
+            val rootDir = File("..").canonicalFile
+            return Paths.get(rootDir.toString(), "test-resources", "npl-sources", subPath)
+        }
+
         data class TestContext(
             val writer: Writer = StringWriter(),
-            val testResourcesPath: Path = Paths.get("src", "test", "resources", "npl-sources"),
+            val testResourcesPath: Path = getTestResourcesPath(),
             val checkCommand: CheckCommand =
                 CheckCommand(
                     useColor = false,
@@ -29,11 +35,11 @@ class CheckCommandTest :
         ) {
             val context =
                 TestContext(
-                    testResourcesPath = Paths.get("src", "test", "resources", "npl-sources", testDir),
+                    testResourcesPath = getTestResourcesPath(testDir),
                     checkCommand =
                         CheckCommand(
                             useColor = false,
-                            baseDir = Paths.get("src", "test", "resources", "npl-sources", testDir),
+                            baseDir = getTestResourcesPath(testDir),
                         ),
                 )
             context.apply(test)
@@ -284,7 +290,7 @@ class CheckCommandTest :
                 val coloredCheckCommand =
                     CheckCommand(
                         useColor = true,
-                        baseDir = Paths.get("src", "test", "resources", "npl-sources", "failure/single_file"),
+                        baseDir = getTestResourcesPath("failure/single_file"),
                     )
                 val writer = StringWriter()
 
