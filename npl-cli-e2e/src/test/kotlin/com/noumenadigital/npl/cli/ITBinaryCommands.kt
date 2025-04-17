@@ -1,35 +1,14 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
-import java.io.File
 
 class ITBinaryCommands :
     FunSpec({
-        data class TestContext(
-            val commands: String,
-            val process: Process =
-                ProcessBuilder("./target/npl", commands)
-                    .directory(File("."))
-                    .redirectErrorStream(true)
-                    .start(),
-            val output: String =
-                process.inputStream
-                    .bufferedReader()
-                    .readText()
-                    .trimIndent(),
-        )
-
-        fun runWithCommand(
-            commands: List<String>,
-            test: TestContext.() -> Unit,
-        ) {
-            TestContext(commands.joinToString(" ")).apply(test)
-        }
-
         test("version command should return correct value") {
-            runWithCommand(listOf("version")) {
+            runCommand(listOf("version")) {
                 process.waitFor()
 
                 val expectedOutput =
@@ -43,8 +22,7 @@ class ITBinaryCommands :
         }
 
         test("help command should return list of commands") {
-            runWithCommand(listOf("help")) {
-
+            runCommand(listOf("help")) {
                 process.waitFor()
 
                 val expectedOutput =
@@ -56,13 +34,12 @@ class ITBinaryCommands :
                     """.trimIndent()
 
                 output shouldBe expectedOutput
-
                 process.exitValue() shouldBe ExitCode.SUCCESS.code
             }
         }
 
         test("unknown command error") {
-            runWithCommand(listOf("notexisitingcommand")) {
+            runCommand(listOf("notexisitingcommand")) {
                 process.waitFor()
 
                 val expectedOutput =
@@ -76,7 +53,7 @@ class ITBinaryCommands :
         }
 
         test("correct command should be suggested") {
-            runWithCommand(listOf("versTion")) {
+            runCommand(listOf("versTion")) {
                 process.waitFor()
 
                 val expectedOutput =
