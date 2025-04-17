@@ -1,0 +1,28 @@
+package objects.iou
+
+// Missing import for Color which is used in the struct
+struct TimestampedAmountWithColor {
+    amount: Number,
+    timestamp: DateTime,
+    color: Color  // Error - Color is not imported from car package
+};
+
+@api
+protocol[issuer, payee] Iou(var forAmount: Number) {
+    require(forAmount > 0, "Initial amount must be strictly positive");
+
+    initial state unpaid;
+    final state paid;
+
+    // This will fail as we're trying to use an undefined function
+    function initialValue() returns Number -> calculateValue(forAmount);
+
+    @api
+    permission[issuer] pay(amount: Number) | unpaid {
+        require(amount > 0, "Amount must be strictly positive");
+
+        if (amount == forAmount) {
+            become paid;
+        };
+    };
+};

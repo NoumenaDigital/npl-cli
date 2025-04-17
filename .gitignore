@@ -25,3 +25,7 @@ hs_err_pid*
 replay_pid*
 
 /.idea/
+/target/
+.cursorrules
+/npl-cli-core/target/
+/npl-cli-e2e/target/

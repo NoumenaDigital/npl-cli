@@ -1,0 +1,19 @@
+package objects.car
+
+enum Color {
+    Red, Blue, Yellow, Green, Black
+};
+
+@api
+protocol[owner] Car(var model: Text, var color: Color) {
+    // Missing closing bracket for permission block
+    @api
+    permission[owner] changeColor(newColor: Color) {
+        this.color = newColor;
+
+
+    // Wrong variable name
+    permission[owner] getColor() returns Color {
+        return unknownVariable;
+    };
+};

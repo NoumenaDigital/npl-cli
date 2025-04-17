@@ -1,0 +1,37 @@
+package objects.iou
+
+struct TimestampedAmount {
+    amount: Number,
+    timestamp: DateTime
+};
+
+// Missing function implementation
+function total(entries: List<TimestampedAmount>) returns Number;
+
+@api
+protocol[issuer, payee] Iou(var forAmount: Number) {
+    require(forAmount > 0, "Initial amount must be strictly positive");
+
+    initial state unpaid;
+    final state paid;
+    final state forgiven;
+
+    private var payments = listOf<TimestampedAmount>();
+
+    // This will cause an error since total() is not implemented
+    function amountOwed() returns Number -> forAmount - total(payments);
+
+    @api
+    permission[issuer] pay(amount: Number) | unpaid {
+        require(amount > 0, "Amount must be strictly positive");
+        require(amount <= amountOwed(), "Amount may not exceed amount owed");
+
+        var p = TimestampedAmount(amount = amount, timestamp = now());
+
+        payments = payments.with(p);
+
+        if (amountOwed() == 0) {
+            become paid;
+        };
+    };
+};

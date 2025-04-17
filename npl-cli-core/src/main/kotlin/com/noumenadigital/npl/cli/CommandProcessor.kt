@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
 import com.noumenadigital.npl.cli.exception.InternalException
@@ -10,28 +11,35 @@ import java.io.Writer
 class CommandProcessor(
     private val commandsParser: CommandsParser = CommandsParser,
 ) {
-    companion object {
-        private const val START_MESSAGE = "Executing command '%s'...\n"
-        private const val END_MESSAGE_SUCCESS = "\nCommand '%s' finished SUCCESSFULLY."
-    }
-
     fun process(
         inputArgs: List<String>,
         output: Writer,
-    ) {
+    ): ExitCode {
         output.use { out ->
             try {
-                val command = commandsParser.parse(inputArgs)
-                out.write(START_MESSAGE.format(command.commandName))
-                command.execute(out)
-                out.write(END_MESSAGE_SUCCESS.format(command.commandName))
+                return commandsParser.parse(inputArgs).execute(out)
             } catch (ex: InternalException) {
                 when (ex) {
-                    is CommandNotFoundException -> output.write(ex.buildOutputMessage())
-                    is CommandParsingException -> output.write(ex.buildOutputMessage())
+                    is CommandNotFoundException -> {
+                        output.write(ex.buildOutputMessage())
+                        return ExitCode.CONFIG_ERROR
+                    }
+                    is CommandParsingException -> {
+                        output.write(ex.buildOutputMessage())
+                        return ExitCode.USAGE_ERROR
+                    }
+                    is CommandExecutionException -> {
+                        output.write(ex.buildOutputMessage(inputArgs))
+                        return ExitCode.INTERNAL_ERROR
+                    }
                 }
             } catch (ex: Exception) {
-                ex.buildOutputMessage(inputArgs)
+                output.write(ex.buildOutputMessage(inputArgs))
+                return when {
+                    ex is java.io.IOException -> ExitCode.IO_ERROR
+                    ex.message?.contains("file", ignoreCase = true) == true -> ExitCode.NO_INPUT
+                    else -> ExitCode.INTERNAL_ERROR
+                }
             }
         }
     }
