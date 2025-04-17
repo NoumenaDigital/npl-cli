@@ -35,8 +35,6 @@ data class CheckCommand(
 
         try {
             checkDirectory(targetDir)
-            colorOutput.writeln("Looking for NPL files in $targetDir")
-
             val sources = collectSourcesFromDirectory(targetDir, colorOutput)
             val mainResult =
                 if (sources.isEmpty()) {

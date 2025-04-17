@@ -56,7 +56,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             Completed compilation for 1 file in XXX ms
 
                             NPL check completed successfully.
@@ -77,7 +76,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             Completed compilation for 4 files in XXX ms
 
                             NPL check completed successfully.
@@ -98,7 +96,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             Completed compilation for 2 files in XXX ms
 
                             NPL check completed successfully.
@@ -119,7 +116,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             Completed compilation for 2 files in XXX ms
 
                             NPL check completed successfully.
@@ -140,7 +136,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             Completed compilation for 1 file in XXX ms
 
                             NPL check completed successfully.
@@ -163,7 +158,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             $testDirPath/src/main/npl/objects/car/car.npl: (7, 1) E0001: Syntax error: rule statement failed predicate: {quirksMode}?
                             $testDirPath/src/main/npl/objects/car/car.npl: (8, 1) E0001: Syntax error: missing {<EOF>, ';'} at 'protocol'
                             $testDirPath/src/main/npl/objects/car/car.npl: (16, 5) E0001: Syntax error: extraneous input 'permission' expecting {'become', 'const', 'for', 'function', 'guard', 'if', 'match', 'notify', 'optional', 'private', 'require', 'return', 'this', 'var', 'vararg', 'with', TEXT_LITERAL, BOOLEAN_LITERAL, PARTY_LITERAL, TIME_LITERAL, NUMBER_LITERAL, IDENTIFIER, '(', '{', '}', '-', '!'}
@@ -186,7 +180,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             $testDirPath/src/main/npl/objects/iou/iou.npl: (9, 64) E0001: Syntax error: mismatched input ';' expecting {'->', '<'}
 
                             NPL check failed with errors.
@@ -207,7 +200,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             $testDirPath/src/main/npl/objects/car/car.npl: (10, 69) E0002: Unknown 'Vehicle'
                             $testDirPath/src/main/npl/objects/iou/iou.npl: (7, 12) E0002: Unknown 'Color'
                             $testDirPath/src/main/npl/objects/iou/iou.npl: (18, 47) E0002: Unknown 'calculateValue'
@@ -230,7 +222,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             $testDirPath/src/test/npl/objects/test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod'
 
                             NPL check failed with errors.
@@ -251,7 +242,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             $testDirPath/src/main/npl-141.1/objects/car/car.npl: (3, 11) E0001: Syntax error: missing {<EOF>, ';'} at 'this'
                             $testDirPath/src/main/npl-141.1/objects/car/car.npl: (3, 16) E0001: Syntax error: missing {<EOF>, ';'} at 'will'
                             $testDirPath/src/main/npl-141.1/objects/car/car.npl: (3, 21) E0001: Syntax error: missing {<EOF>, ';'} at 'cause'
@@ -317,7 +307,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             $testDirPath/src/main/npl/objects.iou/iou.npl: (18, 5) W0019: Public property `payments` should be explicitly typed.
                             $testDirPath/src/main/npl/processes/demo.npl: (15, 5) W0016: Declared variable `car` unused
                             $testDirPath/src/main/npl/processes/demo.npl: (16, 5) W0016: Declared variable `iou` unused
@@ -341,7 +330,6 @@ class ITCheckCommand :
                     val expectedOutput =
                         normalizeOutput(
                             """
-                            Looking for NPL files in $testDirPath
                             No NPL source files found
 
                             NPL check completed with warnings.
