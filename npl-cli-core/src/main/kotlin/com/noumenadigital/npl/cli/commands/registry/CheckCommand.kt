@@ -20,7 +20,7 @@ data class CheckCommand(
 ) : CommandExecutor {
     companion object {
         const val COMMAND_DESCRIPTION =
-            "Validate the correctness of the NPL sources (excluding test sources) in the current directory."
+            "Validate the correctness of the NPL sources (excluding test sources) in the current directory"
         private const val NPL_EXTENSION = ".npl"
     }
 
@@ -191,7 +191,7 @@ data class CheckCommand(
                 .walk(directory.toPath())
                 .filter { Files.isRegularFile(it) && it.toString().endsWith(NPL_EXTENSION) }
                 .forEach { sources.add(Source.create(it.toUri().toURL())) }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Just return what we have so far
         }
 

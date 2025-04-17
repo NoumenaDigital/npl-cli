@@ -30,9 +30,7 @@ class ITBinaryCommands :
 
                 val expectedOutput =
                     """
-                    Executing command 'version'...
                     I'm v1.0
-                    Command 'version' finished SUCCESSFULLY.
                     """.trimIndent()
 
                 output shouldBeEqual expectedOutput
@@ -47,11 +45,10 @@ class ITBinaryCommands :
 
                 val expectedOutput =
                     """
-                    Executing command 'help'...
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
+                    check      Validate the correctness of the NPL sources (excluding test sources) in the current directory
 
-                    Command 'help' finished SUCCESSFULLY.
                     """.trimIndent()
 
                 output shouldBe expectedOutput
@@ -70,7 +67,7 @@ class ITBinaryCommands :
                     """.trimIndent()
 
                 output shouldBeEqual expectedOutput
-                process.exitValue() shouldBe 0 // TODO: this should be 1, changed after https://github.com/NoumenaDigital/npl-cli/pull/11
+                process.exitValue() shouldBe 78
             }
         }
 
@@ -84,7 +81,7 @@ class ITBinaryCommands :
                     """.trimIndent()
 
                 output shouldBeEqual expectedOutput
-                process.exitValue() shouldBe 0 // TODO: this should be 1, changed after https://github.com/NoumenaDigital/npl-cli/pull/11
+                process.exitValue() shouldBe 78
             }
         }
     })
