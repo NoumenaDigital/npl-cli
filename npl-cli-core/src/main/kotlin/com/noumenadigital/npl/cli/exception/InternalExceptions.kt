@@ -9,3 +9,8 @@ class CommandParsingException(
 class CommandNotFoundException(
     val commandName: String,
 ) : InternalException()
+
+class CommandExecutionException(
+    override val message: String,
+    override val cause: Throwable? = null,
+) : InternalException()

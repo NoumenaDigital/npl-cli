@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli.commands
 
+import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -12,8 +13,9 @@ class VersionCommandTest :
             val writer = StringWriter()
             val command = VersionCommand
 
-            command.execute(writer)
+            val exitCode = command.execute(writer)
 
             writer.toString() shouldBe "I'm v1.0"
+            exitCode shouldBe ExitCode.SUCCESS
         }
     })

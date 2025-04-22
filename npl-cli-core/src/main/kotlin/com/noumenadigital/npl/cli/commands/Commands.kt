@@ -1,26 +1,29 @@
 package com.noumenadigital.npl.cli.commands
 
+import com.noumenadigital.npl.cli.commands.registry.CheckCommand
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 
 enum class Commands(
-    val commandName: String,
-    val description: String,
-    val createExecutor: (List<String>) -> CommandExecutor,
+    private val commandExecutorFactory: () -> CommandExecutor,
 ) {
-    VERSION(
-        "version",
-        VersionCommand.COMMAND_DESCRIPTION,
-        { VersionCommand },
-    ),
-    HELP(
-        "help",
-        HelpCommand.COMMAND_DESCRIPTION,
-        { HelpCommand },
-    ),
+    VERSION({ VersionCommand }),
+    HELP({ HelpCommand }),
+    CHECK({ CheckCommand() }),
     ;
+
+    val commandName: String
+        get() = commandExecutorFactory().commandName
+
+    val description: String
+        get() = commandExecutorFactory().description
+
+    /**
+     * Get the base executor for this command
+     */
+    fun getBaseExecutor(): CommandExecutor = commandExecutorFactory()
 
     companion object {
         fun commandFromString(
@@ -28,10 +31,12 @@ enum class Commands(
             params: List<String> = emptyList(),
         ): CommandExecutor {
             val normalizedCommand = command.lowercase()
-            return Commands.fromString(normalizedCommand)?.createExecutor?.invoke(params)
-                ?: throw CommandNotFoundException(normalizedCommand)
-        }
+            val matchedCommand =
+                entries.find { it.commandName.equals(normalizedCommand, ignoreCase = true) }
+                    ?: throw CommandNotFoundException(normalizedCommand)
 
-        private fun fromString(name: String): Commands? = entries.find { it.commandName.equals(name, ignoreCase = true) }
+            val baseExecutor = matchedCommand.getBaseExecutor()
+            return baseExecutor.createInstance(params)
+        }
     }
 }

@@ -1,0 +1,13 @@
+package objects
+
+use objects.iou.Iou
+
+const ISSUER = 'issuer';
+const PAYEE = 'payee';
+
+@test
+function test_with_error(test: Test) -> {
+    // This is a error in a test file, but should not cause check failure
+    var iou = Iou[ISSUER, PAYEE](100);
+    iou.undefinedMethod(); // Error: undefinedMethod does not exist
+};
