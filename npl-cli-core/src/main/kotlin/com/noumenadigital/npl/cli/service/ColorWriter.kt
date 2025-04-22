@@ -27,11 +27,8 @@ class ColorWriter(
     }
 
     override fun close() {
-        try {
-            writer.close()
-        } finally {
-            AnsiConsole.systemUninstall()
-        }
+        AnsiConsole.systemUninstall()
+        writer.close()
     }
 
     fun yellow(text: String) {
