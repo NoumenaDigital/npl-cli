@@ -1,17 +1,18 @@
 package com.noumenadigital.npl.cli
 
 import com.noumenadigital.npl.cli.TestUtils.normalize
+import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
 
-class ITCheckCommand :
+class CheckCommandIT :
     FunSpec({
         context("success") {
             test("single file") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("success", "single_file")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("success", "single_file")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -31,7 +32,7 @@ class ITCheckCommand :
 
             test("multiple files") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -51,7 +52,7 @@ class ITCheckCommand :
 
             test("multiple packages") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("success", "multiple_packages")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("success", "multiple_packages")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -71,7 +72,7 @@ class ITCheckCommand :
 
             test("both main and test sources") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -91,7 +92,7 @@ class ITCheckCommand :
 
             test("versioned npl directory fallback") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("success", "versioned_dirs")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("success", "versioned_dirs")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -113,7 +114,7 @@ class ITCheckCommand :
         context("failures") {
             test("single file") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("failure", "single_file")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("failure", "single_file")).toAbsolutePath().toString()
                 runCommand(listOf("check", testDirPath)) {
                     process.waitFor()
 
@@ -133,7 +134,7 @@ class ITCheckCommand :
 
             test("multiple files") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("failure", "multiple_files")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("failure", "multiple_files")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -153,7 +154,7 @@ class ITCheckCommand :
 
             test("multiple packages") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("failure", "multiple_packages")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("failure", "multiple_packages")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -173,9 +174,9 @@ class ITCheckCommand :
                 }
             }
 
-            test("failure in test sources") {
+            test("failure in test sources but not in main sources") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("success", "test_failure")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("success", "test_failure")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -195,7 +196,7 @@ class ITCheckCommand :
 
             test("versioned directory with errors") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("failure", "versioned_dir_errors")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("failure", "versioned_dir_errors")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -216,49 +217,12 @@ class ITCheckCommand :
                     process.exitValue() shouldBe ExitCode.COMPILATION_ERROR.code
                 }
             }
-
-            test("directory does not exist") {
-                val nonExistentPath = "${TestUtils.getTestResourcesPath()}/non_existent_dir"
-                runCommand(
-                    commands = listOf("check", nonExistentPath),
-                ) {
-                    process.waitFor()
-
-                    val expectedOutput =
-                        """
-                    Target directory does not exist: $nonExistentPath
-                    """.normalize()
-
-                    output.normalize() shouldBe expectedOutput
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-                }
-            }
-
-            test("path is not a directory") {
-                // Create a temporary file
-                val tempFile = File.createTempFile("test", ".tmp")
-                tempFile.deleteOnExit()
-
-                runCommand(
-                    commands = listOf("check", tempFile.absolutePath),
-                ) {
-                    process.waitFor()
-
-                    val expectedOutput =
-                        """
-                    Target path is not a directory: ${tempFile.absolutePath}
-                    """.normalize()
-
-                    output.normalize() shouldBe expectedOutput
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-                }
-            }
         }
 
         context("warnings") {
             test("warnings during compilation") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("warnings", "compilation")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("warnings", "compilation")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -281,7 +245,7 @@ class ITCheckCommand :
 
             test("no NPL sources") {
                 val testDirPath =
-                    TestUtils.getTestResourcesPath(listOf("warnings", "no_sources")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("warnings", "no_sources")).toAbsolutePath().toString()
                 runCommand(
                     commands = listOf("check", testDirPath),
                 ) {
@@ -299,4 +263,43 @@ class ITCheckCommand :
                 }
             }
         }
-    })
+
+        context("directory failures") {
+            test("directory does not exist") {
+                val nonExistentPath = getTestResourcesPath(listOf("non_existent_directory")).toAbsolutePath()
+                runCommand(
+                    commands = listOf("check", nonExistentPath.toString()),
+                ) {
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    Target directory does not exist: $nonExistentPath
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                }
+            }
+
+            test("path is not a directory") {
+                // Create a temporary file to use as target
+                val tempFile = File.createTempFile("temp", ".txt")
+                tempFile.deleteOnExit()
+
+                runCommand(
+                    commands = listOf("check", tempFile.absolutePath),
+                ) {
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    Target path is not a directory: ${tempFile.absolutePath}
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                }
+            }
+        }
+    }) 

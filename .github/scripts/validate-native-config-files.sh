@@ -1,16 +1,16 @@
 #!/bin/bash
 set -e
 
-# Run the generate-native-configs.sh script
-echo "Running generate-native-configs.sh..."
-./generate-native-configs.sh
+# Run the Maven config-gen profile to generate native configuration
+echo "Generating native configuration with Maven..."
+mvn clean verify -Pconfig-gen
 
 # Check for git diff
 echo "Validating that there are no changes in the repository..."
 if [[ -n $(git diff --ignore-blank-lines) ]]; then
-  echo "Error: Running generate-native-configs.sh resulted in changes to the repository."
+  echo "Error: Running 'mvn verify -Pconfig-gen' resulted in changes to the repository."
   exit 1
 fi
 
-echo "Validation passed: No changes detected after running generate-native-configs.sh."
+echo "Validation passed: No changes detected after generating native configuration."
 exit 0

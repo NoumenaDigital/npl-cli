@@ -13,8 +13,8 @@ import java.nio.file.Paths
 class CheckCommandTest :
     FunSpec({
         fun getTestResourcesPath(subPath: String = ""): Path {
-            val rootDir = File("..").canonicalFile
-            return Paths.get(rootDir.toString(), "test-resources", "npl-sources", subPath)
+            val rootDir = File(".").canonicalFile
+            return Paths.get(rootDir.toString(), "src/test/resources", "npl-sources", subPath)
         }
 
         data class TestContext(

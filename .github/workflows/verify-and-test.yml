@@ -63,5 +63,5 @@ jobs:
           java-version: "21"
           cache: "maven"
 
-      - name: "Build npl-cli native binary"
+      - name: "Build npl-cli native binary and test it"
         run: mvn -Pnative clean verify
