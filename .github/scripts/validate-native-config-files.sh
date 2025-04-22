@@ -8,7 +8,8 @@ mvn clean verify -Pconfig-gen
 # Check for git diff
 echo "Validating that there are no changes in the repository..."
 if [[ -n $(git diff --ignore-blank-lines) ]]; then
-  echo "Error: Running 'mvn verify -Pconfig-gen' resulted in changes to the repository."
+  echo "Error: Running 'mvn verify -Pconfig-gen' resulted in changes to the repository:"
+  git diff --ignore-blank-lines
   exit 1
 fi
 
