@@ -67,9 +67,6 @@
     <profiles>
         <profile>
             <id>native</id>
-            <properties>
-                <packaging.type>pom</packaging.type>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
