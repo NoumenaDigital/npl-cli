@@ -115,7 +115,7 @@
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-        
+
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -141,13 +141,13 @@
                     <jvmTarget>1.8</jvmTarget>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -162,7 +162,7 @@
                     </archive>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -233,7 +233,7 @@
                             <mainClass>${main.class}</mainClass>
                         </configuration>
                     </plugin>
-                    
+
                     <!-- Create symlink for tests -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -257,7 +257,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
+
                     <!-- Run integration tests with failsafe -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -318,7 +318,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
+
                     <!-- Run with native-image-agent -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -343,7 +343,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
+
                     <!-- Run unit tests with proper modes -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -357,7 +357,7 @@
                             </environmentVariables>
                         </configuration>
                     </plugin>
-                    
+
                     <!-- Run integration tests after packaging -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

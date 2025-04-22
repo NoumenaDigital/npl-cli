@@ -1,6 +1,5 @@
 package com.noumenadigital.npl.cli
 
-import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equals.shouldBeEqual
@@ -66,4 +65,4 @@ class BinaryCommandsIT :
                 process.exitValue() shouldBe ExitCode.CONFIG_ERROR.code
             }
         }
-    }) 
+    })
