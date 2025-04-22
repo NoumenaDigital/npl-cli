@@ -19,6 +19,14 @@
             <artifactId>language-compiler</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.noumenadigital.platform</groupId>
+            <artifactId>npl-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser-v3</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
         </dependency>

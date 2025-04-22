@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
+import com.noumenadigital.npl.cli.service.ColorWriter
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.StringWriter
@@ -10,7 +11,7 @@ class VersionCommandTest :
     FunSpec({
 
         test("should write version string to output") {
-            val writer = StringWriter()
+            val writer = ColorWriter(StringWriter(), true)
             val command = VersionCommand
 
             val exitCode = command.execute(writer)

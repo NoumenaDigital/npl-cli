@@ -2,11 +2,11 @@ package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.registry.CheckCommand
+import com.noumenadigital.npl.cli.service.ColorWriter
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
 import java.io.StringWriter
-import java.io.Writer
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -18,11 +18,10 @@ class CheckCommandTest :
         }
 
         data class TestContext(
-            val writer: Writer = StringWriter(),
+            val writer: ColorWriter = ColorWriter(StringWriter(), false),
             val testResourcesPath: Path = getTestResourcesPath(),
             val checkCommand: CheckCommand =
                 CheckCommand(
-                    useColor = false,
                     targetDir = testResourcesPath.toAbsolutePath().toString(),
                 ),
         ) {
@@ -38,7 +37,6 @@ class CheckCommandTest :
                     testResourcesPath = getTestResourcesPath(testDir),
                     checkCommand =
                         CheckCommand(
-                            useColor = false,
                             targetDir = getTestResourcesPath(testDir).toAbsolutePath().toString(),
                         ),
                 )
@@ -278,10 +276,9 @@ class CheckCommandTest :
             test("can enable colors if needed") {
                 val coloredCheckCommand =
                     CheckCommand(
-                        useColor = true,
                         targetDir = getTestResourcesPath("failure/single_file").toAbsolutePath().toString(),
                     )
-                val writer = StringWriter()
+                val writer = ColorWriter(StringWriter(), true)
 
                 val exitCode = coloredCheckCommand.execute(writer)
 
@@ -294,10 +291,9 @@ class CheckCommandTest :
         context("directory failures") {
             test("directory does not exist") {
                 val nonExistentPath = getTestResourcesPath("non_existent_directory").toAbsolutePath()
-                val writer = StringWriter()
+                val writer = ColorWriter(StringWriter(), false)
                 val checkCommand =
                     CheckCommand(
-                        useColor = false,
                         targetDir = nonExistentPath.toString(),
                     )
 
@@ -312,10 +308,9 @@ class CheckCommandTest :
                 val tempFile = File.createTempFile("temp", ".txt")
                 tempFile.deleteOnExit()
 
-                val writer = StringWriter()
+                val writer = ColorWriter(StringWriter(), false)
                 val checkCommand =
                     CheckCommand(
-                        useColor = false,
                         targetDir = tempFile.absolutePath,
                     )
 

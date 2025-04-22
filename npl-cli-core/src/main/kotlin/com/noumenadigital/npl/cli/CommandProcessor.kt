@@ -5,15 +5,15 @@ import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
 import com.noumenadigital.npl.cli.exception.InternalException
 import com.noumenadigital.npl.cli.exception.buildOutputMessage
+import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CommandsParser
-import java.io.Writer
 
 class CommandProcessor(
     private val commandsParser: CommandsParser = CommandsParser,
 ) {
     fun process(
         inputArgs: List<String>,
-        output: Writer,
+        output: ColorWriter,
     ): ExitCode {
         output.use { out ->
             try {

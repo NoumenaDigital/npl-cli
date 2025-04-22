@@ -1,7 +1,7 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import java.io.Writer
+import com.noumenadigital.npl.cli.service.ColorWriter
 
 data class CommandParameter(
     val name: String,
@@ -19,5 +19,5 @@ sealed interface CommandExecutor {
 
     fun createInstance(params: List<String>): CommandExecutor = this
 
-    fun execute(output: Writer): ExitCode
+    fun execute(output: ColorWriter): ExitCode
 }
