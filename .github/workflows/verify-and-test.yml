@@ -12,23 +12,6 @@ concurrency:
 
 jobs:
   verify:
-    name: "Run tests"
-    runs-on: "ubuntu-latest"
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v4
-
-      - name: "Set up Java and Maven"
-        uses: actions/setup-java@v4
-        with:
-          distribution: "graalvm"
-          java-version: "21"
-          cache: "maven"
-
-      - name: "Validate native config diff"
-        run: .github/scripts/validate-native-config-files.sh
-
-  verify-native:
     name: "Build and verify ${{ matrix.os }}-${{ matrix.arch }} Native Binary"
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -63,5 +46,8 @@ jobs:
           java-version: "21"
           cache: "maven"
 
-      - name: "Build npl-cli native binary"
+      - name: "Validate native config diff"
+        run: .github/scripts/validate-native-config-files.sh
+
+      - name: "Build npl-cli native binary and test it"
         run: mvn -Pnative clean verify

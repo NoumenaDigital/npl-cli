@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
 
-class ITBinaryCommands :
+class BinaryCommandsIT :
     FunSpec({
         test("version command should return correct value") {
             runCommand(listOf("version")) {
