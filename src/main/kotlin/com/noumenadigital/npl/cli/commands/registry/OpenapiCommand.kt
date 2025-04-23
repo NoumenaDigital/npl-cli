@@ -46,7 +46,7 @@ data class OpenapiCommand(
                 }
 
                 else -> {
-                    if (compilationResult.hasWarnings) { // might be unused
+                    if (compilationResult.hasWarnings) {
                         output.warning("NPL openapi has compilation warnings")
                     }
                     val protocolsPerPackage: Map<String, List<ProtocolProto>>? =
@@ -56,7 +56,7 @@ data class OpenapiCommand(
 
                     if (protocolsPerPackage.isNullOrEmpty()) {
                         output.error("No NPL protocols found in the target directory.")
-                        return ExitCode.DATA_ERROR
+                        return ExitCode.GENERAL_ERROR
                     }
 
                     protocolsPerPackage.forEach { (packagePath, protocols) ->
@@ -81,6 +81,9 @@ data class OpenapiCommand(
                     return ExitCode.SUCCESS
                 }
             }
+        } catch (e: CommandExecutionException) {
+            output.error(e.message)
+            return ExitCode.GENERAL_ERROR
         } catch (e: Exception) {
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
         }

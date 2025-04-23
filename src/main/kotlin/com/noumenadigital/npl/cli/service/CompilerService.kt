@@ -20,10 +20,7 @@ object CompilerService {
         nplContribLibrary: String = "$sourcesDir/npl-contrib",
         output: ColorWriter,
     ): CompilationResult {
-        val nplSources = collectSourcesFromDirectory(sourcesDir, output)
-        if (nplSources.isEmpty()) {
-            return CompilationResult(0, 0, 1, true)
-        }
+        val nplSources = collectSourcesFromDirectory(sourcesDir)
         val compileResult = compileSource(nplSources, nplContribLibrary, output)
         reportCompilationResults(nplSources.size, compileResult, output)
         output.info()
@@ -92,7 +89,8 @@ object CompilerService {
         output: ColorWriter,
     ): CompilationResult {
         if (sources.isEmpty()) {
-            return CompilationResult(0, 0, 1, true)
+            output.error("No NPL source files found")
+            return CompilationResult(0, 1, 0, false)
         }
 
         val compilerConfiguration =
@@ -142,20 +140,16 @@ object CompilerService {
         return CompilationResult(sources.size, errorCount, warningCount, errorCount == 0, protos = protos)
     }
 
-    private fun collectSourcesFromDirectory(
-        directory: String,
-        output: ColorWriter,
-    ): List<Source> {
+    private fun collectSourcesFromDirectory(directory: String): List<Source> {
         val dir = File(directory)
         if (!dir.exists() || !dir.isDirectory) {
-            output.info("No NPL source files found\n")
-            return emptyList()
+            throw CommandExecutionException("No NPL source files found")
         }
 
         val sources = collectNplSources(dir)
 
         if (sources.isEmpty()) {
-            output.info("No NPL source files found\n")
+            throw CommandExecutionException("No NPL source files found")
         }
 
         return sources

@@ -57,7 +57,7 @@ class OpenapiCommandIT :
                                 """.normalize()
 
                         output.normalize() shouldBe expectedOutput
-                        process.exitValue() shouldBe ExitCode.DATA_ERROR.code
+                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                         testResourcesPath.resolve("openapi").toFile().exists() shouldBe false
                     }
                 }
@@ -198,14 +198,11 @@ class OpenapiCommandIT :
                             val expectedOutput =
                                 """
                                  No NPL source files found
-
-                                 NPL openapi has compilation warnings
-                                 No NPL protocols found in the target directory.
                                  """.normalize()
 
                             output.normalize() shouldBe expectedOutput
                             testResourcesPath.resolve("openapi").toFile().exists() shouldBe false
-                            process.exitValue() shouldBe ExitCode.DATA_ERROR.code
+                            process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                         }
                     }
                 }

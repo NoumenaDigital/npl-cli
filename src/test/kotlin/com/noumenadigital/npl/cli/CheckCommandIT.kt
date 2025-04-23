@@ -254,8 +254,6 @@ class CheckCommandIT :
                     val expectedOutput =
                         """
                     No NPL source files found
-
-                    NPL check completed with warnings.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
