@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equals.shouldBeEqual
@@ -14,9 +15,9 @@ class BinaryCommandsIT :
                 val expectedOutput =
                     """
                     I'm v1.0
-                    """.trimIndent()
+                    """.normalize()
 
-                output shouldBeEqual expectedOutput
+                output.normalize() shouldBeEqual expectedOutput
                 process.exitValue() shouldBe ExitCode.SUCCESS.code
             }
         }
@@ -31,9 +32,11 @@ class BinaryCommandsIT :
                     help       Display the description for npl-cli commands
                     check      Validate the correctness of NPL sources
                                  <directory>  Target directory containing NPL source files to check (defaults to current directory)
-                    """.trimIndent()
+                    openapi    Generate the openapi specifications of NPL api
+                                 <directory>  Source directory containing NPL protocols (defaults to current directory)
+                    """.normalize()
 
-                output shouldBe expectedOutput
+                output.normalize() shouldBe expectedOutput
                 process.exitValue() shouldBe ExitCode.SUCCESS.code
             }
         }
@@ -45,9 +48,9 @@ class BinaryCommandsIT :
                 val expectedOutput =
                     """
                     Command not supported: 'notexisitingcommand'.
-                    """.trimIndent()
+                    """.normalize()
 
-                output shouldBeEqual expectedOutput
+                output.normalize() shouldBeEqual expectedOutput
                 process.exitValue() shouldBe ExitCode.CONFIG_ERROR.code
             }
         }
@@ -59,9 +62,9 @@ class BinaryCommandsIT :
                 val expectedOutput =
                     """
                     Command not supported: 'verstion'. Did you mean 'version'?
-                    """.trimIndent()
+                    """.normalize()
 
-                output shouldBeEqual expectedOutput
+                output.normalize() shouldBeEqual expectedOutput
                 process.exitValue() shouldBe ExitCode.CONFIG_ERROR.code
             }
         }

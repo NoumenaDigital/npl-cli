@@ -2,20 +2,20 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.Commands
-import java.io.Writer
+import com.noumenadigital.npl.cli.service.ColorWriter
 
 data object HelpCommand : CommandExecutor {
     override val commandName: String = "help"
     override val description: String = "Display the description for npl-cli commands"
 
-    override fun execute(output: Writer): ExitCode {
+    override fun execute(output: ColorWriter): ExitCode {
         val entries = Commands.entries
         val commandPadding = entries.maxOf { it.commandName.length } + 4
 
         entries.forEach { command ->
             // Print command name and description
             val name = command.commandName.padEnd(commandPadding)
-            output.write("$name${command.description}\n")
+            output.info("$name${command.description}")
 
             // Display parameter descriptions if any
             val executor = Commands.commandFromString(command.commandName)
@@ -32,7 +32,7 @@ data object HelpCommand : CommandExecutor {
                         else -> ""
                     }
 
-                output.write("$paramIndent<${param.name}>$requiredMark  ${param.description} $defaultText\n")
+                output.info("$paramIndent<${param.name}>$requiredMark  ${param.description} $defaultText")
             }
         }
 

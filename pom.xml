@@ -49,6 +49,7 @@
         <logback.version>1.5.13</logback.version>
         <slf4j.version>2.0.16</slf4j.version>
         <main.class>com.noumenadigital.npl.cli.MainKt</main.class>
+        <swagger-parser-v3.version>2.1.26</swagger-parser-v3.version>
     </properties>
 
     <dependencies>
@@ -57,6 +58,16 @@
             <groupId>com.noumenadigital.platform</groupId>
             <artifactId>language-compiler</artifactId>
             <version>${platform.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.noumenadigital.platform</groupId>
+            <artifactId>npl-api</artifactId>
+            <version>${platform.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser-v3</artifactId>
+            <version>${swagger-parser-v3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

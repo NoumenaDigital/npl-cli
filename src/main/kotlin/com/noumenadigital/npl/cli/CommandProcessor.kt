@@ -5,15 +5,15 @@ import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
 import com.noumenadigital.npl.cli.exception.InternalException
 import com.noumenadigital.npl.cli.exception.buildOutputMessage
+import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CommandsParser
-import java.io.Writer
 
 class CommandProcessor(
     private val commandsParser: CommandsParser = CommandsParser,
 ) {
     fun process(
         inputArgs: List<String>,
-        output: Writer,
+        output: ColorWriter,
     ): ExitCode {
         output.use { out ->
             try {
@@ -21,20 +21,22 @@ class CommandProcessor(
             } catch (ex: InternalException) {
                 when (ex) {
                     is CommandNotFoundException -> {
-                        output.write(ex.buildOutputMessage())
+                        output.error(ex.buildOutputMessage())
                         return ExitCode.CONFIG_ERROR
                     }
+
                     is CommandParsingException -> {
-                        output.write(ex.buildOutputMessage())
+                        output.error(ex.buildOutputMessage())
                         return ExitCode.USAGE_ERROR
                     }
+
                     is CommandExecutionException -> {
-                        output.write(ex.buildOutputMessage(inputArgs))
+                        output.error(ex.buildOutputMessage(inputArgs))
                         return ExitCode.INTERNAL_ERROR
                     }
                 }
             } catch (ex: Exception) {
-                output.write(ex.buildOutputMessage(inputArgs))
+                output.error(ex.buildOutputMessage(inputArgs))
                 return when {
                     ex is java.io.IOException -> ExitCode.IO_ERROR
                     ex.message?.contains("file", ignoreCase = true) == true -> ExitCode.NO_INPUT
