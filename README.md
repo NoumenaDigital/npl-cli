@@ -35,12 +35,12 @@ Regular testing that runs integration tests directly without using binary:
 mvn clean test
 ```
 
-### E2E Profile
+### Native Profile
 
 Builds a native binary and runs integration tests against it:
 
 ```bash
-mvn clean verify -Pe2e
+mvn clean verify -Pnative
 ```
 
 ### Config Generation Profile

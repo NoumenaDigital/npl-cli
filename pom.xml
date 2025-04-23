@@ -7,7 +7,6 @@
     <groupId>com.noumenadigital.platform</groupId>
     <artifactId>npl-cli</artifactId>
     <version>2025.1.3</version>
-    <packaging>jar</packaging>
 
     <name>NPL CLI</name>
     <description>NPL CLI is a command-line tool designed to interact with the NPL Runtime and NOUMENA Cloud</description>
@@ -204,9 +203,9 @@
             </build>
         </profile>
 
-        <!-- E2E Profile: Build native binary and run tests against it -->
+        <!-- Native Profile: Build native binary and run "e2e" tests against it -->
         <profile>
-            <id>e2e</id>
+            <id>native</id>
             <build>
                 <plugins>
                     <!-- Build the native binary -->
