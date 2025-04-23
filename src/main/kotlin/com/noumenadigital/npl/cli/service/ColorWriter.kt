@@ -1,12 +1,19 @@
-package com.noumenadigital.npl.cli.util
+package com.noumenadigital.npl.cli.service
 
 import org.fusesource.jansi.Ansi
+import org.fusesource.jansi.AnsiConsole
 import java.io.Writer
 
 class ColorWriter(
     private val writer: Writer,
     private val useColor: Boolean = true,
 ) : Writer() {
+    init {
+        if (useColor) {
+            AnsiConsole.systemInstall()
+        }
+    }
+
     override fun write(
         cbuf: CharArray,
         off: Int,
@@ -20,7 +27,11 @@ class ColorWriter(
     }
 
     override fun close() {
-        writer.close()
+        writer.use {
+            if (useColor) {
+                AnsiConsole.systemUninstall()
+            }
+        }
     }
 
     fun yellow(text: String) {
@@ -64,4 +75,6 @@ class ColorWriter(
         } else {
             text
         }
+
+    override fun toString(): String = writer.toString()
 }

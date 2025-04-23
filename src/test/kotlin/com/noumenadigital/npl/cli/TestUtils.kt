@@ -1,6 +1,8 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.service.ColorWriter
 import java.io.File
+import java.io.StringWriter
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -122,7 +124,7 @@ object TestUtils {
     }
 
     private fun runDirect(commands: List<String>): TestContext {
-        val stringWriter = java.io.StringWriter()
+        val stringWriter = ColorWriter(StringWriter(), false)
 
         val exitCode = CommandProcessor().process(commands, stringWriter)
 

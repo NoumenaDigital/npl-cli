@@ -5,13 +5,12 @@ import com.noumenadigital.npl.cli.ExitCode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.StringWriter
-import java.io.Writer
 
 class CommandProcessorServiceTest :
     FunSpec({
         data class TestContext(
             val commandsParser: CommandsParser = CommandsParser,
-            val writer: Writer = StringWriter(),
+            val writer: ColorWriter = ColorWriter(StringWriter(), false),
             val executor: CommandProcessor = CommandProcessor(commandsParser),
         )
 
@@ -38,6 +37,8 @@ class CommandProcessorServiceTest :
                     help       Display the description for npl-cli commands
                     check      Validate the correctness of NPL sources
                                  <directory>  Target directory containing NPL source files to check (defaults to current directory)
+                    openapi    Generate the openapi specifications of NPL api
+                                 <directory>  Target directory containing NPL protocols (defaults to current directory)
                     """.trimIndent()
 
                 writer.toString().trimIndent() shouldBe expectedOutput
