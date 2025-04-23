@@ -74,8 +74,8 @@ class OpenapiCommandIT :
                             """
                         Completed compilation for 4 files in XXX ms
 
-                        Generating openapi for /processes
                         Generating openapi for /objects/iou
+                        Generating openapi for /processes
                         NPL openapi completed successfully.
                         """.normalize()
 
@@ -98,8 +98,8 @@ class OpenapiCommandIT :
                             """
                             Completed compilation for 2 files in XXX ms
 
-                            Generating openapi for /objects/iou
                             Generating openapi for /objects/car
+                            Generating openapi for /objects/iou
                             NPL openapi completed successfully.
                             """.normalize()
 

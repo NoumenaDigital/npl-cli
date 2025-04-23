@@ -51,6 +51,7 @@ data class OpenapiCommand(
                 compilationResult.protos
                     ?.filterIsInstance<ProtocolProto>()
                     ?.groupBy { it.protoId.qualifiedPath.toString() }
+                    ?.toSortedMap()
 
             if (protocolsPerPackage.isNullOrEmpty()) {
                 output.error("No NPL protocols found in the target directory.")

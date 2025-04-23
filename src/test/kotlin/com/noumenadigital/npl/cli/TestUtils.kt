@@ -42,8 +42,6 @@ object TestUtils {
         replace("\r\n", "\n")
             // Normalize durations
             .replace(Regex("in \\d+ ms"), "in XXX ms")
-            // Normalize openapi paths
-            .replace(Regex("Generating openapi for .+"), "Generating openapi for XXX")
             // Remove any ANSI color codes
             .replace(Regex("\\e\\[[0-9;]*m"), "")
             .trimIndent()
