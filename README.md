@@ -9,6 +9,8 @@ offers several useful commands for interacting with your NPL projects.
 - `npl help` - Displays help information for the NPL CLI.
 - `npl check` - Checks the NPL for compilation errors and warnings. An optional path to a directory can be provided as
   an argument. If no path is provided, the current working directory is used.
+- `npl openapi` - Generates the openapi specs for NPL protocols. An optional path to a directory can be provided as an
+  argument. If no path is provided, the current working directory is used.
 
 ## Supported Operating Systems and architectures
 
