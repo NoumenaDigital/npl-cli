@@ -8,11 +8,11 @@ import com.noumenadigital.npl.lang.ProtocolProto
 import com.noumenadigital.platform.nplapi.ApiConfiguration
 import com.noumenadigital.platform.nplapi.openapi.OpenAPIGenerator
 import io.swagger.v3.core.util.Yaml
-import java.io.File
-import java.io.FileWriter
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
+import java.nio.file.Path
+import java.nio.file.Paths
 
 data class OpenapiCommand(
     private val targetDir: String = ".",
@@ -56,7 +56,7 @@ data class OpenapiCommand(
 
                     if (protocolsPerPackage.isNullOrEmpty()) {
                         output.redln("No NPL protocols found in the target directory.")
-                        return ExitCode.NO_INPUT
+                        return ExitCode.DATA_ERROR
                     }
 
                     protocolsPerPackage.forEach { (packagePath, protocols) ->
@@ -70,12 +70,11 @@ data class OpenapiCommand(
                             }
 
                         val openApi = apiGen.generate(protocols)
-
                         val packageName = packagePath.removePrefix("/").replace("/", ".")
 
                         writeToFile(
                             Yaml.pretty(openApi),
-                            "$targetDir/openapi/$packageName-openapi.yml",
+                            Paths.get(targetDir, "openapi", "$packageName-openapi.yml"),
                         )
                     }
                     output.greenln("NPL openapi completed successfully.")
@@ -89,15 +88,13 @@ data class OpenapiCommand(
 
     private fun writeToFile(
         content: String,
-        filePath: String,
+        filePath: Path,
     ) {
         try {
-            val file = File(filePath)
+            val file = filePath.toFile()
             file.parentFile?.mkdirs()
 
-            FileWriter(filePath, false).use { writer ->
-                writer.write(content)
-            }
+            file.writeText(content)
         } catch (e: IOException) {
             throw CommandExecutionException("Failed to write to file: ${e.message}", e)
         }
