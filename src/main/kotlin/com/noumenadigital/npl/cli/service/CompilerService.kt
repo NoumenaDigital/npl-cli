@@ -60,7 +60,7 @@ object CompilerService {
                     "$warningText in ${result.duration} ms"
 
             if (result.hasWarnings) {
-                output.info(successMessage)
+                output.warning(successMessage)
             } else {
                 output.success(successMessage)
             }

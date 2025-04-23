@@ -21,22 +21,22 @@ class CommandProcessor(
             } catch (ex: InternalException) {
                 when (ex) {
                     is CommandNotFoundException -> {
-                        output.write(ex.buildOutputMessage())
+                        output.error(ex.buildOutputMessage())
                         return ExitCode.CONFIG_ERROR
                     }
 
                     is CommandParsingException -> {
-                        output.write(ex.buildOutputMessage())
+                        output.error(ex.buildOutputMessage())
                         return ExitCode.USAGE_ERROR
                     }
 
                     is CommandExecutionException -> {
-                        output.write(ex.buildOutputMessage(inputArgs))
+                        output.error(ex.buildOutputMessage(inputArgs))
                         return ExitCode.INTERNAL_ERROR
                     }
                 }
             } catch (ex: Exception) {
-                output.write(ex.buildOutputMessage(inputArgs))
+                output.error(ex.buildOutputMessage(inputArgs))
                 return when {
                     ex is java.io.IOException -> ExitCode.IO_ERROR
                     ex.message?.contains("file", ignoreCase = true) == true -> ExitCode.NO_INPUT

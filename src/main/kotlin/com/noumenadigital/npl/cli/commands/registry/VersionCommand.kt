@@ -9,7 +9,7 @@ data object VersionCommand : CommandExecutor {
 
     // TODO: ST-4556
     override fun execute(output: ColorWriter): ExitCode {
-        output.write("I'm v1.0")
+        output.success("I'm v1.0")
         return ExitCode.SUCCESS
     }
 }

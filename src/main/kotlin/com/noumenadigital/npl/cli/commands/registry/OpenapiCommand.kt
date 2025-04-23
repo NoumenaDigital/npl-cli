@@ -25,7 +25,7 @@ data class OpenapiCommand(
         listOf(
             CommandParameter(
                 name = "directory",
-                description = "Target directory containing NPL protocols",
+                description = "Source directory containing NPL protocols",
                 defaultValue = ".",
                 isRequired = false,
             ),
@@ -39,48 +39,44 @@ data class OpenapiCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             val compilationResult = compileAndReport(sourcesDir = targetDir, output = output)
-            when {
-                compilationResult.hasErrors -> {
-                    output.error("NPL openapi failed with errors.")
-                    return ExitCode.COMPILATION_ERROR
-                }
-
-                else -> {
-                    if (compilationResult.hasWarnings) {
-                        output.warning("NPL openapi has compilation warnings")
-                    }
-                    val protocolsPerPackage: Map<String, List<ProtocolProto>>? =
-                        compilationResult.protos
-                            ?.filterIsInstance<ProtocolProto>()
-                            ?.groupBy { it.protoId.qualifiedPath.toString() }
-
-                    if (protocolsPerPackage.isNullOrEmpty()) {
-                        output.error("No NPL protocols found in the target directory.")
-                        return ExitCode.GENERAL_ERROR
-                    }
-
-                    protocolsPerPackage.forEach { (packagePath, protocols) ->
-                        output.info("Generating openapi for $packagePath")
-
-                        val apiGen =
-                            try {
-                                OpenAPIGenerator(ApiConfiguration(URI(defaultUri), null), packagePath)
-                            } catch (e: URISyntaxException) {
-                                throw CommandExecutionException("Failed to run openapi generation", e)
-                            }
-
-                        val openApi = apiGen.generate(protocols)
-                        val packageName = packagePath.removePrefix("/").replace("/", ".")
-
-                        writeToFile(
-                            Yaml.pretty(openApi),
-                            Paths.get(targetDir, "openapi", "$packageName-openapi.yml"),
-                        )
-                    }
-                    output.success("NPL openapi completed successfully.")
-                    return ExitCode.SUCCESS
-                }
+            if (compilationResult.hasErrors) {
+                output.error("NPL openapi failed with errors.")
+                return ExitCode.COMPILATION_ERROR
             }
+            if (compilationResult.hasWarnings) {
+                output.warning("NPL openapi has compilation warnings")
+            }
+
+            val protocolsPerPackage: Map<String, List<ProtocolProto>>? =
+                compilationResult.protos
+                    ?.filterIsInstance<ProtocolProto>()
+                    ?.groupBy { it.protoId.qualifiedPath.toString() }
+
+            if (protocolsPerPackage.isNullOrEmpty()) {
+                output.error("No NPL protocols found in the target directory.")
+                return ExitCode.GENERAL_ERROR
+            }
+
+            protocolsPerPackage.forEach { (packagePath, protocols) ->
+                output.info("Generating openapi for $packagePath")
+
+                val apiGen =
+                    try {
+                        OpenAPIGenerator(ApiConfiguration(URI(defaultUri), null), packagePath)
+                    } catch (e: URISyntaxException) {
+                        throw CommandExecutionException("Failed to run openapi generation", e)
+                    }
+
+                val openApi = apiGen.generate(protocols)
+                val packageName = packagePath.removePrefix("/").replace("/", ".")
+
+                writeToFile(
+                    Yaml.pretty(openApi),
+                    Paths.get(targetDir, "openapi", "$packageName-openapi.yml"),
+                )
+            }
+            output.success("NPL openapi completed successfully.")
+            return ExitCode.SUCCESS
         } catch (e: CommandExecutionException) {
             output.error(e.message)
             return ExitCode.GENERAL_ERROR

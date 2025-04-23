@@ -20,10 +20,7 @@ class CommandProcessorServiceTest :
         test("should execute parsed command and write output") {
             withTestContext {
                 val exitCode = executor.process(listOf("version"), writer)
-                val expectedOutput =
-                    """
-                    I'm v1.0
-                    """.trimIndent()
+                val expectedOutput = "I'm v1.0\n"
                 writer.toString() shouldBe expectedOutput
                 exitCode shouldBe ExitCode.SUCCESS
             }
@@ -38,7 +35,7 @@ class CommandProcessorServiceTest :
                     check      Validate the correctness of NPL sources
                                  <directory>  Target directory containing NPL source files to check (defaults to current directory)
                     openapi    Generate the openapi specifications of NPL api
-                                 <directory>  Target directory containing NPL protocols (defaults to current directory)
+                                 <directory>  Source directory containing NPL protocols (defaults to current directory)
                     """.trimIndent()
 
                 writer.toString().trimIndent() shouldBe expectedOutput
@@ -49,10 +46,7 @@ class CommandProcessorServiceTest :
         test("should print error message if command cannot be found") {
             withTestContext {
                 val exitCode = executor.process(listOf("nonExistingCommand"), writer)
-                val expectedOutput =
-                    """
-                    Command not supported: 'nonexistingcommand'.
-                    """.trimIndent()
+                val expectedOutput = "Command not supported: 'nonexistingcommand'.\n"
                 writer.toString() shouldBe expectedOutput
                 exitCode shouldBe ExitCode.CONFIG_ERROR
             }
@@ -61,10 +55,7 @@ class CommandProcessorServiceTest :
         test("should suggest another command if there is match with existing command") {
             withTestContext {
                 val exitCode = executor.process(listOf("vers"), writer)
-                val expectedOutput =
-                    """
-                    Command not supported: 'vers'. Did you mean 'version'?
-                    """.trimIndent()
+                val expectedOutput = "Command not supported: 'vers'. Did you mean 'version'?\n"
                 writer.toString() shouldBe expectedOutput
                 exitCode shouldBe ExitCode.CONFIG_ERROR
             }

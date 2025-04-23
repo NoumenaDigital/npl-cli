@@ -7,51 +7,31 @@ import java.io.Writer
 class ColorWriter(
     private val writer: Writer,
     private val useColor: Boolean = true,
-) : Writer() {
+) : AutoCloseable {
     init {
         if (useColor) {
             AnsiConsole.systemInstall()
         }
     }
 
-    override fun write(
-        cbuf: CharArray,
-        off: Int,
-        len: Int,
-    ) {
-        writer.write(cbuf, off, len)
-    }
-
-    override fun flush() {
-        writer.flush()
-    }
-
-    override fun close() {
-        writer.use {
-            if (useColor) {
-                AnsiConsole.systemUninstall()
-            }
-        }
-    }
-
     fun warning(text: String) {
-        write(formatWithColor(text, Ansi::fgYellow))
-        write("\n")
+        writer.write(formatWithColor(text, Ansi::fgYellow))
+        writer.write("\n")
     }
 
     fun error(text: String) {
-        write(formatWithColor(text, Ansi::fgRed))
-        write("\n")
+        writer.write(formatWithColor(text, Ansi::fgRed))
+        writer.write("\n")
     }
 
     fun success(text: String) {
-        write(formatWithColor(text, Ansi::fgGreen))
-        write("\n")
+        writer.write(formatWithColor(text, Ansi::fgGreen))
+        writer.write("\n")
     }
 
     fun info(text: String = "") {
-        write(text)
-        write("\n")
+        writer.write(text)
+        writer.write("\n")
     }
 
     private fun formatWithColor(
@@ -63,6 +43,14 @@ class ColorWriter(
         } else {
             text
         }
+
+    override fun close() {
+        writer.use {
+            if (useColor) {
+                AnsiConsole.systemUninstall()
+            }
+        }
+    }
 
     override fun toString(): String = writer.toString()
 }
