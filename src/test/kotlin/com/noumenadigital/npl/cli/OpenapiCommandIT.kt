@@ -11,6 +11,8 @@ import java.nio.file.Path
 
 class OpenapiCommandIT :
     FunSpec({
+        val openApiParser = OpenAPIV3Parser()
+
         data class OpenapiTestContext(
             val testResourcesPath: Path = getTestResourcesPath(),
         ) {
@@ -19,7 +21,7 @@ class OpenapiCommandIT :
             fun validateOpenapiSpec(expectedFileName: String): SwaggerParseResult {
                 val openapiDir = testResourcesPath.resolve("openapi")
                 val file = openapiDir.resolve(expectedFileName).toFile()
-                return OpenAPIV3Parser().readLocation(file.path, null, null)
+                return openApiParser.readLocation(file.path, null, null)
             }
         }
 

@@ -15,7 +15,7 @@ data object HelpCommand : CommandExecutor {
         entries.forEach { command ->
             // Print command name and description
             val name = command.commandName.padEnd(commandPadding)
-            output.write("$name${command.description}\n")
+            output.info("$name${command.description}")
 
             // Display parameter descriptions if any
             val executor = Commands.commandFromString(command.commandName)
@@ -32,7 +32,7 @@ data object HelpCommand : CommandExecutor {
                         else -> ""
                     }
 
-                output.write("$paramIndent<${param.name}>$requiredMark  ${param.description} $defaultText\n")
+                output.info("$paramIndent<${param.name}>$requiredMark  ${param.description} $defaultText")
             }
         }
 

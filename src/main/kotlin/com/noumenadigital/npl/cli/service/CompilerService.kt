@@ -26,7 +26,7 @@ object CompilerService {
         }
         val compileResult = compileSource(nplSources, nplContribLibrary, output)
         reportCompilationResults(nplSources.size, compileResult, output)
-        output.write("\n")
+        output.info()
         return compileResult
     }
 
@@ -63,9 +63,9 @@ object CompilerService {
                     "$warningText in ${result.duration} ms"
 
             if (result.hasWarnings) {
-                output.writeln(successMessage)
+                output.info(successMessage)
             } else {
-                output.greenln(successMessage)
+                output.success(successMessage)
             }
         }
     }
@@ -120,12 +120,12 @@ object CompilerService {
 
                 if (warningCount > 0) {
                     compileResult.warnings.forEach { warning ->
-                        output.yellowln(warning.description)
+                        output.warning(warning.description)
                     }
                 }
 
                 compileResult.errors.forEach { error ->
-                    output.redln(error.description)
+                    output.error(error.description)
                 }
             }
 
@@ -133,7 +133,7 @@ object CompilerService {
                 // Only warnings, no errors
                 warningCount = compileResult.warnings.size
                 compileResult.warnings.forEach { warning ->
-                    output.yellowln(warning.description)
+                    output.warning(warning.description)
                 }
                 protos = compileResult.throwOnError().protos.all
             }
@@ -148,14 +148,14 @@ object CompilerService {
     ): List<Source> {
         val dir = File(directory)
         if (!dir.exists() || !dir.isDirectory) {
-            output.writeln("No NPL source files found\n")
+            output.info("No NPL source files found\n")
             return emptyList()
         }
 
         val sources = collectNplSources(dir)
 
         if (sources.isEmpty()) {
-            output.writeln("No NPL source files found\n")
+            output.info("No NPL source files found\n")
         }
 
         return sources

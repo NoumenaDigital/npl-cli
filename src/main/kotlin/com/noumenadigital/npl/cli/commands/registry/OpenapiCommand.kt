@@ -41,13 +41,13 @@ data class OpenapiCommand(
             val compilationResult = compileAndReport(sourcesDir = targetDir, output = output)
             when {
                 compilationResult.hasErrors -> {
-                    output.redln("NPL openapi failed with errors.")
+                    output.error("NPL openapi failed with errors.")
                     return ExitCode.COMPILATION_ERROR
                 }
 
                 else -> {
                     if (compilationResult.hasWarnings) { // might be unused
-                        output.yellowln("NPL openapi has compilation warnings")
+                        output.warning("NPL openapi has compilation warnings")
                     }
                     val protocolsPerPackage: Map<String, List<ProtocolProto>>? =
                         compilationResult.protos
@@ -55,12 +55,12 @@ data class OpenapiCommand(
                             ?.groupBy { it.protoId.qualifiedPath.toString() }
 
                     if (protocolsPerPackage.isNullOrEmpty()) {
-                        output.redln("No NPL protocols found in the target directory.")
+                        output.error("No NPL protocols found in the target directory.")
                         return ExitCode.DATA_ERROR
                     }
 
                     protocolsPerPackage.forEach { (packagePath, protocols) ->
-                        output.writeln("Generating openapi for $packagePath")
+                        output.info("Generating openapi for $packagePath")
 
                         val apiGen =
                             try {
@@ -77,7 +77,7 @@ data class OpenapiCommand(
                             Paths.get(targetDir, "openapi", "$packageName-openapi.yml"),
                         )
                     }
-                    output.greenln("NPL openapi completed successfully.")
+                    output.success("NPL openapi completed successfully.")
                     return ExitCode.SUCCESS
                 }
             }

@@ -34,34 +34,22 @@ class ColorWriter(
         }
     }
 
-    fun yellow(text: String) {
+    fun warning(text: String) {
         write(formatWithColor(text, Ansi::fgYellow))
+        write("\n")
     }
 
-    fun red(text: String) {
+    fun error(text: String) {
         write(formatWithColor(text, Ansi::fgRed))
+        write("\n")
     }
 
-    fun green(text: String) {
+    fun success(text: String) {
         write(formatWithColor(text, Ansi::fgGreen))
-    }
-
-    fun yellowln(text: String) {
-        yellow(text)
         write("\n")
     }
 
-    fun redln(text: String) {
-        red(text)
-        write("\n")
-    }
-
-    fun greenln(text: String) {
-        green(text)
-        write("\n")
-    }
-
-    fun writeln(text: String) {
+    fun info(text: String = "") {
         write(text)
         write("\n")
     }

@@ -34,22 +34,22 @@ data class CheckCommand(
 
             when {
                 result.hasErrors -> {
-                    output.redln("NPL check failed with errors.")
+                    output.error("NPL check failed with errors.")
                     return ExitCode.COMPILATION_ERROR
                 }
 
                 result.hasWarnings -> {
-                    output.yellowln("NPL check completed with warnings.")
+                    output.warning("NPL check completed with warnings.")
                     return ExitCode.GENERAL_ERROR
                 }
 
                 else -> {
-                    output.greenln("NPL check completed successfully.")
+                    output.success("NPL check completed successfully.")
                     return ExitCode.SUCCESS
                 }
             }
         } catch (e: CommandExecutionException) {
-            output.redln(e.message)
+            output.error(e.message)
             return ExitCode.GENERAL_ERROR
         } catch (e: Exception) {
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
