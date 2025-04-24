@@ -9,15 +9,28 @@ echo "Validating native-image configs..."
 # Store the diff output
 DIFF_OUTPUT=$(git diff --ignore-blank-lines -- src/main/resources/META-INF/native-image/)
 
-# Check if diff contains only acceptable changes
+# If there are changes, analyze them
 if [[ -n "$DIFF_OUTPUT" ]]; then
-  # Count lines that contain jansi patterns or are just brackets/commas
-  ACCEPTABLE_LINES=$(echo "$DIFF_OUTPUT" | grep -E '(org/fusesource/jansi|^\s*[{},]+\s*$|^\+|^-|^diff|^index|^---|^\+\+\+)' | wc -l)
-  TOTAL_LINES=$(echo "$DIFF_OUTPUT" | wc -l)
+  # Extract only added/removed content lines (lines starting with + or - but not +++ or ---)
+  # and remove the leading + or - character
+  CHANGED_CONTENT=$(echo "$DIFF_OUTPUT" | grep -E '^(\+|-)[^+-]' | sed 's/^[+-]//')
 
-  # If all lines are acceptable, pass validation
-  if [[ "$ACCEPTABLE_LINES" -eq "$TOTAL_LINES" ]]; then
-    echo "Validation passed: Only acceptable changes found in native-image configuration."
+  # Define acceptable patterns
+  # 1. Lines containing jansi-related changes
+  JANSI_PATTERN='org/fusesource/jansi'
+
+  # 2. Lines with only JSON syntax (brackets and commas with optional whitespace)
+  JSON_SYNTAX_PATTERN='^\s*[{},]+\s*$'
+
+  # Count total content changes
+  TOTAL_CHANGES=$(echo "$CHANGED_CONTENT" | wc -l)
+
+  # Count acceptable content changes (matching our patterns)
+  ACCEPTABLE_CHANGES=$(echo "$CHANGED_CONTENT" | grep -E "($JANSI_PATTERN|$JSON_SYNTAX_PATTERN)" | wc -l)
+
+  # If all content changes are acceptable, pass validation
+  if [[ "$TOTAL_CHANGES" -eq "$ACCEPTABLE_CHANGES" ]]; then
+    echo "Validation passed: Only acceptable changes detected in native-image configuration."
     exit 0
   else
     echo "Error: Unexpected changes detected in native-image configs:"
