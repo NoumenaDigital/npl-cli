@@ -21,22 +21,11 @@
 },
 {
   "name":"org.fusesource.jansi.internal.JansiLoader",
-  "methods":[
-    {"name":"initialize","parameterTypes":[] }
-  ]
+  "methods":[{"name":"initialize","parameterTypes":[] }]
 },
 {
   "name":"org.fusesource.jansi.internal.Kernel32",
-  "fields":[
-    {"name":"BACKGROUND_BLUE"}, {"name":"BACKGROUND_GREEN"}, {"name":"BACKGROUND_INTENSITY"}, {"name":"BACKGROUND_RED"},
-    {"name":"FOREGROUND_BLUE"}, {"name":"FOREGROUND_GREEN"}, {"name":"FOREGROUND_INTENSITY"}, {"name":"FOREGROUND_RED"},
-    {"name":"HAVE_ISATTY"}, {"name":"HAVE_TTYNAME"}
-  ],
-  "methods":[
-    {"name":"FillConsoleOutputAttribute","parameterTypes":["long","short","int","org.fusesource.jansi.internal.Kernel32$COORD","org.fusesource.jansi.internal.Kernel32$DWORD"] },
-    {"name":"GetConsoleScreenBufferInfo","parameterTypes":["long","org.fusesource.jansi.internal.Kernel32$CONSOLE_SCREEN_BUFFER_INFO"] },
-    {"name":"SetConsoleTextAttribute","parameterTypes":["long","short"] },
-    {"name":"SetConsoleTitle","parameterTypes":["java.lang.String"] }
-  ]
+  "fields":[{"name":"BACKGROUND_BLUE"}, {"name":"BACKGROUND_GREEN"}, {"name":"BACKGROUND_INTENSITY"}, {"name":"BACKGROUND_RED"}, {"name":"FOREGROUND_BLUE"}, {"name":"FOREGROUND_GREEN"}, {"name":"FOREGROUND_INTENSITY"}, {"name":"FOREGROUND_RED"}, {"name":"HAVE_ISATTY"}, {"name":"HAVE_TTYNAME"}],
+  "methods":[{"name":"FillConsoleOutputAttribute","parameterTypes":["long","short","int","org.fusesource.jansi.internal.Kernel32$COORD","org.fusesource.jansi.internal.Kernel32$DWORD"] }, {"name":"GetConsoleScreenBufferInfo","parameterTypes":["long","org.fusesource.jansi.internal.Kernel32$CONSOLE_SCREEN_BUFFER_INFO"] }, {"name":"SetConsoleTextAttribute","parameterTypes":["long","short"] }, {"name":"SetConsoleTitle","parameterTypes":["java.lang.String"] }]
 }
 ]
