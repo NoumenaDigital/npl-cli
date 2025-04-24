@@ -4,6 +4,7 @@ import com.noumenadigital.npl.cli.CommandProcessor
 import com.noumenadigital.npl.cli.ExitCode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import java.io.StringWriter
 
 class CommandProcessorServiceTest :
@@ -20,8 +21,7 @@ class CommandProcessorServiceTest :
         test("should execute parsed command and write output") {
             withTestContext {
                 val exitCode = executor.process(listOf("version"), writer)
-                val expectedOutput = "I'm v1.0\n"
-                writer.toString() shouldBe expectedOutput
+                writer.toString() shouldStartWith "NPL CLI "
                 exitCode shouldBe ExitCode.SUCCESS
             }
         }

@@ -5,19 +5,36 @@ import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
+import java.io.File
+import javax.xml.parsers.DocumentBuilderFactory
 
 class BinaryCommandsIT :
     FunSpec({
-        test("version command should return correct value") {
+        test("version command should return correct version based on test mode") {
+            val pomFile = File("pom.xml")
+            val dbFactory = DocumentBuilderFactory.newInstance()
+            val dBuilder = dbFactory.newDocumentBuilder()
+            val doc = dBuilder.parse(pomFile)
+            doc.documentElement.normalize()
+
+            val pomVersion =
+                doc.documentElement
+                    .getElementsByTagName("version")
+                    .item(0)
+                    .textContent
+
             runCommand(listOf("version")) {
                 process.waitFor()
 
+                val testMode = System.getenv().getOrDefault("TEST_MODE", "direct")
+
+                val expectedVersion = if (testMode == "direct") "development" else pomVersion
                 val expectedOutput =
                     """
-                    I'm v1.0
+                    NPL CLI $expectedVersion
                     """.normalize()
 
-                output.normalize() shouldBeEqual expectedOutput
+                output.normalize() shouldBe expectedOutput
                 process.exitValue() shouldBe ExitCode.SUCCESS.code
             }
         }
