@@ -1,17 +1,15 @@
 #!/bin/bash
 set -e
 
-# Run the Maven config-gen profile to generate native configuration
 echo "Generating native configuration with Maven..."
 mvn clean verify -Pconfig-gen
 
-# Check for git diff
-echo "Validating that there are no changes in the repository..."
-if [[ -n $(git diff --ignore-blank-lines) ]]; then
-  echo "Error: Running 'mvn verify -Pconfig-gen' resulted in changes to the repository:"
-  git diff --ignore-blank-lines
+echo "Validating native-image configs..."
+if [[ -n $(git diff --ignore-blank-lines -- src/main/resources/META-INF/native-image/) ]]; then
+  echo "Error: Unexpected changes detected in native-image configs:"
+  git diff --ignore-blank-lines -- src/main/resources/META-INF/native-image/
   exit 1
+else
+  echo "Validation passed: No changes detected in native-image configuration."
+  exit 0
 fi
-
-echo "Validation passed: No changes detected after generating native configuration."
-exit 0
