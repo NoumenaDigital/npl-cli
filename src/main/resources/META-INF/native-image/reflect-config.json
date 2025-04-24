@@ -478,6 +478,21 @@
   "name":"org.eclipse.core.runtime.FileLocator"
 },
 {
+  "name":"org.fusesource.jansi.internal.CLibrary",
+  "fields":[{"name":"HAVE_ISATTY"}, {"name":"HAVE_TTYNAME"}]
+},
+{
+  "name":"org.fusesource.jansi.internal.JansiLoader",
+  "methods":[{"name":"initialize","parameterTypes":[] }]
+},
+{
+  "name":"org.fusesource.jansi.internal.Kernel32",
+  "fields":[{"name":"HAVE_ISATTY"}, {"name":"HAVE_TTYNAME"}]
+},
+{
+  "name":"org.fusesource.jansi.internal.WindowsSupport"
+},
+{
   "name":"org.robolectric.Robolectric"
 },
 {
