@@ -111,7 +111,6 @@ jobs:
             chmod +x dist/${{ matrix.output_name }}
           fi
 
-
       - name: "Sign and Notarize macOS binary"
         if: matrix.sign_and_notarize
         run: |
@@ -122,17 +121,19 @@ jobs:
           security import cli.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
 
+          # Sign the binary
           codesign --timestamp --options runtime --sign "$(security find-identity -v -p codesigning build.keychain | grep 'Developer ID Application' | awk '{print $2}')" dist/${{ matrix.output_name }}
           codesign --verify --verbose dist/${{ matrix.output_name }}
 
-          xcrun notarytool submit dist/${{ matrix.output_name }} \
+          # Package the signed binary in a zip for notarization
+          ditto -c -k --keepParent dist/${{ matrix.output_name }} dist/${{ matrix.output_name }}.zip
+
+          # Submit zip to notarization service
+          xcrun notarytool submit dist/${{ matrix.output_name }}.zip \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
-            --wait \
-            --force
-
-          xcrun stapler staple dist/${{ matrix.output_name }}
+            --wait
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
