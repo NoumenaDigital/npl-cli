@@ -12,11 +12,23 @@ concurrency:
 
 jobs:
   validate-config:
-    name: "Validate native config diff (${{ matrix.runner }})"
+    name: "Validate native config diff (${{ matrix.os }}-${{ matrix.arch }})"
     strategy:
       fail-fast: false
       matrix:
-        runner: [ubuntu-latest, linux-arm-64, macos-13, macos-latest]
+        include:
+          - os: ubuntu
+            runner: ubuntu-latest
+            arch: x86_64
+          - os: ubuntu
+            runner: linux-arm-64
+            arch: aarch64
+          - os: macos
+            runner: macos-13
+            arch: x86_64
+          - os: macos
+            runner: macos-latest
+            arch: aarch64
     runs-on: ${{ matrix.runner }}
     steps:
       - name: "Checkout"
@@ -33,11 +45,23 @@ jobs:
         run: .github/scripts/validate-native-config-files.sh
 
   build-and-test:
-    name: "Build and test native binary (${{ matrix.runner }})"
+    name: "Build and test native binary (${{ matrix.os }}-${{ matrix.arch }})"
     strategy:
       fail-fast: false
       matrix:
-        runner: [ubuntu-latest, linux-arm-64, macos-13, macos-latest]
+        include:
+          - os: ubuntu
+            runner: ubuntu-latest
+            arch: x86_64
+          - os: ubuntu
+            runner: linux-arm-64
+            arch: aarch64
+          - os: macos
+            runner: macos-13
+            arch: x86_64
+          - os: macos
+            runner: macos-latest
+            arch: aarch64
     runs-on: ${{ matrix.runner }}
     steps:
       - name: "Checkout"
