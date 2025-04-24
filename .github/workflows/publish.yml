@@ -119,7 +119,7 @@ jobs:
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
-          security import cli.p12 -k build.keychain -P "APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security import cli.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
 
           codesign --timestamp --options runtime --sign "$(security find-identity -v -p codesigning build.keychain | grep 'Developer ID Application' | awk '{print $2}')" dist/${{ matrix.output_name }}
