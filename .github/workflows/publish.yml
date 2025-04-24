@@ -129,7 +129,8 @@ jobs:
             --apple-id "$APPLE_ID" \
             --password "$APPLE_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
-            --wait
+            --wait \
+            --force
 
           xcrun stapler staple dist/${{ matrix.output_name }}
         env:
