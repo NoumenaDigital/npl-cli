@@ -103,7 +103,7 @@ jobs:
       - name: "Build npl-cli native binary"
         run: mvn -Pnative package -DskipTests
 
-      - name: "Prepare binary for upload (Linux/macOS)"
+      - name: "Prepare binary for upload"
         run: |
           mkdir -p dist
           if [ -f npl-cli-core/target/npl-${{needs.determine-version.outputs.version}} ]; then
