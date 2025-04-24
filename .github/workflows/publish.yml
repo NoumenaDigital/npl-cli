@@ -54,7 +54,7 @@ jobs:
   build-native:
     name: "Build ${{ matrix.os }}-${{ matrix.arch }} Native Binary"
     needs: determine-version
-    if: needs.determine-version.outputs.should_release == 'true'
+    if: needs.determine-version.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -139,7 +139,7 @@ jobs:
   create-release:
     name: "Create GitHub Release"
     needs: [determine-version, build-native]
-    if: needs.determine-version.outputs.should_release == 'true'
+    if: needs.determine-version.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: "Download individual artifacts"
