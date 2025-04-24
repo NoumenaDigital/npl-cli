@@ -111,13 +111,6 @@ jobs:
             chmod +x dist/${{ matrix.output_name }}
           fi
 
-      - name: "Upload native binary artifact"
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.output_name }}
-          path: dist/${{ matrix.output_name }}
-          if-no-files-found: error
-          retention-days: 30
 
       - name: "Sign and Notarize macOS binary"
         if: matrix.sign_and_notarize == 'true'
@@ -145,6 +138,14 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: "Upload native binary artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output_name }}
+          path: dist/${{ matrix.output_name }}
+          if-no-files-found: error
+          retention-days: 30
 
   create-release:
     name: "Create GitHub Release"
