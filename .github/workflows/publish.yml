@@ -113,7 +113,7 @@ jobs:
 
 
       - name: "Sign and Notarize macOS binary"
-        if: matrix.sign_and_notarize == 'true'
+        if: matrix.sign_and_notarize
         run: |
           echo "$APPLE_CERTIFICATE" | base64 --decode > cli.p12
           security create-keychain -p "" build.keychain
