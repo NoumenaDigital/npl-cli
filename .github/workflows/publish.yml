@@ -72,10 +72,12 @@ jobs:
             runner: macos-13
             arch: x86_64
             output_name: npl-cli-macos-x86_64-${{needs.determine-version.outputs.version}}
+            sign_and_notarize: true
           - os: macos
             runner: macos-latest
             arch: aarch64
             output_name: npl-cli-macos-aarch64-${{needs.determine-version.outputs.version}}
+            sign_and_notarize: true
 
     steps:
       - name: "Checkout"
@@ -106,6 +108,33 @@ jobs:
           path: dist/${{ matrix.output_name }}
           if-no-files-found: error
           retention-days: 30
+
+      - name: "Sign and Notarize macOS binary"
+        if: matrix.sign_and_notarize == 'true'
+        run: |
+          echo "$APPLE_CERTIFICATE" | base64 --decode > cli.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import cli.p12 -k build.keychain -P "APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+
+          codesign --timestamp --options runtime --sign "$(security find-identity -v -p codesigning build.keychain | grep 'Developer ID Application' | awk '{print $2}')" dist/${{ matrix.output_name }}
+          codesign --verify --verbose dist/${{ matrix.output_name }}
+
+          xcrun notarytool submit dist/${{ matrix.output_name }} \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+
+          xcrun stapler staple dist/${{ matrix.output_name }}
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
   create-release:
     name: "Create GitHub Release"
