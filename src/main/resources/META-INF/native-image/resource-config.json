@@ -65,9 +65,24 @@
   }, {
     "pattern":"\\Qlogback.xml\\E"
   }, {
+    "pattern":"\\Qorg/fusesource/jansi/internal/native/Mac/arm64/libjansi.jnilib\\E"
+  }, {
+    "pattern":"\\Qorg/fusesource/jansi/jansi.properties\\E"
+  }, {
     "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt72b/nfc.nrm\\E"
   }, {
     "pattern":"java.base:\\Qsun/net/www/content-types.properties\\E"
+  }],
+  "excludes":[{
+    "pattern":"\\Qorg/fusesource/jansi/internal/native/Linux/arm64/libjansi.so\\E"
+  }, {
+    "pattern":"\\Qorg/fusesource/jansi/internal/native/Linux/x86_64/libjansi.so\\E"
+  }, {
+    "pattern":"\\Qorg/fusesource/jansi/internal/native/Mac/arm64/libjansi.jnilib\\E"
+  }, {
+    "pattern":"\\Qorg/fusesource/jansi/internal/native/Mac/x86_64/libjansi.jnilib\\E"
+  }, {
+    "pattern":"\\Qorg/fusesource/jansi/jansi.properties\\E"
   }]},
   "bundles":[]
 }
