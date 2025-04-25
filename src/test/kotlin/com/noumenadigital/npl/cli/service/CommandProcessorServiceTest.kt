@@ -20,7 +20,9 @@ class CommandProcessorServiceTest :
         test("should execute parsed command and write output") {
             withTestContext {
                 val exitCode = executor.process(listOf("version"), writer)
-                val expectedOutput = "I'm v1.0\n"
+                val expectedOutput =
+                    "Could not determine NPL CLI version from POM file, assuming `development`.\n" +
+                        "NPL CLI development\n"
                 writer.toString() shouldBe expectedOutput
                 exitCode shouldBe ExitCode.SUCCESS
             }
