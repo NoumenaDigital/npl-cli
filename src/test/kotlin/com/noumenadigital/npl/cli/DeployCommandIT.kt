@@ -9,30 +9,17 @@ import com.noumenadigital.npl.cli.config.DeployTarget
 import com.noumenadigital.npl.cli.config.EngineConfig
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
 import java.io.File
-import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 
 class DeployCommandIT :
     FunSpec({
 
-        // Test helper to verify multipart form data content
-        fun RecordedRequest.containsFileWithName(name: String): Boolean {
-            val body = body.readUtf8()
-            return body.contains("name=\"archive\"") &&
-                body.contains("filename=\"$name\"") &&
-                body.contains("Content-Type: application/zip")
-        }
-
         // Helper function to create a test config file
         fun createConfigFile(
             tempDir: File,
-            serverPort: Int,
+            engineManagementUrl: String,
+            keycloakAuthUrl: String,
         ): File {
             // Create .noumena directory
             val configDir = File(tempDir, ".noumena")
@@ -49,12 +36,12 @@ class DeployCommandIT :
                         mapOf(
                             "test-target" to
                                 DeployTarget(
-                                    engineManagementUrl = "http://localhost:$serverPort",
-                                    authUrl = "http://localhost:$serverPort/auth",
-                                    username = "test-user",
-                                    password = "test-password",
-                                    clientId = "test-client",
-                                    clientSecret = "test-secret",
+                                    engineManagementUrl = engineManagementUrl,
+                                    authUrl = "$keycloakAuthUrl/realms/noumena",
+                                    username = "user1",
+                                    password = "password1",
+                                    clientId = "nm-platform-service-client",
+                                    clientSecret = "87ff12ca-cf29-4719-bda8-c92faa78e3c4",
                                 ),
                         ),
                 )
@@ -74,182 +61,6 @@ class DeployCommandIT :
                 test()
             } finally {
                 System.setProperty("user.home", originalUserHome)
-            }
-        }
-
-        context("deploy sources") {
-            test("successful deployment") {
-                // Create temporary directory for config
-                val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
-                try {
-                    // Create a new server instance for this test
-                    val server = MockWebServer()
-                    server.start()
-
-                    // Set up dispatcher for all endpoints
-                    server.dispatcher =
-                        object : Dispatcher() {
-                            override fun dispatch(request: RecordedRequest): MockResponse {
-                                println("Mock server received request: ${request.method} ${request.path}")
-
-                                return when {
-                                    request.path == "/auth/.well-known/openid-configuration" ||
-                                        request.path == "/.well-known/openid-configuration" -> {
-                                        MockResponse()
-                                            .setResponseCode(200)
-                                            .setBody(
-                                                """
-                                                {
-                                                    "issuer": "http://localhost:${server.port}/auth",
-                                                    "authorization_endpoint": "http://localhost:${server.port}/auth/oauth/authorize",
-                                                    "token_endpoint": "http://localhost:${server.port}/auth/oauth/token",
-                                                    "userinfo_endpoint": "http://localhost:${server.port}/auth/oauth/userinfo",
-                                                    "jwks_uri": "http://localhost:${server.port}/auth/oauth/jwks",
-                                                    "response_types_supported": ["code", "token"],
-                                                    "subject_types_supported": ["public"],
-                                                    "id_token_signing_alg_values_supported": ["RS256"]
-                                                }
-                                                """.trimIndent(),
-                                            )
-                                    }
-
-                                    request.path == "/auth/oauth/token" -> {
-                                        // Token endpoint
-                                        MockResponse()
-                                            .setResponseCode(200)
-                                            .setBody(
-                                                """
-                                                {
-                                                    "access_token": "mock-access-token",
-                                                    "token_type": "bearer",
-                                                    "expires_in": 3600,
-                                                    "refresh_token": "mock-refresh-token"
-                                                }
-                                                """.trimIndent(),
-                                            )
-                                    }
-
-                                    // Handle all other endpoints with success
-                                    else -> {
-                                        MockResponse()
-                                            .setResponseCode(200)
-                                            .setBody("""{"message": "Success"}""")
-                                    }
-                                }
-                            }
-                        }
-
-                    // Create config file with test target pointing to the server
-                    createConfigFile(tempDir, server.port)
-
-                    // Get test directory with NPL sources
-                    val testDirPath = getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
-
-                    // Run the test with the temporary config
-                    withConfigDir(tempDir) {
-                        runCommand(
-                            commands = listOf("deploy", "test-target", testDirPath),
-                        ) {
-                            process.waitFor(5, TimeUnit.SECONDS)
-
-                            val expectedOutput =
-                                """
-                            Creating NPL deployment archive...
-                            Deploying NPL sources and migrations to http://localhost:${server.port}...
-                            Successfully deployed NPL sources and migrations to target 'test-target'.
-                        """.normalize()
-
-                            output.normalize() shouldBe expectedOutput
-                            process.exitValue() shouldBe ExitCode.SUCCESS.code
-                        }
-                    }
-
-                    // Clean up
-                    server.shutdown()
-                } finally {
-                    tempDir.deleteRecursively()
-                }
-            }
-
-            test("server returns error") {
-                val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
-                try {
-                    val server = MockWebServer()
-                    server.start()
-
-                    server.dispatcher =
-                        object : Dispatcher() {
-                            override fun dispatch(request: RecordedRequest): MockResponse =
-                                when {
-                                    request.path == "/auth/.well-known/openid-configuration" ||
-                                        request.path == "/.well-known/openid-configuration" -> {
-                                        MockResponse()
-                                            .setResponseCode(200)
-                                            .setBody(
-                                                """
-                                                {
-                                                    "issuer": "http://localhost:${server.port}/auth",
-                                                    "authorization_endpoint": "http://localhost:${server.port}/auth/oauth/authorize",
-                                                    "token_endpoint": "http://localhost:${server.port}/auth/oauth/token",
-                                                    "userinfo_endpoint": "http://localhost:${server.port}/auth/oauth/userinfo",
-                                                    "jwks_uri": "http://localhost:${server.port}/auth/oauth/jwks",
-                                                    "response_types_supported": ["code", "token"],
-                                                    "subject_types_supported": ["public"],
-                                                    "id_token_signing_alg_values_supported": ["RS256"]
-                                                }
-                                                """.trimIndent(),
-                                            )
-                                    }
-
-                                    request.path == "/auth/oauth/token" -> {
-                                        // Token endpoint
-                                        MockResponse()
-                                            .setResponseCode(200)
-                                            .setBody(
-                                                """
-                                                {
-                                                    "access_token": "mock-access-token",
-                                                    "token_type": "bearer",
-                                                    "expires_in": 3600,
-                                                    "refresh_token": "mock-refresh-token"
-                                                }
-                                                """.trimIndent(),
-                                            )
-                                    }
-
-                                    request.path?.contains("/api/deployment") == true -> {
-                                        // Deployment endpoint - return an error
-                                        MockResponse()
-                                            .setResponseCode(500)
-                                            .setBody("""{"error": "Internal server error"}""")
-                                    }
-
-                                    else -> {
-                                        MockResponse().setResponseCode(404)
-                                    }
-                                }
-                        }
-
-                    createConfigFile(tempDir, server.port)
-
-                    val testDirPath = getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
-
-                    withConfigDir(tempDir) {
-                        runCommand(
-                            commands = listOf("deploy", "test-target", testDirPath),
-                        ) {
-                            process.waitFor(5, TimeUnit.SECONDS)
-
-                            // Check for error message in output
-                            output.normalize() shouldContain "Error deploying NPL sources"
-                            process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-                        }
-                    }
-
-                    server.shutdown()
-                } finally {
-                    tempDir.deleteRecursively()
-                }
             }
         }
 

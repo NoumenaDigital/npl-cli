@@ -91,11 +91,18 @@ class DeployCommand(
                     authorizationProvider = authProvider,
                 )
 
-                writer.info("Successfully deployed NPL sources and migrations to target '$targetLabel'.")
+                writer.success("Successfully deployed NPL sources and migrations to target '$targetLabel'.")
                 return ExitCode.SUCCESS
             }
         } catch (e: Exception) {
-            writer.error("Error deploying NPL sources: ${e.message}")
+            writer.error("Error deploying NPL sources: ${e.message ?: "Failed to deploy NPL sources"}")
+            writer.error("Cause: ${e.javaClass.simpleName}")
+
+            // Print stack trace for detailed debugging
+            e.stackTrace.take(5).forEach { element ->
+                writer.error("  at $element")
+            }
+
             return ExitCode.GENERAL_ERROR
         }
     }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.noumenadigital.platform.client.auth" level="${LOG_LEVEL_AUTH:-WARN}" />
+    <logger name="io.swagger.v3.parser.OpenAPIV3Parser" level="${LOG_LEVEL_OPENAPI:-WARN}" />
+    <logger name="org.apache.http" level="${LOG_LEVEL_HTTP:-WARN}" />
+    <logger name="org.apache.http.wire" level="${LOG_LEVEL_HTTP_WIRE:-WARN}" />
+    <logger name="org.apache.http.headers" level="${LOG_LEVEL_HTTP_HEADERS:-WARN}" />
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>
