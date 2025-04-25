@@ -4,6 +4,7 @@ import com.noumenadigital.npl.cli.commands.registry.CheckCommand
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
 import com.noumenadigital.npl.cli.commands.registry.OpenapiCommand
+import com.noumenadigital.npl.cli.commands.registry.TestCommand
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 
@@ -14,6 +15,7 @@ enum class Commands(
     HELP({ HelpCommand }),
     CHECK({ CheckCommand() }),
     OPENAPI({ OpenapiCommand() }),
+    TEST({ TestCommand() }),
     ;
 
     val commandName: String

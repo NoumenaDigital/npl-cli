@@ -3,7 +3,7 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
-import com.noumenadigital.npl.cli.service.CompilerService.compileAndReport
+import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.lang.ProtocolProto
 import com.noumenadigital.platform.nplapi.ApiConfiguration
 import com.noumenadigital.platform.nplapi.openapi.OpenAPIGenerator
@@ -16,6 +16,7 @@ import java.nio.file.Paths
 
 data class OpenapiCommand(
     private val targetDir: String = ".",
+    private val compilerService: CompilerService = CompilerService(targetDir, "$targetDir/npl-contrib"),
 ) : CommandExecutor {
     override val commandName: String = "openapi"
     override val description: String = "Generate the openapi specifications of NPL api"
@@ -43,7 +44,7 @@ data class OpenapiCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            val compilationResult = compileAndReport(sourcesDir = targetDir, output = output)
+            val compilationResult = compilerService.compileAndReport(output = output)
             if (compilationResult.hasErrors) {
                 output.error("NPL openapi failed with errors.")
                 return ExitCode.COMPILATION_ERROR
