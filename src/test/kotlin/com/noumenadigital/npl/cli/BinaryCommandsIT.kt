@@ -30,9 +30,8 @@ class BinaryCommandsIT :
 
                 val expectedVersion = if (testMode == "direct") "development" else pomVersion
                 val expectedOutput =
-                    """
-                    NPL CLI $expectedVersion
-                    """.normalize()
+                    "${if (testMode == "direct") "Could not determine NPL CLI version from POM file, assuming `development`.\n" else ""}NPL CLI $expectedVersion"
+                        .normalize()
 
                 output.normalize() shouldBe expectedOutput
                 process.exitValue() shouldBe ExitCode.SUCCESS.code
