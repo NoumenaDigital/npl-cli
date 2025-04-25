@@ -15,7 +15,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 data class OpenapiCommand(
-    private val targetDir: String = ".",
+    private val srcDir: String = ".",
 ) : CommandExecutor {
     override val commandName: String = "openapi"
     override val description: String = "Generate the openapi specifications of NPL api"
@@ -36,14 +36,14 @@ data class OpenapiCommand(
     }
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val targetDir =
+        val srcDir =
             params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: CURRENT_DIRECTORY
-        return OpenapiCommand(targetDir = targetDir)
+        return OpenapiCommand(srcDir = srcDir)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            val compilationResult = compileAndReport(sourcesDir = targetDir, output = output)
+            val compilationResult = compileAndReport(sourcesDir = srcDir, output = output)
             if (compilationResult.hasErrors) {
                 output.error("NPL openapi failed with errors.")
                 return ExitCode.COMPILATION_ERROR

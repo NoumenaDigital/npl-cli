@@ -7,7 +7,7 @@ import com.noumenadigital.npl.cli.service.CompilerService.compileAndReport
 import java.io.File
 
 data class CheckCommand(
-    private val targetDir: String = ".",
+    private val srcDir: String = ".",
 ) : CommandExecutor {
     override val commandName: String = "check"
     override val description: String = "Validate the correctness of NPL sources"
@@ -23,14 +23,14 @@ data class CheckCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val targetDir = params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: "."
-        return CheckCommand(targetDir = targetDir)
+        val srcDir = params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: "."
+        return CheckCommand(srcDir = srcDir)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            checkDirectory(targetDir)
-            val result = compileAndReport(sourcesDir = targetDir, output = output)
+            checkDirectory(srcDir)
+            val result = compileAndReport(sourcesDir = srcDir, output = output)
 
             when {
                 result.hasErrors -> {
