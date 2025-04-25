@@ -140,3 +140,102 @@ Make sure the version you set correctly reflects the corresponding Noumena Platf
 
 The older CLI was intended for use with Noumena Cloud. It is no longer supported and has been replaced by the new CLI.
 The old CLI is still available under the GitHub releases, and is documented in the [old CLI README](OLD-CLI-README.md).
+
+## Deploy Command
+
+The `deploy` command allows you to deploy NPL sources to a Noumena Engine instance.
+
+### Usage
+
+```bash
+npl-cli deploy <target> [directory] [--clean]
+```
+
+Where:
+
+- `<target>` (required) is the named target from the configuration file
+- `[directory]` (optional) is the path to the directory containing NPL sources (defaults to current directory)
+- `[--clean]` (optional) clears the application contents before deployment
+
+### Configuration
+
+The deploy command requires configuration settings that are read from a JSON file. The CLI looks for configuration in
+the following locations (in order):
+
+1. `./.noumena/config.json` (current directory)
+2. `~/.noumena/config.json` (user's home directory)
+
+The configuration file contains multiple named deployment targets, allowing you to quickly switch between different
+environments (dev, test, prod, etc.) without changing the command.
+
+#### Configuration Schema
+
+```json
+{
+  "targets": {
+    "target-name": {
+      "engineManagementUrl": "http://server:port",
+      "authUrl": "http://auth-server:port",
+      "username": "your-username",
+      "password": "your-password",
+      "clientId": "client-id",
+      "clientSecret": "client-secret"
+    },
+    "another-target": {
+      // Another target configuration
+    }
+  }
+}
+```
+
+#### Required Properties for Each Target
+
+| Property            | Description                              |
+| ------------------- | ---------------------------------------- |
+| engineManagementUrl | URL of the Noumena Engine Management API |
+| authUrl             | URL of the authentication endpoint       |
+| username            | Username for authentication              |
+| password            | Password for authentication              |
+| clientId            | Client ID for authentication             |
+
+#### Optional Properties for Each Target
+
+| Property     | Description                      | Default |
+| ------------ | -------------------------------- | ------- |
+| clientSecret | Client secret for authentication | ""      |
+
+#### Example Configuration
+
+A sample configuration file is available at `src/main/resources/sample-config.json`.
+
+To set up your configuration:
+
+```bash
+# Create the configuration directory
+mkdir -p ~/.noumena
+
+# Copy the sample configuration and edit it
+cp src/main/resources/sample-config.json ~/.noumena/config.json
+```
+
+Then edit the file with your specific settings.
+
+#### Example Commands
+
+Deploy to the "dev" target using current directory as source:
+
+```bash
+npl-cli deploy dev
+```
+
+Deploy to the "prod" target with a specific source directory:
+
+```bash
+npl-cli deploy prod /path/to/npl/sources
+```
+
+Deploy to the "test" target after clearing application contents:
+
+```bash
+npl-cli deploy test --clean
+```

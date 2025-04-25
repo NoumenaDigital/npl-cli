@@ -84,6 +84,23 @@
   "queryAllDeclaredMethods":true
 },
 {
+  "name":"com.noumenadigital.npl.cli.config.DeployTarget",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"<init>","parameterTypes":["java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String"] }]
+},
+{
+  "name":"com.noumenadigital.npl.cli.config.EngineConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"<init>","parameterTypes":["java.util.Map"] }]
+},
+{
+  "name":"com.noumenadigital.npl.cli.config.EngineConfig$Companion"
+},
+{
   "name":"io.swagger.v3.core.jackson.ApiResponsesSerializer",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
@@ -340,6 +357,9 @@
   "name":"java.lang.RuntimePermission"
 },
 {
+  "name":"java.lang.String"
+},
+{
   "name":"java.math.BigDecimal",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -449,10 +469,34 @@
   "name":"javax.smartcardio.CardPermission"
 },
 {
+  "name":"kotlin.Any"
+},
+{
+  "name":"kotlin.Boolean"
+},
+{
+  "name":"kotlin.Int"
+},
+{
+  "name":"kotlin.Metadata",
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"bv","parameterTypes":[] }, {"name":"d1","parameterTypes":[] }, {"name":"d2","parameterTypes":[] }, {"name":"k","parameterTypes":[] }, {"name":"mv","parameterTypes":[] }, {"name":"pn","parameterTypes":[] }, {"name":"xi","parameterTypes":[] }, {"name":"xs","parameterTypes":[] }]
+},
+{
+  "name":"kotlin.SafePublicationLazyImpl",
+  "fields":[{"name":"_value"}]
+},
+{
+  "name":"kotlin.String"
+},
+{
   "name":"kotlin.collections.EmptyList",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true
+},
+{
+  "name":"kotlin.collections.Map"
 },
 {
   "name":"kotlin.jvm.internal.DefaultConstructorMarker"
@@ -464,6 +508,10 @@
 {
   "name":"kotlin.reflect.jvm.internal.ReflectionFactoryImpl",
   "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"kotlin.reflect.jvm.internal.impl.resolve.scopes.DescriptorKindFilter",
+  "allPublicFields":true
 },
 {
   "name":"libcore.io.Memory"

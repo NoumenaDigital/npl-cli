@@ -50,6 +50,10 @@ class BinaryCommandsIT :
                                  <directory>  Target directory containing NPL source files to check (defaults to current directory)
                     openapi    Generate the openapi specifications of NPL api
                                  <directory>  Source directory containing NPL protocols (defaults to current directory)
+                    deploy     Deploy NPL sources to a Noumena Engine instance
+                                 <target> (required)  Named target from config.json to deploy to
+                                 <directory>  Directory containing NPL sources (defaults to current directory)
+                                 --clean  Clear application contents before deployment
                     """.normalize()
 
                 output.normalize() shouldBe expectedOutput

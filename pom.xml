@@ -50,6 +50,7 @@
         <slf4j.version>2.0.16</slf4j.version>
         <main.class>com.noumenadigital.npl.cli.MainKt</main.class>
         <swagger-parser-v3.version>2.1.26</swagger-parser-v3.version>
+        <mockwebserver.version>4.12.0</mockwebserver.version>
     </properties>
 
     <dependencies>
@@ -62,6 +63,11 @@
         <dependency>
             <groupId>com.noumenadigital.platform</groupId>
             <artifactId>npl-api</artifactId>
+            <version>${platform.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.noumenadigital.platform</groupId>
+            <artifactId>clients</artifactId>
             <version>${platform.version}</version>
         </dependency>
         <dependency>
@@ -118,6 +124,12 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
             <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>${mockwebserver.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
