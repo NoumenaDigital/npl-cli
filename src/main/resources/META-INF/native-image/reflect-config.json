@@ -131,6 +131,40 @@
   "name":"com.noumenadigital.npl.cli.config.EngineConfig$Companion"
 },
 {
+  "name":"com.noumenadigital.platform.api.models.ApiModelError",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"setErrorType","parameterTypes":["com.noumenadigital.platform.api.models.ApiModelError$ErrorTypeEnum"] }, {"name":"setMessage","parameterTypes":["java.lang.String"] }, {"name":"setStackTrace","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"com.noumenadigital.platform.api.models.ApiModelError$ErrorTypeEnum",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"fromValue","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"com.noumenadigital.platform.api.models.ApiServerError",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.noumenadigital.platform.api.models.ApiSourceError",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setErrors","parameterTypes":["java.util.List"] }]
+},
+{
+  "name":"com.noumenadigital.platform.api.models.SourceErrorDetail",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setCode","parameterTypes":["java.lang.String"] }, {"name":"setDescription","parameterTypes":["java.lang.String"] }]
+},
+{
   "name":"com.noumenadigital.platform.client.auth.OpenIdConnectService$OpenIdConfiguration",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,

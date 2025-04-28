@@ -46,6 +46,8 @@ object TestUtils {
             .replace(Regex("\\e\\[[0-9;]*m"), "")
             // Replace the random port number with a placeholder
             .replace(Regex("localhost:(\\d{4,5})"), "localhost:XXXXX")
+            // Normalize the zip file name
+            .replace(Regex("zip:file:.+\\."), "zip:file:SOME_PATH.")
             .trimIndent()
 
     fun runCommand(

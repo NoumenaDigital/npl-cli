@@ -126,7 +126,7 @@ class DeployCommandTestContainersIT :
                 .withReuse(true)
                 .withNetworkAliases("engine")
                 .withExposedPorts(12000, 12400)
-                .dependsOn(postgresContainer, keycloakContainer)
+                .dependsOn(postgresContainer, keycloakContainer, provisioningContainer)
                 .withEnv(
                     mapOf(
                         "ENGINE_DB_URL" to "jdbc:postgresql://postgres:5432/platform",
@@ -146,27 +146,9 @@ class DeployCommandTestContainersIT :
                 ).withStartupTimeout(startupTimeout)
 
         beforeSpec {
-            logger.info { "Starting PostgreSQL container..." }
             postgresContainer.start()
-
-            logger.info { "Starting Keycloak container..." }
             keycloakContainer.start()
-
-            logger.info { "Starting provisioning container..." }
             provisioningContainer.start()
-
-            while (provisioningContainer.isRunning) {
-                Thread.sleep(500)
-            }
-
-            val exitCode =
-                provisioningContainer.containerInfo.state.exitCodeLong
-                    ?.toInt()
-            if (exitCode != 0) {
-                throw IllegalStateException("Provisioning container failed with exit code $exitCode")
-            }
-
-            logger.info { "Starting Engine container..." }
             engineContainer.start()
         }
 
@@ -332,8 +314,11 @@ class DeployCommandTestContainersIT :
                     Application contents cleared
                     Creating NPL deployment archive...
                     Deploying NPL sources and migrations to http://localhost:XXXXX...
-                    Error deploying NPL sources: Failed to deploy NPL sources
-                    Cause: ServerException
+                    Error deploying NPL sources: '1' source errors encountered:
+                    class SourceErrorDetail {
+                        code: 0001
+                        description: /npl-1.0/objects/iou/iou.npl: (1, 9) E0001: Syntax error: missing {<EOF>, ';'} at 'NPL'
+                    }
                     """.trimIndent()
 
                 exitCode shouldBe ExitCode.GENERAL_ERROR.code
@@ -371,8 +356,7 @@ class DeployCommandTestContainersIT :
                     Application contents cleared
                     Creating NPL deployment archive...
                     Deploying NPL sources and migrations to http://localhost:XXXXX...
-                    Error deploying NPL sources: Failed to deploy NPL sources
-                    Cause: ServerException
+                    Error deploying NPL sources: Unknown exception: 'Could not locate `migration.yml` in zip:file:SOME_PATH.'
                     """.trimIndent()
 
                 exitCode shouldBe ExitCode.GENERAL_ERROR.code
