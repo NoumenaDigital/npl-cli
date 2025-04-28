@@ -1,12 +1,8 @@
 package com.noumenadigital.npl.cli
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
-import com.noumenadigital.npl.cli.config.DeployTarget
-import com.noumenadigital.npl.cli.config.EngineConfig
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
@@ -14,55 +10,6 @@ import java.util.concurrent.TimeUnit
 
 class DeployCommandIT :
     FunSpec({
-
-        // Helper function to create a test config file
-        fun createConfigFile(
-            tempDir: File,
-            engineManagementUrl: String,
-            keycloakAuthUrl: String,
-        ): File {
-            // Create .noumena directory
-            val configDir = File(tempDir, ".noumena")
-            configDir.mkdirs()
-
-            // Create config file
-            val configFile = File(configDir, "config.json")
-
-            val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
-
-            val engineConfig =
-                EngineConfig(
-                    targets =
-                        mapOf(
-                            "test-target" to
-                                DeployTarget(
-                                    engineManagementUrl = engineManagementUrl,
-                                    authUrl = "$keycloakAuthUrl/realms/noumena",
-                                    username = "user1",
-                                    password = "password1",
-                                    clientId = "nm-platform-service-client",
-                                    clientSecret = "87ff12ca-cf29-4719-bda8-c92faa78e3c4",
-                                ),
-                        ),
-                )
-
-            mapper.writeValue(configFile, engineConfig)
-            return configFile
-        }
-
-        // Set the system property to use a temporary config directory
-        fun withConfigDir(
-            tempDir: File,
-            test: () -> Unit,
-        ) {
-            val originalUserHome = System.getProperty("user.home")
-            try {
-                System.setProperty("user.home", tempDir.absolutePath)
-                test()
-            } finally {
-                System.setProperty("user.home", originalUserHome)
-            }
-        }
 
         context("deploy error handling") {
             test("missing target") {
