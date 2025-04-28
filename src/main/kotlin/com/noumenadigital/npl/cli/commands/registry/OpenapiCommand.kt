@@ -19,7 +19,6 @@ data class OpenapiCommand(
 ) : CommandExecutor {
     override val commandName: String = "openapi"
     override val description: String = "Generate the openapi specifications of NPL api"
-    private val defaultUri = "http://localhost:12000"
 
     override val parameters: List<CommandParameter> =
         listOf(
@@ -31,8 +30,14 @@ data class OpenapiCommand(
             ),
         )
 
+    companion object {
+        private const val CURRENT_DIRECTORY = "."
+        private const val DEFAULT_OPENAPI_URI = "http://localhost:12000"
+    }
+
     override fun createInstance(params: List<String>): CommandExecutor {
-        val targetDir = params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: "."
+        val targetDir =
+            params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: CURRENT_DIRECTORY
         return OpenapiCommand(targetDir = targetDir)
     }
 
@@ -59,21 +64,21 @@ data class OpenapiCommand(
             }
 
             protocolsPerPackage.forEach { (packagePath, protocols) ->
-                output.info("Generating openapi for $packagePath")
+                output.info("Generating openapi for ${packagePath.removePrefix()}")
 
                 val apiGen =
                     try {
-                        OpenAPIGenerator(ApiConfiguration(URI(defaultUri), null), packagePath)
+                        OpenAPIGenerator(ApiConfiguration(URI(DEFAULT_OPENAPI_URI), null), packagePath)
                     } catch (e: URISyntaxException) {
                         throw CommandExecutionException("Failed to run openapi generation", e)
                     }
 
                 val openApi = apiGen.generate(protocols)
-                val packageName = packagePath.removePrefix("/").replace("/", ".")
+                val packageName = packagePath.removePrefix().replace("/", ".")
 
                 writeToFile(
                     Yaml.pretty(openApi),
-                    Paths.get(targetDir, "openapi", "$packageName-openapi.yml"),
+                    Paths.get(CURRENT_DIRECTORY, "openapi", "$packageName-openapi.yml"),
                 )
             }
             output.success("NPL openapi completed successfully.")
@@ -86,6 +91,8 @@ data class OpenapiCommand(
         }
     }
 
+    private fun String.removePrefix(): String = removePrefix("/")
+
     private fun writeToFile(
         content: String,
         filePath: Path,
@@ -93,7 +100,6 @@ data class OpenapiCommand(
         try {
             val file = filePath.toFile()
             file.parentFile?.mkdirs()
-
             file.writeText(content)
         } catch (e: IOException) {
             throw CommandExecutionException("Failed to write to file: ${e.message}", e)
