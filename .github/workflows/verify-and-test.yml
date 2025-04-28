@@ -30,6 +30,8 @@ jobs:
             runner: macos-latest
             arch: aarch64
     runs-on: ${{ matrix.runner }}
+    env:
+      TESTCONTAINERS_RYUK_DISABLED: true # github runners do their own teardown
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -63,6 +65,8 @@ jobs:
             runner: macos-latest
             arch: aarch64
     runs-on: ${{ matrix.runner }}
+    env:
+      TESTCONTAINERS_RYUK_DISABLED: true # github runners do their own teardown
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
