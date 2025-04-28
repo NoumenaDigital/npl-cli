@@ -5,25 +5,16 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 
-/**
- * Configuration model for a single deployment target
- */
 data class DeployTarget(
-    // Required properties
     val engineManagementUrl: String = "http://localhost:12400",
     val authUrl: String = "http://localhost:11000",
     val username: String = "",
     val password: String = "",
     val clientId: String = "",
-    // Optional properties
     val clientSecret: String = "",
 )
 
-/**
- * Configuration for Noumena Engine connections
- */
 class EngineConfig(
-    // Map of labeled targets
     val targets: Map<String, DeployTarget> = emptyMap(),
 ) {
     companion object {
@@ -50,7 +41,7 @@ class EngineConfig(
             return if (configFile != null) {
                 try {
                     mapper.readValue(configFile)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     EngineConfig()
                 }
             } else {

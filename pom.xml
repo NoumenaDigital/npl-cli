@@ -50,20 +50,8 @@
         <slf4j.version>2.0.16</slf4j.version>
         <main.class>com.noumenadigital.npl.cli.MainKt</main.class>
         <swagger-parser-v3.version>2.1.26</swagger-parser-v3.version>
-        <testcontainers.version>1.21.0</testcontainers.version>
+        <mockwebserver.version>4.12.0</mockwebserver.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainers.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <!-- Core dependencies -->
@@ -133,33 +121,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>${mockwebserver.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
+            <artifactId>kotlin-test-junit</artifactId>
             <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -223,14 +193,7 @@
                     <argLine>-XX:+EnableDynamicAgentLoading</argLine>
                     <includes>
                         <include>**/*Test.*</include>
-                        <include>**/*IT.*</include>
                     </includes>
-                    <systemPropertyVariables>
-                        <testcontainers.reuse.enable>true</testcontainers.reuse.enable>
-                        <kotest.framework.classpath.scanning.autoscan.disable>true</kotest.framework.classpath.scanning.autoscan.disable>
-                    </systemPropertyVariables>
-                    <forkCount>1</forkCount>
-                    <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
         </plugins>
@@ -257,9 +220,6 @@
                             <environmentVariables>
                                 <TEST_MODE>direct</TEST_MODE>
                             </environmentVariables>
-                            <systemPropertyVariables>
-                                <kotest.framework.classpath.scanning.autoscan.disable>true</kotest.framework.classpath.scanning.autoscan.disable>
-                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -343,10 +303,6 @@
                             <environmentVariables>
                                 <TEST_MODE>binary</TEST_MODE>
                             </environmentVariables>
-                            <systemPropertyVariables>
-                                <testcontainers.reuse.enable>true</testcontainers.reuse.enable>
-                                <kotest.framework.classpath.scanning.autoscan.disable>true</kotest.framework.classpath.scanning.autoscan.disable>
-                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -396,9 +352,6 @@
                             <environmentVariables>
                                 <TEST_MODE>direct</TEST_MODE>
                             </environmentVariables>
-                            <systemPropertyVariables>
-                                <kotest.framework.classpath.scanning.autoscan.disable>true</kotest.framework.classpath.scanning.autoscan.disable>
-                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
 
@@ -424,10 +377,6 @@
                             <environmentVariables>
                                 <TEST_MODE>jar</TEST_MODE>
                             </environmentVariables>
-                            <systemPropertyVariables>
-                                <testcontainers.reuse.enable>true</testcontainers.reuse.enable>
-                                <kotest.framework.classpath.scanning.autoscan.disable>true</kotest.framework.classpath.scanning.autoscan.disable>
-                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
