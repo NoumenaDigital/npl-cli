@@ -1,0 +1,21 @@
+package objects
+
+use objects.iou.Iou
+
+const ISSUER = 'issuer';
+const PAYEE = 'payee';
+
+@test
+function test_initial_amount_owed_failed(test: Test) -> {
+    var iou = Iou[ISSUER, PAYEE](100);
+
+    test.assertEquals(999, iou.getAmountOwed[ISSUER](), "Amount owed should equal initial value");
+};
+
+@test
+function test_amount_owed_after_pay_failed(test: Test) -> {
+    var iou = Iou[ISSUER, PAYEE](100);
+    iou.pay[ISSUER](50);
+
+    test.assertEquals(777, iou.getAmountOwed[ISSUER](), "Amount owed should reflect payment");
+};

@@ -4,11 +4,12 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
+import com.noumenadigital.npl.cli.service.SourcesManager
 import java.io.File
 
 data class CheckCommand(
     private val targetDir: String = ".",
-    private val compilerService: CompilerService = CompilerService(targetDir, "$targetDir/npl-contrib"),
+    private val compilerService: CompilerService = CompilerService(SourcesManager(targetDir)),
 ) : CommandExecutor {
     override val commandName: String = "check"
     override val description: String = "Validate the correctness of NPL sources"

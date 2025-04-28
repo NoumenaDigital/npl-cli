@@ -5,13 +5,40 @@ import com.noumenadigital.npl.lang.Source
 import java.io.File
 import java.nio.file.Files
 
-object SourcesManager {
-    private const val NPL_EXTENSION = ".npl"
+class SourcesManager(
+    private val projectDirectoryPath: String,
+) {
+    companion object {
+        private const val NPL_EXTENSION = ".npl"
+    }
 
-    fun collectSourcesFromDirectory(directory: String): List<Source> {
-        val dir = File(directory)
+    private val testDirectory: String = "$projectDirectoryPath/src/test/npl"
+    private val nplContribLibrary: String = "$projectDirectoryPath/npl-contrib"
+
+    fun getNplContribLibrary(): String = nplContribLibrary
+
+    fun getNplTestSources(): List<Source> {
+        collectSourcesFromDirectory(testDirectory).let { sources ->
+            if (sources.isEmpty()) {
+                throw CommandExecutionException("No NPL test files found")
+            }
+            return sources
+        }
+    }
+
+    fun getNplSources(): List<Source> {
+        collectSourcesFromDirectory(projectDirectoryPath).let { sources ->
+            if (sources.isEmpty()) {
+                throw CommandExecutionException("No NPL source files found")
+            }
+            return sources
+        }
+    }
+
+    private fun collectSourcesFromDirectory(directoryPath: String): List<Source> {
+        val dir = File(directoryPath)
         if (!dir.exists() || !dir.isDirectory) {
-            throw CommandExecutionException("No NPL source files found")
+            throw CommandExecutionException("Directory $directoryPath does not exist")
         }
         val sources = mutableListOf<Source>()
         Files
@@ -21,9 +48,6 @@ object SourcesManager {
             .forEach {
                 sources.add(Source.create(it.toUri().toURL()))
             }
-        if (sources.isEmpty()) {
-            throw CommandExecutionException("No NPL source files found")
-        }
         return sources
     }
 }

@@ -84,6 +84,13 @@
   "queryAllDeclaredMethods":true
 },
 {
+  "name":"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"io.micrometer.context.ContextRegistry"
+},
+{
   "name":"io.swagger.v3.core.jackson.ApiResponsesSerializer",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
@@ -363,6 +370,9 @@
   "name":"java.security.AllPermission"
 },
 {
+  "name":"java.security.SecureRandomParameters"
+},
+{
   "name":"java.security.SecurityPermission"
 },
 {
@@ -502,9 +512,61 @@
   "name":"org.slf4j.spi.LocationAwareLogger"
 },
 {
+  "name":"reactor.core.publisher.FluxPublish",
+  "fields":[{"name":"connection"}]
+},
+{
+  "name":"reactor.core.publisher.FluxPublish$PubSubInner",
+  "fields":[{"name":"requested"}]
+},
+{
+  "name":"reactor.core.publisher.FluxPublish$PublishSubscriber",
+  "fields":[{"name":"error"}, {"name":"state"}, {"name":"subscribers"}]
+},
+{
+  "name":"reactor.core.publisher.FluxRefCount$RefCountInner",
+  "fields":[{"name":"state"}]
+},
+{
+  "name":"reactor.core.publisher.FluxRefCount$RefCountMonitor",
+  "fields":[{"name":"disconnect"}]
+},
+{
+  "name":"reactor.core.publisher.FluxReplay$ReplaySubscriber",
+  "fields":[{"name":"state"}]
+},
+{
+  "name":"reactor.core.publisher.LambdaSubscriber",
+  "fields":[{"name":"subscription"}]
+},
+{
+  "name":"reactor.core.publisher.SinkManyBestEffort",
+  "fields":[{"name":"subscribers"}]
+},
+{
+  "name":"reactor.core.publisher.SinkManyReplayProcessor",
+  "fields":[{"name":"subscribers"}]
+},
+{
+  "name":"reactor.core.publisher.SinkManyReplayProcessor$ReplayInner",
+  "fields":[{"name":"requested"}, {"name":"wip"}]
+},
+{
+  "name":"reactor.core.publisher.SinksSpecs$AbstractSerializedSink",
+  "fields":[{"name":"lockedAt"}, {"name":"wip"}]
+},
+{
   "name":"sun.misc.Unsafe",
   "allDeclaredFields":true,
   "methods":[{"name":"arrayBaseOffset","parameterTypes":["java.lang.Class"] }, {"name":"arrayIndexScale","parameterTypes":["java.lang.Class"] }, {"name":"copyMemory","parameterTypes":["long","long","long"] }, {"name":"copyMemory","parameterTypes":["java.lang.Object","long","java.lang.Object","long","long"] }, {"name":"getBoolean","parameterTypes":["java.lang.Object","long"] }, {"name":"getByte","parameterTypes":["long"] }, {"name":"getByte","parameterTypes":["java.lang.Object","long"] }, {"name":"getDouble","parameterTypes":["java.lang.Object","long"] }, {"name":"getFloat","parameterTypes":["java.lang.Object","long"] }, {"name":"getInt","parameterTypes":["long"] }, {"name":"getInt","parameterTypes":["java.lang.Object","long"] }, {"name":"getLong","parameterTypes":["long"] }, {"name":"getLong","parameterTypes":["java.lang.Object","long"] }, {"name":"getObject","parameterTypes":["java.lang.Object","long"] }, {"name":"objectFieldOffset","parameterTypes":["java.lang.reflect.Field"] }, {"name":"putBoolean","parameterTypes":["java.lang.Object","long","boolean"] }, {"name":"putByte","parameterTypes":["long","byte"] }, {"name":"putByte","parameterTypes":["java.lang.Object","long","byte"] }, {"name":"putDouble","parameterTypes":["java.lang.Object","long","double"] }, {"name":"putFloat","parameterTypes":["java.lang.Object","long","float"] }, {"name":"putInt","parameterTypes":["long","int"] }, {"name":"putInt","parameterTypes":["java.lang.Object","long","int"] }, {"name":"putLong","parameterTypes":["long","long"] }, {"name":"putLong","parameterTypes":["java.lang.Object","long","long"] }, {"name":"putObject","parameterTypes":["java.lang.Object","long","java.lang.Object"] }]
+},
+{
+  "name":"sun.security.provider.NativePRNG",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"<init>","parameterTypes":["java.security.SecureRandomParameters"] }]
+},
+{
+  "name":"sun.security.provider.SHA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"sun.security.provider.SHA2$SHA256",

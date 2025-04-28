@@ -170,7 +170,7 @@ class OpenapiCommandIT :
                             $absolutePath/src/main/npl/objects.iou/iou.npl: (18, 5) W0019: Public property `payments` should be explicitly typed.
                             $absolutePath/src/main/npl/processes/demo.npl: (15, 5) W0016: Declared variable `car` unused
                             $absolutePath/src/main/npl/processes/demo.npl: (16, 5) W0016: Declared variable `iou` unused
-                            Completed compilation for 4 files with 3 warnings in XXX ms
+                            Completed compilation for 5 files with 3 warnings in XXX ms
 
                             NPL openapi has compilation warnings
                             Generating openapi for objects/car

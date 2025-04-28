@@ -44,6 +44,8 @@ object TestUtils {
             .replace(Regex("in \\d+ ms"), "in XXX ms")
             // Remove any ANSI color codes
             .replace(Regex("\\e\\[[0-9;]*m"), "")
+            .replace(Regex("(\\.*FAIL)[ \\t]+"), "$1")
+            .replace(Regex("\\.{2,}"), "..padding..")
             .trimIndent()
 
     fun runCommand(

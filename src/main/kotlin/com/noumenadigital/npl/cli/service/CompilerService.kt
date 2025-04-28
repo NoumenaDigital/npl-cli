@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
-import com.noumenadigital.npl.cli.service.SourcesManager.collectSourcesFromDirectory
 import com.noumenadigital.npl.contrib.NplContribConfiguration
 import com.noumenadigital.npl.lang.CompileFailure
 import com.noumenadigital.npl.lang.CompilerConfiguration
@@ -12,11 +11,22 @@ import com.noumenadigital.npl.lang.Type
 import java.time.Duration
 
 data class CompilerService(
-    private val sourcesDir: String,
-    private val nplContribLibrary: String = "$sourcesDir/npl-contrib",
+    private val sourcesManager: SourcesManager,
 ) {
+    companion object {
+        fun compilerConfiguration(nplContribLibrary: String): CompilerConfiguration {
+            val compilerConfiguration =
+                CompilerConfiguration(
+                    tag = null,
+                    quirksMode = false, // TODO: is this what we want?
+                    nplContribConfiguration = NplContribConfiguration(nplContribPath = nplContribLibrary),
+                )
+            return compilerConfiguration
+        }
+    }
+
     fun compileAndReport(output: ColorWriter): CompilationResult {
-        val nplSources = collectSourcesFromDirectory(sourcesDir)
+        val nplSources = sourcesManager.getNplSources()
         val compileResult = compileSource(nplSources, output)
         reportCompilationResults(nplSources.size, compileResult, output)
         output.info()
@@ -28,7 +38,7 @@ data class CompilerService(
         output: ColorWriter,
     ): CompilationResult {
         val startTime = System.nanoTime()
-        val compileResult = compile(sources, nplContribLibrary, output)
+        val compileResult = compile(sources, sourcesManager.getNplContribLibrary(), output)
         val duration = Duration.ofNanos(System.nanoTime() - startTime).toMillis()
 
         compileResult.duration = duration
@@ -112,16 +122,6 @@ data class CompilerService(
         }
 
         return CompilationResult(sources.size, errorCount, warningCount, errorCount == 0, protos = protos)
-    }
-
-    fun compilerConfiguration(nplContribLibrary: String): CompilerConfiguration {
-        val compilerConfiguration =
-            CompilerConfiguration(
-                tag = null,
-                quirksMode = false, // TODO: is this what we want?
-                nplContribConfiguration = NplContribConfiguration(nplContribPath = nplContribLibrary),
-            )
-        return compilerConfiguration
     }
 
     data class CompilationResult(
