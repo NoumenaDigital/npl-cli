@@ -36,12 +36,17 @@ class DeployConfig(
         /**
          * Load configuration from a YAML file
          * Looks in the following locations in order:
-         * 1. Current directory .npl/deploy.yml
-         * 2. User home directory .npl/deploy.yml
+         * 1. Provided current directory .npl/deploy.yml
+         * 2. Provided user home directory .npl/deploy.yml
+         * @param currentWorkDir The current working directory File object.
+         * @param userHomeDir The user's home directory File object.
          */
-        fun load(): DeployConfig {
-            val currentDirConfig = File(".npl/deploy.yml")
-            val userHomeConfig = File(System.getProperty("user.home"), ".npl/deploy.yml")
+        fun load(
+            currentWorkDir: File = File("."),
+            userHomeDir: File = File(System.getProperty("user.home")),
+        ): DeployConfig {
+            val currentDirConfig = File(currentWorkDir, ".npl/deploy.yml")
+            val userHomeConfig = File(userHomeDir, ".npl/deploy.yml")
 
             val configFile =
                 when {
