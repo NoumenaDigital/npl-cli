@@ -2057,7 +2057,16 @@
       "glob": "org/apache/http/client/version.properties"
     },
     {
+      "glob": "org/fusesource/jansi/internal/native/Linux/arm64/libjansi.so"
+    },
+    {
+      "glob": "org/fusesource/jansi/internal/native/Linux/x86_64/libjansi.so"
+    },
+    {
       "glob": "org/fusesource/jansi/internal/native/Mac/arm64/libjansi.jnilib"
+    },
+    {
+      "glob": "org/fusesource/jansi/internal/native/Mac/x86_64/libjansi.jnilib"
     },
     {
       "glob": "org/fusesource/jansi/jansi.properties"
