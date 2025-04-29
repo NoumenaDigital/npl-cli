@@ -56,8 +56,9 @@ class DeployCommand(
         try {
             val targetConfig = config.targets[targetLabel]
 
-            if (targetConfig !is EngineTargetConfig) {
-                writer.error("Deployment target '$targetLabel' is not configured as an 'engine' target.")
+            if (targetConfig == null || targetConfig !is EngineTargetConfig) {
+                writer.error("Deployment target '$targetLabel' is not configured correctly.")
+                writer.error("Ensure the target exists in your config and has 'type: engine'.")
                 writer.error("Currently, deployment is only supported for 'engine' target types.")
                 return ExitCode.CONFIG_ERROR
             }
