@@ -190,7 +190,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                    <argLine>--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow</argLine>
                     <includes>
                         <include>**/*Test.*</include>
                     </includes>
@@ -212,6 +212,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <argLine>--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow</argLine>
                             <includes>
                                 <include>**/*Test.*</include>
                                 <include>**/IT*.*</include>
@@ -249,8 +250,7 @@
                         <configuration>
                             <imageName>npl-${project.version}</imageName>
                             <buildArgs>
-                                <buildArg>--strict-image-heap</buildArg>
-                                <buildArg>--enable-sbom</buildArg>
+                                <buildArg>--exact-reachability-metadata</buildArg>
                             </buildArgs>
                             <mainClass>${main.class}</mainClass>
                         </configuration>
@@ -296,6 +296,7 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <argLine>--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow</argLine>
                             <includes>
                                 <include>**/IT*.*</include>
                                 <include>**/*IT.*</include>
@@ -346,6 +347,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <argLine>--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow</argLine>
                             <includes>
                                 <include>**/*Test.*</include>
                             </includes>
@@ -370,6 +372,7 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <argLine>--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow</argLine>
                             <includes>
                                 <include>**/IT*.*</include>
                                 <include>**/*IT.*</include>

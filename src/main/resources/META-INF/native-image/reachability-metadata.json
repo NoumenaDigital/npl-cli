@@ -1,0 +1,2248 @@
+{
+  "reflection": [
+    {
+      "type": "[B"
+    },
+    {
+      "type": "[C"
+    },
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.deser.BeanDeserializerModifier;"
+    },
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.deser.Deserializers;"
+    },
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.deser.KeyDeserializers;"
+    },
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.deser.ValueInstantiators;"
+    },
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.ser.BeanSerializerModifier;"
+    },
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.ser.Serializers;"
+    },
+    {
+      "type": "[Ljava.lang.Object;"
+    },
+    {
+      "type": "[Ljava.util.HashMap$Node;"
+    },
+    {
+      "type": "[Lorg.springframework.util.ConcurrentReferenceHashMap$Segment;"
+    },
+    {
+      "type": "ch.qos.logback.classic.BasicConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.encoder.PatternLayoutEncoder",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.joran.SerializedModelConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.spi.LogbackServiceProvider"
+    },
+    {
+      "type": "ch.qos.logback.classic.util.DefaultJoranConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.ConsoleAppender",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.OutputStreamAppender",
+      "methods": [
+        {
+          "name": "setEncoder",
+          "parameterTypes": [
+            "ch.qos.logback.core.encoder.Encoder"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.encoder.Encoder",
+      "methods": [
+        {
+          "name": "valueOf",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.encoder.LayoutWrappingEncoder",
+      "methods": [
+        {
+          "name": "setParent",
+          "parameterTypes": [
+            "ch.qos.logback.core.spi.ContextAware"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.pattern.PatternLayoutEncoderBase",
+      "methods": [
+        {
+          "name": "setPattern",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.spi.ContextAware",
+      "methods": [
+        {
+          "name": "valueOf",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.google.common.util.concurrent.AbstractFuture",
+      "fields": [
+        {
+          "name": "listeners"
+        },
+        {
+          "name": "value"
+        },
+        {
+          "name": "waiters"
+        }
+      ]
+    },
+    {
+      "type": "com.google.common.util.concurrent.AbstractFuture$Waiter",
+      "fields": [
+        {
+          "name": "next"
+        },
+        {
+          "name": "thread"
+        }
+      ]
+    },
+    {
+      "type": "com.google.protobuf.AbstractProtobufList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.google.protobuf.ExtensionRegistry",
+      "methods": [
+        {
+          "name": "getEmptyRegistry",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.google.protobuf.Internal$ProtobufList"
+    },
+    {
+      "type": "com.google.protobuf.LazyStringArrayList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.google.protobuf.LazyStringList"
+    },
+    {
+      "type": "com.google.protobuf.ProtocolStringList"
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.DeployConfig",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.DeployConfig$Companion"
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.DeploymentTargetConfig"
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.EngineTargetConfig",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.platform.api.models.ApiModelError",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "setErrorType",
+          "parameterTypes": [
+            "com.noumenadigital.platform.api.models.ApiModelError$ErrorTypeEnum"
+          ]
+        },
+        {
+          "name": "setMessage",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.platform.api.models.ApiModelError$ErrorTypeEnum",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "fromValue",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.platform.api.models.ApiServerError",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.platform.api.models.ApiSourceError",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "setErrors",
+          "parameterTypes": [
+            "java.util.List"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.platform.api.models.SourceErrorDetail",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "setCode",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "setDescription",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.platform.client.auth.OpenIdConnectService$OpenIdConfiguration",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.platform.client.auth.OpenIdConnectService$TokenResponse",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "int",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.stdlib.StdlibExtraPlugin"
+    },
+    {
+      "type": "com.sun.crypto.provider.AESCipher$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ARCFOURCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESedeCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.prometheus.client.Striped64",
+      "fields": [
+        {
+          "name": "base"
+        },
+        {
+          "name": "busy"
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.ApiResponsesSerializer",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.PathsSerializer",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.mixin.ComponentsMixin",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.mixin.ExtensionsMixin",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.mixin.InfoMixin",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.mixin.MediaTypeMixin",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.mixin.OpenAPIMixin",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.mixin.OperationMixin",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.core.jackson.mixin.SchemaMixin",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.Components",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getCallbacks",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExamples",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getHeaders",
+          "parameterTypes": []
+        },
+        {
+          "name": "getLinks",
+          "parameterTypes": []
+        },
+        {
+          "name": "getParameters",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRequestBodies",
+          "parameterTypes": []
+        },
+        {
+          "name": "getResponses",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSchemas",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSecuritySchemes",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.OpenAPI",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getComponents",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExternalDocs",
+          "parameterTypes": []
+        },
+        {
+          "name": "getInfo",
+          "parameterTypes": []
+        },
+        {
+          "name": "getJsonSchemaDialect",
+          "parameterTypes": []
+        },
+        {
+          "name": "getOpenapi",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPaths",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSecurity",
+          "parameterTypes": []
+        },
+        {
+          "name": "getServers",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTags",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.Operation",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getCallbacks",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDeprecated",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExternalDocs",
+          "parameterTypes": []
+        },
+        {
+          "name": "getOperationId",
+          "parameterTypes": []
+        },
+        {
+          "name": "getParameters",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRequestBody",
+          "parameterTypes": []
+        },
+        {
+          "name": "getResponses",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSecurity",
+          "parameterTypes": []
+        },
+        {
+          "name": "getServers",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSummary",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTags",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.PathItem",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "get$ref",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDelete",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getGet",
+          "parameterTypes": []
+        },
+        {
+          "name": "getHead",
+          "parameterTypes": []
+        },
+        {
+          "name": "getOptions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getParameters",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPatch",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPost",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPut",
+          "parameterTypes": []
+        },
+        {
+          "name": "getServers",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSummary",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTrace",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.Paths",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.info.Info",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getContact",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getLicense",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTermsOfService",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTitle",
+          "parameterTypes": []
+        },
+        {
+          "name": "getVersion",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.ArraySchema",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.BooleanSchema",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.Content",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.IntegerSchema",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.MediaType",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getEncoding",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExample",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExamples",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSchema",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.NumberSchema",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.ObjectSchema",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.Schema",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "get$dynamicAnchor",
+          "parameterTypes": []
+        },
+        {
+          "name": "get$ref",
+          "parameterTypes": []
+        },
+        {
+          "name": "get$vocabulary",
+          "parameterTypes": []
+        },
+        {
+          "name": "getAdditionalProperties",
+          "parameterTypes": []
+        },
+        {
+          "name": "getAllOf",
+          "parameterTypes": []
+        },
+        {
+          "name": "getAnyOf",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDefault",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDeprecated",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDiscriminator",
+          "parameterTypes": []
+        },
+        {
+          "name": "getEnum",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExample",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExclusiveMaximum",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExclusiveMinimum",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExternalDocs",
+          "parameterTypes": []
+        },
+        {
+          "name": "getFormat",
+          "parameterTypes": []
+        },
+        {
+          "name": "getItems",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMaxItems",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMaxLength",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMaxProperties",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMaximum",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMinItems",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMinLength",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMinProperties",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMinimum",
+          "parameterTypes": []
+        },
+        {
+          "name": "getMultipleOf",
+          "parameterTypes": []
+        },
+        {
+          "name": "getNot",
+          "parameterTypes": []
+        },
+        {
+          "name": "getNullable",
+          "parameterTypes": []
+        },
+        {
+          "name": "getOneOf",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPattern",
+          "parameterTypes": []
+        },
+        {
+          "name": "getProperties",
+          "parameterTypes": []
+        },
+        {
+          "name": "getReadOnly",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRequired",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTitle",
+          "parameterTypes": []
+        },
+        {
+          "name": "getType",
+          "parameterTypes": []
+        },
+        {
+          "name": "getUniqueItems",
+          "parameterTypes": []
+        },
+        {
+          "name": "getWriteOnly",
+          "parameterTypes": []
+        },
+        {
+          "name": "getXml",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.StringSchema",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.UUIDSchema",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.parameters.Parameter",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "get$ref",
+          "parameterTypes": []
+        },
+        {
+          "name": "getAllowEmptyValue",
+          "parameterTypes": []
+        },
+        {
+          "name": "getAllowReserved",
+          "parameterTypes": []
+        },
+        {
+          "name": "getContent",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDeprecated",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExample",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExamples",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExplode",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getIn",
+          "parameterTypes": []
+        },
+        {
+          "name": "getName",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRequired",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSchema",
+          "parameterTypes": []
+        },
+        {
+          "name": "getStyle",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.parameters.Parameter$StyleEnum",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.parameters.QueryParameter",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getIn",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.parameters.RequestBody",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "get$ref",
+          "parameterTypes": []
+        },
+        {
+          "name": "getContent",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRequired",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.responses.ApiResponse",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "get$ref",
+          "parameterTypes": []
+        },
+        {
+          "name": "getContent",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getHeaders",
+          "parameterTypes": []
+        },
+        {
+          "name": "getLinks",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.responses.ApiResponses",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.security.SecurityRequirement",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.security.SecurityScheme",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "get$ref",
+          "parameterTypes": []
+        },
+        {
+          "name": "getBearerFormat",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getFlows",
+          "parameterTypes": []
+        },
+        {
+          "name": "getIn",
+          "parameterTypes": []
+        },
+        {
+          "name": "getName",
+          "parameterTypes": []
+        },
+        {
+          "name": "getOpenIdConnectUrl",
+          "parameterTypes": []
+        },
+        {
+          "name": "getScheme",
+          "parameterTypes": []
+        },
+        {
+          "name": "getType",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.swagger.v3.oas.models.security.SecurityScheme$In",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.security.SecurityScheme$Type",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.servers.Server",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getDescription",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExtensions",
+          "parameterTypes": []
+        },
+        {
+          "name": "getUrl",
+          "parameterTypes": []
+        },
+        {
+          "name": "getVariables",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.io.FilePermission"
+    },
+    {
+      "type": "java.io.Serializable"
+    },
+    {
+      "type": "java.lang.ClassValue"
+    },
+    {
+      "type": "java.lang.Cloneable"
+    },
+    {
+      "type": "java.lang.Comparable"
+    },
+    {
+      "type": "java.lang.Iterable"
+    },
+    {
+      "type": "java.lang.Number",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.lang.Object",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.lang.RuntimePermission"
+    },
+    {
+      "type": "java.lang.String"
+    },
+    {
+      "type": "java.lang.Thread",
+      "fields": [
+        {
+          "name": "threadLocalRandomProbe"
+        }
+      ]
+    },
+    {
+      "type": "java.math.BigDecimal",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.net.NetPermission"
+    },
+    {
+      "type": "java.net.SocketPermission"
+    },
+    {
+      "type": "java.net.URLPermission",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.nio.Buffer",
+      "fields": [
+        {
+          "name": "address"
+        }
+      ]
+    },
+    {
+      "type": "java.security.AlgorithmParametersSpi"
+    },
+    {
+      "type": "java.security.AllPermission"
+    },
+    {
+      "type": "java.security.KeyStoreSpi"
+    },
+    {
+      "type": "java.security.SecureRandomParameters"
+    },
+    {
+      "type": "java.security.SecurityPermission"
+    },
+    {
+      "type": "java.sql.Date"
+    },
+    {
+      "type": "java.sql.Timestamp"
+    },
+    {
+      "type": "java.util.AbstractCollection",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.AbstractList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.AbstractMap",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.Collection"
+    },
+    {
+      "type": "java.util.Collections$SingletonList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.Collections$SingletonMap",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.HashMap",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.LinkedHashMap",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.List"
+    },
+    {
+      "type": "java.util.Map"
+    },
+    {
+      "type": "java.util.PropertyPermission"
+    },
+    {
+      "type": "java.util.RandomAccess"
+    },
+    {
+      "type": "java.util.SequencedMap"
+    },
+    {
+      "type": "java.util.UUID",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.concurrent.atomic.AtomicBoolean",
+      "fields": [
+        {
+          "name": "value"
+        }
+      ]
+    },
+    {
+      "type": "java.util.concurrent.atomic.AtomicMarkableReference",
+      "fields": [
+        {
+          "name": "pair"
+        }
+      ]
+    },
+    {
+      "type": "java.util.concurrent.atomic.AtomicReference",
+      "fields": [
+        {
+          "name": "value"
+        }
+      ]
+    },
+    {
+      "type": "java.util.concurrent.atomic.Striped64",
+      "fields": [
+        {
+          "name": "base"
+        },
+        {
+          "name": "cellsBusy"
+        }
+      ]
+    },
+    {
+      "type": "javax.security.auth.x500.X500Principal",
+      "fields": [
+        {
+          "name": "thisX500Name"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "sun.security.x509.X500Name"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.smartcardio.CardPermission"
+    },
+    {
+      "type": "kotlin.Any"
+    },
+    {
+      "type": "kotlin.Boolean"
+    },
+    {
+      "type": "kotlin.Int"
+    },
+    {
+      "type": "kotlin.Metadata",
+      "methods": [
+        {
+          "name": "bv",
+          "parameterTypes": []
+        },
+        {
+          "name": "d1",
+          "parameterTypes": []
+        },
+        {
+          "name": "d2",
+          "parameterTypes": []
+        },
+        {
+          "name": "k",
+          "parameterTypes": []
+        },
+        {
+          "name": "mv",
+          "parameterTypes": []
+        },
+        {
+          "name": "pn",
+          "parameterTypes": []
+        },
+        {
+          "name": "xi",
+          "parameterTypes": []
+        },
+        {
+          "name": "xs",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "kotlin.SafePublicationLazyImpl",
+      "fields": [
+        {
+          "name": "_value"
+        }
+      ]
+    },
+    {
+      "type": "kotlin.String"
+    },
+    {
+      "type": "kotlin.collections.EmptyList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "kotlin.collections.Map"
+    },
+    {
+      "type": "kotlin.jvm.internal.DefaultConstructorMarker"
+    },
+    {
+      "type": "kotlin.jvm.internal.markers.KMappedMarker"
+    },
+    {
+      "type": "kotlin.reflect.jvm.internal.ReflectionFactoryImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "kotlin.reflect.jvm.internal.impl.load.java.ErasedOverridabilityCondition"
+    },
+    {
+      "type": "kotlin.reflect.jvm.internal.impl.load.java.FieldOverridabilityCondition"
+    },
+    {
+      "type": "kotlin.reflect.jvm.internal.impl.load.java.JavaIncompatibilityRulesOverridabilityCondition"
+    },
+    {
+      "type": "kotlin.reflect.jvm.internal.impl.resolve.scopes.DescriptorKindFilter",
+      "allPublicFields": true
+    },
+    {
+      "type": "libcore.io.Memory"
+    },
+    {
+      "type": "org.apache.logging.log4j.spi.ExtendedLogger"
+    },
+    {
+      "type": "org.apache.logging.slf4j.SLF4JProvider"
+    },
+    {
+      "type": "org.eclipse.core.runtime.FileLocator"
+    },
+    {
+      "type": "org.fusesource.jansi.internal.CLibrary",
+      "fields": [
+        {
+          "name": "HAVE_ISATTY"
+        },
+        {
+          "name": "HAVE_TTYNAME"
+        }
+      ]
+    },
+    {
+      "type": "org.fusesource.jansi.internal.JansiLoader",
+      "methods": [
+        {
+          "name": "initialize",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.fusesource.jansi.internal.Kernel32",
+      "fields": [
+        {
+          "name": "HAVE_ISATTY"
+        },
+        {
+          "name": "HAVE_TTYNAME"
+        }
+      ]
+    },
+    {
+      "type": "org.fusesource.jansi.internal.WindowsSupport"
+    },
+    {
+      "type": "org.robolectric.Robolectric"
+    },
+    {
+      "type": "org.slf4j.Logger"
+    },
+    {
+      "type": "org.slf4j.spi.LocationAwareLogger"
+    },
+    {
+      "type": "sun.misc.Unsafe",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "arrayBaseOffset",
+          "parameterTypes": [
+            "java.lang.Class"
+          ]
+        },
+        {
+          "name": "arrayIndexScale",
+          "parameterTypes": [
+            "java.lang.Class"
+          ]
+        },
+        {
+          "name": "copyMemory",
+          "parameterTypes": [
+            "long",
+            "long",
+            "long"
+          ]
+        },
+        {
+          "name": "copyMemory",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "java.lang.Object",
+            "long",
+            "long"
+          ]
+        },
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long"
+          ]
+        },
+        {
+          "name": "getByte",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "getByte",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long"
+          ]
+        },
+        {
+          "name": "getDouble",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long"
+          ]
+        },
+        {
+          "name": "getFloat",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long"
+          ]
+        },
+        {
+          "name": "getInt",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "getInt",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long"
+          ]
+        },
+        {
+          "name": "getLong",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "getLong",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long"
+          ]
+        },
+        {
+          "name": "getObject",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long"
+          ]
+        },
+        {
+          "name": "objectFieldOffset",
+          "parameterTypes": [
+            "java.lang.reflect.Field"
+          ]
+        },
+        {
+          "name": "putBoolean",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "boolean"
+          ]
+        },
+        {
+          "name": "putByte",
+          "parameterTypes": [
+            "long",
+            "byte"
+          ]
+        },
+        {
+          "name": "putByte",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "byte"
+          ]
+        },
+        {
+          "name": "putDouble",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "double"
+          ]
+        },
+        {
+          "name": "putFloat",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "float"
+          ]
+        },
+        {
+          "name": "putInt",
+          "parameterTypes": [
+            "long",
+            "int"
+          ]
+        },
+        {
+          "name": "putInt",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "int"
+          ]
+        },
+        {
+          "name": "putLong",
+          "parameterTypes": [
+            "long",
+            "long"
+          ]
+        },
+        {
+          "name": "putLong",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "long"
+          ]
+        },
+        {
+          "name": "putObject",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.NativePRNG",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.security.SecureRandomParameters"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA2$SHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.X509Factory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAKeyFactory$Legacy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.KeyManagerFactoryImpl$SunX509",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.SSLContextImpl$DefaultSSLContext",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityInfoAccessExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.BasicConstraintsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CRLDistributionPointsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CertificatePoliciesExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.ExtendedKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.IssuerAlternativeNameExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.KeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.NetscapeCertTypeExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.PrivateKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectAlternativeNameExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "glob": ""
+    },
+    {
+      "glob": "META-INF/maven/com.noumenadigital.platform/npl-cli/pom.properties"
+    },
+    {
+      "glob": "META-INF/services/ch.qos.logback.classic.spi.Configurator"
+    },
+    {
+      "glob": "META-INF/services/com.noumenadigital.npl.contrib.NativeImplWithoutRuntimePlugin"
+    },
+    {
+      "glob": "META-INF/services/java.lang.System$LoggerFinder"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.InetAddressResolverProvider"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.URLStreamHandlerProvider"
+    },
+    {
+      "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
+    },
+    {
+      "glob": "META-INF/services/javax.xml.parsers.SAXParserFactory"
+    },
+    {
+      "glob": "META-INF/services/kotlin.reflect.jvm.internal.impl.resolve.ExternalOverridabilityCondition"
+    },
+    {
+      "glob": "META-INF/services/kotlin.reflect.jvm.internal.impl.util.ModuleVisibilityHelper"
+    },
+    {
+      "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "kotlin/collections/collections.kotlin_builtins"
+    },
+    {
+      "glob": "kotlin/kotlin.kotlin_builtins"
+    },
+    {
+      "glob": "lang"
+    },
+    {
+      "glob": "lang/collection/collection.npl"
+    },
+    {
+      "glob": "lang/collection/list.npl"
+    },
+    {
+      "glob": "lang/collection/map.npl"
+    },
+    {
+      "glob": "lang/collection/set.npl"
+    },
+    {
+      "glob": "lang/core/blob.npl"
+    },
+    {
+      "glob": "lang/core/boolean.npl"
+    },
+    {
+      "glob": "lang/core/common.npl"
+    },
+    {
+      "glob": "lang/core/notifyresult.npl"
+    },
+    {
+      "glob": "lang/core/number.npl"
+    },
+    {
+      "glob": "lang/core/optional.npl"
+    },
+    {
+      "glob": "lang/core/party.npl"
+    },
+    {
+      "glob": "lang/core/protocol.npl"
+    },
+    {
+      "glob": "lang/core/symbol.npl"
+    },
+    {
+      "glob": "lang/core/text.npl"
+    },
+    {
+      "glob": "lang/datetime/datetime.npl"
+    },
+    {
+      "glob": "lang/datetime/duration.npl"
+    },
+    {
+      "glob": "lang/datetime/localdate.npl"
+    },
+    {
+      "glob": "lang/datetime/period.npl"
+    },
+    {
+      "glob": "lang/datetime/zoneid.npl"
+    },
+    {
+      "glob": "lang/math/math.npl"
+    },
+    {
+      "glob": "lang/test/test.npl"
+    },
+    {
+      "glob": "logback-test.scmo"
+    },
+    {
+      "glob": "logback-test.xml"
+    },
+    {
+      "glob": "logback.scmo"
+    },
+    {
+      "glob": "logback.xml"
+    },
+    {
+      "glob": "mozilla/public-suffix-list.txt"
+    },
+    {
+      "glob": "org/apache/http/client/version.properties"
+    },
+    {
+      "glob": "org/fusesource/jansi/internal/native/Mac/arm64/libjansi.jnilib"
+    },
+    {
+      "glob": "org/fusesource/jansi/jansi.properties"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/nfc.nrm"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/net/www/content-types.properties"
+    },
+    {
+      "module": "java.xml",
+      "glob": "jdk/xml/internal/jdkcatalog/JDKCatalog.xml"
+    }
+  ],
+  "bundles": [],
+  "jni": [
+    {
+      "type": "com.noumenadigital.npl.cli.MainKt",
+      "methods": [
+        {
+          "name": "main",
+          "parameterTypes": [
+            "java.lang.String[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Boolean",
+      "methods": [
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.String",
+      "methods": [
+        {
+          "name": "lastIndexOf",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "substring",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.System",
+      "methods": [
+        {
+          "name": "getProperty",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "setProperty",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.fusesource.jansi.internal.CLibrary",
+      "fields": [
+        {
+          "name": "HAVE_ISATTY"
+        },
+        {
+          "name": "HAVE_TTYNAME"
+        },
+        {
+          "name": "TCSADRAIN"
+        },
+        {
+          "name": "TCSAFLUSH"
+        },
+        {
+          "name": "TCSANOW"
+        },
+        {
+          "name": "TIOCGETA"
+        },
+        {
+          "name": "TIOCGETD"
+        },
+        {
+          "name": "TIOCGWINSZ"
+        },
+        {
+          "name": "TIOCSETA"
+        },
+        {
+          "name": "TIOCSETD"
+        },
+        {
+          "name": "TIOCSWINSZ"
+        }
+      ]
+    },
+    {
+      "type": "org.fusesource.jansi.internal.JansiLoader",
+      "methods": [
+        {
+          "name": "initialize",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.fusesource.jansi.internal.Kernel32",
+      "fields": [
+        {
+          "name": "BACKGROUND_BLUE"
+        },
+        {
+          "name": "BACKGROUND_GREEN"
+        },
+        {
+          "name": "BACKGROUND_INTENSITY"
+        },
+        {
+          "name": "BACKGROUND_RED"
+        },
+        {
+          "name": "FOREGROUND_BLUE"
+        },
+        {
+          "name": "FOREGROUND_GREEN"
+        },
+        {
+          "name": "FOREGROUND_INTENSITY"
+        },
+        {
+          "name": "FOREGROUND_RED"
+        },
+        {
+          "name": "HAVE_ISATTY"
+        },
+        {
+          "name": "HAVE_TTYNAME"
+        }
+      ],
+      "methods": [
+        {
+          "name": "FillConsoleOutputAttribute",
+          "parameterTypes": [
+            "long",
+            "short",
+            "int",
+            "org.fusesource.jansi.internal.Kernel32$COORD",
+            "org.fusesource.jansi.internal.Kernel32$DWORD"
+          ]
+        },
+        {
+          "name": "GetConsoleScreenBufferInfo",
+          "parameterTypes": [
+            "long",
+            "org.fusesource.jansi.internal.Kernel32$CONSOLE_SCREEN_BUFFER_INFO"
+          ]
+        },
+        {
+          "name": "SetConsoleTextAttribute",
+          "parameterTypes": [
+            "long",
+            "short"
+          ]
+        },
+        {
+          "name": "SetConsoleTitle",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    }
+  ]
+}

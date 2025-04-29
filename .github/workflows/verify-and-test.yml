@@ -38,7 +38,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: "graalvm"
-          java-version: "21"
+          java-version: "24"
           cache: "maven"
 
       - name: "Validate native config diff"
@@ -71,7 +71,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: "graalvm"
-          java-version: "21"
+          java-version: "24"
           cache: "maven"
 
       - name: "Build npl-cli native binary and test it"
