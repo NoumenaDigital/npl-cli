@@ -79,10 +79,10 @@ class DeployCommandIT :
             engineManagementUrl: String,
             keycloakAuthUrl: String,
         ): File {
-            val configDir = File(tempDir, ".noumena")
+            val configDir = File(tempDir, ".npl")
             configDir.mkdirs()
 
-            val configFile = File(configDir, "config.yml")
+            val configFile = File(configDir, "deploy.yml")
 
             val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
 
@@ -114,16 +114,16 @@ class DeployCommandIT :
             try {
                 System.setProperty("user.home", tempDir.absolutePath)
 
-                val localConfigDir = File(".noumena")
+                val localConfigDir = File(".npl")
                 localConfigDir.mkdirs()
-                File(tempDir, ".noumena/config.yml").copyTo(
-                    File(localConfigDir, "config.yml"),
+                File(tempDir, ".npl/deploy.yml").copyTo(
+                    File(localConfigDir, "deploy.yml"),
                     overwrite = true,
                 )
 
                 test()
             } finally {
-                File(".noumena/config.yml").delete()
+                File(".npl/deploy.yml").delete()
                 System.setProperty("user.home", originalUserHome)
             }
         }
@@ -378,8 +378,8 @@ class DeployCommandIT :
                     Options:
                       --clean          Clear application contents before deployment
 
-                    Configuration is read from .noumena/config.yml in the current directory
-                    or the user's home directory.
+                    Configuration is read from .npl/deploy.yml in the current directory
+                    or the user's home directory (~/.npl/deploy.yml).
                 """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -400,7 +400,8 @@ class DeployCommandIT :
                     Configuration errors:
                       Target 'nonexistent-target' not found in configuration
 
-                    Please create a configuration file at .noumena/config.yml
+                    Please create or check the configuration file at .npl/deploy.yml
+                    (in the current directory or your home directory ~/.npl/deploy.yml)
                     with the following format:
                     targets:
                       nonexistent-target:

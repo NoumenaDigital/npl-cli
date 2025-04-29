@@ -36,12 +36,12 @@ class DeployConfig(
         /**
          * Load configuration from a YAML file
          * Looks in the following locations in order:
-         * 1. Current directory .noumena/config.yml
-         * 2. User home directory .noumena/config.yml
+         * 1. Current directory .npl/deploy.yml
+         * 2. User home directory .npl/deploy.yml
          */
         fun load(): DeployConfig {
-            val currentDirConfig = File(".noumena/config.yml")
-            val userHomeConfig = File(System.getProperty("user.home"), ".noumena/config.yml")
+            val currentDirConfig = File(".npl/deploy.yml")
+            val userHomeConfig = File(System.getProperty("user.home"), ".npl/deploy.yml")
 
             val configFile =
                 when {

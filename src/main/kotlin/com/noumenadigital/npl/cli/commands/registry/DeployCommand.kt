@@ -34,7 +34,8 @@ class DeployCommand(
             writer.error("Configuration errors:")
             configErrors.forEach { writer.error("  $it") }
             writer.info("")
-            writer.info("Please create a configuration file at .noumena/config.yml")
+            writer.info("Please create or check the configuration file at .npl/deploy.yml")
+            writer.info("(in the current directory or your home directory ~/.npl/deploy.yml)")
             writer.info("with the following format:")
             writer.info(
                 """

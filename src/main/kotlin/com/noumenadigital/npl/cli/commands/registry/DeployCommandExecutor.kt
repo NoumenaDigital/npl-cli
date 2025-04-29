@@ -65,7 +65,7 @@ class DeployCommandExecutor(
         output.info("Options:")
         output.info("  --clean          Clear application contents before deployment")
         output.info()
-        output.info("Configuration is read from .noumena/config.yml in the current directory")
-        output.info("or the user's home directory.")
+        output.info("Configuration is read from .npl/deploy.yml in the current directory")
+        output.info("or the user's home directory (~/.npl/deploy.yml).")
     }
 }

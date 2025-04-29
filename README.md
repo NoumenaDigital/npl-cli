@@ -162,8 +162,8 @@ Where:
 The deploy command requires configuration settings that are read from a YAML file. The CLI looks for configuration in
 the following locations (in order):
 
-1. `./.noumena/config.yml` (current directory)
-2. `~/.noumena/config.yml` (user's home directory)
+1. `./.npl/deploy.yml` (current directory)
+2. `~/.npl/deploy.yml` (user's home directory)
 
 The configuration file contains multiple named deployment targets, allowing you to quickly switch between different
 environments (dev, test, prod, etc.) without changing the command.
@@ -209,10 +209,10 @@ To set up your configuration:
 
 ```bash
 # Create the configuration directory
-mkdir -p ~/.noumena
+mkdir -p ~/.npl
 
 # Copy the sample configuration and edit it
-cp src/main/resources/sample-config.yml ~/.noumena/config.yml
+cp src/main/resources/sample-config.yml ~/.npl/deploy.yml
 ```
 
 Then edit the file with your specific settings.
