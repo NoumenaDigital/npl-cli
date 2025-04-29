@@ -131,15 +131,15 @@ class DeployCommandIT :
         fun executeDeployCommand(
             tempDir: File,
             testDirPath: String,
-            withClean: Boolean = false,
+            withClear: Boolean = false,
         ): Pair<String, Int> {
             var output = ""
             var exitCode = -1
 
             withConfigDir(tempDir) {
                 val commands =
-                    if (withClean) {
-                        listOf("deploy", "test-target", testDirPath, "--clean")
+                    if (withClear) {
+                        listOf("deploy", "test-target", testDirPath, "--clear")
                     } else {
                         listOf("deploy", "test-target", testDirPath)
                     }
@@ -195,7 +195,7 @@ class DeployCommandIT :
                 }
             }
 
-            test("deploy with clean flag") {
+            test("deploy with clear flag") {
                 mockEngine.enqueue(
                     MockResponse()
                         .setResponseCode(200)
@@ -220,7 +220,7 @@ class DeployCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
-                    val (output, exitCode) = executeDeployCommand(tempDir, testDirPath, withClean = true)
+                    val (output, exitCode) = executeDeployCommand(tempDir, testDirPath, withClear = true)
 
                     output.normalize() shouldBe
                         """
@@ -280,7 +280,7 @@ class DeployCommandIT :
                         executeDeployCommand(
                             tempDir = tempDir,
                             testDirPath = testDirPath,
-                            withClean = true,
+                            withClear = true,
                         )
 
                     output.normalize() shouldBe
@@ -340,7 +340,7 @@ class DeployCommandIT :
                         executeDeployCommand(
                             tempDir = tempDir,
                             testDirPath = testDirPath,
-                            withClean = true,
+                            withClear = true,
                         )
 
                     output.normalize() shouldBe
@@ -369,7 +369,7 @@ class DeployCommandIT :
                     val expectedOutput =
                         """
                     Missing required parameter: target
-                    Usage: deploy <target> <directory> [--clean]
+                    Usage: deploy <target> <directory> [--clear]
 
                     Arguments:
                       target           Named target from deploy.yml to deploy to
@@ -384,7 +384,7 @@ class DeployCommandIT :
                                             └── migration.yml
 
                     Options:
-                      --clean          Clear application contents before deployment
+                      --clear          Clear application contents before deployment
 
                     Configuration is read from .npl/deploy.yml in the current directory
                     or the user's home directory (~/.npl/deploy.yml).
@@ -404,7 +404,7 @@ class DeployCommandIT :
                     val expectedOutput =
                         """
                     Missing required parameter: directory
-                    Usage: deploy <target> <directory> [--clean]
+                    Usage: deploy <target> <directory> [--clear]
 
                     Arguments:
                       target           Named target from deploy.yml to deploy to
@@ -419,7 +419,7 @@ class DeployCommandIT :
                                             └── migration.yml
 
                     Options:
-                      --clean          Clear application contents before deployment
+                      --clear          Clear application contents before deployment
 
                     Configuration is read from .npl/deploy.yml in the current directory
                     or the user's home directory (~/.npl/deploy.yml).

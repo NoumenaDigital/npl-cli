@@ -14,7 +14,7 @@ import java.io.File
 class DeployCommand(
     private val targetLabel: String,
     private val srcDir: String,
-    private val cleanFirst: Boolean = false,
+    private val clearFirst: Boolean = false,
 ) {
     fun execute(writer: ColorWriter): ExitCode {
         val sourceDir = File(srcDir)
@@ -74,7 +74,7 @@ class DeployCommand(
             val authProvider = TokenAuthorizationProvider(userConfig, authConfig)
 
             ManagementHttpClient(targetConfig.engineManagementUrl, httpClient).use { client ->
-                if (cleanFirst) {
+                if (clearFirst) {
                     writer.info("Clearing application contents...")
                     client.clearApplicationContents(authProvider)
                     writer.info("Application contents cleared")

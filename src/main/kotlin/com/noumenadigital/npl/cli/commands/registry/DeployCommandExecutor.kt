@@ -22,7 +22,7 @@ class DeployCommandExecutor(
                 isRequired = true,
             ),
             CommandParameter(
-                name = "--clean",
+                name = "--clear",
                 description = "Clear application contents before deployment",
             ),
         )
@@ -36,32 +36,31 @@ class DeployCommandExecutor(
             return ExitCode.GENERAL_ERROR
         }
 
-        // Parse arguments
-        val cleanFlag = args.contains("--clean")
+        val clearFlag = args.contains("--clear")
 
-        // Remove the --clean flag if present to simplify remaining arg processing
-        val argsWithoutClean = args.filterNot { it == "--clean" }
+        // Remove the --clear flag if present to simplify remaining arg processing
+        val argsWithoutClear = args.filterNot { it == "--clear" }
 
         // First arg is always the target
-        val target = argsWithoutClean.first()
+        val target = argsWithoutClear.first()
 
         // Second arg is directory, if provided
-        if (argsWithoutClean.size < 2) {
+        if (argsWithoutClear.size < 2) {
             output.error("Missing required parameter: directory")
             displayUsage(output)
             return ExitCode.GENERAL_ERROR
         }
-        val directory = argsWithoutClean[1]
+        val directory = argsWithoutClear[1]
 
         return DeployCommand(
             targetLabel = target,
             srcDir = directory,
-            cleanFirst = cleanFlag,
+            clearFirst = clearFlag,
         ).execute(output)
     }
 
     private fun displayUsage(output: ColorWriter) {
-        output.info("Usage: deploy <target> <directory> [--clean]")
+        output.info("Usage: deploy <target> <directory> [--clear]")
         output.info()
         output.info("Arguments:")
         output.info("  target           Named target from deploy.yml to deploy to")
@@ -76,7 +75,7 @@ class DeployCommandExecutor(
         output.info("                        └── migration.yml")
         output.info()
         output.info("Options:")
-        output.info("  --clean          Clear application contents before deployment")
+        output.info("  --clear          Clear application contents before deployment")
         output.info()
         output.info("Configuration is read from .npl/deploy.yml in the current directory")
         output.info("or the user's home directory (~/.npl/deploy.yml).")

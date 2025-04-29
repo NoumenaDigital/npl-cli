@@ -148,14 +148,14 @@ The `deploy` command allows you to deploy NPL sources to a Noumena Engine instan
 ### Usage
 
 ```bash
-npl-cli deploy [target] [directory] [--clean]
+npl-cli deploy <target> <directory> [--clear]
 ```
 
 Where:
 
 - `[target]` (required) is the named target from the configuration file
 - `[directory]` (required) is the path to the directory containing NPL sources
-- `[--clean]` (optional) clears the application contents before deployment
+- `[--clear]` (optional) clears the application contents before deployment
 
 ### Configuration
 
@@ -234,5 +234,5 @@ npl-cli deploy prod /path/to/npl/sources
 Deploy to the "test" target after clearing application contents:
 
 ```bash
-npl-cli deploy test --clean
+npl-cli deploy test --clear
 ```

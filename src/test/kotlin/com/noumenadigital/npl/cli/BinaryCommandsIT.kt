@@ -53,7 +53,7 @@ class BinaryCommandsIT :
                     deploy     Deploy NPL sources to a Noumena Engine instance
                                  <target> (required)  Named target from deploy.yml to deploy to
                                  <directory> (required)  Directory containing NPL sources
-                                 --clean  Clear application contents before deployment
+                                 --clear  Clear application contents before deployment
                     """.normalize()
 
                 output.normalize() shouldBe expectedOutput
