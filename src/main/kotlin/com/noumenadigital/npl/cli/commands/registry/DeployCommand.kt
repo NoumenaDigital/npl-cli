@@ -13,7 +13,7 @@ import java.io.File
 
 class DeployCommand(
     private val targetLabel: String,
-    private val srcDir: String = ".",
+    private val srcDir: String,
     private val cleanFirst: Boolean = false,
 ) {
     fun execute(writer: ColorWriter): ExitCode {

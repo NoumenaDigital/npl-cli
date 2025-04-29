@@ -242,6 +242,10 @@
     {
       "type": "com.noumenadigital.platform.api.models.ApiModelError",
       "allDeclaredFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true,
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
       "methods": [
         {
           "name": "setErrorType",

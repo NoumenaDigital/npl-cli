@@ -179,7 +179,7 @@ targets:
     username: your-username
     password: your-password
     clientId: client-id
-    clientSecret: client-secret # Optional
+    clientSecret: client-secret
   another-target:
     # Another target configuration
     ...
@@ -203,7 +203,7 @@ targets:
 
 #### Example Configuration
 
-A sample configuration file is available at `src/main/resources/sample-config.yml`.
+A sample configuration file is available at `src/main/resources/sample-deploy.yml`.
 
 To set up your configuration:
 
@@ -212,7 +212,7 @@ To set up your configuration:
 mkdir -p ~/.npl
 
 # Copy the sample configuration and edit it
-cp src/main/resources/sample-config.yml ~/.npl/deploy.yml
+cp src/main/resources/sample-deploy.yml ~/.npl/deploy.yml
 ```
 
 Then edit the file with your specific settings.

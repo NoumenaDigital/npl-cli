@@ -369,11 +369,54 @@ class DeployCommandIT :
                     val expectedOutput =
                         """
                     Missing required parameter: target
-                    Usage: deploy <target> [directory] [--clean]
+                    Usage: deploy <target> <directory> [--clean]
 
                     Arguments:
-                      target           Named target from config.json to deploy to
-                      directory        Directory containing NPL sources (defaults to current directory)
+                      target           Named target from deploy.yml to deploy to
+                      directory        Directory containing NPL sources.
+                                       IMPORTANT: The directory must contain a valid NPL source structure, including
+                                       migrations. E.g.:
+                                        main
+                                        ├── npl-1.0
+                                        │   └── processes
+                                        │       └── demo.npl
+                                        └── yaml
+                                            └── migration.yml
+
+                    Options:
+                      --clean          Clear application contents before deployment
+
+                    Configuration is read from .npl/deploy.yml in the current directory
+                    or the user's home directory (~/.npl/deploy.yml).
+                """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                }
+            }
+
+            test("missing directory parameter") {
+                runCommand(
+                    commands = listOf("deploy", "test-target"),
+                ) {
+                    process.waitFor(5, TimeUnit.SECONDS)
+
+                    val expectedOutput =
+                        """
+                    Missing required parameter: directory
+                    Usage: deploy <target> <directory> [--clean]
+
+                    Arguments:
+                      target           Named target from deploy.yml to deploy to
+                      directory        Directory containing NPL sources.
+                                       IMPORTANT: The directory must contain a valid NPL source structure, including
+                                       migrations. E.g.:
+                                        main
+                                        ├── npl-1.0
+                                        │   └── processes
+                                        │       └── demo.npl
+                                        └── yaml
+                                            └── migration.yml
 
                     Options:
                       --clean          Clear application contents before deployment

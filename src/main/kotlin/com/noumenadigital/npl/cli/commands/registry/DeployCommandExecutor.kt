@@ -13,13 +13,13 @@ class DeployCommandExecutor(
         listOf(
             CommandParameter(
                 name = "target",
-                description = "Named target from config.json to deploy to",
+                description = "Named target from deploy.yml to deploy to",
                 isRequired = true,
             ),
             CommandParameter(
                 name = "directory",
                 description = "Directory containing NPL sources",
-                defaultValue = ".",
+                isRequired = true,
             ),
             CommandParameter(
                 name = "--clean",
@@ -46,7 +46,12 @@ class DeployCommandExecutor(
         val target = argsWithoutClean.first()
 
         // Second arg is directory, if provided
-        val directory = if (argsWithoutClean.size > 1) argsWithoutClean[1] else "."
+        if (argsWithoutClean.size < 2) {
+            output.error("Missing required parameter: directory")
+            displayUsage(output)
+            return ExitCode.GENERAL_ERROR
+        }
+        val directory = argsWithoutClean[1]
 
         return DeployCommand(
             targetLabel = target,
@@ -56,11 +61,19 @@ class DeployCommandExecutor(
     }
 
     private fun displayUsage(output: ColorWriter) {
-        output.info("Usage: deploy <target> [directory] [--clean]")
+        output.info("Usage: deploy <target> <directory> [--clean]")
         output.info()
         output.info("Arguments:")
-        output.info("  target           Named target from config.json to deploy to")
-        output.info("  directory        Directory containing NPL sources (defaults to current directory)")
+        output.info("  target           Named target from deploy.yml to deploy to")
+        output.info("  directory        Directory containing NPL sources.")
+        output.info("                   IMPORTANT: The directory must contain a valid NPL source structure, including")
+        output.info("                   migrations. E.g.:")
+        output.info("                    main")
+        output.info("                    ├── npl-1.0")
+        output.info("                    │   └── processes")
+        output.info("                    │       └── demo.npl")
+        output.info("                    └── yaml")
+        output.info("                        └── migration.yml")
         output.info()
         output.info("Options:")
         output.info("  --clean          Clear application contents before deployment")
