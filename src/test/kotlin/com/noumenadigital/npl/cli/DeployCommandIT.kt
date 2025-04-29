@@ -5,8 +5,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
-import com.noumenadigital.npl.cli.config.DeployTarget
-import com.noumenadigital.npl.cli.config.EngineConfig
+import com.noumenadigital.npl.cli.config.DeployConfig
+import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.Dispatcher
@@ -87,12 +87,12 @@ class DeployCommandIT :
 
             val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
 
-            val engineConfig =
-                EngineConfig(
+            val deployConfig =
+                DeployConfig(
                     targets =
                         mapOf(
                             "test-target" to
-                                DeployTarget(
+                                EngineTargetConfig(
                                     engineManagementUrl = engineManagementUrl,
                                     authUrl = "${keycloakAuthUrl}realms/noumena",
                                     username = "user1",
@@ -103,7 +103,7 @@ class DeployCommandIT :
                         ),
                 )
 
-            mapper.writeValue(configFile, engineConfig)
+            mapper.writeValue(configFile, deployConfig)
             return configFile
         }
 
@@ -421,6 +421,7 @@ class DeployCommandIT :
                     {
                       "targets": {
                         "nonexistent-target": {
+                          "type": "engine",
                           "engineManagementUrl": "<URL of the Noumena Engine API>",
                           "authUrl": "<URL of the authentication endpoint>",
                           "username": "<username for authentication>",

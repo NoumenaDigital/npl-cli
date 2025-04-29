@@ -1,7 +1,8 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.config.EngineConfig
+import com.noumenadigital.npl.cli.config.DeployConfig
+import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.platform.client.auth.AuthConfiguration
 import com.noumenadigital.platform.client.auth.TokenAuthorizationProvider
@@ -16,7 +17,6 @@ class DeployCommand(
     private val cleanFirst: Boolean = false,
 ) {
     fun execute(writer: ColorWriter): ExitCode {
-        // Verify the source directory exists
         val sourceDir = File(srcDir)
         if (!sourceDir.exists()) {
             writer.error("Target directory does not exist: ${sourceDir.absolutePath}")
@@ -28,9 +28,8 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        // Load configuration
-        val config = EngineConfig.load()
-        val configErrors = EngineConfig.validateTarget(config, targetLabel)
+        val config = DeployConfig.load()
+        val configErrors = DeployConfig.validateTarget(config, targetLabel)
         if (configErrors.isNotEmpty()) {
             writer.error("Configuration errors:")
             configErrors.forEach { writer.error("  $it") }
@@ -42,6 +41,7 @@ class DeployCommand(
                 {
                   "targets": {
                     "$targetLabel": {
+                      "type": "engine",
                       "engineManagementUrl": "<URL of the Noumena Engine API>",
                       "authUrl": "<URL of the authentication endpoint>",
                       "username": "<username for authentication>",
@@ -56,35 +56,34 @@ class DeployCommand(
             return ExitCode.CONFIG_ERROR
         }
 
+        val httpClient = HttpClients.createSystem()
         try {
-            // Create an HTTP client
-            val httpClient = HttpClients.createSystem()
+            val targetConfig = config.targets[targetLabel]
 
-            // Get the target configuration
-            val target = config.targets[targetLabel]!!
+            if (targetConfig !is EngineTargetConfig) {
+                writer.error("Deployment target '$targetLabel' is not configured as an 'engine' target.")
+                writer.error("Currently, deployment is only supported for 'engine' target types.")
+                return ExitCode.CONFIG_ERROR
+            }
 
-            // Create the authorization provider
-            val userConfig = UserConfiguration(target.username, target.password)
+            val userConfig = UserConfiguration(targetConfig.username, targetConfig.password)
             val authConfig =
                 AuthConfiguration(
-                    clientId = target.clientId,
-                    clientSecret = target.clientSecret,
-                    authUrl = target.authUrl,
+                    clientId = targetConfig.clientId,
+                    clientSecret = targetConfig.clientSecret,
+                    authUrl = targetConfig.authUrl,
                 )
             val authProvider = TokenAuthorizationProvider(userConfig, authConfig)
 
-            // Use the ManagementHttpClient to deploy sources
-            ManagementHttpClient(target.engineManagementUrl, httpClient).use { client ->
-                // Clear application contents if requested
+            ManagementHttpClient(targetConfig.engineManagementUrl, httpClient).use { client ->
                 if (cleanFirst) {
                     writer.info("Clearing application contents...")
                     client.clearApplicationContents(authProvider)
                     writer.info("Application contents cleared")
                 }
 
-                // Deploy the sources based on configuration
                 writer.info("Creating NPL deployment archive...")
-                writer.info("Deploying NPL sources and migrations to ${target.engineManagementUrl}...")
+                writer.info("Deploying NPL sources and migrations to ${targetConfig.engineManagementUrl}...")
 
                 client.deploySourcesWithMigrations(
                     sourceDirectory = srcDir,
@@ -97,6 +96,8 @@ class DeployCommand(
         } catch (e: Exception) {
             writer.error("Error deploying NPL sources: ${e.message ?: "Failed to deploy NPL sources"}")
             return ExitCode.GENERAL_ERROR
+        } finally {
+            httpClient.close()
         }
     }
 }
