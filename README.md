@@ -34,7 +34,7 @@ This helps ensure consistency between the platform and CLI tool while allowing i
 
 ## Prerequisites
 
-You'll need Maven and Java 21 (graalvm if you want to build binaries) or later installed on your system.
+You'll need Maven and Java 24 (graalvm if you want to build binaries) or later installed on your system.
 
 ## Build Profiles
 
@@ -159,33 +159,30 @@ Where:
 
 ### Configuration
 
-The deploy command requires configuration settings that are read from a JSON file. The CLI looks for configuration in
+The deploy command requires configuration settings that are read from a YAML file. The CLI looks for configuration in
 the following locations (in order):
 
-1. `./.noumena/config.json` (current directory)
-2. `~/.noumena/config.json` (user's home directory)
+1. `./.noumena/config.yml` (current directory)
+2. `~/.noumena/config.yml` (user's home directory)
 
 The configuration file contains multiple named deployment targets, allowing you to quickly switch between different
 environments (dev, test, prod, etc.) without changing the command.
 
-#### Configuration Schema
+#### Configuration Schema (YAML)
 
-```json
-{
-  "targets": {
-    "target-name": {
-      "engineManagementUrl": "http://server:port",
-      "authUrl": "http://auth-server:port",
-      "username": "your-username",
-      "password": "your-password",
-      "clientId": "client-id",
-      "clientSecret": "client-secret"
-    },
-    "another-target": {
-      // Another target configuration
-    }
-  }
-}
+```yaml
+targets:
+  target-name:
+    type: engine # Currently only 'engine' type is supported
+    engineManagementUrl: http://server:port
+    authUrl: http://auth-server:port/realms/your-realm # Include the realm in the URL
+    username: your-username
+    password: your-password
+    clientId: client-id
+    clientSecret: client-secret # Optional
+  another-target:
+    # Another target configuration
+    ...
 ```
 
 #### Required Properties for Each Target
@@ -206,7 +203,7 @@ environments (dev, test, prod, etc.) without changing the command.
 
 #### Example Configuration
 
-A sample configuration file is available at `src/main/resources/sample-config.json`.
+A sample configuration file is available at `src/main/resources/sample-config.yml`.
 
 To set up your configuration:
 
@@ -215,7 +212,7 @@ To set up your configuration:
 mkdir -p ~/.noumena
 
 # Copy the sample configuration and edit it
-cp src/main/resources/sample-config.json ~/.noumena/config.json
+cp src/main/resources/sample-config.yml ~/.noumena/config.yml
 ```
 
 Then edit the file with your specific settings.

@@ -34,23 +34,19 @@ class DeployCommand(
             writer.error("Configuration errors:")
             configErrors.forEach { writer.error("  $it") }
             writer.info("")
-            writer.info("Please create a configuration file at .noumena/config.json")
+            writer.info("Please create a configuration file at .noumena/config.yml")
             writer.info("with the following format:")
             writer.info(
                 """
-                {
-                  "targets": {
-                    "$targetLabel": {
-                      "type": "engine",
-                      "engineManagementUrl": "<URL of the Noumena Engine API>",
-                      "authUrl": "<URL of the authentication endpoint>",
-                      "username": "<username for authentication>",
-                      "password": "<password for authentication>",
-                      "clientId": "<client ID for authentication>",
-                      "clientSecret": "<client secret for authentication>"
-                    }
-                  }
-                }
+                targets:
+                  $targetLabel:
+                    type: engine
+                    engineManagementUrl: <URL of the Noumena Engine API>
+                    authUrl: <URL of the authentication endpoint>
+                    username: <username for authentication>
+                    password: <password for authentication>
+                    clientId: <client ID for authentication>
+                    clientSecret: <client secret for authentication>
                 """.trimIndent(),
             )
             return ExitCode.CONFIG_ERROR

@@ -1,6 +1,7 @@
 package com.noumenadigital.npl.cli
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
@@ -20,7 +21,6 @@ import java.util.concurrent.TimeUnit
 class DeployCommandIT :
     FunSpec({
 
-        // Set up the mock web server for each test
         lateinit var mockKeycloak: MockWebServer
         lateinit var mockEngine: MockWebServer
 
@@ -28,7 +28,6 @@ class DeployCommandIT :
             mockKeycloak = MockWebServer()
             mockEngine = MockWebServer()
 
-            // Start them on random ports
             mockKeycloak.start()
             mockEngine.start()
 
@@ -83,9 +82,9 @@ class DeployCommandIT :
             val configDir = File(tempDir, ".noumena")
             configDir.mkdirs()
 
-            val configFile = File(configDir, "config.json")
+            val configFile = File(configDir, "config.yml")
 
-            val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+            val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
 
             val deployConfig =
                 DeployConfig(
@@ -115,18 +114,16 @@ class DeployCommandIT :
             try {
                 System.setProperty("user.home", tempDir.absolutePath)
 
-                // Also create a config file in the current directory for JAR mode
                 val localConfigDir = File(".noumena")
                 localConfigDir.mkdirs()
-                File(tempDir, ".noumena/config.json").copyTo(
-                    File(localConfigDir, "config.json"),
+                File(tempDir, ".noumena/config.yml").copyTo(
+                    File(localConfigDir, "config.yml"),
                     overwrite = true,
                 )
 
                 test()
             } finally {
-                // Clean up the local config file
-                File(".noumena/config.json").delete()
+                File(".noumena/config.yml").delete()
                 System.setProperty("user.home", originalUserHome)
             }
         }
@@ -139,7 +136,6 @@ class DeployCommandIT :
             var output = ""
             var exitCode = -1
 
-            // Configure the user.home system property to point to our temp directory
             withConfigDir(tempDir) {
                 val commands =
                     if (withClean) {
@@ -166,10 +162,8 @@ class DeployCommandIT :
             cleanupMockServers()
         }
 
-        // Main use cases first
         context("successful deployments") {
             test("simple deploy") {
-                // Configure the mock engine to respond to deployment requests
                 mockEngine.enqueue(
                     MockResponse()
                         .setResponseCode(200)
@@ -202,7 +196,6 @@ class DeployCommandIT :
             }
 
             test("deploy with clean flag") {
-                // Configure the mock engine to respond to clear application request
                 mockEngine.enqueue(
                     MockResponse()
                         .setResponseCode(200)
@@ -210,7 +203,6 @@ class DeployCommandIT :
                         .setBody("{}"),
                 )
 
-                // Configure the mock engine to respond to deployment request
                 mockEngine.enqueue(
                     MockResponse()
                         .setResponseCode(200)
@@ -228,7 +220,6 @@ class DeployCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
-                    // Execute the deploy command with clean flag
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath, withClean = true)
 
                     output.normalize() shouldBe
@@ -246,10 +237,8 @@ class DeployCommandIT :
             }
         }
 
-        // Error cases during deployment
         context("deployment errors") {
             test("when deploying NPL sources with compilation errors") {
-                // Configure the mock engine to respond to clear application request
                 mockEngine.enqueue(
                     MockResponse()
                         .setResponseCode(200)
@@ -257,7 +246,6 @@ class DeployCommandIT :
                         .setBody("{}"),
                 )
 
-                // Configure the mock engine to respond with an error for deploying invalid sources
                 mockEngine.enqueue(
                     MockResponse()
                         .setResponseCode(400)
@@ -315,7 +303,6 @@ class DeployCommandIT :
             }
 
             test("when deploying without required migration file") {
-                // Configure the mock engine to respond to clear application request
                 mockEngine.enqueue(
                     MockResponse()
                         .setResponseCode(200)
@@ -323,7 +310,6 @@ class DeployCommandIT :
                         .setBody("{}"),
                 )
 
-                // Configure the mock engine to respond with migration error
                 mockEngine.enqueue(
                     MockResponse()
                         .setResponseCode(500)
@@ -350,7 +336,6 @@ class DeployCommandIT :
                             .toAbsolutePath()
                             .toString()
 
-                    // Execute the deploy command
                     val (output, exitCode) =
                         executeDeployCommand(
                             tempDir = tempDir,
@@ -374,7 +359,6 @@ class DeployCommandIT :
             }
         }
 
-        // Edge cases and validation errors
         context("command validation errors") {
             test("missing target parameter") {
                 runCommand(
@@ -394,7 +378,7 @@ class DeployCommandIT :
                     Options:
                       --clean          Clear application contents before deployment
 
-                    Configuration is read from .noumena/config.json in the current directory
+                    Configuration is read from .noumena/config.yml in the current directory
                     or the user's home directory.
                 """.normalize()
 
@@ -416,21 +400,17 @@ class DeployCommandIT :
                     Configuration errors:
                       Target 'nonexistent-target' not found in configuration
 
-                    Please create a configuration file at .noumena/config.json
+                    Please create a configuration file at .noumena/config.yml
                     with the following format:
-                    {
-                      "targets": {
-                        "nonexistent-target": {
-                          "type": "engine",
-                          "engineManagementUrl": "<URL of the Noumena Engine API>",
-                          "authUrl": "<URL of the authentication endpoint>",
-                          "username": "<username for authentication>",
-                          "password": "<password for authentication>",
-                          "clientId": "<client ID for authentication>",
-                          "clientSecret": "<client secret for authentication>"
-                        }
-                      }
-                    }
+                    targets:
+                      nonexistent-target:
+                        type: engine
+                        engineManagementUrl: <URL of the Noumena Engine API>
+                        authUrl: <URL of the authentication endpoint>
+                        username: <username for authentication>
+                        password: <password for authentication>
+                        clientId: <client ID for authentication>
+                        clientSecret: <client secret for authentication>
                 """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -439,7 +419,6 @@ class DeployCommandIT :
             }
 
             test("invalid directory path") {
-                // Use a non-existent directory path
                 val nonExistentDir = "/non/existent/directory"
 
                 runCommand(
@@ -453,7 +432,6 @@ class DeployCommandIT :
             }
 
             test("file provided instead of directory") {
-                // Create a temporary file
                 val tempFile = File.createTempFile("test", ".txt")
                 tempFile.deleteOnExit()
 

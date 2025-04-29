@@ -1,0 +1,25 @@
+targets:
+  dev:
+    type: engine
+    engineManagementUrl: http://localhost:12400
+    authUrl: http://localhost:11000
+    username: admin
+    password: admin
+    clientId: npl-cli
+    clientSecret: ""
+  test:
+    type: engine
+    engineManagementUrl: http://test-server:12400
+    authUrl: http://test-server:11000
+    username: test-user
+    password: test-password
+    clientId: npl-cli-test
+    clientSecret: secret
+  prod:
+    type: engine
+    engineManagementUrl: https://production-server:12400
+    authUrl: https://production-server:11000
+    username: prod-user
+    password: prod-password
+    clientId: npl-cli-prod
+    clientSecret: prod-secret

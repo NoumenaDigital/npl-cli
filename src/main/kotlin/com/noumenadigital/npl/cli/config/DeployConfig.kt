@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli.config
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
@@ -30,17 +31,17 @@ class DeployConfig(
     val targets: Map<String, DeploymentTargetConfig> = emptyMap(),
 ) {
     companion object {
-        private val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+        private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
 
         /**
-         * Load configuration from a JSON file
+         * Load configuration from a YAML file
          * Looks in the following locations in order:
-         * 1. Current directory .noumena/config.json
-         * 2. User home directory .noumena/config.json
+         * 1. Current directory .noumena/config.yml
+         * 2. User home directory .noumena/config.yml
          */
         fun load(): DeployConfig {
-            val currentDirConfig = File(".noumena/config.json")
-            val userHomeConfig = File(System.getProperty("user.home"), ".noumena/config.json")
+            val currentDirConfig = File(".noumena/config.yml")
+            val userHomeConfig = File(System.getProperty("user.home"), ".noumena/config.yml")
 
             val configFile =
                 when {
