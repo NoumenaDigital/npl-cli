@@ -7,6 +7,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.SwaggerParseResult
+import java.io.File
 import java.nio.file.Path
 
 class OpenapiCommandIT :
@@ -15,12 +16,12 @@ class OpenapiCommandIT :
 
         data class OpenapiTestContext(
             val testResourcesPath: Path = getTestResourcesPath(),
+            val openapiDir: File = File(".").resolve("openapi"),
         ) {
             val absolutePath: String get() = testResourcesPath.toAbsolutePath().toString()
 
             fun validateOpenapiSpec(expectedFileName: String): SwaggerParseResult {
-                val openapiDir = testResourcesPath.resolve("openapi")
-                val file = openapiDir.resolve(expectedFileName).toFile()
+                val file = openapiDir.resolve(expectedFileName)
                 return openApiParser.readLocation(file.path, null, null)
             }
         }
@@ -28,7 +29,6 @@ class OpenapiCommandIT :
         fun withOpenapiTestContext(
             testDir: List<String>,
             clearFunction: OpenapiTestContext.() -> Unit = {
-                val openapiDir = getTestResourcesPath(testDir).resolve("openapi").toFile()
                 if (openapiDir.exists()) {
                     openapiDir.deleteRecursively()
                 }
@@ -74,8 +74,8 @@ class OpenapiCommandIT :
                             """
                         Completed compilation for 4 files in XXX ms
 
-                        Generating openapi for /objects/iou
-                        Generating openapi for /processes
+                        Generating openapi for objects/iou
+                        Generating openapi for processes
                         NPL openapi completed successfully.
                         """.normalize()
 
@@ -98,8 +98,8 @@ class OpenapiCommandIT :
                             """
                             Completed compilation for 2 files in XXX ms
 
-                            Generating openapi for /objects/car
-                            Generating openapi for /objects/iou
+                            Generating openapi for objects/car
+                            Generating openapi for objects/iou
                             NPL openapi completed successfully.
                             """.normalize()
 
@@ -173,9 +173,9 @@ class OpenapiCommandIT :
                             Completed compilation for 4 files with 3 warnings in XXX ms
 
                             NPL openapi has compilation warnings
-                            Generating openapi for /objects/car
-                            Generating openapi for /objects/iou
-                            Generating openapi for /processes
+                            Generating openapi for objects/car
+                            Generating openapi for objects/iou
+                            Generating openapi for processes
                             NPL openapi completed successfully.
                             """.normalize()
 
