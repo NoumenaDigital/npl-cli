@@ -19,6 +19,17 @@ offers several useful commands for interacting with your NPL projects.
 | MacOS | Yes    | Yes    |
 | Linux | Yes    | Yes    |
 
+## Versioning
+
+The NPL CLI uses a versioning scheme aligned with Noumena Platform releases.
+
+### Examples
+
+- `2025.1.2` — Base release matching the Noumena Platform version.
+- `2025.1.2-1` — First CLI-specific patch based on platform version `2025.1.2`.
+
+This helps ensure consistency between the platform and CLI tool while allowing independent CLI updates when needed.
+
 # Development
 
 ## Prerequisites
@@ -112,6 +123,18 @@ pre-commit run prettier --all-files
 
 Note that `prettier` formats tables differently than IntelliJ, so you might want to disable IntelliJ's
 `Incorrect table formatting` Markdown inspection.
+
+## Version
+
+The NPL CLI follows a versioning scheme aligned with Noumena Platform releases.
+
+### Updating the Version
+
+- You must manually update the version in the `pom.xml` file.
+- For a **first-time release**, set the version to match the Noumena Platform version (e.g., `2025.1.2`).
+- For **CLI patches**, append a patch number starting from `-1` (e.g., `2025.1.2-1`).
+
+Make sure the version you set correctly reflects the corresponding Noumena Platform release.
 
 ## Old CLI
 
