@@ -8,7 +8,6 @@ import com.noumenadigital.platform.client.auth.AuthConfiguration
 import com.noumenadigital.platform.client.auth.TokenAuthorizationProvider
 import com.noumenadigital.platform.client.auth.UserConfiguration
 import com.noumenadigital.platform.client.engine.ManagementHttpClient
-import java.io.File
 
 sealed class DeployResult {
     data class Success(
@@ -17,14 +16,6 @@ sealed class DeployResult {
 
     data class ClearSuccess(
         val targetLabel: String,
-    ) : DeployResult()
-
-    data class DirectoryNotFound(
-        val path: String,
-    ) : DeployResult()
-
-    data class PathIsNotDirectory(
-        val path: String,
     ) : DeployResult()
 
     data class DeploymentFailed(
@@ -83,14 +74,6 @@ class DeployService {
         targetLabel: String,
         srcDir: String,
     ): DeployResult {
-        val sourceDir = File(srcDir)
-        if (!sourceDir.exists()) {
-            return DeployResult.DirectoryNotFound(sourceDir.absolutePath)
-        }
-        if (!sourceDir.isDirectory) {
-            return DeployResult.PathIsNotDirectory(sourceDir.absolutePath)
-        }
-
         val context = setupClientContext(targetLabel)
 
         return try {
