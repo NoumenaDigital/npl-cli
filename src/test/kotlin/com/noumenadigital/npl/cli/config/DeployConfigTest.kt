@@ -1,11 +1,12 @@
 package com.noumenadigital.npl.cli.config
 
+import com.noumenadigital.npl.cli.exception.DeployConfigException
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import java.io.File
 import java.nio.file.Files
@@ -145,52 +146,66 @@ class DeployConfigTest :
                             ),
                     )
                 val errors = DeployConfig.validateTarget(config, "valid")
-                errors.shouldBeEmpty()
+                errors shouldBe Unit // No exception should be thrown
             }
 
-            test("should return error if target not found") {
+            test("should throw DeployConfigException if target not found") {
                 val config = DeployConfig(targets = emptyMap())
-                val errors = DeployConfig.validateTarget(config, "missing")
-                errors.shouldContainExactly("Target 'missing' not found in configuration")
+                val exception =
+                    shouldThrow<DeployConfigException> {
+                        DeployConfig.validateTarget(config, "missing")
+                    }
+                exception.message shouldContain "Target 'missing' not found in configuration"
             }
 
-            test("should return error if username is blank") {
+            test("should throw DeployConfigException for missing username") {
                 val config =
                     DeployConfig(
                         targets =
                             mapOf(
-                                "no_user" to EngineTargetConfig(username = "", password = "pass"),
+                                "test" to EngineTargetConfig(username = "", password = "pass"),
                             ),
                     )
-                val errors = DeployConfig.validateTarget(config, "no_user")
-                errors.shouldContainExactly("username is required for engine target")
+                val exception =
+                    shouldThrow<DeployConfigException> {
+                        DeployConfig.validateTarget(config, "test")
+                    }
+                exception.message shouldContain "username is required"
             }
 
-            test("should return error if password is blank") {
+            test("should throw DeployConfigException for missing password") {
                 val config =
                     DeployConfig(
                         targets =
                             mapOf(
-                                "no_pass" to EngineTargetConfig(username = "user", password = " "), // Test with whitespace
+                                "test" to EngineTargetConfig(username = "user", password = ""),
                             ),
                     )
-                val errors = DeployConfig.validateTarget(config, "no_pass")
-                errors.shouldContainExactly("password is required for engine target")
+                val exception =
+                    shouldThrow<DeployConfigException> {
+                        DeployConfig.validateTarget(config, "test")
+                    }
+                exception.message shouldContain "password is required"
             }
 
-            test("should return multiple errors if both username and password are blank") {
+            test("should throw DeployConfigException for invalid schema version") {
+                val config = DeployConfig(schemaVersion = "v2")
+                val exception =
+                    shouldThrow<DeployConfigException> {
+                        DeployConfig.validateTarget(config, "anyTarget")
+                    }
+                exception.message shouldContain "Unsupported configuration schema version 'v2'"
+            }
+
+            test("should pass for valid config") {
                 val config =
                     DeployConfig(
                         targets =
                             mapOf(
-                                "both_blank" to EngineTargetConfig(username = "", password = ""),
+                                "test" to EngineTargetConfig(username = "user", password = "pass"),
                             ),
                     )
-                val errors = DeployConfig.validateTarget(config, "both_blank")
-                errors.shouldContainExactly(
-                    "username is required for engine target",
-                    "password is required for engine target",
-                )
+                DeployConfig.validateTarget(config, "test")
             }
         }
     })

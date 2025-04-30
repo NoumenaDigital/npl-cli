@@ -396,7 +396,7 @@ class DeployCommandIT :
 
                         schemaVersion: v1
                         targets:
-                          test-target:
+                          <your-target-name>:
                             type: engine
                             engineManagementUrl: <URL of the Noumena Engine API>
                             authUrl: <URL of the authentication endpoint>
@@ -504,7 +504,7 @@ class DeployCommandIT :
 
                     schemaVersion: v1
                     targets:
-                      nonexistent-target:
+                      <your-target-name>:
                         type: engine
                         engineManagementUrl: <URL of the Noumena Engine API>
                         authUrl: <URL of the authentication endpoint>

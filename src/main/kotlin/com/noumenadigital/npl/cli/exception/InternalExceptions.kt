@@ -14,3 +14,12 @@ class CommandExecutionException(
     override val message: String,
     override val cause: Throwable? = null,
 ) : InternalException()
+
+data class DeployConfigException(
+    override val message: String,
+) : InternalException()
+
+data class ClientSetupException(
+    override val message: String,
+    override val cause: Throwable? = null,
+) : InternalException()

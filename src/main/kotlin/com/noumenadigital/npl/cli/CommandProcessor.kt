@@ -1,8 +1,10 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.exception.ClientSetupException
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
+import com.noumenadigital.npl.cli.exception.DeployConfigException
 import com.noumenadigital.npl.cli.exception.InternalException
 import com.noumenadigital.npl.cli.exception.buildOutputMessage
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -33,6 +35,16 @@ class CommandProcessor(
                     is CommandExecutionException -> {
                         output.error(ex.buildOutputMessage(inputArgs))
                         return ExitCode.INTERNAL_ERROR
+                    }
+
+                    is DeployConfigException -> {
+                        output.error(ex.buildOutputMessage())
+                        return ExitCode.CONFIG_ERROR
+                    }
+
+                    is ClientSetupException -> {
+                        output.error(ex.buildOutputMessage())
+                        return ExitCode.GENERAL_ERROR
                     }
                 }
             } catch (ex: Exception) {

@@ -2,7 +2,7 @@ package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.commands.registry.CheckCommand
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
-import com.noumenadigital.npl.cli.commands.registry.DeployCommandExecutor
+import com.noumenadigital.npl.cli.commands.registry.DeployCommand
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
 import com.noumenadigital.npl.cli.commands.registry.OpenapiCommand
 import com.noumenadigital.npl.cli.commands.registry.TestCommand
@@ -17,7 +17,7 @@ enum class Commands(
     CHECK({ CheckCommand() }),
     TEST({ TestCommand() }),
     OPENAPI({ OpenapiCommand() }),
-    DEPLOY({ DeployCommandExecutor() }),
+    DEPLOY({ DeployCommand() }),
     ;
 
     val commandName: String

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.noumenadigital.npl.cli.exception.DeployConfigException
 import java.io.File
 
 @JsonTypeInfo(
@@ -67,35 +68,34 @@ data class DeployConfig(
             }
         }
 
-        /**
-         * Checks if the target exists and has required properties set
-         */
         fun validateTarget(
             config: DeployConfig,
             targetLabel: String,
-        ): List<String> {
-            val errors = mutableListOf<String>()
-
+        ) {
             if (config.schemaVersion != "v1") {
-                errors.add("Unsupported configuration schema version '${config.schemaVersion}'. Supported version is 'v1'.")
-                // Don't proceed with other checks if the schema is wrong
-                return errors
+                throw DeployConfigException(
+                    message = "Unsupported configuration schema version '${config.schemaVersion}'. Supported version is 'v1'.",
+                )
             }
 
-            val target = config.targets[targetLabel]
-            if (target == null) {
-                errors.add("Target '$targetLabel' not found in configuration")
-                return errors
-            }
+            val target =
+                config.targets[targetLabel]
+                    ?: throw DeployConfigException("Target '$targetLabel' not found in configuration")
 
             when (target) {
                 is EngineTargetConfig -> {
-                    if (target.username.isBlank()) errors.add("username is required for engine target")
-                    if (target.password.isBlank()) errors.add("password is required for engine target")
+                    val fieldErrors = mutableListOf<String>()
+                    if (target.username.isBlank()) fieldErrors.add("username is required for engine target")
+                    if (target.password.isBlank()) fieldErrors.add("password is required for engine target")
+
+                    if (fieldErrors.isNotEmpty()) {
+                        throw DeployConfigException(
+                            "Configuration errors for target '$targetLabel':\n" +
+                                fieldErrors.joinToString("\n") { "  - $it" },
+                        )
+                    }
                 }
             }
-
-            return errors
         }
     }
 }

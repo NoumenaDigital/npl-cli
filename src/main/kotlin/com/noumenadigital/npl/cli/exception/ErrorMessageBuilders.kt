@@ -26,3 +26,35 @@ fun CommandNotFoundException.buildOutputMessage(): String {
 
 fun Exception.buildOutputMessage(inputArgs: List<String>): String =
     "Executing command: [${inputArgs.joinToString(" ")}] FAILED. Error: ${stackTraceToString().trim()}"
+
+fun DeployConfigException.buildOutputMessage(): String {
+    val errorLines =
+        this.message
+            .split("\n")
+            .filter { it.isNotBlank() }
+            .joinToString("\n") { "  $it" }
+
+    val helpText =
+        """
+
+        Please create or check the configuration file at .npl/deploy.yml
+        (in the current directory or your home directory ~/.npl/deploy.yml)
+        with the following format:
+
+        schemaVersion: v1
+        targets:
+          <your-target-name>:
+            type: engine
+            engineManagementUrl: <URL of the Noumena Engine API>
+            authUrl: <URL of the authentication endpoint>
+            username: <username for authentication>
+            password: <password for authentication>
+            clientId: <client ID for authentication>
+            clientSecret: <client secret for authentication>
+        """.trimIndent()
+
+    return "Configuration errors:\n$errorLines\n$helpText"
+}
+
+// Builder for ClientSetupException
+fun ClientSetupException.buildOutputMessage(): String = "Client setup error: ${this.message}"
