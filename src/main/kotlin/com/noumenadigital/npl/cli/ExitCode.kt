@@ -11,6 +11,7 @@ enum class ExitCode(
     GENERAL_ERROR(1),
     COMPILATION_ERROR(2),
     USAGE_ERROR(64),
+    DATA_ERROR(65),
     NO_INPUT(66),
     INTERNAL_ERROR(70),
     IO_ERROR(74),

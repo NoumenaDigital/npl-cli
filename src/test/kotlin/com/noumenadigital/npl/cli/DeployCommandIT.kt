@@ -183,7 +183,7 @@ class DeployCommandIT :
 
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath)
 
-                    output.normalize() shouldBe
+                    output.normalize(withPadding = false) shouldBe
                         """
                         Creating NPL deployment archive...
                         Deploying NPL sources and migrations to $engineUrl...
@@ -222,7 +222,7 @@ class DeployCommandIT :
 
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath, withClear = true)
 
-                    output.normalize() shouldBe
+                    output.normalize(withPadding = false) shouldBe
                         """
                         Clearing application contents...
                         Application contents cleared
@@ -283,7 +283,7 @@ class DeployCommandIT :
                             withClear = true,
                         )
 
-                    output.normalize() shouldBe
+                    output.normalize(withPadding = false) shouldBe
                         """
                         Clearing application contents...
                         Application contents cleared
@@ -343,7 +343,7 @@ class DeployCommandIT :
                             withClear = true,
                         )
 
-                    output.normalize() shouldBe
+                    output.normalize(withPadding = false) shouldBe
                         """
                         Clearing application contents...
                         Application contents cleared

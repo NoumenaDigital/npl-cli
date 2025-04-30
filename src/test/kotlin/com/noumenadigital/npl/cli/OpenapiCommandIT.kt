@@ -28,7 +28,8 @@ class OpenapiCommandIT :
 
         fun withOpenapiTestContext(
             testDir: List<String>,
-            clearFunction: OpenapiTestContext.() -> Unit = {
+            cleanFunction: OpenapiTestContext.() -> Unit = {
+                val openapiDir = getTestResourcesPath(testDir).resolve("openapi").toFile()
                 if (openapiDir.exists()) {
                     openapiDir.deleteRecursively()
                 }
@@ -39,7 +40,11 @@ class OpenapiCommandIT :
                 OpenapiTestContext(
                     testResourcesPath = getTestResourcesPath(testDir),
                 )
-            context.apply(test).apply(clearFunction)
+            try {
+                context.test()
+            } finally {
+                context.cleanFunction()
+            }
         }
 
         context("success") {
@@ -170,7 +175,7 @@ class OpenapiCommandIT :
                             $absolutePath/src/main/npl/objects.iou/iou.npl: (18, 5) W0019: Public property `payments` should be explicitly typed.
                             $absolutePath/src/main/npl/processes/demo.npl: (15, 5) W0016: Declared variable `car` unused
                             $absolutePath/src/main/npl/processes/demo.npl: (16, 5) W0016: Declared variable `iou` unused
-                            Completed compilation for 4 files with 3 warnings in XXX ms
+                            Completed compilation for 5 files with 3 warnings in XXX ms
 
                             NPL openapi has compilation warnings
                             Generating openapi for objects/car

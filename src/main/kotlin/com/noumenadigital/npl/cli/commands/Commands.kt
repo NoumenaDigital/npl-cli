@@ -5,6 +5,7 @@ import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.DeployCommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
 import com.noumenadigital.npl.cli.commands.registry.OpenapiCommand
+import com.noumenadigital.npl.cli.commands.registry.TestCommand
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 
@@ -14,6 +15,7 @@ enum class Commands(
     VERSION({ VersionCommand }),
     HELP({ HelpCommand }),
     CHECK({ CheckCommand() }),
+    TEST({ TestCommand() }),
     OPENAPI({ OpenapiCommand() }),
     DEPLOY({ DeployCommandExecutor() }),
     ;

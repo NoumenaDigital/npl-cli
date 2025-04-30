@@ -48,6 +48,8 @@ class BinaryCommandsIT :
                     help       Display the description for npl-cli commands
                     check      Validate the correctness of NPL sources
                                  <directory>  Target directory containing NPL source files to check (defaults to current directory)
+                    test       Run the NPL tests
+                                 <directory>  Source directory containing NPL tests to run (defaults to current directory)
                     openapi    Generate the openapi specifications of NPL api
                                  <directory>  Source directory containing NPL protocols (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance

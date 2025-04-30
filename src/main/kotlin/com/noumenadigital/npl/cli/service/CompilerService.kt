@@ -8,20 +8,14 @@ import com.noumenadigital.npl.lang.Loader
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.Source
 import com.noumenadigital.npl.lang.Type
-import java.io.File
-import java.nio.file.Files
 import java.time.Duration
 
-object CompilerService {
-    private const val NPL_EXTENSION = ".npl"
-
-    fun compileAndReport(
-        sourcesDir: String,
-        nplContribLibrary: String = "$sourcesDir/npl-contrib",
-        output: ColorWriter,
-    ): CompilationResult {
-        val nplSources = collectSourcesFromDirectory(sourcesDir)
-        val compileResult = compileSource(nplSources, nplContribLibrary, output)
+data class CompilerService(
+    private val sourcesManager: SourcesManager,
+) {
+    fun compileAndReport(output: ColorWriter): CompilationResult {
+        val nplSources = sourcesManager.getNplSources()
+        val compileResult = compileSource(nplSources, output)
         reportCompilationResults(nplSources.size, compileResult, output)
         output.info()
         return compileResult
@@ -29,11 +23,10 @@ object CompilerService {
 
     private fun compileSource(
         sources: List<Source>,
-        nplContribLibrary: String,
         output: ColorWriter,
     ): CompilationResult {
         val startTime = System.nanoTime()
-        val compileResult = compile(sources, nplContribLibrary, output)
+        val compileResult = compile(sources, sourcesManager.nplContribLibrary, output)
         val duration = Duration.ofNanos(System.nanoTime() - startTime).toMillis()
 
         compileResult.duration = duration
@@ -45,42 +38,25 @@ object CompilerService {
         result: CompilationResult,
         output: ColorWriter,
     ) {
-        if (!result.hasErrors) {
-            val warningText =
-                if (result.hasWarnings) {
-                    " with ${result.warningCount} warning" +
-                        (if (result.warningCount > 1) "s" else "")
-                } else {
-                    ""
-                }
+        if (result.hasErrors) return // Early exit if there are errors
 
-            val successMessage =
-                "Completed compilation for $sourceCount file" +
-                    (if (sourceCount > 1) "s" else "") +
-                    "$warningText in ${result.duration} ms"
+        val filePluralization = if (sourceCount > 1) "s" else ""
+        val warningPluralization = if (result.warningCount > 1) "s" else ""
 
-            if (result.hasWarnings) {
-                output.warning(successMessage)
-            } else {
-                output.success(successMessage)
+        val warningMessagePart =
+            when {
+                result.hasWarnings -> " with ${result.warningCount} warning$warningPluralization"
+                else -> ""
             }
+
+        val successMessage =
+            "Completed compilation for $sourceCount file$filePluralization$warningMessagePart in ${result.duration} ms"
+
+        if (result.hasWarnings) {
+            output.warning(successMessage)
+        } else {
+            output.success(successMessage)
         }
-    }
-
-    private fun collectNplSources(directory: File): List<Source> {
-        val sources = mutableListOf<Source>()
-
-        try {
-            Files
-                .walk(directory.toPath())
-                .filter { Files.isRegularFile(it) && it.toString().endsWith(NPL_EXTENSION) }
-                .sorted()
-                .forEach { sources.add(Source.create(it.toUri().toURL())) }
-        } catch (_: Exception) {
-            // Just return what we have so far
-        }
-
-        return sources
     }
 
     private fun compile(
@@ -94,11 +70,7 @@ object CompilerService {
         }
 
         val compilerConfiguration =
-            CompilerConfiguration(
-                tag = null,
-                quirksMode = false, // TODO: is this what we want?
-                nplContribConfiguration = NplContribConfiguration(nplContribPath = nplContribLibrary),
-            )
+            compilerConfiguration(nplContribLibrary)
 
         val compileResult =
             try {
@@ -140,21 +112,6 @@ object CompilerService {
         return CompilationResult(sources.size, errorCount, warningCount, errorCount == 0, protos = protos)
     }
 
-    private fun collectSourcesFromDirectory(directory: String): List<Source> {
-        val dir = File(directory)
-        if (!dir.exists() || !dir.isDirectory) {
-            throw CommandExecutionException("No NPL source files found")
-        }
-
-        val sources = collectNplSources(dir)
-
-        if (sources.isEmpty()) {
-            throw CommandExecutionException("No NPL source files found")
-        }
-
-        return sources
-    }
-
     data class CompilationResult(
         val fileCount: Int,
         val errorCount: Int,
@@ -169,4 +126,14 @@ object CompilerService {
         val hasWarnings: Boolean
             get() = warningCount > 0
     }
+}
+
+fun compilerConfiguration(nplContribLibrary: String): CompilerConfiguration {
+    val compilerConfiguration =
+        CompilerConfiguration(
+            tag = null,
+            quirksMode = false, // TODO: is this what we want?
+            nplContribConfiguration = NplContribConfiguration(nplContribPath = nplContribLibrary),
+        )
+    return compilerConfiguration
 }

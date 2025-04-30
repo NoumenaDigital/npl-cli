@@ -414,6 +414,9 @@
       ]
     },
     {
+      "type": "io.micrometer.context.ContextRegistry"
+    },
+    {
       "type": "io.prometheus.client.Striped64",
       "fields": [
         {
@@ -1501,6 +1504,106 @@
     },
     {
       "type": "org.slf4j.spi.LocationAwareLogger"
+    },
+    {
+      "type": "reactor.core.publisher.FluxPublish",
+      "fields": [
+        {
+          "name": "connection"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.FluxPublish$PubSubInner",
+      "fields": [
+        {
+          "name": "requested"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.FluxPublish$PublishSubscriber",
+      "fields": [
+        {
+          "name": "error"
+        },
+        {
+          "name": "state"
+        },
+        {
+          "name": "subscribers"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.FluxRefCount$RefCountInner",
+      "fields": [
+        {
+          "name": "state"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.FluxRefCount$RefCountMonitor",
+      "fields": [
+        {
+          "name": "disconnect"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.FluxReplay$ReplaySubscriber",
+      "fields": [
+        {
+          "name": "state"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.LambdaSubscriber",
+      "fields": [
+        {
+          "name": "subscription"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.SinkManyBestEffort",
+      "fields": [
+        {
+          "name": "subscribers"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.SinkManyReplayProcessor",
+      "fields": [
+        {
+          "name": "subscribers"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.SinkManyReplayProcessor$ReplayInner",
+      "fields": [
+        {
+          "name": "requested"
+        },
+        {
+          "name": "wip"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.SinksSpecs$AbstractSerializedSink",
+      "fields": [
+        {
+          "name": "lockedAt"
+        },
+        {
+          "name": "wip"
+        }
+      ]
     },
     {
       "type": "sun.misc.Unsafe",
