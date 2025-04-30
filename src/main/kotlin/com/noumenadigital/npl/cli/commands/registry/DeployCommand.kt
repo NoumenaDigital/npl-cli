@@ -36,9 +36,10 @@ class DeployCommand(
             writer.info("")
             writer.info("Please create or check the configuration file at .npl/deploy.yml")
             writer.info("(in the current directory or your home directory ~/.npl/deploy.yml)")
-            writer.info("with the following format:")
+            writer.info("with the following format:\n")
             writer.info(
                 """
+                schemaVersion: v1
                 targets:
                   $targetLabel:
                     type: engine

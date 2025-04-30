@@ -78,6 +78,7 @@ class DeployCommandIT :
             tempDir: File,
             engineManagementUrl: String,
             keycloakAuthUrl: String,
+            schemaVersion: String = "v1",
         ): File {
             val configDir = File(tempDir, ".npl")
             configDir.mkdirs()
@@ -88,6 +89,7 @@ class DeployCommandIT :
 
             val deployConfig =
                 DeployConfig(
+                    schemaVersion = schemaVersion,
                     targets =
                         mapOf(
                             "test-target" to
@@ -359,6 +361,59 @@ class DeployCommandIT :
             }
         }
 
+        context("configuration errors") {
+            test("unsupported schema version") {
+                val engineUrl = mockEngine.url("/").toString()
+                val keycloakUrl = mockKeycloak.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
+                try {
+                    // Create config with unsupported version
+                    createConfigFile(tempDir, engineUrl, keycloakUrl, schemaVersion = "2")
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+
+                    var output = ""
+                    var exitCode = -1
+
+                    withConfigDir(tempDir) {
+                        runCommand(commands = listOf("deploy", "test-target", testDirPath)) {
+                            process.waitFor(60, TimeUnit.SECONDS)
+                            output = this.output
+                            exitCode = process.exitValue()
+                        }
+                    }
+
+                    val expectedOutput =
+                        """
+                        Configuration errors:
+                          Unsupported configuration schema version '2'. Supported version is 'v1'.
+
+                        Please create or check the configuration file at .npl/deploy.yml
+                        (in the current directory or your home directory ~/.npl/deploy.yml)
+                        with the following format:
+
+                        schemaVersion: v1
+                        targets:
+                          test-target:
+                            type: engine
+                            engineManagementUrl: <URL of the Noumena Engine API>
+                            authUrl: <URL of the authentication endpoint>
+                            username: <username for authentication>
+                            password: <password for authentication>
+                            clientId: <client ID for authentication>
+                            clientSecret: <client secret for authentication>
+                        """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.CONFIG_ERROR.code
+                } finally {
+                    tempDir.deleteRecursively()
+                }
+            }
+        }
+
         context("command validation errors") {
             test("missing target parameter") {
                 runCommand(
@@ -446,6 +501,8 @@ class DeployCommandIT :
                     Please create or check the configuration file at .npl/deploy.yml
                     (in the current directory or your home directory ~/.npl/deploy.yml)
                     with the following format:
+
+                    schemaVersion: v1
                     targets:
                       nonexistent-target:
                         type: engine

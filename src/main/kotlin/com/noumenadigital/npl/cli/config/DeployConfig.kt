@@ -27,7 +27,8 @@ data class EngineTargetConfig(
     val clientSecret: String = "bar",
 ) : DeploymentTargetConfig
 
-class DeployConfig(
+data class DeployConfig(
+    val schemaVersion: String = "v1",
     val targets: Map<String, DeploymentTargetConfig> = emptyMap(),
 ) {
     companion object {
@@ -74,6 +75,12 @@ class DeployConfig(
             targetLabel: String,
         ): List<String> {
             val errors = mutableListOf<String>()
+
+            if (config.schemaVersion != "v1") {
+                errors.add("Unsupported configuration schema version '${config.schemaVersion}'. Supported version is 'v1'.")
+                // Don't proceed with other checks if the schema is wrong
+                return errors
+            }
 
             val target = config.targets[targetLabel]
             if (target == null) {

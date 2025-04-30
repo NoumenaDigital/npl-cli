@@ -173,6 +173,7 @@ environments (dev, test, prod, etc.) without changing the command.
 #### Configuration Schema (YAML)
 
 ```yaml
+schemaVersion: v1
 targets:
   target-name:
     type: engine # Currently only 'engine' type is supported
