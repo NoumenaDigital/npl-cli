@@ -12,6 +12,10 @@ data class TestCommand(
     private val targetDir: String = ".",
     private val testHarness: TestHarness = TestHarness(SourcesManager(targetDir)),
 ) : CommandExecutor {
+    companion object {
+        const val MIN_PADDING = 25
+    }
+
     override val commandName: String = "test"
     override val description: String = "Run the NPL tests"
 
