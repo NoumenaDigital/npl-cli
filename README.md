@@ -189,42 +189,17 @@ targets:
     ...
 ```
 
-#### Required Properties for Each Target
+#### Properties for Each Target
 
-| Property            | Description                              |
-| ------------------- | ---------------------------------------- |
-| engineManagementUrl | URL of the Noumena Engine Management API |
-| authUrl             | URL of the authentication endpoint       |
-| username            | Username for authentication              |
-| password            | Password for authentication              |
-| clientId            | Client ID for authentication             |
-
-#### Optional Properties for Each Target
-
-| Property     | Description                      | Default |
-| ------------ | -------------------------------- | ------- |
-| clientSecret | Client secret for authentication | ""      |
+| Property              | Description                              | Default Value              |
+| --------------------- | ---------------------------------------- | -------------------------- |
+| `engineManagementUrl` | URL of the Noumena Engine Management API | `"http://localhost:12400"` |
+| `authUrl`             | URL of the authentication endpoint       | `"http://localhost:11000"` |
+| `username`            | Username for authentication              | (Required)                 |
+| `password`            | Password for authentication              | (Required)                 |
+| `clientId`            | Client ID for authentication             | `"foo"`                    |
+| `clientSecret`        | Client secret for authentication         | `"bar"`                    |
 
 #### Example Configuration
 
-A sample configuration file is available at `src/main/resources/sample-deploy.yml`.
-
-To set up your configuration:
-
-```bash
-# Create the configuration directory
-mkdir -p ~/.npl
-
-# Copy the sample configuration and edit it
-cp src/main/resources/sample-deploy.yml ~/.npl/deploy.yml
-```
-
-Then edit the file with your specific settings.
-
-#### Example
-
-Deploy NPL sources (that use the typical `src/main` structure) to the `dev` target:
-
-```bash
-npl deploy dev npl/src/main
-```
+A sample configuration file is available at `
