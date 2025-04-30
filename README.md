@@ -150,7 +150,7 @@ The `deploy` command allows you to deploy NPL sources to a Noumena Engine instan
 ### Usage
 
 ```bash
-npl-cli deploy <target> <directory> [--clear]
+npl deploy <target> <directory> [--clear]
 ```
 
 Where:
@@ -219,22 +219,10 @@ cp src/main/resources/sample-deploy.yml ~/.npl/deploy.yml
 
 Then edit the file with your specific settings.
 
-#### Example Commands
+#### Example
 
-Deploy to the "dev" target using current directory as source:
-
-```bash
-npl-cli deploy dev
-```
-
-Deploy to the "prod" target with a specific source directory:
+Deploy NPL sources (that use the typical `src/main` structure) to the `dev` target:
 
 ```bash
-npl-cli deploy prod /path/to/npl/sources
-```
-
-Deploy to the "test" target after clearing application contents:
-
-```bash
-npl-cli deploy test --clear
+npl deploy dev npl/src/main
 ```
