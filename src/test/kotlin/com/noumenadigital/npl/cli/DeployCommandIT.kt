@@ -125,7 +125,7 @@ class DeployCommandIT :
 
                 test()
             } finally {
-                File(".npl/deploy.yml").delete()
+                File(".npl").deleteRecursively()
                 System.setProperty("user.home", originalUserHome)
             }
         }
