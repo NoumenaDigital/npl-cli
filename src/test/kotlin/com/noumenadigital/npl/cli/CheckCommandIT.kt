@@ -233,7 +233,7 @@ class CheckCommandIT :
                     $testDirPath/src/main/npl/objects.iou/iou.npl: (18, 5) W0019: Public property `payments` should be explicitly typed.
                     $testDirPath/src/main/npl/processes/demo.npl: (15, 5) W0016: Declared variable `car` unused
                     $testDirPath/src/main/npl/processes/demo.npl: (16, 5) W0016: Declared variable `iou` unused
-                    Completed compilation for 4 files with 3 warnings in XXX ms
+                    Completed compilation for 5 files with 3 warnings in XXX ms
 
                     NPL check completed with warnings.
                     """.normalize()

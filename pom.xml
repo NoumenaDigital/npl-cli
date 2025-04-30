@@ -65,6 +65,11 @@
             <version>${platform.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.noumenadigital.platform</groupId>
+            <artifactId>testing</artifactId>
+            <version>${platform.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser-v3</artifactId>
             <version>${swagger-parser-v3.version}</version>
