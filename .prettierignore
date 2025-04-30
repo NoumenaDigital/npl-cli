@@ -1,1 +1,2 @@
 LICENSE.md
+src/main/resources/META-INF/native-image/reachability-metadata.json
