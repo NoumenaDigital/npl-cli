@@ -62,7 +62,7 @@ data class TestCommand(
         testResults: List<TestHarness.TestHarnessResults>,
         output: ColorWriter,
     ) {
-        val paddingResult = maxOf(testResults.maxOfOrNull { it.description.length } ?: 0, 25)
+        val paddingResult = maxOf(testResults.maxOfOrNull { it.description.length } ?: 0, MIN_PADDING)
         testResults.forEach {
             val success = !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut()
             if (success) {
