@@ -13,18 +13,6 @@ import java.time.Duration
 data class CompilerService(
     private val sourcesManager: SourcesManager,
 ) {
-    companion object {
-        fun compilerConfiguration(nplContribLibrary: String): CompilerConfiguration {
-            val compilerConfiguration =
-                CompilerConfiguration(
-                    tag = null,
-                    quirksMode = false, // TODO: is this what we want?
-                    nplContribConfiguration = NplContribConfiguration(nplContribPath = nplContribLibrary),
-                )
-            return compilerConfiguration
-        }
-    }
-
     fun compileAndReport(output: ColorWriter): CompilationResult {
         val nplSources = sourcesManager.getNplSources()
         val compileResult = compileSource(nplSources, output)
@@ -38,7 +26,7 @@ data class CompilerService(
         output: ColorWriter,
     ): CompilationResult {
         val startTime = System.nanoTime()
-        val compileResult = compile(sources, sourcesManager.getNplContribLibrary(), output)
+        val compileResult = compile(sources, sourcesManager.nplContribLibrary, output)
         val duration = Duration.ofNanos(System.nanoTime() - startTime).toMillis()
 
         compileResult.duration = duration
@@ -138,4 +126,14 @@ data class CompilerService(
         val hasWarnings: Boolean
             get() = warningCount > 0
     }
+}
+
+fun compilerConfiguration(nplContribLibrary: String): CompilerConfiguration {
+    val compilerConfiguration =
+        CompilerConfiguration(
+            tag = null,
+            quirksMode = false, // TODO: is this what we want?
+            nplContribConfiguration = NplContribConfiguration(nplContribPath = nplContribLibrary),
+        )
+    return compilerConfiguration
 }

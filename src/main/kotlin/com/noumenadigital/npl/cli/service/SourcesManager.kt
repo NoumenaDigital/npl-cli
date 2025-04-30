@@ -12,19 +12,7 @@ class SourcesManager(
         private const val NPL_EXTENSION = ".npl"
     }
 
-    private val testDirectory: String = "$projectDirectoryPath/src/test/npl"
-    private val nplContribLibrary: String = "$projectDirectoryPath/npl-contrib"
-
-    fun getNplContribLibrary(): String = nplContribLibrary
-
-    fun getNplTestSources(): List<Source> {
-        collectSourcesFromDirectory(testDirectory).let { sources ->
-            if (sources.isEmpty()) {
-                throw CommandExecutionException("No NPL test files found")
-            }
-            return sources
-        }
-    }
+    val nplContribLibrary: String = "$projectDirectoryPath/npl-contrib"
 
     fun getNplSources(): List<Source> {
         collectSourcesFromDirectory(projectDirectoryPath).let { sources ->

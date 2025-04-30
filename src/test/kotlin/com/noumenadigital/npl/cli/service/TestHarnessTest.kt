@@ -25,9 +25,16 @@ class TestHarnessTest :
 
             fun createTestFile(
                 name: String,
-                content: String = "package test",
+                content: String =
+                    """
+                    package test
+                    @test
+                    function test(test: Test) -> {
+                        test.assertEquals(100, 100, "Should be true");
+                    };
+                    """.trimIndent(),
             ) {
-                val dir = File(tempDir, "src/test/npl").apply { mkdirs() }
+                val dir = File(tempDir, SRC_TEST_DIR).apply { mkdirs() }
                 File(dir, "$name.npl").writeText(content)
             }
         }
@@ -65,4 +72,8 @@ class TestHarnessTest :
                 results.first().description shouldBe "compilation"
             }
         }
-    })
+    }) {
+    companion object {
+        private const val SRC_TEST_DIR = "src/test/npl"
+    }
+}

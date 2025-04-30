@@ -95,23 +95,6 @@ class TestCommandIT :
                         process.exitValue() shouldBe ExitCode.DATA_ERROR.code
                     }
                 }
-                test("no test folder found") {
-                    val testDirPath =
-                        getTestResourcesPath(listOf("success", "single_file")).toAbsolutePath().toString()
-                    runCommand(
-                        commands = listOf("test", testDirPath),
-                    ) {
-                        process.waitFor()
-
-                        val expectedOutput =
-                            """
-                        Directory $testDirPath/src/test/npl does not exist
-                    """.normalize()
-
-                        output.normalize() shouldBe expectedOutput
-                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-                    }
-                }
                 test("no test sources found") {
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "empty_tests_folder")).toAbsolutePath().toString()
@@ -122,11 +105,11 @@ class TestCommandIT :
 
                         val expectedOutput =
                             """
-                        No NPL test files found
+                        No NPL tests found.
                     """.normalize()
 
                         output.normalize() shouldBe expectedOutput
-                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                        process.exitValue() shouldBe ExitCode.DATA_ERROR.code
                     }
                 }
                 test("sources compilation failure") {

@@ -25,7 +25,7 @@ class TestHarness(
                 TestExecutor.compile(
                     listener,
                     sources,
-                    CompilerService.compilerConfiguration(sourcesManager.getNplContribLibrary()),
+                    compilerConfiguration(sourcesManager.nplContribLibrary),
                 )
             }
         val isCompilationSuccess =
@@ -36,7 +36,10 @@ class TestHarness(
                     compilationResult.result?.let { compilationOutput ->
                         val results = invokeAll(createCallables(compilationOutput)).map { c -> c.get() }
                         shutdown()
-                        results.map { TestHarnessResults(it.tapResult, it.duration, it.description) }
+                        results
+                            .filter { it.tapResult.testResults.isNotEmpty() }
+                            .sortedBy { it.description }
+                            .map { TestHarnessResults(it.tapResult, it.duration, it.description) }
                     }
                 }
             return result ?: emptyList()
@@ -73,7 +76,7 @@ class TestHarness(
 
     private fun createCallables(compilationOutput: TestExecutor.Output) =
         sourcesManager
-            .getNplTestSources()
+            .getNplSources()
             .map { source ->
                 Callable {
                     runTest(source.location.path) { listener ->

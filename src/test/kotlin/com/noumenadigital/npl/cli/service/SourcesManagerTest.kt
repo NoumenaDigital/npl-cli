@@ -47,8 +47,8 @@ class SourcesManagerTest :
             withTestContext {
                 File(projectDir, "src/test/npl").mkdirs()
                 shouldThrow<CommandExecutionException> {
-                    manager.getNplTestSources()
-                }.message shouldBe "No NPL test files found"
+                    manager.getNplSources()
+                }.message shouldBe "No NPL source files found"
             }
         }
 
@@ -75,13 +75,12 @@ class SourcesManagerTest :
 
         test("should throw if given directory does not exist") {
             withTestContext(File("nonexistingDir")) {
-                val invalidDir = File(projectDir, "/src/test/npl").absolutePath
 
                 val exception =
                     shouldThrow<CommandExecutionException> {
-                        manager.getNplTestSources()
+                        manager.getNplSources()
                     }
-                exception.message shouldBe "Directory $invalidDir does not exist"
+                exception.message shouldBe "Directory ${projectDir.absolutePath} does not exist"
             }
         }
     })
