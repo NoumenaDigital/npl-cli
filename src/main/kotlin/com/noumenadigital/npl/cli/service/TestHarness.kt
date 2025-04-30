@@ -32,7 +32,7 @@ class TestHarness(
             !compilationResult.tapResult.containsNotOk() && !compilationResult.tapResult.containsBailOut()
         if (isCompilationSuccess) {
             val result =
-                Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1).run {
+                Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime().availableProcessors() - 1)).run {
                     compilationResult.result?.let { compilationOutput ->
                         val results = invokeAll(createCallables(compilationOutput)).map { c -> c.get() }
                         shutdown()
