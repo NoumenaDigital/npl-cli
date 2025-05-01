@@ -44,6 +44,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: "Set up Maven"
+        uses: actions/setup-java@v4
+        with:
+          distribution: "graalvm"
+          java-version: "24"
+          cache: "maven"
+
       - name: "Determine Release Version"
         id: set-version
         run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
