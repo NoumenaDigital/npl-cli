@@ -38,14 +38,14 @@ object TestUtils {
             .normalize()
     }
 
-    fun String.normalize(): String =
+    fun String.normalize(withPadding: Boolean = true): String =
         replace("\r\n", "\n")
             // Normalize durations
             .replace(Regex("in \\d+ ms"), "in XXX ms")
             // Remove any ANSI color codes
             .replace(Regex("\\e\\[[0-9;]*m"), "")
             .replace(Regex("(\\.*FAIL)[ \\t]+"), "$1")
-            .replace(Regex("\\.{2,}"), "..padding..") // TODO: remove when ST-4601
+            .replace(Regex("(\\.{2,})"), if (withPadding) "..padding.." else "$1") // TODO: remove when ST-4601
             .trimIndent()
 
     fun runCommand(
@@ -100,6 +100,9 @@ object TestUtils {
             mutableListOf(
                 "java",
                 "-agentlib:native-image-agent=config-merge-dir=src/main/resources/META-INF/native-image",
+                "-Duser.home=${System.getProperty("user.home")}",
+                "--enable-native-access=ALL-UNNAMED",
+                "--sun-misc-unsafe-memory-access=allow",
                 "-jar",
                 jarPath,
             )

@@ -27,12 +27,14 @@ data object HelpCommand : CommandExecutor {
                 val defaultValue = param.defaultValue
                 val defaultText =
                     when {
-                        defaultValue == "." -> "(defaults to current directory)"
-                        defaultValue != null -> "(defaults to $defaultValue)"
+                        defaultValue == "." -> " (defaults to current directory)"
+                        defaultValue != null -> " (defaults to $defaultValue)"
                         else -> ""
                     }
 
-                output.info("$paramIndent<${param.name}>$requiredMark  ${param.description} $defaultText")
+                // Only surround with angle brackets if not prefixed with --
+                val formattedName = if (param.name.startsWith("--")) param.name else "<${param.name}>"
+                output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
             }
         }
 

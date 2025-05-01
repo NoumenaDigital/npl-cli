@@ -9,10 +9,11 @@ offers several useful commands for interacting with your NPL projects.
 - `npl help` - Displays help information for the NPL CLI.
 - `npl check` - Checks the NPL for compilation errors and warnings. An optional path to a directory can be provided as
   an argument. If no path is provided, the current working directory is used.
-- `npl openapi` - Generates the openapi specs for NPL protocols. An optional path to a directory can be provided as an
-  argument. If no path is provided, the current working directory is used.
 - `npl test` - Run the NPL tests. An optional path to a directory can be provided as an argument. If no path is
   provided, the current working directory is used.
+- `npl openapi` - Generates the openapi specs for NPL protocols. An optional path to a directory can be provided as an
+  argument. If no path is provided, the current working directory is used.
+- `npl deploy` - Deploys NPL sources to a configured Noumena Engine target. [See details](#deploy-command).
 
 ## Supported Operating Systems and architectures
 
@@ -36,7 +37,7 @@ This helps ensure consistency between the platform and CLI tool while allowing i
 
 ## Prerequisites
 
-You'll need Maven and Java 21 (graalvm if you want to build binaries) or later installed on your system.
+You'll need Maven and Java 24 (graalvm if you want to build binaries) or later installed on your system.
 
 ## Build Profiles
 
@@ -142,3 +143,63 @@ Make sure the version you set correctly reflects the corresponding Noumena Platf
 
 The older CLI was intended for use with Noumena Cloud. It is no longer supported and has been replaced by the new CLI.
 The old CLI is still available under the GitHub releases, and is documented in the [old CLI README](OLD-CLI-README.md).
+
+## Deploy Command
+
+The `deploy` command allows you to deploy NPL sources to a Noumena Engine instance.
+
+### Usage
+
+```bash
+npl deploy <target> <directory> [--clear]
+```
+
+Where:
+
+- `[target]` (required) is the named target from the configuration file
+- `[directory]` (required) is the path to the directory containing NPL sources
+- `[--clear]` (optional) clears the application contents before deployment
+
+### Configuration
+
+The deploy command requires configuration settings that are read from a YAML file. The CLI looks for configuration in
+the following locations (in order):
+
+1. `./.npl/deploy.yml` (current directory)
+2. `~/.npl/deploy.yml` (user's home directory)
+
+The configuration file contains multiple named deployment targets, allowing you to quickly switch between different
+environments (dev, test, prod, etc.) without changing the command.
+
+#### Configuration Schema (YAML)
+
+```yaml
+schemaVersion: v1
+targets:
+  target-name:
+    type: engine # Currently only 'engine' type is supported
+    engineManagementUrl: http://server:port
+    authUrl: http://auth-server:port/realms/your-realm # Include the realm in the URL
+    username: your-username
+    password: your-password
+    clientId: client-id
+    clientSecret: client-secret
+  another-target:
+    # Another target configuration
+    ...
+```
+
+#### Properties for Each Target
+
+| Property              | Description                              | Default Value                             |
+| --------------------- | ---------------------------------------- | ----------------------------------------- |
+| `engineManagementUrl` | URL of the Noumena Engine Management API | `"http://localhost:12400/realms/noumena"` |
+| `authUrl`             | URL of the authentication endpoint       | `"http://localhost:11000"`                |
+| `username`            | Username for authentication              | (Required)                                |
+| `password`            | Password for authentication              | (Required)                                |
+| `clientId`            | Client ID for authentication             | `"foo"`                                   |
+| `clientSecret`        | Client secret for authentication         | `"bar"`                                   |
+
+#### Example Configuration
+
+A sample configuration file is available at `

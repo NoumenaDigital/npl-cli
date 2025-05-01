@@ -29,7 +29,7 @@ class OpenapiCommandIT :
         fun withOpenapiTestContext(
             testDir: List<String>,
             cleanFunction: OpenapiTestContext.() -> Unit = {
-                val openapiDir = getTestResourcesPath(testDir).resolve("openapi").toFile()
+                val openapiDir = File(".").resolve("openapi")
                 if (openapiDir.exists()) {
                     openapiDir.deleteRecursively()
                 }

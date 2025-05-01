@@ -5,9 +5,9 @@ echo "Generating native configuration with Maven..."
 mvn clean verify -Pconfig-gen
 
 echo "Validating native-image configs..."
-if [[ -n $(git diff --ignore-blank-lines -- src/main/resources/META-INF/native-image/) ]]; then
+if [[ -n $(git diff --ignore-all-space -- src/main/resources/META-INF/native-image/) ]]; then
   echo "Error: Unexpected changes detected in native-image configs:"
-  git diff --ignore-blank-lines -- src/main/resources/META-INF/native-image/
+  git diff --ignore-all-space -- src/main/resources/META-INF/native-image/
   exit 1
 else
   echo "Validation passed: No changes detected in native-image configuration."
