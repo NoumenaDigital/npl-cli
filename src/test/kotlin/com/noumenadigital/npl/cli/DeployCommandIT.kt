@@ -21,17 +21,17 @@ import java.util.concurrent.TimeUnit
 class DeployCommandIT :
     FunSpec({
 
-        lateinit var mockKeycloak: MockWebServer
+        lateinit var mockOidc: MockWebServer
         lateinit var mockEngine: MockWebServer
 
         fun setupMockServers() {
-            mockKeycloak = MockWebServer()
+            mockOidc = MockWebServer()
             mockEngine = MockWebServer()
 
-            mockKeycloak.start()
+            mockOidc.start()
             mockEngine.start()
 
-            mockKeycloak.dispatcher =
+            mockOidc.dispatcher =
                 object : Dispatcher() {
                     override fun dispatch(request: RecordedRequest): MockResponse {
                         when (request.path) {
@@ -42,7 +42,7 @@ class DeployCommandIT :
                                     .setBody(
                                         """
                                         {
-                                            "token_endpoint": "${mockKeycloak.url("/realms/noumena/protocol/openid-connect/token")}"
+                                            "token_endpoint": "${mockOidc.url("/realms/noumena/protocol/openid-connect/token")}"
                                         }
                                         """.trimIndent(),
                                     )
@@ -70,14 +70,14 @@ class DeployCommandIT :
         }
 
         fun cleanupMockServers() {
-            mockKeycloak.shutdown()
+            mockOidc.shutdown()
             mockEngine.shutdown()
         }
 
         fun createConfigFile(
             tempDir: File,
             engineManagementUrl: String,
-            keycloakAuthUrl: String,
+            oidcAuthUrl: String,
             schemaVersion: String = "v1",
         ): File {
             val configDir = File(tempDir, ".npl")
@@ -95,7 +95,7 @@ class DeployCommandIT :
                             "test-target" to
                                 EngineTargetConfig(
                                     engineManagementUrl = engineManagementUrl,
-                                    authUrl = "${keycloakAuthUrl}realms/noumena",
+                                    authUrl = "${oidcAuthUrl}realms/noumena",
                                     username = "user1",
                                     password = "password1",
                                     clientId = "nm-platform-service-client",
@@ -174,11 +174,11 @@ class DeployCommandIT :
                 )
 
                 val engineUrl = mockEngine.url("/").toString()
-                val keycloakUrl = mockKeycloak.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
 
                 val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
                 try {
-                    createConfigFile(tempDir, engineUrl, keycloakUrl)
+                    createConfigFile(tempDir, engineUrl, oidcUrl)
 
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
@@ -213,11 +213,11 @@ class DeployCommandIT :
                 )
 
                 val engineUrl = mockEngine.url("").toString()
-                val keycloakUrl = mockKeycloak.url("").toString()
+                val oidcUrl = mockOidc.url("").toString()
 
                 val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
                 try {
-                    createConfigFile(tempDir, engineUrl, keycloakUrl)
+                    createConfigFile(tempDir, engineUrl, oidcUrl)
 
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
@@ -269,11 +269,11 @@ class DeployCommandIT :
                 )
 
                 val engineUrl = mockEngine.url("").toString()
-                val keycloakUrl = mockKeycloak.url("").toString()
+                val oidcUrl = mockOidc.url("").toString()
 
                 val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
                 try {
-                    createConfigFile(tempDir, engineUrl, keycloakUrl)
+                    createConfigFile(tempDir, engineUrl, oidcUrl)
 
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-failure", "main")).toAbsolutePath().toString()
@@ -327,11 +327,11 @@ class DeployCommandIT :
                 )
 
                 val engineUrl = mockEngine.url("").toString()
-                val keycloakUrl = mockKeycloak.url("").toString()
+                val oidcUrl = mockOidc.url("").toString()
 
                 val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
                 try {
-                    createConfigFile(tempDir, engineUrl, keycloakUrl)
+                    createConfigFile(tempDir, engineUrl, oidcUrl)
 
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "both_sources", "src", "main"))
@@ -363,7 +363,7 @@ class DeployCommandIT :
 
         context("authentication errors") {
             test("invalid client credentials") {
-                mockKeycloak.dispatcher =
+                mockOidc.dispatcher =
                     object : Dispatcher() {
                         override fun dispatch(request: RecordedRequest): MockResponse =
                             when (request.path) {
@@ -374,7 +374,7 @@ class DeployCommandIT :
                                         .setBody(
                                             """
                                             {
-                                                "token_endpoint": "${mockKeycloak.url("/realms/noumena/protocol/openid-connect/token")}"
+                                                "token_endpoint": "${mockOidc.url("/realms/noumena/protocol/openid-connect/token")}"
                                             }
                                             """.trimIndent(),
                                         )
@@ -397,12 +397,12 @@ class DeployCommandIT :
                     }
 
                 val engineUrl = mockEngine.url("/").toString() // Engine URL doesn't matter much here
-                val keycloakUrl = mockKeycloak.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
 
                 val tempDir = Files.createTempDirectory("npl-cli-test-auth-fail").toFile()
                 try {
                     // Config file uses standard credentials, but the mock server forces failure
-                    createConfigFile(tempDir, engineUrl, keycloakUrl)
+                    createConfigFile(tempDir, engineUrl, oidcUrl)
 
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
@@ -428,12 +428,12 @@ class DeployCommandIT :
         context("configuration errors") {
             test("unsupported schema version") {
                 val engineUrl = mockEngine.url("/").toString()
-                val keycloakUrl = mockKeycloak.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
 
                 val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
                 try {
                     // Create config with unsupported version
-                    createConfigFile(tempDir, engineUrl, keycloakUrl, schemaVersion = "2")
+                    createConfigFile(tempDir, engineUrl, oidcUrl, schemaVersion = "2")
 
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
