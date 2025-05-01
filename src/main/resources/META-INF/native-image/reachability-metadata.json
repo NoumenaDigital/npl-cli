@@ -322,6 +322,23 @@
       ]
     },
     {
+      "type": "com.noumenadigital.platform.client.auth.OpenIdConnectService$ErrorResponse",
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true,
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
       "type": "com.noumenadigital.platform.client.auth.OpenIdConnectService$OpenIdConfiguration",
       "allDeclaredFields": true,
       "methods": [

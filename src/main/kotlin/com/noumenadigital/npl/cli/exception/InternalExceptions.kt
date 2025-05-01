@@ -23,3 +23,8 @@ data class ClientSetupException(
     override val message: String,
     override val cause: Throwable? = null,
 ) : InternalException()
+
+data class AuthorizationFailedException(
+    override val message: String,
+    override val cause: Throwable? = null,
+) : InternalException()

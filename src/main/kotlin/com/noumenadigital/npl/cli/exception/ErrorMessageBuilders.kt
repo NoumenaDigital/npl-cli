@@ -56,5 +56,6 @@ fun DeployConfigException.buildOutputMessage(): String {
     return "Configuration errors:\n$errorLines\n$helpText"
 }
 
-// Builder for ClientSetupException
 fun ClientSetupException.buildOutputMessage(): String = "Client setup error: ${this.message}"
+
+fun AuthorizationFailedException.buildOutputMessage(): String = this.message

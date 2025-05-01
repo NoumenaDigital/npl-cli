@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
@@ -45,6 +46,11 @@ class CommandProcessor(
                     is ClientSetupException -> {
                         output.error(ex.buildOutputMessage())
                         return ExitCode.GENERAL_ERROR
+                    }
+
+                    is AuthorizationFailedException -> {
+                        output.error(ex.buildOutputMessage())
+                        return ExitCode.CONFIG_ERROR
                     }
                 }
             } catch (ex: Exception) {

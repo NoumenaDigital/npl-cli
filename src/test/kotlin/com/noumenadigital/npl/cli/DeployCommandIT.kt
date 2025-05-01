@@ -361,6 +361,70 @@ class DeployCommandIT :
             }
         }
 
+        context("authentication errors") {
+            test("invalid client credentials") {
+                mockKeycloak.dispatcher =
+                    object : Dispatcher() {
+                        override fun dispatch(request: RecordedRequest): MockResponse =
+                            when (request.path) {
+                                "/realms/noumena/.well-known/openid-configuration" -> {
+                                    MockResponse()
+                                        .setResponseCode(200)
+                                        .setHeader("Content-Type", "application/json")
+                                        .setBody(
+                                            """
+                                            {
+                                                "token_endpoint": "${mockKeycloak.url("/realms/noumena/protocol/openid-connect/token")}"
+                                            }
+                                            """.trimIndent(),
+                                        )
+                                }
+                                "/realms/noumena/protocol/openid-connect/token" -> {
+                                    MockResponse()
+                                        .setResponseCode(401) // Unauthorized
+                                        .setHeader("Content-Type", "application/json")
+                                        .setBody(
+                                            """
+                                            {
+                                                "error": "invalid_client",
+                                                "error_description": "Invalid client credentials"
+                                            }
+                                            """.trimIndent(),
+                                        )
+                                }
+                                else -> MockResponse().setResponseCode(404)
+                            }
+                    }
+
+                val engineUrl = mockEngine.url("/").toString() // Engine URL doesn't matter much here
+                val keycloakUrl = mockKeycloak.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test-auth-fail").toFile()
+                try {
+                    // Config file uses standard credentials, but the mock server forces failure
+                    createConfigFile(tempDir, engineUrl, keycloakUrl)
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+
+                    val (output, exitCode) = executeDeployCommand(tempDir, testDirPath)
+
+                    val expectedOutput =
+                        """
+                        Creating NPL deployment archive...
+                        Deploying NPL sources and migrations to $engineUrl...
+                        Authorization exception: Invalid client credentials
+                        """.trimIndent()
+
+                    output.normalize(withPadding = false) shouldBe expectedOutput
+                    exitCode shouldBe ExitCode.CONFIG_ERROR.code
+                } finally {
+                    tempDir.deleteRecursively()
+                    setupMockServers() // Re-setup default dispatchers
+                }
+            }
+        }
+
         context("configuration errors") {
             test("unsupported schema version") {
                 val engineUrl = mockEngine.url("/").toString()

@@ -2,9 +2,11 @@ package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
+import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
 import com.noumenadigital.npl.cli.exception.DeployConfigException
 import com.noumenadigital.platform.client.auth.AuthConfiguration
+import com.noumenadigital.platform.client.auth.AuthorizationFailedAuthTokenException
 import com.noumenadigital.platform.client.auth.TokenAuthorizationProvider
 import com.noumenadigital.platform.client.auth.UserConfiguration
 import com.noumenadigital.platform.client.engine.ManagementHttpClient
@@ -82,6 +84,11 @@ class DeployService {
                 authorizationProvider = context.authProvider,
             )
             DeployResult.Success(targetLabel)
+        } catch (e: AuthorizationFailedAuthTokenException) {
+            throw AuthorizationFailedException(
+                message = e.message ?: "Authorization failed",
+                cause = e,
+            )
         } catch (e: Exception) {
             DeployResult.DeploymentFailed(targetLabel, e)
         }
