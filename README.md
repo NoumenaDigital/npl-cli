@@ -191,14 +191,14 @@ targets:
 
 #### Properties for Each Target
 
-| Property              | Description                              | Default Value              |
-| --------------------- | ---------------------------------------- | -------------------------- |
-| `engineManagementUrl` | URL of the Noumena Engine Management API | `"http://localhost:12400"` |
-| `authUrl`             | URL of the authentication endpoint       | `"http://localhost:11000"` |
-| `username`            | Username for authentication              | (Required)                 |
-| `password`            | Password for authentication              | (Required)                 |
-| `clientId`            | Client ID for authentication             | `"foo"`                    |
-| `clientSecret`        | Client secret for authentication         | `"bar"`                    |
+| Property              | Description                              | Default Value                             |
+| --------------------- | ---------------------------------------- | ----------------------------------------- |
+| `engineManagementUrl` | URL of the Noumena Engine Management API | `"http://localhost:12400/realms/noumena"` |
+| `authUrl`             | URL of the authentication endpoint       | `"http://localhost:11000"`                |
+| `username`            | Username for authentication              | (Required)                                |
+| `password`            | Password for authentication              | (Required)                                |
+| `clientId`            | Client ID for authentication             | `"foo"`                                   |
+| `clientSecret`        | Client secret for authentication         | `"bar"`                                   |
 
 #### Example Configuration
 

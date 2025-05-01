@@ -3,12 +3,12 @@ schemaVersion: v1
 targets:
   dev:
     type: engine
-    engineManagementUrl: http://localhost:12400
+    engineManagementUrl: http://localhost:12400/realms/noumena
     authUrl: http://localhost:11000
-    username: admin
-    password: admin
-    clientId: npl-cli
-    clientSecret: ""
+    username: user1
+    password: password1
+    clientId: my-client-id
+    clientSecret: my-client-secret
   test:
     type: engine
     engineManagementUrl: http://test-server:12400
