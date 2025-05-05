@@ -477,7 +477,7 @@ class DeployCommandIT :
                         "Missing required parameter: --target=<name> (or use --dev for local defaults)\n" +
                             DeployCommand.USAGE_STRING
 
-                    output shouldBe expectedOutput
+                    output.normalize() shouldBe expectedOutput.normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -490,7 +490,7 @@ class DeployCommandIT :
 
                     val expectedOutput = "Missing required parameter: --sourceDir=<directory>\n${DeployCommand.USAGE_STRING}"
 
-                    output shouldBe expectedOutput
+                    output.normalize() shouldBe expectedOutput.normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -518,7 +518,7 @@ class DeployCommandIT :
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    output shouldBe "Source directory does not exist: /non/existent/directory"
+                    output.normalize() shouldBe "Source directory does not exist: /non/existent/directory".normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -532,7 +532,7 @@ class DeployCommandIT :
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    output shouldBe "Source path is not a directory: ${tempFile.absolutePath}"
+                    output.normalize() shouldBe "Source path is not a directory: ${tempFile.absolutePath}".normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
