@@ -83,6 +83,7 @@ class DeployCommand(
                 targetConfig = DeployConfig.DEFAULT_DEV_CONFIG
                 // Skip validation for default config
             }
+
             targetArg != null -> {
                 // --target specified (with or without --dev): Load and validate from config
                 val targetLabel = targetArg.substringAfter("=")
@@ -94,6 +95,7 @@ class DeployCommand(
                     return ExitCode.CONFIG_ERROR
                 }
             }
+
             else -> {
                 // Neither --dev nor --target provided: --target is required
                 output.error("Missing required parameter: --target=<name> (or use --dev for local defaults)")
@@ -108,10 +110,12 @@ class DeployCommand(
                 is DeployResult.ClearSuccess -> {
                     output.info("Application contents cleared for ${targetConfig.engineManagementUrl}")
                 }
+
                 is DeployResult.ClearFailed -> {
                     output.error("Failed to clear application contents: ${clearResult.exception.message ?: "Unknown error"}")
                     return ExitCode.GENERAL_ERROR
                 }
+
                 else -> {
                     output.error("Unexpected result during clear operation: $clearResult")
                     return ExitCode.GENERAL_ERROR
@@ -127,10 +131,12 @@ class DeployCommand(
                 output.success("Successfully deployed NPL sources and migrations to ${targetConfig.engineManagementUrl}.")
                 return ExitCode.SUCCESS
             }
+
             is DeployResult.DeploymentFailed -> {
                 output.error("Error deploying NPL sources: ${deployResult.exception.message ?: "Unknown deployment failure"}")
                 return ExitCode.GENERAL_ERROR
             }
+
             else -> {
                 output.error("Internal error: Unhandled deployment result state: $deployResult")
                 return ExitCode.INTERNAL_ERROR
@@ -145,7 +151,11 @@ class DeployCommand(
     }
 
     private fun displayUsage(writer: ColorWriter) {
-        writer.info(
+        writer.info(USAGE_STRING)
+    }
+
+    companion object {
+        val USAGE_STRING =
             """
             Usage: deploy [--target=<name> | --dev] --sourceDir=<directory> [--clear]
 
@@ -171,7 +181,6 @@ class DeployCommand(
               --clear            Clear application contents before deployment.
 
             Configuration for --target is read from .npl/deploy.yml (current dir or home dir).
-            """.trimIndent(),
-        )
+            """.trimIndent()
     }
 }

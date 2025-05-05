@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.commands.registry.DeployCommand
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import io.kotest.core.spec.style.FunSpec
@@ -473,35 +474,10 @@ class DeployCommandIT :
                     process.waitFor(5, TimeUnit.SECONDS)
 
                     val expectedOutput =
-                        """
-                    Missing required parameter: --target=<name> (or use --dev for local defaults)
-                    Usage: deploy [--target=<name> | --dev] --sourceDir=<directory> [--clear]
+                        "Missing required parameter: --target=<name> (or use --dev for local defaults)\n" +
+                            DeployCommand.USAGE_STRING
 
-                    Deploys NPL sources to a Noumena Engine instance.
-
-                    Arguments:
-                      --sourceDir=<dir>  Directory containing NPL sources (required).
-                                         IMPORTANT: The directory must contain a valid NPL source structure, including
-                                         migrations. E.g.:
-                                          main
-                                          ├── npl-1.0
-                                          │   └── processes
-                                          │       └── demo.npl
-                                          └── yaml
-                                              └── migration.yml
-
-                    Target Specification (one required):
-                      --target=<name>    Named target from deploy.yml to deploy to.
-                      --dev              Use default local development settings (localhost:12400, user 'alice').
-                                         If both --dev and --target are given, --target takes precedence.
-
-                    Options:
-                      --clear            Clear application contents before deployment.
-
-                    Configuration for --target is read from .npl/deploy.yml (current dir or home dir).
-                """.normalize()
-
-                    output.normalize() shouldBe expectedOutput
+                    output shouldBe expectedOutput
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -512,36 +488,9 @@ class DeployCommandIT :
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    val expectedOutput =
-                        """
-                    Missing required parameter: --sourceDir=<directory>
-                    Usage: deploy [--target=<name> | --dev] --sourceDir=<directory> [--clear]
+                    val expectedOutput = "Missing required parameter: --sourceDir=<directory>\n${DeployCommand.USAGE_STRING}"
 
-                    Deploys NPL sources to a Noumena Engine instance.
-
-                    Arguments:
-                      --sourceDir=<dir>  Directory containing NPL sources (required).
-                                         IMPORTANT: The directory must contain a valid NPL source structure, including
-                                         migrations. E.g.:
-                                          main
-                                          ├── npl-1.0
-                                          │   └── processes
-                                          │       └── demo.npl
-                                          └── yaml
-                                              └── migration.yml
-
-                    Target Specification (one required):
-                      --target=<name>    Named target from deploy.yml to deploy to.
-                      --dev              Use default local development settings (localhost:12400, user 'alice').
-                                         If both --dev and --target are given, --target takes precedence.
-
-                    Options:
-                      --clear            Clear application contents before deployment.
-
-                    Configuration for --target is read from .npl/deploy.yml (current dir or home dir).
-                """.normalize()
-
-                    output.normalize() shouldBe expectedOutput
+                    output shouldBe expectedOutput
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
