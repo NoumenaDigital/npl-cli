@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
+import com.noumenadigital.npl.cli.exception.DeployConfigException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.DeployResult
 import com.noumenadigital.npl.cli.service.DeployService
@@ -19,8 +20,8 @@ class DeployCommand(
         listOf(
             NamedParameter(
                 name = "--target",
-                description = "Named target from deploy.yml to deploy to",
-                isRequired = true,
+                description = "Named target from deploy.yml to deploy to. Required unless --dev is used.",
+                isRequired = false,
                 valuePlaceholder = "<name>",
             ),
             NamedParameter(
@@ -32,6 +33,11 @@ class DeployCommand(
             NamedParameter(
                 name = "--clear",
                 description = "Clear application contents before deployment",
+                isRequired = false,
+            ),
+            NamedParameter(
+                name = "--dev",
+                description = "Use default local development settings (ignores deploy.yml unless --target is also specified)",
                 isRequired = false,
             ),
         )
@@ -48,40 +54,59 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
+        val devFlag = options.contains("--dev")
         val clearFlag = options.contains("--clear")
         val targetArg = options.find { it.startsWith("--target=") }
+
         val sourceDirArg = options.find { it.startsWith("--sourceDir=") }
-
-        if (targetArg == null) {
-            output.error("Missing required parameter: --target=<name>")
-            displayUsage(output)
-            return ExitCode.GENERAL_ERROR
-        }
-        val targetLabel = targetArg.substringAfter("=")
-
         if (sourceDirArg == null) {
-            output.error("Missing required parameter: --sourceDir=<path>")
+            output.error("Missing required parameter: --sourceDir=<directory>")
             displayUsage(output)
             return ExitCode.GENERAL_ERROR
         }
         val srcDir = sourceDirArg.substringAfter("=")
-
         val sourceDirFile = File(srcDir)
         if (!sourceDirFile.exists()) {
-            output.error("Target directory does not exist: ${sourceDirFile.absolutePath}")
+            output.error("Source directory does not exist: ${sourceDirFile.absolutePath}")
             return ExitCode.GENERAL_ERROR
         }
         if (!sourceDirFile.isDirectory) {
-            output.error("Target path is not a directory: ${sourceDirFile.absolutePath}")
+            output.error("Source path is not a directory: ${sourceDirFile.absolutePath}")
             return ExitCode.GENERAL_ERROR
         }
-        val targetConfig = validateTargetConfig(targetLabel)
+
+        val targetConfig: EngineTargetConfig
+        when {
+            devFlag && targetArg == null -> {
+                // --dev used, no --target: Use defaults
+                output.info("Using default local development settings.")
+                targetConfig = DeployConfig.DEFAULT_DEV_CONFIG
+                // Skip validation for default config
+            }
+            targetArg != null -> {
+                // --target specified (with or without --dev): Load and validate from config
+                val targetLabel = targetArg.substringAfter("=")
+                try {
+                    targetConfig = loadAndValidateTargetConfig(targetLabel)
+                } catch (e: DeployConfigException) {
+                    output.error("Configuration error: ${e.message}")
+                    // Optionally display full usage or config help here
+                    return ExitCode.CONFIG_ERROR
+                }
+            }
+            else -> {
+                // Neither --dev nor --target provided: --target is required
+                output.error("Missing required parameter: --target=<name> (or use --dev for local defaults)")
+                displayUsage(output)
+                return ExitCode.GENERAL_ERROR
+            }
+        }
 
         if (clearFlag) {
-            output.info("Clearing application contents...")
-            when (val clearResult = deployService.clearApplication(targetLabel)) {
+            output.info("Clearing application contents for ${targetConfig.engineManagementUrl}...")
+            when (val clearResult = deployService.clearApplication(targetConfig)) {
                 is DeployResult.ClearSuccess -> {
-                    output.info("Application contents cleared")
+                    output.info("Application contents cleared for ${targetConfig.engineManagementUrl}")
                 }
                 is DeployResult.ClearFailed -> {
                     output.error("Failed to clear application contents: ${clearResult.exception.message ?: "Unknown error"}")
@@ -94,14 +119,12 @@ class DeployCommand(
             }
         }
 
-        val engineManagementUrl = targetConfig.engineManagementUrl
-
         output.info("Creating NPL deployment archive...")
-        output.info("Deploying NPL sources and migrations to $engineManagementUrl...")
+        output.info("Deploying NPL sources and migrations to ${targetConfig.engineManagementUrl}...")
 
-        when (val deployResult = deployService.deploySourcesAndMigrations(targetLabel, srcDir)) {
+        when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, srcDir)) {
             is DeployResult.Success -> {
-                output.success("Successfully deployed NPL sources and migrations to target '${deployResult.targetLabel}'.")
+                output.success("Successfully deployed NPL sources and migrations to ${targetConfig.engineManagementUrl}.")
                 return ExitCode.SUCCESS
             }
             is DeployResult.DeploymentFailed -> {
@@ -115,21 +138,21 @@ class DeployCommand(
         }
     }
 
-    private fun validateTargetConfig(targetLabel: String): EngineTargetConfig {
+    private fun loadAndValidateTargetConfig(targetLabel: String): EngineTargetConfig {
         val config = DeployConfig.load()
         DeployConfig.validateTarget(config, targetLabel)
-
         return config.targets[targetLabel] as EngineTargetConfig
     }
 
     private fun displayUsage(writer: ColorWriter) {
         writer.info(
             """
-            Usage: deploy --target=<name> --sourceDir=<directory> [--clear]
+            Usage: deploy [--target=<name> | --dev] --sourceDir=<directory> [--clear]
+
+            Deploys NPL sources to a Noumena Engine instance.
 
             Arguments:
-              --target=<name>    Named target from deploy.yml to deploy to
-              --sourceDir=<dir>  Directory containing NPL sources.
+              --sourceDir=<dir>  Directory containing NPL sources (required).
                                  IMPORTANT: The directory must contain a valid NPL source structure, including
                                  migrations. E.g.:
                                   main
@@ -139,11 +162,15 @@ class DeployCommand(
                                   └── yaml
                                       └── migration.yml
 
-            Options:
-              --clear            Clear application contents before deployment
+            Target Specification (one required):
+              --target=<name>    Named target from deploy.yml to deploy to.
+              --dev              Use default local development settings (localhost:12400, user 'alice').
+                                 If both --dev and --target are given, --target takes precedence.
 
-            Configuration is read from .npl/deploy.yml in the current directory
-            or the user's home directory (~/.npl/deploy.yml).
+            Options:
+              --clear            Clear application contents before deployment.
+
+            Configuration for --target is read from .npl/deploy.yml (current dir or home dir).
             """.trimIndent(),
         )
     }

@@ -189,7 +189,7 @@ class DeployCommandIT :
                         """
                         Creating NPL deployment archive...
                         Deploying NPL sources and migrations to $engineUrl...
-                        Successfully deployed NPL sources and migrations to target 'test-target'.
+                        Successfully deployed NPL sources and migrations to $engineUrl.
                         """.trimIndent()
                     exitCode shouldBe ExitCode.SUCCESS.code
                 } finally {
@@ -226,11 +226,11 @@ class DeployCommandIT :
 
                     output.normalize(withPadding = false) shouldBe
                         """
-                        Clearing application contents...
-                        Application contents cleared
+                        Clearing application contents for $engineUrl...
+                        Application contents cleared for $engineUrl
                         Creating NPL deployment archive...
                         Deploying NPL sources and migrations to $engineUrl...
-                        Successfully deployed NPL sources and migrations to target 'test-target'.
+                        Successfully deployed NPL sources and migrations to $engineUrl.
                         """.trimIndent()
                     exitCode shouldBe ExitCode.SUCCESS.code
                 } finally {
@@ -287,8 +287,8 @@ class DeployCommandIT :
 
                     output.normalize(withPadding = false) shouldBe
                         """
-                        Clearing application contents...
-                        Application contents cleared
+                        Clearing application contents for $engineUrl...
+                        Application contents cleared for $engineUrl
                         Creating NPL deployment archive...
                         Deploying NPL sources and migrations to $engineUrl...
                         Error deploying NPL sources: '1' source errors encountered:
@@ -347,8 +347,8 @@ class DeployCommandIT :
 
                     output.normalize(withPadding = false) shouldBe
                         """
-                        Clearing application contents...
-                        Application contents cleared
+                        Clearing application contents for $engineUrl...
+                        Application contents cleared for $engineUrl
                         Creating NPL deployment archive...
                         Deploying NPL sources and migrations to $engineUrl...
                         Error deploying NPL sources: Unknown exception: 'Could not locate `migration.yml` in zip:file:/tmp/npl-deployment-${mockEngine.hostName}.zip'
@@ -451,23 +451,7 @@ class DeployCommandIT :
 
                     val expectedOutput =
                         """
-                        Configuration errors:
-                          Unsupported configuration schema version '2'. Supported version is 'v1'.
-
-                        Please create or check the configuration file at .npl/deploy.yml
-                        (in the current directory or your home directory ~/.npl/deploy.yml)
-                        with the following format:
-
-                        schemaVersion: v1
-                        targets:
-                          <your-target-name>:
-                            type: engine
-                            engineManagementUrl: <URL of the Noumena Engine API>
-                            authUrl: <URL of the authentication endpoint>
-                            username: <username for authentication>
-                            password: <password for authentication>
-                            clientId: <client ID for authentication>
-                            clientSecret: <client secret for authentication>
+                        Configuration error: Unsupported configuration schema version '2'. Supported version is 'v1'.
                         """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -480,19 +464,23 @@ class DeployCommandIT :
 
         context("command validation errors") {
             test("missing target parameter") {
+                val testDirPath =
+                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+
                 runCommand(
-                    commands = listOf("deploy"),
+                    commands = listOf("deploy", "--sourceDir=$testDirPath"),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
                     val expectedOutput =
                         """
-                    Missing required parameter: --target=<name>
-                    Usage: deploy --target=<name> --sourceDir=<directory> [--clear]
+                    Missing required parameter: --target=<name> (or use --dev for local defaults)
+                    Usage: deploy [--target=<name> | --dev] --sourceDir=<directory> [--clear]
+
+                    Deploys NPL sources to a Noumena Engine instance.
 
                     Arguments:
-                      --target=<name>    Named target from deploy.yml to deploy to
-                      --sourceDir=<dir>  Directory containing NPL sources.
+                      --sourceDir=<dir>  Directory containing NPL sources (required).
                                          IMPORTANT: The directory must contain a valid NPL source structure, including
                                          migrations. E.g.:
                                           main
@@ -502,11 +490,15 @@ class DeployCommandIT :
                                           └── yaml
                                               └── migration.yml
 
-                    Options:
-                      --clear            Clear application contents before deployment
+                    Target Specification (one required):
+                      --target=<name>    Named target from deploy.yml to deploy to.
+                      --dev              Use default local development settings (localhost:12400, user 'alice').
+                                         If both --dev and --target are given, --target takes precedence.
 
-                    Configuration is read from .npl/deploy.yml in the current directory
-                    or the user's home directory (~/.npl/deploy.yml).
+                    Options:
+                      --clear            Clear application contents before deployment.
+
+                    Configuration for --target is read from .npl/deploy.yml (current dir or home dir).
                 """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -522,12 +514,13 @@ class DeployCommandIT :
 
                     val expectedOutput =
                         """
-                    Missing required parameter: --sourceDir=<path>
-                    Usage: deploy --target=<name> --sourceDir=<directory> [--clear]
+                    Missing required parameter: --sourceDir=<directory>
+                    Usage: deploy [--target=<name> | --dev] --sourceDir=<directory> [--clear]
+
+                    Deploys NPL sources to a Noumena Engine instance.
 
                     Arguments:
-                      --target=<name>    Named target from deploy.yml to deploy to
-                      --sourceDir=<dir>  Directory containing NPL sources.
+                      --sourceDir=<dir>  Directory containing NPL sources (required).
                                          IMPORTANT: The directory must contain a valid NPL source structure, including
                                          migrations. E.g.:
                                           main
@@ -537,11 +530,15 @@ class DeployCommandIT :
                                           └── yaml
                                               └── migration.yml
 
-                    Options:
-                      --clear            Clear application contents before deployment
+                    Target Specification (one required):
+                      --target=<name>    Named target from deploy.yml to deploy to.
+                      --dev              Use default local development settings (localhost:12400, user 'alice').
+                                         If both --dev and --target are given, --target takes precedence.
 
-                    Configuration is read from .npl/deploy.yml in the current directory
-                    or the user's home directory (~/.npl/deploy.yml).
+                    Options:
+                      --clear            Clear application contents before deployment.
+
+                    Configuration for --target is read from .npl/deploy.yml (current dir or home dir).
                 """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -557,26 +554,7 @@ class DeployCommandIT :
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    val expectedOutput =
-                        """
-                    Configuration errors:
-                      Target 'nonexistent-target' not found in configuration
-
-                    Please create or check the configuration file at .npl/deploy.yml
-                    (in the current directory or your home directory ~/.npl/deploy.yml)
-                    with the following format:
-
-                    schemaVersion: v1
-                    targets:
-                      <your-target-name>:
-                        type: engine
-                        engineManagementUrl: <URL of the Noumena Engine API>
-                        authUrl: <URL of the authentication endpoint>
-                        username: <username for authentication>
-                        password: <password for authentication>
-                        clientId: <client ID for authentication>
-                        clientSecret: <client secret for authentication>
-                """.normalize()
+                    val expectedOutput = "Configuration error: Target 'nonexistent-target' not found in configuration"
 
                     output.normalize() shouldBe expectedOutput
                     process.exitValue() shouldBe ExitCode.CONFIG_ERROR.code
@@ -591,7 +569,7 @@ class DeployCommandIT :
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    output.normalize().contains("Target directory does not exist") shouldBe true
+                    output shouldBe "Source directory does not exist: /non/existent/directory"
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -605,7 +583,7 @@ class DeployCommandIT :
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    output.normalize().contains("Target path is not a directory") shouldBe true
+                    output shouldBe "Source path is not a directory: ${tempFile.absolutePath}"
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
