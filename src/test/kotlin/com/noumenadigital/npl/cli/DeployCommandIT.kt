@@ -141,9 +141,9 @@ class DeployCommandIT :
             withConfigDir(tempDir) {
                 val commands =
                     if (withClear) {
-                        listOf("deploy", "test-target", testDirPath, "--clear")
+                        listOf("deploy", "--target=test-target", "--sourceDir=$testDirPath", "--clear")
                     } else {
-                        listOf("deploy", "test-target", testDirPath)
+                        listOf("deploy", "--target=test-target", "--sourceDir=$testDirPath")
                     }
 
                 runCommand(commands = commands) {
@@ -442,7 +442,7 @@ class DeployCommandIT :
                     var exitCode = -1
 
                     withConfigDir(tempDir) {
-                        runCommand(commands = listOf("deploy", "test-target", testDirPath)) {
+                        runCommand(commands = listOf("deploy", "--target=test-target", "--sourceDir=$testDirPath")) {
                             process.waitFor(60, TimeUnit.SECONDS)
                             output = this.output
                             exitCode = process.exitValue()
@@ -487,23 +487,23 @@ class DeployCommandIT :
 
                     val expectedOutput =
                         """
-                    Missing required parameter: target
-                    Usage: deploy <target> <directory> [--clear]
+                    Missing required parameter: --target=<name>
+                    Usage: deploy --target=<name> --sourceDir=<directory> [--clear]
 
                     Arguments:
-                      target           Named target from deploy.yml to deploy to
-                      directory        Directory containing NPL sources.
-                                       IMPORTANT: The directory must contain a valid NPL source structure, including
-                                       migrations. E.g.:
-                                        main
-                                        ├── npl-1.0
-                                        │   └── processes
-                                        │       └── demo.npl
-                                        └── yaml
-                                            └── migration.yml
+                      --target=<name>    Named target from deploy.yml to deploy to
+                      --sourceDir=<dir>  Directory containing NPL sources.
+                                         IMPORTANT: The directory must contain a valid NPL source structure, including
+                                         migrations. E.g.:
+                                          main
+                                          ├── npl-1.0
+                                          │   └── processes
+                                          │       └── demo.npl
+                                          └── yaml
+                                              └── migration.yml
 
                     Options:
-                      --clear          Clear application contents before deployment
+                      --clear            Clear application contents before deployment
 
                     Configuration is read from .npl/deploy.yml in the current directory
                     or the user's home directory (~/.npl/deploy.yml).
@@ -516,29 +516,29 @@ class DeployCommandIT :
 
             test("missing directory parameter") {
                 runCommand(
-                    commands = listOf("deploy", "test-target"),
+                    commands = listOf("deploy", "--target=test-target"),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
                     val expectedOutput =
                         """
-                    Missing required parameter: directory
-                    Usage: deploy <target> <directory> [--clear]
+                    Missing required parameter: --sourceDir=<path>
+                    Usage: deploy --target=<name> --sourceDir=<directory> [--clear]
 
                     Arguments:
-                      target           Named target from deploy.yml to deploy to
-                      directory        Directory containing NPL sources.
-                                       IMPORTANT: The directory must contain a valid NPL source structure, including
-                                       migrations. E.g.:
-                                        main
-                                        ├── npl-1.0
-                                        │   └── processes
-                                        │       └── demo.npl
-                                        └── yaml
-                                            └── migration.yml
+                      --target=<name>    Named target from deploy.yml to deploy to
+                      --sourceDir=<dir>  Directory containing NPL sources.
+                                         IMPORTANT: The directory must contain a valid NPL source structure, including
+                                         migrations. E.g.:
+                                          main
+                                          ├── npl-1.0
+                                          │   └── processes
+                                          │       └── demo.npl
+                                          └── yaml
+                                              └── migration.yml
 
                     Options:
-                      --clear          Clear application contents before deployment
+                      --clear            Clear application contents before deployment
 
                     Configuration is read from .npl/deploy.yml in the current directory
                     or the user's home directory (~/.npl/deploy.yml).
@@ -553,7 +553,7 @@ class DeployCommandIT :
                 val testDirPath = getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
 
                 runCommand(
-                    commands = listOf("deploy", "nonexistent-target", testDirPath),
+                    commands = listOf("deploy", "--target=nonexistent-target", "--sourceDir=$testDirPath"),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
@@ -587,7 +587,7 @@ class DeployCommandIT :
                 val nonExistentDir = "/non/existent/directory"
 
                 runCommand(
-                    commands = listOf("deploy", "test-target", nonExistentDir),
+                    commands = listOf("deploy", "--target=test-target", "--sourceDir=$nonExistentDir"),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
@@ -601,7 +601,7 @@ class DeployCommandIT :
                 tempFile.deleteOnExit()
 
                 runCommand(
-                    commands = listOf("deploy", "test-target", tempFile.absolutePath),
+                    commands = listOf("deploy", "--target=test-target", "--sourceDir=${tempFile.absolutePath}"),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 

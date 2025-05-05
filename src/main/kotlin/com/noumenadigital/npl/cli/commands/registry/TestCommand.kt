@@ -21,7 +21,7 @@ data class TestCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            CommandParameter(
+            PositionalParameter(
                 name = "directory",
                 description = "Source directory containing NPL tests to run",
                 defaultValue = ".",

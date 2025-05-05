@@ -41,8 +41,8 @@ class CommandProcessorServiceTest :
                     openapi    Generate the openapi specifications of NPL api
                                  <directory>  Source directory containing NPL protocols (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
-                                 <target> (required)  Named target from deploy.yml to deploy to
-                                 <directory> (required)  Directory containing NPL sources
+                                 --target=<name> (required)  Named target from deploy.yml to deploy to
+                                 --sourceDir=<directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
                     """.trimIndent()
 

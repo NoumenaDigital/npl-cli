@@ -17,43 +17,54 @@ class DeployCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            CommandParameter(
-                name = "target",
+            NamedParameter(
+                name = "--target",
                 description = "Named target from deploy.yml to deploy to",
                 isRequired = true,
+                valuePlaceholder = "<name>",
             ),
-            CommandParameter(
-                name = "directory",
+            NamedParameter(
+                name = "--sourceDir",
                 description = "Directory containing NPL sources",
                 isRequired = true,
+                valuePlaceholder = "<directory>",
             ),
-            CommandParameter(
+            NamedParameter(
                 name = "--clear",
                 description = "Clear application contents before deployment",
+                isRequired = false,
             ),
         )
 
     override fun createInstance(params: List<String>): CommandExecutor = DeployCommand(params)
 
     override fun execute(output: ColorWriter): ExitCode {
-        val (options, positionalArgs) = args.partition { it.startsWith("--") }
+        val options = args.filter { it.startsWith("--") }
+        val positionalArgs = args.filterNot { it.startsWith("--") }
+
+        if (positionalArgs.isNotEmpty()) {
+            output.error("Unknown positional arguments: ${positionalArgs.joinToString(" ")}")
+            displayUsage(output)
+            return ExitCode.GENERAL_ERROR
+        }
 
         val clearFlag = options.contains("--clear")
+        val targetArg = options.find { it.startsWith("--target=") }
+        val sourceDirArg = options.find { it.startsWith("--sourceDir=") }
 
-        if (positionalArgs.isEmpty()) {
-            output.error("Missing required parameter: target")
+        if (targetArg == null) {
+            output.error("Missing required parameter: --target=<name>")
             displayUsage(output)
             return ExitCode.GENERAL_ERROR
         }
+        val targetLabel = targetArg.substringAfter("=")
 
-        val targetLabel = positionalArgs[0]
-
-        if (positionalArgs.size < 2) {
-            output.error("Missing required parameter: directory")
+        if (sourceDirArg == null) {
+            output.error("Missing required parameter: --sourceDir=<path>")
             displayUsage(output)
             return ExitCode.GENERAL_ERROR
         }
-        val srcDir = positionalArgs[1]
+        val srcDir = sourceDirArg.substringAfter("=")
 
         val sourceDirFile = File(srcDir)
         if (!sourceDirFile.exists()) {
@@ -114,22 +125,22 @@ class DeployCommand(
     private fun displayUsage(writer: ColorWriter) {
         writer.info(
             """
-            Usage: deploy <target> <directory> [--clear]
+            Usage: deploy --target=<name> --sourceDir=<directory> [--clear]
 
             Arguments:
-              target           Named target from deploy.yml to deploy to
-              directory        Directory containing NPL sources.
-                               IMPORTANT: The directory must contain a valid NPL source structure, including
-                               migrations. E.g.:
-                                main
-                                ├── npl-1.0
-                                │   └── processes
-                                │       └── demo.npl
-                                └── yaml
-                                    └── migration.yml
+              --target=<name>    Named target from deploy.yml to deploy to
+              --sourceDir=<dir>  Directory containing NPL sources.
+                                 IMPORTANT: The directory must contain a valid NPL source structure, including
+                                 migrations. E.g.:
+                                  main
+                                  ├── npl-1.0
+                                  │   └── processes
+                                  │       └── demo.npl
+                                  └── yaml
+                                      └── migration.yml
 
             Options:
-              --clear          Clear application contents before deployment
+              --clear            Clear application contents before deployment
 
             Configuration is read from .npl/deploy.yml in the current directory
             or the user's home directory (~/.npl/deploy.yml).
