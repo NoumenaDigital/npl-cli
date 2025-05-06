@@ -142,9 +142,9 @@ class DeployCommandIT :
             withConfigDir(tempDir) {
                 val commands =
                     if (withClear) {
-                        listOf("deploy", "--target=test-target", "--sourceDir=$testDirPath", "--clear")
+                        listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath, "--clear")
                     } else {
-                        listOf("deploy", "--target=test-target", "--sourceDir=$testDirPath")
+                        listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath)
                     }
 
                 runCommand(commands = commands) {
@@ -443,7 +443,7 @@ class DeployCommandIT :
                     var exitCode = -1
 
                     withConfigDir(tempDir) {
-                        runCommand(commands = listOf("deploy", "--target=test-target", "--sourceDir=$testDirPath")) {
+                        runCommand(commands = listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath)) {
                             process.waitFor(60, TimeUnit.SECONDS)
                             output = this.output
                             exitCode = process.exitValue()
@@ -469,12 +469,12 @@ class DeployCommandIT :
                     getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
                 runCommand(
-                    commands = listOf("deploy", "--sourceDir=$testDirPath"),
+                    commands = listOf("deploy", "--sourceDir", testDirPath),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
                     val expectedOutput =
-                        "Missing required parameter: --target=<name> (or use --dev for local defaults)\n" +
+                        "Missing required parameter: --target <name> (or use --dev for local defaults)\n" +
                             DeployCommand.USAGE_STRING
 
                     output.normalize() shouldBe expectedOutput.normalize()
@@ -484,11 +484,11 @@ class DeployCommandIT :
 
             test("missing directory parameter") {
                 runCommand(
-                    commands = listOf("deploy", "--target=test-target"),
+                    commands = listOf("deploy", "--target", "test-target"),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    val expectedOutput = "Missing required parameter: --sourceDir=<directory>\n${DeployCommand.USAGE_STRING}"
+                    val expectedOutput = "Missing required parameter: --sourceDir <directory>\n${DeployCommand.USAGE_STRING}"
 
                     output.normalize() shouldBe expectedOutput.normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
@@ -499,7 +499,7 @@ class DeployCommandIT :
                 val testDirPath = getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
 
                 runCommand(
-                    commands = listOf("deploy", "--target=nonexistent-target", "--sourceDir=$testDirPath"),
+                    commands = listOf("deploy", "--target", "nonexistent-target", "--sourceDir", testDirPath),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
@@ -514,7 +514,7 @@ class DeployCommandIT :
                 val nonExistentDir = "/non/existent/directory"
 
                 runCommand(
-                    commands = listOf("deploy", "--target=test-target", "--sourceDir=$nonExistentDir"),
+                    commands = listOf("deploy", "--target", "test-target", "--sourceDir", nonExistentDir),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
@@ -528,7 +528,7 @@ class DeployCommandIT :
                 tempFile.deleteOnExit()
 
                 runCommand(
-                    commands = listOf("deploy", "--target=test-target", "--sourceDir=${tempFile.absolutePath}"),
+                    commands = listOf("deploy", "--target", "test-target", "--sourceDir", tempFile.absolutePath),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 

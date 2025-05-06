@@ -45,27 +45,28 @@ class DeployCommand(
     override fun createInstance(params: List<String>): CommandExecutor = DeployCommand(params)
 
     override fun execute(output: ColorWriter): ExitCode {
-        val options = args.filter { it.startsWith("--") }
-        val positionalArgs = args.filterNot { it.startsWith("--") }
+        // Parse arguments using the simpler parameter-based parser
+        val parser = CommandArgumentParser()
+        val parsedArgs = parser.parse(args, parameters)
 
-        if (positionalArgs.isNotEmpty()) {
-            output.error("Unknown positional arguments: ${positionalArgs.joinToString(" ")}")
+        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+            output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
             displayUsage(output)
             return ExitCode.GENERAL_ERROR
         }
 
-        val devFlag = options.contains("--dev")
-        val clearFlag = options.contains("--clear")
-        val targetArg = options.find { it.startsWith("--target=") }
+        val devFlag = parsedArgs.hasFlag("--dev")
+        val clearFlag = parsedArgs.hasFlag("--clear")
+        val targetValue = parsedArgs.getValue("--target")
+        val sourceDirValue = parsedArgs.getValue("--sourceDir")
 
-        val sourceDirArg = options.find { it.startsWith("--sourceDir=") }
-        if (sourceDirArg == null) {
-            output.error("Missing required parameter: --sourceDir=<directory>")
+        if (sourceDirValue == null) {
+            output.error("Missing required parameter: --sourceDir <directory>")
             displayUsage(output)
             return ExitCode.GENERAL_ERROR
         }
-        val srcDir = sourceDirArg.substringAfter("=")
-        val sourceDirFile = File(srcDir)
+
+        val sourceDirFile = File(sourceDirValue)
         if (!sourceDirFile.exists()) {
             output.error("Source directory does not exist: ${sourceDirFile.absolutePath}")
             return ExitCode.GENERAL_ERROR
@@ -77,18 +78,17 @@ class DeployCommand(
 
         val targetConfig: EngineTargetConfig
         when {
-            devFlag && targetArg == null -> {
+            devFlag && targetValue == null -> {
                 // --dev used, no --target: Use defaults
                 output.info("Using default local development settings.")
                 targetConfig = DeployConfig.DEFAULT_DEV_CONFIG
                 // Skip validation for default config
             }
 
-            targetArg != null -> {
+            targetValue != null -> {
                 // --target specified (with or without --dev): Load and validate from config
-                val targetLabel = targetArg.substringAfter("=")
                 try {
-                    targetConfig = loadAndValidateTargetConfig(targetLabel)
+                    targetConfig = loadAndValidateTargetConfig(targetValue)
                 } catch (e: DeployConfigException) {
                     output.error("Configuration error: ${e.message}")
                     // Optionally display full usage or config help here
@@ -98,7 +98,7 @@ class DeployCommand(
 
             else -> {
                 // Neither --dev nor --target provided: --target is required
-                output.error("Missing required parameter: --target=<name> (or use --dev for local defaults)")
+                output.error("Missing required parameter: --target <name> (or use --dev for local defaults)")
                 displayUsage(output)
                 return ExitCode.GENERAL_ERROR
             }
@@ -126,7 +126,7 @@ class DeployCommand(
         output.info("Creating NPL deployment archive...")
         output.info("Deploying NPL sources and migrations to ${targetConfig.engineManagementUrl}...")
 
-        when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, srcDir)) {
+        when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, sourceDirValue)) {
             is DeployResult.Success -> {
                 output.success("Successfully deployed NPL sources and migrations to ${targetConfig.engineManagementUrl}.")
                 return ExitCode.SUCCESS
@@ -157,12 +157,12 @@ class DeployCommand(
     companion object {
         val USAGE_STRING =
             """
-            Usage: deploy [--target=<name> | --dev] --sourceDir=<directory> [--clear]
+            Usage: deploy [--target <name> | --dev] --sourceDir <directory> [--clear]
 
             Deploys NPL sources to a Noumena Engine instance.
 
             Arguments:
-              --sourceDir=<dir>  Directory containing NPL sources (required).
+              --sourceDir <directory>   Directory containing NPL sources (required).
                                  IMPORTANT: The directory must contain a valid NPL source structure, including
                                  migrations. E.g.:
                                   main
@@ -173,7 +173,7 @@ class DeployCommand(
                                       └── migration.yml
 
             Target Specification (one required):
-              --target=<name>    Named target from deploy.yml to deploy to.
+              --target <name>     Named target from deploy.yml to deploy to.
               --dev              Use default local development settings (localhost:12400, user 'alice').
                                  If both --dev and --target are given, --target takes precedence.
 
