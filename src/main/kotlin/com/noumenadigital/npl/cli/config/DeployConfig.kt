@@ -36,14 +36,6 @@ data class DeployConfig(
     companion object {
         private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
 
-        val DEFAULT_DEV_CONFIG =
-            EngineTargetConfig(
-                engineManagementUrl = "http://localhost:12400",
-                authUrl = "http://localhost:11000",
-                username = "alice",
-                password = "password123",
-            )
-
         /**
          * Load configuration from a YAML file
          * Looks in the following locations in order:
