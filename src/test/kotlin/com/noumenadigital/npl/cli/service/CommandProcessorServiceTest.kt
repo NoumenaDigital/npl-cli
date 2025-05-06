@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.CommandProcessor
 import com.noumenadigital.npl.cli.ExitCode
+import com.noumenadigital.npl.cli.commands.registry.CommandsParser
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.StringWriter

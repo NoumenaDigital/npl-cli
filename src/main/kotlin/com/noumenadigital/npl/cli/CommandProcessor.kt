@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.commands.registry.CommandsParser
 import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
@@ -9,7 +10,6 @@ import com.noumenadigital.npl.cli.exception.DeployConfigException
 import com.noumenadigital.npl.cli.exception.InternalException
 import com.noumenadigital.npl.cli.exception.buildOutputMessage
 import com.noumenadigital.npl.cli.service.ColorWriter
-import com.noumenadigital.npl.cli.service.CommandsParser
 
 class CommandProcessor(
     private val commandsParser: CommandsParser = CommandsParser,
