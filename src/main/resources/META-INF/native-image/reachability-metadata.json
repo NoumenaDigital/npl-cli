@@ -221,6 +221,10 @@
     {
       "type": "com.noumenadigital.npl.cli.config.EngineTargetConfig",
       "allDeclaredFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true,
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
       "methods": [
         {
           "name": "<init>",
