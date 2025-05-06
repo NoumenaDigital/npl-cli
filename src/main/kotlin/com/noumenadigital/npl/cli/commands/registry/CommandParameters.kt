@@ -1,5 +1,7 @@
 package com.noumenadigital.npl.cli.commands.registry
 
+import com.noumenadigital.npl.cli.commands.Commands
+
 sealed interface CommandParameter {
     val name: String
     val description: String
@@ -88,5 +90,15 @@ class CommandArgumentParser {
         fun hasFlag(name: String): Boolean = values.containsKey(name)
 
         fun getValue(name: String): String? = values[name]
+    }
+}
+
+object CommandsParser {
+    fun parse(command: List<String>): CommandExecutor {
+        val commandName = command.firstOrNull() ?: return Commands.HELP.getBaseExecutor().createInstance(emptyList())
+
+        val arguments = if (command.size > 1) command.drop(1) else emptyList()
+
+        return Commands.commandFromString(commandName, arguments)
     }
 }
