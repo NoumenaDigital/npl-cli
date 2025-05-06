@@ -282,6 +282,43 @@ class DeployCommandIT :
                     tempDir.deleteRecursively()
                 }
             }
+
+            test("deploy using default target and . path") {
+                mockEngine.enqueue(
+                    MockResponse()
+                        .setResponseCode(200)
+                        .setHeader("Content-Type", "application/json")
+                        .setBody("{}"),
+                )
+
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test-default").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl, defaultTarget = "other-target")
+
+                    var output = ""
+                    var exitCode = -1
+
+                    withConfigDir(tempDir) {
+                        runCommand(commands = listOf("deploy", "--sourceDir", ".")) {
+                            process.waitFor(60, TimeUnit.SECONDS)
+                            output = this.output
+                            exitCode = process.exitValue()
+                        }
+                    }
+
+                    output.normalize() shouldBe
+                        """
+                        Using default target 'other-target' from configuration.
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
+                } finally {
+                    tempDir.deleteRecursively()
+                }
+            }
         }
 
         context("deployment errors") {
