@@ -1,14 +1,14 @@
 schemaVersion: v1
 
+defaultTarget: dev
+
 targets:
   dev:
     type: engine
-    engineManagementUrl: http://localhost:12400/realms/noumena
+    engineManagementUrl: http://localhost:12400
     authUrl: http://localhost:11000
-    username: user1
-    password: password1
-    clientId: my-client-id
-    clientSecret: my-client-secret
+    username: alice
+    password: password123
   test:
     type: engine
     engineManagementUrl: http://test-server:12400
