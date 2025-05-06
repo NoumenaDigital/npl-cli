@@ -195,10 +195,8 @@ class DeployCommandIT :
 
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath)
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
                         Successfully deployed NPL sources and migrations to $engineUrl.
                         """.trimIndent()
                     exitCode shouldBe ExitCode.SUCCESS.code
@@ -234,12 +232,9 @@ class DeployCommandIT :
 
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath, withClear = true)
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
-                        Clearing application contents for $engineUrl...
                         Application contents cleared for $engineUrl
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
                         Successfully deployed NPL sources and migrations to $engineUrl.
                         """.trimIndent()
                     exitCode shouldBe ExitCode.SUCCESS.code
@@ -277,11 +272,9 @@ class DeployCommandIT :
                         }
                     }
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
                         Using default target 'other-target' from configuration.
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
                         Successfully deployed NPL sources and migrations to $engineUrl.
                         """.trimIndent()
                     exitCode shouldBe ExitCode.SUCCESS.code
@@ -337,12 +330,9 @@ class DeployCommandIT :
                             withClear = true,
                         )
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
-                        Clearing application contents for $engineUrl...
                         Application contents cleared for $engineUrl
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
                         Error deploying NPL sources: '1' source errors encountered:
                         class SourceErrorDetail {
                             code: 0001
@@ -397,12 +387,9 @@ class DeployCommandIT :
                             withClear = true,
                         )
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
-                        Clearing application contents for $engineUrl...
                         Application contents cleared for $engineUrl
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
                         Error deploying NPL sources: Unknown exception: 'Could not locate `migration.yml` in zip:file:/tmp/npl-deployment-${mockEngine.hostName}.zip'
                         """.trimIndent()
 
@@ -498,12 +485,10 @@ class DeployCommandIT :
 
                     val expectedOutput =
                         """
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
                         Authorization exception: Invalid client credentials
                         """.trimIndent()
 
-                    output.normalize(withPadding = false) shouldBe expectedOutput
+                    output.normalize() shouldBe expectedOutput
                     exitCode shouldBe ExitCode.CONFIG_ERROR.code
                 } finally {
                     tempDir.deleteRecursively()

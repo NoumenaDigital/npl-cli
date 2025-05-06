@@ -105,7 +105,6 @@ class DeployCommand(
         }
 
         if (clearFlag) {
-            output.info("Clearing application contents for ${targetConfig.engineManagementUrl}...")
             when (val clearResult = deployService.clearApplication(targetConfig)) {
                 is DeployResult.ClearSuccess -> {
                     output.info("Application contents cleared for ${targetConfig.engineManagementUrl}")
@@ -122,9 +121,6 @@ class DeployCommand(
                 }
             }
         }
-
-        output.info("Creating NPL deployment archive...")
-        output.info("Deploying NPL sources and migrations to ${targetConfig.engineManagementUrl}...")
 
         when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, sourceDirValue)) {
             is DeployResult.Success -> {
