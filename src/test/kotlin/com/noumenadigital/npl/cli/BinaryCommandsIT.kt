@@ -53,8 +53,8 @@ class BinaryCommandsIT :
                     openapi    Generate the openapi specifications of NPL api
                                  <directory>  Source directory containing NPL protocols (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
-                                 --target=<name>  Named target from deploy.yml to deploy to. Required unless --dev is used.
-                                 --sourceDir=<directory> (required)  Directory containing NPL sources
+                                 --target <name>  Named target from deploy.yml to deploy to. Required unless --dev is used or defaultTarget is set in config.
+                                 --sourceDir <directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
                                  --dev  Use default local development settings (ignores deploy.yml unless --target is also specified)
                     """.normalize()

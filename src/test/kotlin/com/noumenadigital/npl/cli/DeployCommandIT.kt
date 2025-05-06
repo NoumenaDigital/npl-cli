@@ -80,6 +80,7 @@ class DeployCommandIT :
             engineManagementUrl: String,
             oidcAuthUrl: String,
             schemaVersion: String = "v1",
+            defaultTarget: String? = null,
         ): File {
             val configDir = File(tempDir, ".npl")
             configDir.mkdirs()
@@ -102,7 +103,15 @@ class DeployCommandIT :
                                     clientId = "nm-platform-service-client",
                                     clientSecret = "87ff12ca-cf29-4719-bda8-c92faa78e3c4",
                                 ),
+                            "other-target" to
+                                EngineTargetConfig(
+                                    engineManagementUrl = engineManagementUrl,
+                                    authUrl = "${oidcAuthUrl}realms/noumena",
+                                    username = "user2",
+                                    password = "password2",
+                                ),
                         ),
+                    defaultTarget = defaultTarget,
                 )
 
             mapper.writeValue(configFile, deployConfig)
@@ -238,6 +247,48 @@ class DeployCommandIT :
                     tempDir.deleteRecursively()
                 }
             }
+
+            test("deploy using defaultTarget from config") {
+                mockEngine.enqueue(
+                    MockResponse()
+                        .setResponseCode(200)
+                        .setHeader("Content-Type", "application/json")
+                        .setBody("{}"),
+                )
+
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test-default").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl, defaultTarget = "other-target")
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+
+                    var output = ""
+                    var exitCode = -1
+
+                    withConfigDir(tempDir) {
+                        runCommand(commands = listOf("deploy", "--sourceDir", testDirPath)) {
+                            process.waitFor(60, TimeUnit.SECONDS)
+                            output = this.output
+                            exitCode = process.exitValue()
+                        }
+                    }
+
+                    output.normalize(withPadding = false) shouldBe
+                        """
+                        Using default target 'other-target' from configuration.
+                        Creating NPL deployment archive...
+                        Deploying NPL sources and migrations to $engineUrl...
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
+                } finally {
+                    tempDir.deleteRecursively()
+                }
+            }
         }
 
         context("deployment errors") {
@@ -360,6 +411,39 @@ class DeployCommandIT :
                     tempDir.deleteRecursively()
                 }
             }
+
+            test("error when defaultTarget is invalid") {
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test-invalid-default").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl, defaultTarget = "invalid-default")
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+
+                    var output = ""
+                    var exitCode = -1
+
+                    withConfigDir(tempDir) {
+                        runCommand(commands = listOf("deploy", "--sourceDir", testDirPath)) {
+                            process.waitFor(60, TimeUnit.SECONDS)
+                            output = this.output
+                            exitCode = process.exitValue()
+                        }
+                    }
+
+                    val expectedOutput =
+                        "Using default target 'invalid-default' from configuration.\n" +
+                            "Configuration error for default target 'invalid-default': " +
+                            "Target 'invalid-default' not found in configuration"
+                    output.normalize() shouldBe expectedOutput.normalize()
+                    exitCode shouldBe ExitCode.CONFIG_ERROR.code
+                } finally {
+                    tempDir.deleteRecursively()
+                }
+            }
         }
 
         context("authentication errors") {
@@ -380,6 +464,7 @@ class DeployCommandIT :
                                             """.trimIndent(),
                                         )
                                 }
+
                                 "/realms/noumena/protocol/openid-connect/token" -> {
                                     MockResponse()
                                         .setResponseCode(401) // Unauthorized
@@ -393,6 +478,7 @@ class DeployCommandIT :
                                             """.trimIndent(),
                                         )
                                 }
+
                                 else -> MockResponse().setResponseCode(404)
                             }
                     }
@@ -474,7 +560,7 @@ class DeployCommandIT :
                     process.waitFor(5, TimeUnit.SECONDS)
 
                     val expectedOutput =
-                        "Missing required parameter: --target <name> (or use --dev for local defaults)\n" +
+                        "Missing required parameter: --target <name>, use --dev, or set defaultTarget in deploy.yml\n" +
                             DeployCommand.USAGE_STRING
 
                     output.normalize() shouldBe expectedOutput.normalize()
@@ -488,7 +574,8 @@ class DeployCommandIT :
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    val expectedOutput = "Missing required parameter: --sourceDir <directory>\n${DeployCommand.USAGE_STRING}"
+                    val expectedOutput =
+                        "Missing required parameter: --sourceDir <directory>\n${DeployCommand.USAGE_STRING}"
 
                     output.normalize() shouldBe expectedOutput.normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code

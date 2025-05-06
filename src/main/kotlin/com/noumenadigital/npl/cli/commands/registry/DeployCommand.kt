@@ -20,7 +20,7 @@ class DeployCommand(
         listOf(
             NamedParameter(
                 name = "--target",
-                description = "Named target from deploy.yml to deploy to. Required unless --dev is used.",
+                description = "Named target from deploy.yml to deploy to. Required unless --dev is used or defaultTarget is set in config.",
                 isRequired = false,
                 valuePlaceholder = "<name>",
             ),
@@ -77,6 +77,8 @@ class DeployCommand(
         }
 
         val targetConfig: EngineTargetConfig
+        val config = DeployConfig.load()
+
         when {
             devFlag && targetValue == null -> {
                 // --dev used, no --target: Use defaults
@@ -88,7 +90,7 @@ class DeployCommand(
             targetValue != null -> {
                 // --target specified (with or without --dev): Load and validate from config
                 try {
-                    targetConfig = loadAndValidateTargetConfig(targetValue)
+                    targetConfig = loadAndValidateTargetConfig(config, targetValue) // Pass loaded config
                 } catch (e: DeployConfigException) {
                     output.error("Configuration error: ${e.message}")
                     // Optionally display full usage or config help here
@@ -96,9 +98,20 @@ class DeployCommand(
                 }
             }
 
+            config.defaultTarget != null -> {
+                // No --target or --dev, but defaultTarget exists in config
+                output.info("Using default target '${config.defaultTarget}' from configuration.")
+                try {
+                    targetConfig = loadAndValidateTargetConfig(config, config.defaultTarget)
+                } catch (e: DeployConfigException) {
+                    output.error("Configuration error for default target '${config.defaultTarget}': ${e.message}")
+                    return ExitCode.CONFIG_ERROR
+                }
+            }
+
             else -> {
-                // Neither --dev nor --target provided: --target is required
-                output.error("Missing required parameter: --target <name> (or use --dev for local defaults)")
+                // Neither --dev nor --target provided, and no defaultTarget in config
+                output.error("Missing required parameter: --target <name>, use --dev, or set defaultTarget in deploy.yml")
                 displayUsage(output)
                 return ExitCode.GENERAL_ERROR
             }
@@ -144,8 +157,10 @@ class DeployCommand(
         }
     }
 
-    private fun loadAndValidateTargetConfig(targetLabel: String): EngineTargetConfig {
-        val config = DeployConfig.load()
+    private fun loadAndValidateTargetConfig(
+        config: DeployConfig,
+        targetLabel: String,
+    ): EngineTargetConfig { // Accept config as parameter
         DeployConfig.validateTarget(config, targetLabel)
         return config.targets[targetLabel] as EngineTargetConfig
     }
@@ -175,6 +190,7 @@ class DeployCommand(
             Target Specification (one required):
               --target <name>     Named target from deploy.yml to deploy to.
               --dev              Use default local development settings (localhost:12400, user 'alice').
+                                 If --target is omitted and --dev is not used, the 'defaultTarget' from deploy.yml is used if set.
                                  If both --dev and --target are given, --target takes precedence.
 
             Options:

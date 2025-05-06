@@ -36,7 +36,7 @@ data object HelpCommand : CommandExecutor {
                     when (param) {
                         is NamedParameter -> {
                             if (param.valuePlaceholder != null) {
-                                param.name + "=" + param.valuePlaceholder
+                                "${param.name} ${param.valuePlaceholder}"
                             } else {
                                 param.name
                             }

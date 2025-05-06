@@ -31,6 +31,7 @@ data class EngineTargetConfig(
 data class DeployConfig(
     val schemaVersion: String = "v1",
     val targets: Map<String, DeploymentTargetConfig> = emptyMap(),
+    val defaultTarget: String? = null,
 ) {
     companion object {
         private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
