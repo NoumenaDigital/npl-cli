@@ -560,7 +560,7 @@ class DeployCommandIT :
                     process.waitFor(5, TimeUnit.SECONDS)
 
                     val expectedOutput =
-                        "Missing required parameter: --target <name>, use --dev, or set defaultTarget in deploy.yml\n" +
+                        "Missing required parameter: --target <name> or set defaultTarget in deploy.yml\n" +
                             DeployCommand.USAGE_STRING
 
                     output.normalize() shouldBe expectedOutput.normalize()

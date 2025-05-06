@@ -20,7 +20,7 @@ class DeployCommand(
         listOf(
             NamedParameter(
                 name = "--target",
-                description = "Named target from deploy.yml to deploy to. Required unless --dev is used or defaultTarget is set in config.",
+                description = "Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.",
                 isRequired = false,
                 valuePlaceholder = "<name>",
             ),
@@ -33,11 +33,6 @@ class DeployCommand(
             NamedParameter(
                 name = "--clear",
                 description = "Clear application contents before deployment",
-                isRequired = false,
-            ),
-            NamedParameter(
-                name = "--dev",
-                description = "Use default local development settings (ignores deploy.yml unless --target is also specified)",
                 isRequired = false,
             ),
         )
@@ -55,7 +50,6 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        val devFlag = parsedArgs.hasFlag("--dev")
         val clearFlag = parsedArgs.hasFlag("--clear")
         val targetValue = parsedArgs.getValue("--target")
         val sourceDirValue = parsedArgs.getValue("--sourceDir")
@@ -80,15 +74,8 @@ class DeployCommand(
         val config = DeployConfig.load()
 
         when {
-            devFlag && targetValue == null -> {
-                // --dev used, no --target: Use defaults
-                output.info("Using default local development settings.")
-                targetConfig = DeployConfig.DEFAULT_DEV_CONFIG
-                // Skip validation for default config
-            }
-
             targetValue != null -> {
-                // --target specified (with or without --dev): Load and validate from config
+                // --target specified: Load and validate from config
                 try {
                     targetConfig = loadAndValidateTargetConfig(config, targetValue) // Pass loaded config
                 } catch (e: DeployConfigException) {
@@ -99,7 +86,7 @@ class DeployCommand(
             }
 
             config.defaultTarget != null -> {
-                // No --target or --dev, but defaultTarget exists in config
+                // No --target, but defaultTarget exists in config
                 output.info("Using default target '${config.defaultTarget}' from configuration.")
                 try {
                     targetConfig = loadAndValidateTargetConfig(config, config.defaultTarget)
@@ -110,8 +97,8 @@ class DeployCommand(
             }
 
             else -> {
-                // Neither --dev nor --target provided, and no defaultTarget in config
-                output.error("Missing required parameter: --target <name>, use --dev, or set defaultTarget in deploy.yml")
+                // Neither --target provided, nor defaultTarget in config
+                output.error("Missing required parameter: --target <name> or set defaultTarget in deploy.yml")
                 displayUsage(output)
                 return ExitCode.GENERAL_ERROR
             }
@@ -172,7 +159,7 @@ class DeployCommand(
     companion object {
         val USAGE_STRING =
             """
-            Usage: deploy [--target <name> | --dev] --sourceDir <directory> [--clear]
+            Usage: deploy --sourceDir <directory> [--target <name>] [--clear]
 
             Deploys NPL sources to a Noumena Engine instance.
 
@@ -189,9 +176,7 @@ class DeployCommand(
 
             Target Specification (one required):
               --target <name>     Named target from deploy.yml to deploy to.
-              --dev              Use default local development settings (localhost:12400, user 'alice').
-                                 If --target is omitted and --dev is not used, the 'defaultTarget' from deploy.yml is used if set.
-                                 If both --dev and --target are given, --target takes precedence.
+                                If --target is omitted, the 'defaultTarget' from deploy.yml is used if set.
 
             Options:
               --clear            Clear application contents before deployment.
