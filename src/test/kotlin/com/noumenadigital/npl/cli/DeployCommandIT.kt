@@ -573,20 +573,32 @@ class DeployCommandIT :
 
         context("command validation errors") {
             test("missing target parameter") {
-                val testDirPath =
-                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
 
-                runCommand(
-                    commands = listOf("deploy", "--sourceDir", testDirPath),
-                ) {
-                    process.waitFor(5, TimeUnit.SECONDS)
+                val tempDir = Files.createTempDirectory("npl-cli-test-missing-target").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl, defaultTarget = null)
 
-                    val expectedOutput =
-                        "Missing required parameter: --target <name> or set defaultTarget in deploy.yml\n" +
-                            DeployCommand.USAGE_STRING
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
-                    output.normalize() shouldBe expectedOutput.normalize()
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    withConfigDir(tempDir) {
+                        runCommand(
+                            commands = listOf("deploy", "--sourceDir", testDirPath),
+                        ) {
+                            process.waitFor(5, TimeUnit.SECONDS)
+
+                            val expectedOutput =
+                                "Missing required parameter: --target <name> or set defaultTarget in deploy.yml\n" +
+                                    DeployCommand.USAGE_STRING
+
+                            output.normalize() shouldBe expectedOutput.normalize()
+                            process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                        }
+                    }
+                } finally {
+                    tempDir.deleteRecursively()
                 }
             }
 
