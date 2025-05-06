@@ -24,7 +24,7 @@ data class OpenapiCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            CommandParameter(
+            PositionalParameter(
                 name = "directory",
                 description = "Source directory containing NPL protocols",
                 defaultValue = ".",

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.commands.registry.DeployCommand
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import io.kotest.core.spec.style.FunSpec
@@ -79,6 +80,7 @@ class DeployCommandIT :
             engineManagementUrl: String,
             oidcAuthUrl: String,
             schemaVersion: String = "v1",
+            defaultTarget: String? = null,
         ): File {
             val configDir = File(tempDir, ".npl")
             configDir.mkdirs()
@@ -101,7 +103,15 @@ class DeployCommandIT :
                                     clientId = "nm-platform-service-client",
                                     clientSecret = "87ff12ca-cf29-4719-bda8-c92faa78e3c4",
                                 ),
+                            "other-target" to
+                                EngineTargetConfig(
+                                    engineManagementUrl = engineManagementUrl,
+                                    authUrl = "${oidcAuthUrl}realms/noumena",
+                                    username = "user2",
+                                    password = "password2",
+                                ),
                         ),
+                    defaultTarget = defaultTarget,
                 )
 
             mapper.writeValue(configFile, deployConfig)
@@ -141,9 +151,9 @@ class DeployCommandIT :
             withConfigDir(tempDir) {
                 val commands =
                     if (withClear) {
-                        listOf("deploy", "test-target", testDirPath, "--clear")
+                        listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath, "--clear")
                     } else {
-                        listOf("deploy", "test-target", testDirPath)
+                        listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath)
                     }
 
                 runCommand(commands = commands) {
@@ -185,11 +195,9 @@ class DeployCommandIT :
 
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath)
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
-                        Successfully deployed NPL sources and migrations to target 'test-target'.
+                        Successfully deployed NPL sources and migrations to $engineUrl.
                         """.trimIndent()
                     exitCode shouldBe ExitCode.SUCCESS.code
                 } finally {
@@ -224,13 +232,87 @@ class DeployCommandIT :
 
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath, withClear = true)
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
-                        Clearing application contents...
-                        Application contents cleared
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
-                        Successfully deployed NPL sources and migrations to target 'test-target'.
+                        Application contents cleared for $engineUrl
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
+                } finally {
+                    tempDir.deleteRecursively()
+                }
+            }
+
+            test("deploy using defaultTarget from config") {
+                mockEngine.enqueue(
+                    MockResponse()
+                        .setResponseCode(200)
+                        .setHeader("Content-Type", "application/json")
+                        .setBody("{}"),
+                )
+
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test-default").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl, defaultTarget = "other-target")
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+
+                    var output = ""
+                    var exitCode = -1
+
+                    withConfigDir(tempDir) {
+                        runCommand(commands = listOf("deploy", "--sourceDir", testDirPath)) {
+                            process.waitFor(60, TimeUnit.SECONDS)
+                            output = this.output
+                            exitCode = process.exitValue()
+                        }
+                    }
+
+                    output.normalize() shouldBe
+                        """
+                        Using default target 'other-target' from configuration.
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
+                } finally {
+                    tempDir.deleteRecursively()
+                }
+            }
+
+            test("deploy using default target and . path") {
+                mockEngine.enqueue(
+                    MockResponse()
+                        .setResponseCode(200)
+                        .setHeader("Content-Type", "application/json")
+                        .setBody("{}"),
+                )
+
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test-default").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl, defaultTarget = "other-target")
+
+                    var output = ""
+                    var exitCode = -1
+
+                    withConfigDir(tempDir) {
+                        runCommand(commands = listOf("deploy", "--sourceDir", ".")) {
+                            process.waitFor(60, TimeUnit.SECONDS)
+                            output = this.output
+                            exitCode = process.exitValue()
+                        }
+                    }
+
+                    output.normalize() shouldBe
+                        """
+                        Using default target 'other-target' from configuration.
+                        Successfully deployed NPL sources and migrations to $engineUrl.
                         """.trimIndent()
                     exitCode shouldBe ExitCode.SUCCESS.code
                 } finally {
@@ -285,12 +367,9 @@ class DeployCommandIT :
                             withClear = true,
                         )
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
-                        Clearing application contents...
-                        Application contents cleared
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
+                        Application contents cleared for $engineUrl
                         Error deploying NPL sources: '1' source errors encountered:
                         class SourceErrorDetail {
                             code: 0001
@@ -345,16 +424,46 @@ class DeployCommandIT :
                             withClear = true,
                         )
 
-                    output.normalize(withPadding = false) shouldBe
+                    output.normalize() shouldBe
                         """
-                        Clearing application contents...
-                        Application contents cleared
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
+                        Application contents cleared for $engineUrl
                         Error deploying NPL sources: Unknown exception: 'Could not locate `migration.yml` in zip:file:/tmp/npl-deployment-${mockEngine.hostName}.zip'
                         """.trimIndent()
 
                     exitCode shouldBe ExitCode.GENERAL_ERROR.code
+                } finally {
+                    tempDir.deleteRecursively()
+                }
+            }
+
+            test("error when defaultTarget is invalid") {
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test-invalid-default").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl, defaultTarget = "invalid-default")
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+
+                    var output = ""
+                    var exitCode = -1
+
+                    withConfigDir(tempDir) {
+                        runCommand(commands = listOf("deploy", "--sourceDir", testDirPath)) {
+                            process.waitFor(60, TimeUnit.SECONDS)
+                            output = this.output
+                            exitCode = process.exitValue()
+                        }
+                    }
+
+                    val expectedOutput =
+                        "Using default target 'invalid-default' from configuration.\n" +
+                            "Configuration error for default target 'invalid-default': " +
+                            "Target 'invalid-default' not found in configuration"
+                    output.normalize() shouldBe expectedOutput.normalize()
+                    exitCode shouldBe ExitCode.CONFIG_ERROR.code
                 } finally {
                     tempDir.deleteRecursively()
                 }
@@ -379,6 +488,7 @@ class DeployCommandIT :
                                             """.trimIndent(),
                                         )
                                 }
+
                                 "/realms/noumena/protocol/openid-connect/token" -> {
                                     MockResponse()
                                         .setResponseCode(401) // Unauthorized
@@ -392,6 +502,7 @@ class DeployCommandIT :
                                             """.trimIndent(),
                                         )
                                 }
+
                                 else -> MockResponse().setResponseCode(404)
                             }
                     }
@@ -411,12 +522,10 @@ class DeployCommandIT :
 
                     val expectedOutput =
                         """
-                        Creating NPL deployment archive...
-                        Deploying NPL sources and migrations to $engineUrl...
                         Authorization exception: Invalid client credentials
                         """.trimIndent()
 
-                    output.normalize(withPadding = false) shouldBe expectedOutput
+                    output.normalize() shouldBe expectedOutput
                     exitCode shouldBe ExitCode.CONFIG_ERROR.code
                 } finally {
                     tempDir.deleteRecursively()
@@ -442,7 +551,7 @@ class DeployCommandIT :
                     var exitCode = -1
 
                     withConfigDir(tempDir) {
-                        runCommand(commands = listOf("deploy", "test-target", testDirPath)) {
+                        runCommand(commands = listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath)) {
                             process.waitFor(60, TimeUnit.SECONDS)
                             output = this.output
                             exitCode = process.exitValue()
@@ -451,23 +560,7 @@ class DeployCommandIT :
 
                     val expectedOutput =
                         """
-                        Configuration errors:
-                          Unsupported configuration schema version '2'. Supported version is 'v1'.
-
-                        Please create or check the configuration file at .npl/deploy.yml
-                        (in the current directory or your home directory ~/.npl/deploy.yml)
-                        with the following format:
-
-                        schemaVersion: v1
-                        targets:
-                          <your-target-name>:
-                            type: engine
-                            engineManagementUrl: <URL of the Noumena Engine API>
-                            authUrl: <URL of the authentication endpoint>
-                            username: <username for authentication>
-                            password: <password for authentication>
-                            clientId: <client ID for authentication>
-                            clientSecret: <client secret for authentication>
+                        Configuration error: Unsupported configuration schema version '2'. Supported version is 'v1'.
                         """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -480,71 +573,45 @@ class DeployCommandIT :
 
         context("command validation errors") {
             test("missing target parameter") {
-                runCommand(
-                    commands = listOf("deploy"),
-                ) {
-                    process.waitFor(5, TimeUnit.SECONDS)
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
 
-                    val expectedOutput =
-                        """
-                    Missing required parameter: target
-                    Usage: deploy <target> <directory> [--clear]
+                val tempDir = Files.createTempDirectory("npl-cli-test-missing-target").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl, defaultTarget = null)
 
-                    Arguments:
-                      target           Named target from deploy.yml to deploy to
-                      directory        Directory containing NPL sources.
-                                       IMPORTANT: The directory must contain a valid NPL source structure, including
-                                       migrations. E.g.:
-                                        main
-                                        ├── npl-1.0
-                                        │   └── processes
-                                        │       └── demo.npl
-                                        └── yaml
-                                            └── migration.yml
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
-                    Options:
-                      --clear          Clear application contents before deployment
+                    withConfigDir(tempDir) {
+                        runCommand(
+                            commands = listOf("deploy", "--sourceDir", testDirPath),
+                        ) {
+                            process.waitFor(5, TimeUnit.SECONDS)
 
-                    Configuration is read from .npl/deploy.yml in the current directory
-                    or the user's home directory (~/.npl/deploy.yml).
-                """.normalize()
+                            val expectedOutput =
+                                "Missing required parameter: --target <name> or set defaultTarget in deploy.yml\n" +
+                                    DeployCommand.USAGE_STRING
 
-                    output.normalize() shouldBe expectedOutput
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                            output.normalize() shouldBe expectedOutput.normalize()
+                            process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                        }
+                    }
+                } finally {
+                    tempDir.deleteRecursively()
                 }
             }
 
             test("missing directory parameter") {
                 runCommand(
-                    commands = listOf("deploy", "test-target"),
+                    commands = listOf("deploy", "--target", "test-target"),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
                     val expectedOutput =
-                        """
-                    Missing required parameter: directory
-                    Usage: deploy <target> <directory> [--clear]
+                        "Missing required parameter: --sourceDir <directory>\n${DeployCommand.USAGE_STRING}"
 
-                    Arguments:
-                      target           Named target from deploy.yml to deploy to
-                      directory        Directory containing NPL sources.
-                                       IMPORTANT: The directory must contain a valid NPL source structure, including
-                                       migrations. E.g.:
-                                        main
-                                        ├── npl-1.0
-                                        │   └── processes
-                                        │       └── demo.npl
-                                        └── yaml
-                                            └── migration.yml
-
-                    Options:
-                      --clear          Clear application contents before deployment
-
-                    Configuration is read from .npl/deploy.yml in the current directory
-                    or the user's home directory (~/.npl/deploy.yml).
-                """.normalize()
-
-                    output.normalize() shouldBe expectedOutput
+                    output.normalize() shouldBe expectedOutput.normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -553,30 +620,11 @@ class DeployCommandIT :
                 val testDirPath = getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
 
                 runCommand(
-                    commands = listOf("deploy", "nonexistent-target", testDirPath),
+                    commands = listOf("deploy", "--target", "nonexistent-target", "--sourceDir", testDirPath),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    val expectedOutput =
-                        """
-                    Configuration errors:
-                      Target 'nonexistent-target' not found in configuration
-
-                    Please create or check the configuration file at .npl/deploy.yml
-                    (in the current directory or your home directory ~/.npl/deploy.yml)
-                    with the following format:
-
-                    schemaVersion: v1
-                    targets:
-                      <your-target-name>:
-                        type: engine
-                        engineManagementUrl: <URL of the Noumena Engine API>
-                        authUrl: <URL of the authentication endpoint>
-                        username: <username for authentication>
-                        password: <password for authentication>
-                        clientId: <client ID for authentication>
-                        clientSecret: <client secret for authentication>
-                """.normalize()
+                    val expectedOutput = "Configuration error: Target 'nonexistent-target' not found in configuration"
 
                     output.normalize() shouldBe expectedOutput
                     process.exitValue() shouldBe ExitCode.CONFIG_ERROR.code
@@ -587,11 +635,11 @@ class DeployCommandIT :
                 val nonExistentDir = "/non/existent/directory"
 
                 runCommand(
-                    commands = listOf("deploy", "test-target", nonExistentDir),
+                    commands = listOf("deploy", "--target", "test-target", "--sourceDir", nonExistentDir),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    output.normalize().contains("Target directory does not exist") shouldBe true
+                    output.normalize() shouldBe "Source directory does not exist: /non/existent/directory".normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -601,11 +649,11 @@ class DeployCommandIT :
                 tempFile.deleteOnExit()
 
                 runCommand(
-                    commands = listOf("deploy", "test-target", tempFile.absolutePath),
+                    commands = listOf("deploy", "--target", "test-target", "--sourceDir", tempFile.absolutePath),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
-                    output.normalize().contains("Target path is not a directory") shouldBe true
+                    output.normalize() shouldBe "Source path is not a directory: ${tempFile.absolutePath}".normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }

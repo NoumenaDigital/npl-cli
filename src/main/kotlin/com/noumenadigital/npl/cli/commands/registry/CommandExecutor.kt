@@ -3,13 +3,6 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.service.ColorWriter
 
-data class CommandParameter(
-    val name: String,
-    val description: String,
-    val defaultValue: String? = null,
-    val isRequired: Boolean = false,
-)
-
 sealed interface CommandExecutor {
     val commandName: String
     val description: String

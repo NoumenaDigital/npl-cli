@@ -32,8 +32,18 @@ data object HelpCommand : CommandExecutor {
                         else -> ""
                     }
 
-                // Only surround with angle brackets if not prefixed with --
-                val formattedName = if (param.name.startsWith("--")) param.name else "<${param.name}>"
+                val formattedName =
+                    when (param) {
+                        is NamedParameter -> {
+                            if (param.valuePlaceholder != null) {
+                                "${param.name} ${param.valuePlaceholder}"
+                            } else {
+                                param.name
+                            }
+                        }
+                        is PositionalParameter -> "<${param.name}>"
+                    }
+
                 output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
             }
         }

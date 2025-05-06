@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.CommandProcessor
 import com.noumenadigital.npl.cli.ExitCode
+import com.noumenadigital.npl.cli.commands.registry.CommandsParser
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.StringWriter
@@ -41,8 +42,8 @@ class CommandProcessorServiceTest :
                     openapi    Generate the openapi specifications of NPL api
                                  <directory>  Source directory containing NPL protocols (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
-                                 <target> (required)  Named target from deploy.yml to deploy to
-                                 <directory> (required)  Directory containing NPL sources
+                                 --target <name>  Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.
+                                 --sourceDir <directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
                     """.trimIndent()
 

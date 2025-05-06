@@ -134,6 +134,41 @@ class DeployConfigTest :
                 val config = DeployConfig.load(currentWorkDir = tempDir)
                 config.targets.shouldBeEmpty()
             }
+
+            test("should load config with defaultTarget") {
+                val configFile = File(tempDir, ".npl/deploy.yml")
+                val yamlContent =
+                    """
+                    defaultTarget: my-default
+                    targets:
+                      dev:
+                        type: engine
+                        username: user_curr
+                        password: pass_curr
+                    """.trimIndent()
+                createTempConfigFile(configFile, yamlContent)
+
+                val config = DeployConfig.load(currentWorkDir = tempDir)
+                config.targets.shouldHaveSize(1)
+                config.defaultTarget shouldBe "my-default"
+            }
+
+            test("should have null defaultTarget if not specified") {
+                val configFile = File(tempDir, ".npl/deploy.yml")
+                val yamlContent =
+                    """
+                    targets:
+                      dev:
+                        type: engine
+                        username: user_curr
+                        password: pass_curr
+                    """.trimIndent()
+                createTempConfigFile(configFile, yamlContent)
+
+                val config = DeployConfig.load(currentWorkDir = tempDir)
+                config.targets.shouldHaveSize(1)
+                config.defaultTarget shouldBe null
+            }
         }
 
         context("DeployConfig.validateTarget") {

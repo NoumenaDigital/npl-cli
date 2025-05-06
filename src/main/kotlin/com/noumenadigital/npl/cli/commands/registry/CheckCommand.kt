@@ -16,7 +16,7 @@ data class CheckCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            CommandParameter(
+            PositionalParameter(
                 name = "directory",
                 description = "Target directory containing NPL source files to check",
                 defaultValue = ".",
