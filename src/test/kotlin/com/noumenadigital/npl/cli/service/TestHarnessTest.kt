@@ -6,6 +6,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
 import java.io.File
+import java.io.File.separator
 
 class TestHarnessTest :
     FunSpec({
@@ -55,7 +56,8 @@ class TestHarnessTest :
                 results
                     .first()
                     .tapResult.bailOuts.size shouldBe 0
-                results.first().description shouldBe File(tempDir, "src/test/npl/test_case.npl").absolutePath
+                results.first().description shouldBe
+                    File(tempDir, "src${separator}test${separator}npl${separator}test_case.npl").absolutePath
             }
         }
 
