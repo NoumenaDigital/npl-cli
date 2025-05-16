@@ -41,6 +41,8 @@ class CommandProcessorServiceTest :
                                  <directory>  Source directory containing NPL tests to run (defaults to current directory)
                     openapi    Generate the openapi specifications of NPL api
                                  <directory>  Source directory containing NPL protocols (defaults to current directory)
+                    puml       Generate a puml diagram from source in the given directory
+                                 <directory>  Source directory containing NPL protocols (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
                                  --target <name>  Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.
                                  --sourceDir <directory> (required)  Directory containing NPL sources
