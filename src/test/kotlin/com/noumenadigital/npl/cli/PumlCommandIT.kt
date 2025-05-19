@@ -4,6 +4,7 @@ import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import java.io.File
 import java.nio.file.Path
@@ -37,6 +38,15 @@ class PumlCommandIT :
             }
         }
 
+        fun File.listAllFilesNames() = walk().filter { it.isFile }.map { it.name }.toList()
+
+        fun File.validateContents(contents: String) = contents shouldBe readText()
+
+        fun File.findFile(
+            fileName: String,
+            action: (File) -> Unit,
+        ) = walk().filter { it.isFile && it.name == fileName }.firstOrNull()?.let { action(it) }
+
         test("Puml command: Happy path") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
                 runCommand(commands = listOf("puml", absolutePath)) {
@@ -45,9 +55,9 @@ class PumlCommandIT :
                     val pumlDir = workingDirectory.resolve("puml")
                     val expectedOutput =
                         """
-                    Puml output directory: ${pumlDir.canonicalFile.path}
-
                     Completed compilation for 4 files in XXX ms
+
+                    Writing Puml files to ${pumlDir.canonicalFile.path}
 
                     Puml diagram generated successfully.
                     """.normalize()
@@ -56,7 +66,10 @@ class PumlCommandIT :
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                     with(workingDirectory.resolve("puml")) {
                         exists() shouldBe true
-                        listFiles()?.size shouldBe 3
+                        listAllFilesNames() shouldContainAll listOf("settle.puml", "iou.puml", "includes.puml")
+                        findFile("settle.puml") { file -> file.validateContents(SETTLE_PUML_CONTENTS) }
+                        findFile("iou.puml") { file -> file.validateContents(IOU_PUML_CONTENTS) }
+                        findFile("includes.puml") { file -> file.validateContents(INCLUDES_PUML_CONTENTS) }
                     }
                 }
             }
@@ -71,18 +84,21 @@ class PumlCommandIT :
                     val pumlDir = workingDirectory.resolve("puml")
                     val expectedOutput =
                         """
-                Puml output directory: ${pumlDir.canonicalFile.path}
+                        Completed compilation for 4 files in XXX ms
 
-                Completed compilation for 4 files in XXX ms
+                        Writing Puml files to ${pumlDir.canonicalFile.path}
 
-                Puml diagram generated successfully.
-                """.normalize()
+                        Puml diagram generated successfully.
+                        """.normalize()
 
                     output.normalize() shouldBe expectedOutput
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                     with(pumlDir) {
                         exists() shouldBe true
-                        listFiles()?.size shouldBe 3
+                        listAllFilesNames() shouldContainAll listOf("settle.puml", "iou.puml", "includes.puml")
+                        findFile("settle.puml") { file -> file.validateContents(SETTLE_PUML_CONTENTS) }
+                        findFile("iou.puml") { file -> file.validateContents(IOU_PUML_CONTENTS) }
+                        findFile("includes.puml") { file -> file.validateContents(INCLUDES_PUML_CONTENTS) }
                     }
                 }
             }
@@ -106,4 +122,55 @@ class PumlCommandIT :
                 output.normalize() shouldBe expectedOutput
             }
         }
-    })
+    }) {
+    companion object {
+        val IOU_PUML_CONTENTS: String =
+            """@startuml
+                |hide empty members
+                |namespace npl.objects.iou {
+                |    class TimestampedAmount << (s,green) >> {
+                |        {field} +amount: Number
+                |        {field} +timestamp: DateTime
+                |    }
+                |    class Iou << (p,orchid) >> {
+                |        {field} +issuer: Party
+                |        {field} +payee: Party
+                |        {field} +payments: List<TimestampedAmount>
+                |        {field} +forAmount: Number
+                |        {field} +observers: Map<Text, Party>
+                |        {method} +[issuer] pay(amount: Number)
+                |        {method} +[payee] forgive()
+                |        {method} +[issuer | payee] getAmountOwed(): Number
+                |    }
+                |    npl.objects.iou.Iou --> "*" npl.objects.iou.TimestampedAmount : payments
+                |}
+                |@enduml
+            """.trimMargin()
+
+        val INCLUDES_PUML_CONTENTS =
+            """
+            @startuml
+            hide empty members
+            !include objects/iou/iou.puml
+            !include processes/settle.puml
+            @enduml
+            """.trimIndent()
+
+        val SETTLE_PUML_CONTENTS =
+            """
+            @startuml
+            hide empty members
+            namespace npl.processes {
+                class Settle << (p,orchid) >> {
+                    {field} +iouOwner: Party
+                    {field} +carOwner: Party
+                    {field} +iou: Iou
+                    {field} +observers: Map<Text, Party>
+                    {method} +[iouOwner | carOwner] swap()
+                }
+                npl.processes.Settle --> "1" npl.objects.iou.Iou : iou
+            }
+            @enduml
+            """.trimIndent()
+    }
+}

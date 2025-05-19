@@ -1,20 +1,15 @@
 package com.noumenadigital.npl.cli.commands.registry
 
-import com.google.common.collect.Multimap
 import com.noumenadigital.npl.cli.ExitCode
+import com.noumenadigital.npl.cli.ExitCode.COMPILATION_ERROR
+import com.noumenadigital.npl.cli.ExitCode.GENERAL_ERROR
+import com.noumenadigital.npl.cli.ExitCode.INTERNAL_ERROR
+import com.noumenadigital.npl.cli.ExitCode.SUCCESS
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
-import com.noumenadigital.npl.lang.Proto
-import com.noumenadigital.npl.lang.Type
 import com.noumenadigital.pumlgen.NplPumlObjectGenerator.generateFiles
 import java.io.File
-import java.net.URL
-import java.nio.file.Path
-
-fun interface WritableArtifact {
-    fun write(outputDirectory: Path?)
-}
 
 data class PumlCommand(
     private val srcDir: String = ".",
@@ -34,46 +29,40 @@ data class PumlCommand(
         )
 
     override fun execute(output: ColorWriter): ExitCode {
-        if (!File(srcDir).isDirectory() || !File(srcDir).exists()) {
-            output.error("Source directory does not exist or is not a directory: $srcDir")
-            return ExitCode.GENERAL_ERROR
-        }
-
-        val outputDir =
-            File(outputDir).resolve("puml").also {
-                if (!it.mkdirs()) {
-                    output.error("Failed to create output directory: ${it.canonicalPath}")
-                    return ExitCode.INTERNAL_ERROR
-                }
-                output.info("Puml output directory: ${it.canonicalPath}\n")
+        try {
+            if (!File(srcDir).isDirectory() || !File(srcDir).exists()) {
+                throw PumlError(GENERAL_ERROR, "Source directory does not exist or is not a directory: $srcDir")
             }
 
-        val protosMap =
-            CompilerService(SourcesManager(srcDir))
-                .compileAndReport(output = output)
-                .userDefinedMap
-                ?: error("No user defined types found")
+            val outputDir = File(outputDir).resolve("puml")
+            val protosMap = CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
 
-        writePumlFilesToOutput(protosMap, outputDir)
+            if (protosMap == null) {
+                throw PumlError(COMPILATION_ERROR, "No user defined types found, check sources and try again.")
+            }
 
-        output.success("Puml diagram generated successfully.")
+            val pumlFiles = generateFiles(protosMap)
 
-        return ExitCode.SUCCESS
-    }
+            if (!outputDir.mkdirs()) {
+                throw PumlError(INTERNAL_ERROR, "Failed to create output directory: ${outputDir.canonicalPath}")
+            }
 
-    private fun writePumlFilesToOutput(
-        protosMap: Multimap<URL, Proto<Type>>,
-        outputDir: File,
-    ) {
-        val pumlFiles =
-            generateFiles(protosMap)
-                .map { e ->
-                    WritableArtifact { outputDirectory ->
-                        outputDirectory?.let { e.write(it) }
-                    }
+            output.info("Writing Puml files to ${outputDir.canonicalPath}\n")
+
+            pumlFiles.forEach {
+                try {
+                    it.write(outputDir.toPath())
+                } catch (e: Exception) {
+                    throw PumlError(INTERNAL_ERROR, e.message!!)
                 }
+            }
 
-        pumlFiles.forEach { it.write(outputDir.toPath()) }
+            output.success("Puml diagram generated successfully.")
+        } catch (e: PumlError) {
+            output.error(e.errorMessage)
+            return e.exitCode
+        }
+        return SUCCESS
     }
 
     override fun createInstance(params: List<String>): CommandExecutor {
@@ -81,6 +70,11 @@ data class PumlCommand(
             params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: CURRENT_DIRECTORY
         return PumlCommand(srcDir = srcDir)
     }
+
+    data class PumlError(
+        val exitCode: ExitCode,
+        val errorMessage: String,
+    ) : Exception(errorMessage)
 
     companion object {
         private const val CURRENT_DIRECTORY = "."
