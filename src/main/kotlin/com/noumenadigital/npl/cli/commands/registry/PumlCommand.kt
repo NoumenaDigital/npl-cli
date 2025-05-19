@@ -43,10 +43,7 @@ data class PumlCommand(
 
             val pumlFiles = generateFiles(protosMap)
 
-            if (!outputDir.mkdirs()) {
-                throw PumlError(INTERNAL_ERROR, "Failed to create output directory: ${outputDir.canonicalPath}")
-            }
-
+            outputDir.mkdirs()
             output.info("Writing Puml files to ${outputDir.canonicalPath}\n")
 
             pumlFiles.forEach {

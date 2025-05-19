@@ -104,6 +104,24 @@ class PumlCommandIT :
             }
         }
 
+        test("Puml command: overwrite existing files") {
+            withPumlTestContext(testDir = listOf("success", "multiple_files")) {
+                runCommand(commands = listOf("puml", absolutePath)) {
+                    process.waitFor()
+
+                    workingDirectory.resolve("puml")
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+
+                runCommand(commands = listOf("puml", absolutePath)) {
+                    process.waitFor()
+
+                    workingDirectory.resolve("puml")
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+        }
+
         test("Puml command: invalid path") {
             runCommand(commands = listOf("puml", "non-existing-path")) {
                 process.waitFor()
