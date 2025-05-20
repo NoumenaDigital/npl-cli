@@ -9,8 +9,7 @@ import org.tap4j.util.StatusValues
 import java.time.Duration
 
 data class TestCommand(
-    private val targetDir: String = ".",
-    private val testHarness: TestHarness = TestHarness(SourcesManager(targetDir)),
+    private val params: List<String> = emptyList(),
 ) : CommandExecutor {
     companion object {
         const val MIN_PADDING = 25
@@ -21,21 +20,31 @@ data class TestCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            PositionalParameter(
-                name = "directory",
+            NamedParameter(
+                name = "--sourceDir",
                 description = "Source directory containing NPL tests to run",
                 defaultValue = ".",
                 isRequired = false,
+                valuePlaceholder = "<directory>",
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val targetDir = params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: "."
-        return TestCommand(targetDir = targetDir)
-    }
+    override fun createInstance(params: List<String>): CommandExecutor = TestCommand(params)
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
+            val parser = CommandArgumentParser()
+            val parsedArgs = parser.parse(params, parameters)
+
+            if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+                output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+//                displayUsage(output)
+                return ExitCode.USAGE_ERROR
+            }
+
+            val sourceDir = parsedArgs.getValue("--sourceDir") ?: "."
+            val testHarness = TestHarness(SourcesManager(sourceDir))
+
             val start = System.nanoTime()
             val testResults = testHarness.runTest()
             handleResults(testResults, output)

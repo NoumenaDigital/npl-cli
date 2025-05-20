@@ -14,7 +14,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", testDirPath),
+                        commands = listOf("test", "--sourceDir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -23,7 +23,7 @@ class TestCommandIT :
                         '$testDirPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
 
                         NPL test completed successfully in XXX ms.
-                    """.normalize()
+                        """.normalize()
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
@@ -33,7 +33,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "test_failure")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", testDirPath),
+                        commands = listOf("test", "--sourceDir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -55,7 +55,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("failure", "test_assertion_failed")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", testDirPath),
+                        commands = listOf("test", "--sourceDir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -75,7 +75,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("failure", "test_failed")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", testDirPath),
+                        commands = listOf("test", "--sourceDir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -99,7 +99,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "empty_tests_folder")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", testDirPath),
+                        commands = listOf("test", "--sourceDir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -116,7 +116,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("failure", "single_file")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", testDirPath),
+                        commands = listOf("test", "--sourceDir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -138,7 +138,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("warnings", "compilation")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", testDirPath),
+                        commands = listOf("test", "--sourceDir", testDirPath),
                     ) {
                         process.waitFor()
 
