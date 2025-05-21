@@ -3,14 +3,32 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.commands.registry.TestCommand.Companion.COVERAGE_FILE
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import java.io.File
 
 class TestCommandIT :
     FunSpec(
         {
+            val coverageFile = File(".").resolve(COVERAGE_FILE)
+
+            beforeEach {
+                if (coverageFile.exists()) {
+                    coverageFile.delete()
+                }
+            }
+
+            afterEach {
+                if (coverageFile.exists()) {
+                    coverageFile.delete()
+                }
+            }
+
             context("success") {
                 test("both main and test sources") {
+                    coverageFile.exists() shouldBe false
+
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
                     runCommand(
@@ -25,10 +43,42 @@ class TestCommandIT :
                         NPL test completed successfully in XXX ms.
                         """.normalize()
 
+                        coverageFile.exists() shouldBe false
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
                     }
                 }
+
+                test("both main and test sources - with coverage") {
+                    coverageFile.exists() shouldBe false
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+                    runCommand(
+                        commands = listOf("test", "--sourceDir", testDirPath, "--coverage"),
+                    ) {
+                        process.waitFor()
+
+                        val expectedOutput =
+                            """
+                        '$testDirPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
+                        Line coverage summary
+                        --------------------------------------
+                        src/main/npl/objects/iou/iou.npl   XXX%
+                        src/test/npl/objects/test_iou.npl XXX%
+                        --------------------------------------
+                        Overall                            XXX%
+
+
+                        NPL test completed successfully in XXX ms.
+                        """.normalize()
+
+                        coverageFile.exists() shouldBe true
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
+
                 test("test compilation failure") {
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "test_failure")).toAbsolutePath().toString()

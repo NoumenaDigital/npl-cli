@@ -50,6 +50,7 @@ class BinaryCommandsIT :
                                  <directory>  Target directory containing NPL source files to check (defaults to current directory)
                     test       Run the NPL tests
                                  --sourceDir <directory>  Source directory containing NPL tests to run (defaults to current directory)
+                                 --coverage  Use to indicate to print report with test coverage details
                     openapi    Generate the openapi specifications of NPL api
                                  <directory>  Source directory containing NPL protocols (defaults to current directory)
                     puml       Generate a puml diagram from source in the given directory
