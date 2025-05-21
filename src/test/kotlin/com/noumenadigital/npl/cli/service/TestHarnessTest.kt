@@ -76,7 +76,7 @@ class TestHarnessTest :
             }
         }
 
-        test("should create coverage.txt when coverage is selected") {
+        test("should create coverage.xml when coverage is selected") {
             withTestContext(withCoverage = true) {
                 createSourceFile("main")
                 createTestFile("test_case")

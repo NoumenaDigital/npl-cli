@@ -74,6 +74,34 @@ class TestCommandIT :
                         """.normalize()
 
                         coverageFile.exists() shouldBe true
+                        coverageFile.readText() shouldBe
+                            """
+                            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                            <coverage version="1">
+                                <file path="$testDirPath/src/main/npl/objects/iou/iou.npl">
+                                    <lineToCover covered="true" lineNumber="8"/>
+                                    <lineToCover covered="true" lineNumber="12"/>
+                                    <lineToCover covered="true" lineNumber="18"/>
+                                    <lineToCover covered="true" lineNumber="20"/>
+                                    <lineToCover covered="true" lineNumber="24"/>
+                                    <lineToCover covered="true" lineNumber="25"/>
+                                    <lineToCover covered="true" lineNumber="27"/>
+                                    <lineToCover covered="true" lineNumber="29"/>
+                                    <lineToCover covered="true" lineNumber="31"/>
+                                    <lineToCover covered="false" lineNumber="38"/>
+                                    <lineToCover covered="true" lineNumber="43"/>
+                                </file>
+                                <file path="$testDirPath/src/test/npl/objects/test_iou.npl">
+                                    <lineToCover covered="true" lineNumber="10"/>
+                                    <lineToCover covered="true" lineNumber="12"/>
+                                    <lineToCover covered="true" lineNumber="17"/>
+                                    <lineToCover covered="true" lineNumber="18"/>
+                                    <lineToCover covered="true" lineNumber="20"/>
+                                </file>
+                            </coverage>
+
+                            """.trimIndent()
+
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
                     }

@@ -35,7 +35,7 @@ data class TestCommand(
             ),
             NamedParameter(
                 name = "--coverage",
-                description = "Use to indicate to print report with test coverage details",
+                description = "Report test coverage details (printed to console as well as coverage.xml)",
                 isRequired = false,
             ),
         )
