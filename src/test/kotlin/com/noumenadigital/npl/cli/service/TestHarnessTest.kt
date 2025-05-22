@@ -56,7 +56,7 @@ class TestHarnessTest :
                 results
                     .first()
                     .tapResult.bailOuts.size shouldBe 0
-                results.first().description shouldBe
+                File(results.first().description).absolutePath shouldBe
                     File(tempDir, listOf("src", "test", "npl", "test_case.npl").joinToString(separator = File.separator)).absolutePath
             }
         }
