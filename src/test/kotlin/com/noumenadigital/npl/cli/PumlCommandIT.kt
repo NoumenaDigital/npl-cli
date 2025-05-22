@@ -77,7 +77,7 @@ class PumlCommandIT :
 
         test("Puml command: relative path") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
-                val dir = Path.of("src/test/resources/npl-sources/success/multiple_files")
+                val dir = Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files")
                 runCommand(commands = listOf("puml", dir.pathString)) {
                     process.waitFor()
 
@@ -132,7 +132,7 @@ class PumlCommandIT :
         }
 
         test("Puml command: directory pointing to a file") {
-            val file = Path.of("src/test/resources/npl-sources/success/multiple_files/test_iou.npl")
+            val file = Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files", "test_iou.npl")
             runCommand(commands = listOf("puml", file.pathString)) {
                 process.waitFor()
                 val expectedOutput = "Source directory does not exist or is not a directory: ${file.pathString}"
