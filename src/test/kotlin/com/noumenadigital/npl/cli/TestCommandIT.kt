@@ -5,6 +5,7 @@ import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import java.io.File
 
 class TestCommandIT :
     FunSpec(
@@ -20,7 +21,7 @@ class TestCommandIT :
 
                         val expectedOutput =
                             """
-                        '$testDirPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
+                        '${testDirPath}${File.separator}src${File.separator}test${File.separator}npl${File.separator}objects${File.separator}test_iou.npl' .. PASS           2    tests in XXX ms
 
                         NPL test completed successfully in XXX ms.
                     """.normalize()
@@ -39,7 +40,7 @@ class TestCommandIT :
 
                         val expectedOutput =
                             """
-                        'compilation' ............... FAIL           0    tests in XXX ms ($testDirPath/src/test/npl/objects/test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod')
+                        'compilation' ............... FAIL           0    tests in XXX ms (${testDirPath}${File.separator}src${File.separator}test${File.separator}npl${File.separator}objects${File.separator}test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod')
 
                         NPL test failed with errors.
                     """.normalize()
@@ -61,7 +62,7 @@ class TestCommandIT :
 
                         val expectedOutput =
                             """
-                        '$testDirPath/src/test/npl/objects/test_iou_failed.npl' . FAIL(1)        2    tests in XXX ms
+                        '${testDirPath}${File.separator}src${File.separator}test${File.separator}npl${File.separator}objects${File.separator}test_iou_failed.npl' . FAIL(1)        2    tests in XXX ms
                         'Amount owed should reflect payment ==> Expect '112300', got '50'.' .......................................................................... FAIL
 
                         NPL test failed with errors.
@@ -81,10 +82,10 @@ class TestCommandIT :
 
                         val expectedOutput =
                             """
-                        '$testDirPath/src/test/npl/objects/test_iou_failed.npl' ... FAIL(2)        2    tests in XXX ms
+                        '${testDirPath}${File.separator}src${File.separator}test${File.separator}npl${File.separator}objects${File.separator}test_iou_failed.npl' ... FAIL(2)        2    tests in XXX ms
                         'Amount owed should equal initial value ==> Expect '999', got '100'.' ................................................................ FAIL
                         'Amount owed should reflect payment ==> Expect '777', got '50'.' ..................................................................... FAIL
-                        '$testDirPath/src/test/npl/objects/test_iou_failed_2.npl' . FAIL(2)        2    tests in XXX ms
+                        '${testDirPath}${File.separator}src${File.separator}test${File.separator}npl${File.separator}objects${File.separator}test_iou_failed_2.npl' . FAIL(2)        2    tests in XXX ms
                         'Amount owed should equal initial value ==> Expect '999', got '100'.' ................................................................ FAIL
                         'Amount owed should reflect payment ==> Expect '777', got '50'.' ..................................................................... FAIL
 
@@ -122,7 +123,7 @@ class TestCommandIT :
 
                         val expectedOutput =
                             """
-                        'compilation' ............... FAIL           0    tests in XXX ms ($testDirPath/src/main/npl/objects/car/car.npl: (7, 1) E0001: Syntax error: rule statement failed predicate: {quirksMode}?)
+                        'compilation' ............... FAIL           0    tests in XXX ms (${testDirPath}${File.separator}src${File.separator}main${File.separator}npl${File.separator}objects${File.separator}car${File.separator}car.npl: (7, 1) E0001: Syntax error: rule statement failed predicate: {quirksMode}?)
 
                         NPL test failed with errors.
                     """.normalize()
@@ -144,7 +145,7 @@ class TestCommandIT :
 
                         val expectedOutput =
                             """
-                        '$testDirPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
+                        '${testDirPath}${File.separator}src${File.separator}test${File.separator}npl${File.separator}objects${File.separator}test_iou.npl' .. PASS           2    tests in XXX ms
 
                         NPL test completed successfully in XXX ms.
                     """.normalize()

@@ -57,7 +57,7 @@ class TestHarnessTest :
                     .first()
                     .tapResult.bailOuts.size shouldBe 0
                 results.first().description shouldBe
-                    File(tempDir, "src${separator}test${separator}npl${separator}test_case.npl").absolutePath
+                    File(tempDir, listOf("src", "test", "npl", "test_case.npl").joinToString(separator = File.separator)).absolutePath
             }
         }
 
@@ -76,6 +76,6 @@ class TestHarnessTest :
         }
     }) {
     companion object {
-        private const val SRC_TEST_DIR = "src/test/npl"
+        private val SRC_TEST_DIR = listOf("src", "test", "npl").joinToString(separator = File.separator)
     }
 }
