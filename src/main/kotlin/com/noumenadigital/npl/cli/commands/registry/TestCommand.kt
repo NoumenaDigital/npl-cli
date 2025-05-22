@@ -96,8 +96,8 @@ data class TestCommand(
         sourceDir: File,
     ): CoverageAnalyzer =
         if (showCoverage) {
-            val coverageFile = File(".").resolve(COVERAGE_FILE)
-            LineCoverageAnalyzer(sourceDir, SonarQubeReporter(coverageFile))
+            val coverageFile = File(".").canonicalFile.resolve(COVERAGE_FILE)
+            LineCoverageAnalyzer(sourceDir.canonicalFile, SonarQubeReporter(coverageFile))
         } else {
             NoCoverageAnalyzer
         }

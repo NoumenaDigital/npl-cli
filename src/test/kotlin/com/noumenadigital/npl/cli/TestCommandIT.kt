@@ -7,6 +7,7 @@ import com.noumenadigital.npl.cli.commands.registry.TestCommand.Companion.COVERA
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
+import kotlin.io.path.pathString
 
 class TestCommandIT :
     FunSpec(
@@ -49,7 +50,66 @@ class TestCommandIT :
                     }
                 }
 
-                test("both main and test sources - with coverage") {
+                test("both main and test sources - with coverage using relative path") {
+                    coverageFile.exists() shouldBe false
+
+                    val testPath = getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath()
+                    val relativePath = File(".").canonicalFile.toPath().relativize(testPath)
+
+                    runCommand(
+                        commands = listOf("test", "--sourceDir", relativePath.pathString, "--coverage"),
+                    ) {
+                        process.waitFor()
+
+                        val expectedOutput =
+                            """
+                        '$testPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
+                        Line coverage summary
+                        --------------------------------------
+                        src/main/npl/objects/iou/iou.npl   XXX%
+                        src/test/npl/objects/test_iou.npl XXX%
+                        --------------------------------------
+                        Overall                            XXX%
+
+
+                        NPL test completed successfully in XXX ms.
+                        """.normalize()
+
+                        coverageFile.exists() shouldBe true
+                        coverageFile.readText() shouldBe
+                            """
+                            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                            <coverage version="1">
+                                <file path="$testPath/src/main/npl/objects/iou/iou.npl">
+                                    <lineToCover covered="true" lineNumber="8"/>
+                                    <lineToCover covered="true" lineNumber="12"/>
+                                    <lineToCover covered="true" lineNumber="18"/>
+                                    <lineToCover covered="true" lineNumber="20"/>
+                                    <lineToCover covered="true" lineNumber="24"/>
+                                    <lineToCover covered="true" lineNumber="25"/>
+                                    <lineToCover covered="true" lineNumber="27"/>
+                                    <lineToCover covered="true" lineNumber="29"/>
+                                    <lineToCover covered="true" lineNumber="31"/>
+                                    <lineToCover covered="false" lineNumber="38"/>
+                                    <lineToCover covered="true" lineNumber="43"/>
+                                </file>
+                                <file path="$testPath/src/test/npl/objects/test_iou.npl">
+                                    <lineToCover covered="true" lineNumber="10"/>
+                                    <lineToCover covered="true" lineNumber="12"/>
+                                    <lineToCover covered="true" lineNumber="17"/>
+                                    <lineToCover covered="true" lineNumber="18"/>
+                                    <lineToCover covered="true" lineNumber="20"/>
+                                </file>
+                            </coverage>
+
+                            """.trimIndent()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
+
+                test("both main and test sources - with coverage using absolute path") {
                     coverageFile.exists() shouldBe false
 
                     val testDirPath =
