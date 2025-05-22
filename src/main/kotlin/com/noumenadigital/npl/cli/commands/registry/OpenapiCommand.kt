@@ -14,6 +14,7 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.notExists
 
 data class OpenapiCommand(
     private val srcDir: String = ".",
@@ -24,11 +25,12 @@ data class OpenapiCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            PositionalParameter(
-                name = "directory",
+            NamedParameter(
+                name = "--sourceDir",
                 description = "Source directory containing NPL protocols",
                 defaultValue = ".",
                 isRequired = false,
+                valuePlaceholder = "<directory>",
             ),
         )
 
@@ -38,13 +40,24 @@ data class OpenapiCommand(
     }
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val srcDir =
-            params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: CURRENT_DIRECTORY
+        val parsedArgs = parseParams(params)
+
+        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+        }
+
+        val srcDir = parsedArgs.getValue("--sourceDir") ?: "."
         return OpenapiCommand(srcDir = srcDir)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
+            val sourcePath = Paths.get(srcDir)
+            if (sourcePath.notExists()) {
+                output.error("Source directory does not exist: $srcDir")
+                return ExitCode.USAGE_ERROR
+            }
+
             val compilationResult = compilerService.compileAndReport(output = output)
             if (compilationResult.hasErrors) {
                 output.error("NPL openapi failed with errors.")
@@ -92,6 +105,8 @@ data class OpenapiCommand(
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
         }
     }
+
+    private fun parseParams(args: List<String>) = CommandArgumentParser().parse(args, parameters)
 
     private fun String.removePrefix(): String = removePrefix("/")
 
