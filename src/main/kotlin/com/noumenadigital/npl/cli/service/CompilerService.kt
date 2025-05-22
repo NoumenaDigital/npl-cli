@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli.service
 
+import com.google.common.collect.Multimap
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.contrib.NplContribConfiguration
 import com.noumenadigital.npl.lang.CompileFailure
@@ -8,6 +9,7 @@ import com.noumenadigital.npl.lang.Loader
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.Source
 import com.noumenadigital.npl.lang.Type
+import java.net.URL
 import java.time.Duration
 
 data class CompilerService(
@@ -82,6 +84,7 @@ data class CompilerService(
         var errorCount = 0
         val warningCount: Int
         var protos: List<Proto<Type>> = emptyList()
+        var userDefinedMap: Multimap<URL, Proto<Type>>? = null
 
         when (compileResult) {
             is CompileFailure -> {
@@ -105,11 +108,21 @@ data class CompilerService(
                 compileResult.warnings.forEach { warning ->
                     output.warning(warning.description)
                 }
-                protos = compileResult.throwOnError().protos.all
+
+                val success = compileResult.throwOnError()
+                protos = success.protos.all
+                userDefinedMap = success.protos.userDefinedMap
             }
         }
 
-        return CompilationResult(sources.size, errorCount, warningCount, errorCount == 0, protos = protos)
+        return CompilationResult(
+            sources.size,
+            errorCount,
+            warningCount,
+            errorCount == 0,
+            protos = protos,
+            userDefinedMap = userDefinedMap,
+        )
     }
 
     data class CompilationResult(
@@ -119,6 +132,7 @@ data class CompilerService(
         val success: Boolean,
         var duration: Long = 0,
         val protos: List<Proto<Type>>? = null,
+        val userDefinedMap: Multimap<URL, Proto<Type>>? = null,
     ) {
         val hasErrors: Boolean
             get() = errorCount > 0
