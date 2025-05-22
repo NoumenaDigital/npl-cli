@@ -5,17 +5,17 @@ offers several useful commands for interacting with your NPL projects.
 
 ## Commands
 
-- `npl version` - Displays the current version of the NPL CLI.
-- `npl help` - Displays help information for the NPL CLI.
-- `npl check` - Checks the NPL for compilation errors and warnings. An optional path to a directory can be provided as
-  an argument. If no path is provided, the current working directory is used.
-- `npl test` - Run the NPL tests. An optional path to a directory can be provided as an argument. If no path is
-  provided, the current working directory is used.
-- `npl puml` - Generate a puml diagram from source in the given directory and its sub-directories. If no path is
-  provided, the current directory will be used.
-- `npl openapi` - Generates the openapi specs for NPL protocols. An optional path to a directory can be provided as an
-  argument. If no path is provided, the current working directory is used.
-- `npl deploy` - Deploys NPL sources to a configured Noumena Engine target. [See details](#deploy-command).
+To see a description of how to use each command, run `npl help`
+
+| Command       | Description                                                                               |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| `npl version` | Displays the current version of the NPL CLI                                               |
+| `npl help`    | Displays help information for the NPL CLI                                                 |
+| `npl check`   | Checks the NPL for compilation errors and warnings                                        |
+| `npl test`    | Runs the NPL tests                                                                        |
+| `npl puml`    | Generates a puml diagram from NPL source                                                  |
+| `npl openapi` | Generates the openapi specs for NPL protocols                                             |
+| `npl deploy`  | Deploys NPL sources to a configured Noumena Engine target. [See details](#deploy-command) |
 
 ## Supported Operating Systems and architectures
 

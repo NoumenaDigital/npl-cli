@@ -42,6 +42,7 @@ object TestUtils {
         replace("\r\n", "\n")
             // Normalize durations
             .replace(Regex("in \\d+ ms"), "in XXX ms")
+            .replace(Regex("\\d+%"), "XXX%")
             // Remove any ANSI color codes
             .replace(Regex("\\e\\[[0-9;]*m"), "")
             .replace(Regex("(\\.*FAIL)[ \\t]+"), "$1")
