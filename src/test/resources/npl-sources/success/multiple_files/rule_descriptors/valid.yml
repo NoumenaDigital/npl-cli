@@ -1,0 +1,11 @@
+objects.iou.Iou:
+  issuer:
+    set:
+      entity:
+        email:
+          - issuer@example.com
+processes.Settle:
+  carOwner:
+    extract:
+      entity:
+        - entity

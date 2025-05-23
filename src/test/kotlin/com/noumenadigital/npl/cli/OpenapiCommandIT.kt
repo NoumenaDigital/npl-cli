@@ -5,10 +5,13 @@ import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.SwaggerParseResult
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.pathString
 
 class OpenapiCommandIT :
     FunSpec({
@@ -208,6 +211,272 @@ class OpenapiCommandIT :
                             output.normalize() shouldBe expectedOutput
                             testResourcesPath.resolve("openapi").toFile().exists() shouldBe false
                             process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                        }
+                    }
+                }
+            }
+
+            context("party rules") {
+                context("success") {
+                    test("empty rules descriptor") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("rule_descriptors/empty.yml")
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        rulesDescPath.absolutePathString(),
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """
+                                Completed compilation for 4 files in XXX ms
+
+                                Generating openapi for objects/iou
+                                Generating openapi for processes
+                                NPL openapi completed successfully.
+                                """.normalize()
+
+                                output.normalize() shouldBe expectedOutput
+                                validateOpenapiSpec("objects.iou-openapi.yml").messages.size shouldBe 0
+                                validateOpenapiSpec("processes-openapi.yml").messages.size shouldBe 0
+                                process.exitValue() shouldBe ExitCode.SUCCESS.code
+                            }
+                        }
+                    }
+
+                    test("valid rules descriptor - absolute path") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("rule_descriptors/valid.yml")
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        rulesDescPath.absolutePathString(),
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """
+                            Completed compilation for 4 files in XXX ms
+
+                            Generating openapi for objects/iou
+                            Generating openapi for processes
+                            NPL openapi completed successfully.
+                            """.normalize()
+
+                                output.normalize() shouldBe expectedOutput
+                                validateOpenapiSpec("objects.iou-openapi.yml").messages.size shouldBe 0
+                                validateOpenapiSpec("processes-openapi.yml").messages.size shouldBe 0
+                                process.exitValue() shouldBe ExitCode.SUCCESS.code
+                            }
+                        }
+                    }
+
+                    test("valid rules descriptor - relative path") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("rule_descriptors/valid.yml")
+                            val relativePath = File(".").canonicalFile.toPath().relativize(rulesDescPath)
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        relativePath.pathString,
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """
+                            Completed compilation for 4 files in XXX ms
+
+                            Generating openapi for objects/iou
+                            Generating openapi for processes
+                            NPL openapi completed successfully.
+                            """.normalize()
+
+                                output.normalize() shouldBe expectedOutput
+                                validateOpenapiSpec("objects.iou-openapi.yml").messages.size shouldBe 0
+                                validateOpenapiSpec("processes-openapi.yml").messages.size shouldBe 0
+                                process.exitValue() shouldBe ExitCode.SUCCESS.code
+                            }
+                        }
+                    }
+                }
+
+                context("failure") {
+                    test("invalid party specified in rules descriptor") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("rule_descriptors/invalid_party.yml")
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        rulesDescPath.absolutePathString(),
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """
+                            Completed compilation for 4 files in XXX ms
+
+                            Generating openapi for objects/iou
+                            Failed while validating the Party automation rules: Invalid Party/Parties [[unknown]] specified on party assignment for rule [/objects/iou/Iou]
+                            """.normalize()
+
+                                output.normalize() shouldBe expectedOutput
+                                process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                            }
+                        }
+                    }
+
+                    test("invalid protocol specified in rules descriptor") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("rule_descriptors/invalid_protocol.yml")
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        rulesDescPath.absolutePathString(),
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """
+                            Completed compilation for 4 files in XXX ms
+
+                            Generating openapi for objects/iou
+                            Failed while validating the Party automation rules: No matching prototype found matching [/unknown/pkg/Iou]
+                            """.normalize()
+
+                                output.normalize() shouldBe expectedOutput
+                                process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                            }
+                        }
+                    }
+
+                    test("specified rules descriptor is a directory") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("rule_descriptors")
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        rulesDescPath.absolutePathString(),
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """Rules descriptor is invalid, blank or does not exist: $rulesDescPath""".normalize()
+
+                                output.normalize() shouldBe expectedOutput
+                                process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
+                            }
+                        }
+                    }
+
+                    test("specified rules descriptor does not exist") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("non-existent-dir/rules.yml")
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        rulesDescPath.absolutePathString(),
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """Rules descriptor is invalid, blank or does not exist: $rulesDescPath""".normalize()
+
+                                output.normalize() shouldBe expectedOutput
+                                process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
+                            }
+                        }
+                    }
+
+                    test("specified rules descriptor is blank") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("")
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        rulesDescPath.absolutePathString(),
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """Rules descriptor is invalid, blank or does not exist: $rulesDescPath""".normalize()
+
+                                output.normalize() shouldBe expectedOutput
+                                process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
+                            }
+                        }
+                    }
+
+                    test("specified rules descriptor is invalid yaml") {
+                        withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                            val rulesDescPath = testResourcesPath.resolve("rule_descriptors/invalid_yaml.yml")
+
+                            runCommand(
+                                commands =
+                                    listOf(
+                                        "openapi",
+                                        "--sourceDir",
+                                        absolutePath,
+                                        "--rulesDescriptor",
+                                        rulesDescPath.absolutePathString(),
+                                    ),
+                            ) {
+                                process.waitFor()
+
+                                val expectedOutput =
+                                    """Failed while parsing the party automation rules:""".normalize()
+
+                                output.normalize() shouldContain expectedOutput
+                                process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                            }
                         }
                     }
                 }
