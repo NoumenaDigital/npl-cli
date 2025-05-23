@@ -137,6 +137,9 @@
       ]
     },
     {
+      "type": "com.ethlo.time.ITU"
+    },
+    {
       "type": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
       "methods": [
         {
@@ -2100,6 +2103,9 @@
       "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
     },
     {
+      "glob": "META-INF/services/java.util.spi.ResourceBundleControlProvider"
+    },
+    {
       "glob": "META-INF/services/javax.xml.parsers.DocumentBuilderFactory"
     },
     {
@@ -2116,6 +2122,15 @@
     },
     {
       "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "jsv-messages.properties"
+    },
+    {
+      "glob": "jsv-messages_en.properties"
+    },
+    {
+      "glob": "jsv-messages_en_CH.properties"
     },
     {
       "glob": "kotlin/collections/collections.kotlin_builtins"
@@ -2223,6 +2238,9 @@
       "glob": "org/fusesource/jansi/jansi.properties"
     },
     {
+      "glob": "party-assignment-schema-v1.json"
+    },
+    {
       "module": "java.base",
       "glob": "jdk/internal/icu/impl/data/icudt76b/nfc.nrm"
     },
@@ -2262,6 +2280,12 @@
         "en",
         "en-CH",
         "en-US"
+      ]
+    },
+    {
+      "name": "jsv-messages",
+      "locales": [
+        "en-CH"
       ]
     }
   ],
