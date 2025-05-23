@@ -9,6 +9,7 @@ import com.noumenadigital.npl.lang.Loader
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.Source
 import com.noumenadigital.npl.lang.Type
+import java.io.File
 import java.net.URL
 import java.time.Duration
 
@@ -93,12 +94,12 @@ data class CompilerService(
 
                 if (warningCount > 0) {
                     compileResult.warnings.forEach { warning ->
-                        output.warning(warning.description)
+                        output.warning(normalizeWindowsPath(warning.description))
                     }
                 }
 
                 compileResult.errors.forEach { error ->
-                    output.error(error.description)
+                    output.error(normalizeWindowsPath(error.description))
                 }
             }
 
@@ -106,7 +107,7 @@ data class CompilerService(
                 // Only warnings, no errors
                 warningCount = compileResult.warnings.size
                 compileResult.warnings.forEach { warning ->
-                    output.warning(warning.description)
+                    output.warning(normalizeWindowsPath(warning.description))
                 }
 
                 val success = compileResult.throwOnError()
@@ -123,6 +124,18 @@ data class CompilerService(
             protos = protos,
             userDefinedMap = userDefinedMap,
         )
+    }
+
+    private fun normalizeWindowsPath(message: String): String {
+        if (File.separatorChar != '\\') {
+            return message // Only normalize on Windows
+        }
+
+        // Convert /D:/path to D:\path format
+        return message
+            .replace(Regex("/([A-Za-z]):/")) { match ->
+                "${match.groupValues[1]}:\\"
+            }.replace('/', '\\')
     }
 
     data class CompilationResult(

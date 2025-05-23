@@ -78,14 +78,6 @@ data class TestCommand(
 
             coverageAnalyzer.writeSummary(output::info)
 
-            if (showCoverage && File.separatorChar == '\\') {
-                val coverageFile = File(".").canonicalFile.resolve(COVERAGE_FILE)
-                if (coverageFile.exists()) {
-                    val fixed = coverageFile.readText().replace('\\', '/')
-                    coverageFile.writeText(fixed)
-                }
-            }
-
             output.success(
                 "\nNPL test completed successfully in ${
                     Duration.ofNanos(System.nanoTime() - start).toMillis()
@@ -142,7 +134,8 @@ data class TestCommand(
                 explanation =
                     it.tapResult.bailOuts
                         .firstOrNull()
-                        ?.reason,
+                        ?.reason
+                        ?.let { reason -> normalizeWindowsPath(reason) },
                 padding = paddingResult,
             )
         output.error(summary)
@@ -196,7 +189,7 @@ data class TestCommand(
         description: String,
         success: Boolean,
         padding: Int,
-    ) = "'$description' ".padEnd(
+    ) = "'${normalizeWindowsPath(description)}' ".padEnd(
         padding + (if (success) 5 else 4),
         '.',
     )
@@ -204,4 +197,16 @@ data class TestCommand(
     private fun formatFailed(failed: Int) = (if (failed > 0) "($failed)" else "").padEnd(10, ' ')
 
     private fun formatSuccess(success: Boolean) = if (success) "PASS" else "FAIL"
+
+    private fun normalizeWindowsPath(message: String): String {
+        if (File.separatorChar != '\\') {
+            return message // Only normalize on Windows
+        }
+
+        // Convert /D:/path to D:\path format
+        return message
+            .replace(Regex("/([A-Za-z]):/")) { match ->
+                "${match.groupValues[1]}:\\"
+            }.replace('/', '\\')
+    }
 }
