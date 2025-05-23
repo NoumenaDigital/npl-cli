@@ -135,7 +135,7 @@ class PumlCommandIT :
             val file = Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files", "test_iou.npl")
             runCommand(commands = listOf("puml", file.pathString)) {
                 process.waitFor()
-                val expectedOutput = "Source directory does not exist or is not a directory: ${file.pathString}"
+                val expectedOutput = "Source directory does not exist or is not a directory: ${file.pathString}".normalize()
 
                 output.normalize() shouldBe expectedOutput
             }
