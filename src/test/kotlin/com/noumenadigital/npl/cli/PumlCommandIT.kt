@@ -40,7 +40,7 @@ class PumlCommandIT :
 
         fun File.listAllFilesNames() = walk().filter { it.isFile }.map { it.name }.toList()
 
-        fun File.validateContents(contents: String) = contents shouldBe readText()
+        fun File.validateContents(contents: String) = contents shouldBe readText().normalize()
 
         fun File.findFile(
             fileName: String,
