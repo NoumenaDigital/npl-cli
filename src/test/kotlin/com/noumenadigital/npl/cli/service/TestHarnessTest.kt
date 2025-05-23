@@ -10,7 +10,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
 import java.io.File
-import java.io.File.separator
 
 class TestHarnessTest :
     FunSpec({

@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.service
 
 import com.google.common.collect.Multimap
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
+import com.noumenadigital.npl.cli.util.normalizeWindowsPath
 import com.noumenadigital.npl.contrib.NplContribConfiguration
 import com.noumenadigital.npl.lang.CompileFailure
 import com.noumenadigital.npl.lang.CompilerConfiguration
@@ -9,7 +10,6 @@ import com.noumenadigital.npl.lang.Loader
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.Source
 import com.noumenadigital.npl.lang.Type
-import java.io.File
 import java.net.URL
 import java.time.Duration
 
@@ -94,12 +94,12 @@ data class CompilerService(
 
                 if (warningCount > 0) {
                     compileResult.warnings.forEach { warning ->
-                        output.warning(normalizeWindowsPath(warning.description))
+                        output.warning(warning.description.normalizeWindowsPath())
                     }
                 }
 
                 compileResult.errors.forEach { error ->
-                    output.error(normalizeWindowsPath(error.description))
+                    output.error(error.description.normalizeWindowsPath())
                 }
             }
 
@@ -107,7 +107,7 @@ data class CompilerService(
                 // Only warnings, no errors
                 warningCount = compileResult.warnings.size
                 compileResult.warnings.forEach { warning ->
-                    output.warning(normalizeWindowsPath(warning.description))
+                    output.warning(warning.description.normalizeWindowsPath())
                 }
 
                 val success = compileResult.throwOnError()
@@ -124,18 +124,6 @@ data class CompilerService(
             protos = protos,
             userDefinedMap = userDefinedMap,
         )
-    }
-
-    private fun normalizeWindowsPath(message: String): String {
-        if (File.separatorChar != '\\') {
-            return message // Only normalize on Windows
-        }
-
-        // Convert /D:/path to D:\path format
-        return message
-            .replace(Regex("/([A-Za-z]):/")) { match ->
-                "${match.groupValues[1]}:\\"
-            }.replace('/', '\\')
     }
 
     data class CompilationResult(

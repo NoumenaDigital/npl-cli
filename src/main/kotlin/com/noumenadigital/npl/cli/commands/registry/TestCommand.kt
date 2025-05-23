@@ -5,6 +5,7 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.service.TestHarness
+import com.noumenadigital.npl.cli.util.normalizeWindowsPath
 import com.noumenadigital.npl.testing.coverage.CoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.LineCoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.NoCoverageAnalyzer
@@ -107,7 +108,7 @@ data class TestCommand(
         testResults: List<TestHarness.TestHarnessResults>,
         output: ColorWriter,
     ) {
-        val paddingResult = maxOf(testResults.maxOfOrNull { normalizeWindowsPath(it.description).length } ?: 0, MIN_PADDING)
+        val paddingResult = maxOf(testResults.maxOfOrNull { it.description.normalizeWindowsPath().length } ?: 0, MIN_PADDING)
         testResults.forEach {
             val success = !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut()
             if (success) {
@@ -135,7 +136,7 @@ data class TestCommand(
                     it.tapResult.bailOuts
                         .firstOrNull()
                         ?.reason
-                        ?.let { reason -> normalizeWindowsPath(reason) },
+                        ?.normalizeWindowsPath(),
                 padding = paddingResult,
             )
         output.error(summary)
@@ -189,7 +190,7 @@ data class TestCommand(
         description: String,
         success: Boolean,
         padding: Int,
-    ) = "'${normalizeWindowsPath(description)}' ".padEnd(
+    ) = "'${description.normalizeWindowsPath()}' ".padEnd(
         padding + (if (success) 5 else 4),
         '.',
     )
@@ -197,16 +198,4 @@ data class TestCommand(
     private fun formatFailed(failed: Int) = (if (failed > 0) "($failed)" else "").padEnd(10, ' ')
 
     private fun formatSuccess(success: Boolean) = if (success) "PASS" else "FAIL"
-
-    private fun normalizeWindowsPath(message: String): String {
-        if (File.separatorChar != '\\') {
-            return message // Only normalize on Windows
-        }
-
-        // Convert /D:/path to D:\path format
-        return message
-            .replace(Regex("/([A-Za-z]):/")) { match ->
-                "${match.groupValues[1]}:\\"
-            }.replace('/', '\\')
-    }
 }
