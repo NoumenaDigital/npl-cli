@@ -77,6 +77,15 @@ data class TestCommand(
             }
 
             coverageAnalyzer.writeSummary(output::info)
+
+            if (showCoverage && File.separatorChar == '\\') {
+                val coverageFile = File(".").canonicalFile.resolve(COVERAGE_FILE)
+                if (coverageFile.exists()) {
+                    val fixed = coverageFile.readText().replace('\\', '/')
+                    coverageFile.writeText(fixed)
+                }
+            }
+
             output.success(
                 "\nNPL test completed successfully in ${
                     Duration.ofNanos(System.nanoTime() - start).toMillis()
