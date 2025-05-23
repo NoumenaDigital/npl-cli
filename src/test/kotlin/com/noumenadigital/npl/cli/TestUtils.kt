@@ -17,7 +17,18 @@ object TestUtils {
     private fun getNplPath(): String {
         // For running with the binary
         val rootDir = File(".").canonicalFile
-        return rootDir.resolve("target/npl").absolutePath
+        val targetDir = rootDir.resolve("target")
+
+        val candidates =
+            targetDir.listFiles { _, name ->
+                name == "npl" || name.startsWith("npl-")
+            }
+
+        if (!candidates.isNullOrEmpty()) {
+            return candidates.maxByOrNull(File::lastModified)?.absolutePath!!
+        }
+
+        throw IllegalStateException("Cannot locate NPL native binary in ${targetDir.absolutePath}")
     }
 
     private fun getJarPath(): String {
@@ -40,6 +51,8 @@ object TestUtils {
 
     fun String.normalize(withPadding: Boolean = true): String =
         replace("\r\n", "\n")
+            // Normalize path separators to forward slashes
+            .replace('\\', '/')
             // Normalize durations
             .replace(Regex("in \\d+ ms"), "in XXX ms")
             .replace(Regex("\\d+%"), "XXX%")

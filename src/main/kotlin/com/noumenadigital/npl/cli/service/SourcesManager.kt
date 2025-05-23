@@ -12,7 +12,7 @@ class SourcesManager(
         private const val NPL_EXTENSION = ".npl"
     }
 
-    val nplContribLibrary: String = "$projectDirectoryPath/npl-contrib"
+    val nplContribLibrary: String = File(projectDirectoryPath, "npl-contrib").path
 
     fun getNplSources(): List<Source> {
         collectSourcesFromDirectory(projectDirectoryPath).let { sources ->

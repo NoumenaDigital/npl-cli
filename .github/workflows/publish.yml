@@ -95,6 +95,10 @@ jobs:
             arch: aarch64
             output_name: npl-cli-macos-aarch64-${{needs.determine-version.outputs.version}}
             sign_and_notarize: true
+          - os: windows
+            runner: windows-latest
+            arch: x86_64
+            output_name: npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe
 
     steps:
       - name: "Checkout"
@@ -117,6 +121,15 @@ jobs:
             cp target/npl-${{needs.determine-version.outputs.version}} dist/${{ matrix.output_name }}
             chmod +x dist/${{ matrix.output_name }}
           fi
+
+      - name: "Prepare Windows binary for upload"
+        if: matrix.os == 'windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          if (Test-Path target\npl-${{needs.determine-version.outputs.version}}.exe) {
+            Copy-Item target\npl-${{needs.determine-version.outputs.version}}.exe -Destination dist\${{ matrix.output_name }}
+          }
 
       - name: "Sign and Notarize macOS binary"
         if: matrix.sign_and_notarize

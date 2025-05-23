@@ -5,6 +5,7 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.service.TestHarness
+import com.noumenadigital.npl.cli.util.normalizeWindowsPath
 import com.noumenadigital.npl.testing.coverage.CoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.LineCoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.NoCoverageAnalyzer
@@ -77,6 +78,7 @@ data class TestCommand(
             }
 
             coverageAnalyzer.writeSummary(output::info)
+
             output.success(
                 "\nNPL test completed successfully in ${
                     Duration.ofNanos(System.nanoTime() - start).toMillis()
@@ -106,7 +108,7 @@ data class TestCommand(
         testResults: List<TestHarness.TestHarnessResults>,
         output: ColorWriter,
     ) {
-        val paddingResult = maxOf(testResults.maxOfOrNull { it.description.length } ?: 0, MIN_PADDING)
+        val paddingResult = maxOf(testResults.maxOfOrNull { it.description.normalizeWindowsPath().length } ?: 0, MIN_PADDING)
         testResults.forEach {
             val success = !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut()
             if (success) {
@@ -133,7 +135,8 @@ data class TestCommand(
                 explanation =
                     it.tapResult.bailOuts
                         .firstOrNull()
-                        ?.reason,
+                        ?.reason
+                        ?.normalizeWindowsPath(),
                 padding = paddingResult,
             )
         output.error(summary)
@@ -187,7 +190,7 @@ data class TestCommand(
         description: String,
         success: Boolean,
         padding: Int,
-    ) = "'$description' ".padEnd(
+    ) = "'${description.normalizeWindowsPath()}' ".padEnd(
         padding + (if (success) 5 else 4),
         '.',
     )
