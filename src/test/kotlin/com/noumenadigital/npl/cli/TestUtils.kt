@@ -51,6 +51,8 @@ object TestUtils {
 
     fun String.normalize(withPadding: Boolean = true): String =
         replace("\r\n", "\n")
+            // Normalize path separators to forward slashes
+            .replace('\\', '/')
             // Normalize durations
             .replace(Regex("in \\d+ ms"), "in XXX ms")
             .replace(Regex("\\d+%"), "XXX%")

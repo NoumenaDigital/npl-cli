@@ -125,7 +125,7 @@ class OpenapiCommandIT :
 
                         val expectedOutput =
                             """
-                    ${absolutePath}${File.separator}src${File.separator}test${File.separator}npl${File.separator}objects${File.separator}test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod'
+                    $absolutePath/src/test/npl/objects/test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod'
 
                     NPL openapi failed with errors.
                     """.normalize()
@@ -147,9 +147,9 @@ class OpenapiCommandIT :
 
                             val expectedOutput =
                                 """
-                        ${absolutePath}${File.separator}src${File.separator}main${File.separator}npl${File.separator}objects${File.separator}car${File.separator}car.npl: (10, 69) E0002: Unknown 'Vehicle'
-                        ${absolutePath}${File.separator}src${File.separator}main${File.separator}npl${File.separator}objects${File.separator}iou${File.separator}iou.npl: (7, 12) E0002: Unknown 'Color'
-                        ${absolutePath}${File.separator}src${File.separator}main${File.separator}npl${File.separator}objects${File.separator}iou${File.separator}iou.npl: (18, 47) E0002: Unknown 'calculateValue'
+                        $absolutePath/src/main/npl/objects/car/car.npl: (10, 69) E0002: Unknown 'Vehicle'
+                        $absolutePath/src/main/npl/objects/iou/iou.npl: (7, 12) E0002: Unknown 'Color'
+                        $absolutePath/src/main/npl/objects/iou/iou.npl: (18, 47) E0002: Unknown 'calculateValue'
 
                         NPL openapi failed with errors.
                         """.normalize()
@@ -172,9 +172,9 @@ class OpenapiCommandIT :
 
                             val expectedOutput =
                                 """
-                            ${absolutePath}${File.separator}src${File.separator}main${File.separator}npl${File.separator}objects.iou${File.separator}iou.npl: (18, 5) W0019: Public property `payments` should be explicitly typed.
-                            ${absolutePath}${File.separator}src${File.separator}main${File.separator}npl${File.separator}processes${File.separator}demo.npl: (15, 5) W0016: Declared variable `car` unused
-                            ${absolutePath}${File.separator}src${File.separator}main${File.separator}npl${File.separator}processes${File.separator}demo.npl: (16, 5) W0016: Declared variable `iou` unused
+                            $absolutePath/src/main/npl/objects.iou/iou.npl: (18, 5) W0019: Public property `payments` should be explicitly typed.
+                            $absolutePath/src/main/npl/processes/demo.npl: (15, 5) W0016: Declared variable `car` unused
+                            $absolutePath/src/main/npl/processes/demo.npl: (16, 5) W0016: Declared variable `iou` unused
                             Completed compilation for 5 files with 3 warnings in XXX ms
 
                             NPL openapi has compilation warnings
