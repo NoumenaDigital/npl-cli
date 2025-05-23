@@ -53,23 +53,6 @@ data class PumlCommand(
                 }
             }
 
-            // On Windows ensure include paths use backslashes to match expectations
-            if (File.separatorChar == '\\') {
-                outputDir
-                    .walk()
-                    .filter { it.isFile && it.extension.equals("puml", ignoreCase = true) }
-                    .forEach { file ->
-                        val updated =
-                            file
-                                .readText()
-                                .lineSequence()
-                                .joinToString("\n") { line ->
-                                    if (line.trimStart().startsWith("!include ")) line.replace('/', '\\') else line
-                                }
-                        file.writeText(updated)
-                    }
-            }
-
             output.success("Puml diagram generated successfully.")
             return SUCCESS
         } catch (e: CommandExecutionException) {
