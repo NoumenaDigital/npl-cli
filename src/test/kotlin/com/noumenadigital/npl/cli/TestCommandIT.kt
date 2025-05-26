@@ -76,7 +76,7 @@ class TestCommandIT :
                         """.normalize()
 
                         coverageFile.exists() shouldBe true
-                        coverageFile.readText() shouldBe
+                        coverageFile.readText().normalize() shouldBe
                             """
                             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
                             <coverage version="1">
@@ -102,7 +102,7 @@ class TestCommandIT :
                                 </file>
                             </coverage>
 
-                            """.trimIndent()
+                            """.trimIndent().normalize()
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
@@ -134,7 +134,7 @@ class TestCommandIT :
                         """.normalize()
 
                         coverageFile.exists() shouldBe true
-                        coverageFile.readText() shouldBe
+                        coverageFile.readText().normalize() shouldBe
                             """
                             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
                             <coverage version="1">
@@ -160,7 +160,7 @@ class TestCommandIT :
                                 </file>
                             </coverage>
 
-                            """.trimIndent()
+                            """.trimIndent().normalize()
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
