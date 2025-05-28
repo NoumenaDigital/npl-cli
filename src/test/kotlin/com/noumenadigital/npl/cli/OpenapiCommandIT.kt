@@ -228,7 +228,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         rulesDescPath.absolutePathString(),
                                     ),
                             ) {
@@ -261,7 +261,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         rulesDescPath.absolutePathString(),
                                     ),
                             ) {
@@ -295,7 +295,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         relativePath.pathString,
                                     ),
                             ) {
@@ -330,7 +330,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         rulesDescPath.absolutePathString(),
                                     ),
                             ) {
@@ -360,7 +360,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         rulesDescPath.absolutePathString(),
                                     ),
                             ) {
@@ -390,7 +390,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         rulesDescPath.absolutePathString(),
                                     ),
                             ) {
@@ -415,7 +415,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         rulesDescPath.absolutePathString(),
                                     ),
                             ) {
@@ -440,7 +440,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         rulesDescPath.absolutePathString(),
                                     ),
                             ) {
@@ -465,7 +465,7 @@ class OpenapiCommandIT :
                                         "openapi",
                                         "--sourceDir",
                                         absolutePath,
-                                        "--rulesDescriptor",
+                                        "--rules",
                                         rulesDescPath.absolutePathString(),
                                     ),
                             ) {

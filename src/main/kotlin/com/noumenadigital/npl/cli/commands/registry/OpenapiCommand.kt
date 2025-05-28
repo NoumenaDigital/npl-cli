@@ -41,7 +41,7 @@ data class OpenapiCommand(
                 valuePlaceholder = "<directory>",
             ),
             NamedParameter(
-                name = "--rulesDescriptor",
+                name = "--rules",
                 description =
                     "Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system",
                 isRequired = false,
@@ -62,8 +62,8 @@ data class OpenapiCommand(
         }
 
         val srcDir = parsedArgs.getValue("--sourceDir") ?: "."
-        val rulesDescriptor = parsedArgs.getValue("--rulesDescriptor")
-        return OpenapiCommand(srcDir, rulesDescriptor)
+        val rules = parsedArgs.getValue("--rules")
+        return OpenapiCommand(srcDir, rules)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
