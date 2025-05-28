@@ -2288,6 +2288,7 @@
     {
       "name": "jsv-messages",
       "locales": [
+        "en",
         "en-CH",
         "en-US"
       ]
