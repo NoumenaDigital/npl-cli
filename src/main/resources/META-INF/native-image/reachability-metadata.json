@@ -2133,6 +2133,9 @@
       "glob": "jsv-messages_en_CH.properties"
     },
     {
+      "glob": "jsv-messages_en_US.properties"
+    },
+    {
       "glob": "kotlin/collections/collections.kotlin_builtins"
     },
     {
@@ -2285,7 +2288,8 @@
     {
       "name": "jsv-messages",
       "locales": [
-        "en-CH"
+        "en-CH",
+        "en-US"
       ]
     }
   ],
