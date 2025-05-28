@@ -62,11 +62,11 @@ class DeployCommand(
 
         val sourceDirFile = File(sourceDirValue)
         if (!sourceDirFile.exists()) {
-            output.error("Source directory does not exist: ${sourceDirFile.absolutePath}")
+            output.error("Source directory does not exist: $sourceDirValue")
             return ExitCode.GENERAL_ERROR
         }
         if (!sourceDirFile.isDirectory) {
-            output.error("Source path is not a directory: ${sourceDirFile.absolutePath}")
+            output.error("Source path is not a directory: $sourceDirValue")
             return ExitCode.GENERAL_ERROR
         }
 

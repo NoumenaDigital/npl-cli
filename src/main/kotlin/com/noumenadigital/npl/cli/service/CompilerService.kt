@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.service
 
 import com.google.common.collect.Multimap
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
+import com.noumenadigital.npl.cli.util.normalizeWindowsPath
 import com.noumenadigital.npl.contrib.NplContribConfiguration
 import com.noumenadigital.npl.lang.CompileFailure
 import com.noumenadigital.npl.lang.CompilerConfiguration
@@ -93,12 +94,12 @@ data class CompilerService(
 
                 if (warningCount > 0) {
                     compileResult.warnings.forEach { warning ->
-                        output.warning(warning.description)
+                        output.warning(warning.description.normalizeWindowsPath())
                     }
                 }
 
                 compileResult.errors.forEach { error ->
-                    output.error(error.description)
+                    output.error(error.description.normalizeWindowsPath())
                 }
             }
 
@@ -106,7 +107,7 @@ data class CompilerService(
                 // Only warnings, no errors
                 warningCount = compileResult.warnings.size
                 compileResult.warnings.forEach { warning ->
-                    output.warning(warning.description)
+                    output.warning(warning.description.normalizeWindowsPath())
                 }
 
                 val success = compileResult.throwOnError()
