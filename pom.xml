@@ -6,7 +6,7 @@
 
     <groupId>com.noumenadigital.platform</groupId>
     <artifactId>npl-cli</artifactId>
-    <version>2025.1.6</version>
+    <version>2025.1.6-1</version>
 
     <name>NPL CLI</name>
     <description>NPL CLI is a command-line tool designed to interact with the NPL Runtime and NOUMENA Cloud</description>
@@ -290,6 +290,33 @@
                             <environmentVariables>
                                 <TEST_MODE>binary</TEST_MODE>
                             </environmentVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>native-static-linux</id>
+            <activation>
+                <os>
+                    <family>linux</family>
+                </os>
+                <property>
+                    <name>static</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <configuration>
+                            <buildArgs combine.children="append">
+                                <buildArg>--static</buildArg>
+                                <buildArg>--libc=musl</buildArg>
+                            </buildArgs>
                         </configuration>
                     </plugin>
                 </plugins>

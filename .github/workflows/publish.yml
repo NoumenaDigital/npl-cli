@@ -81,24 +81,29 @@ jobs:
             runner: ubuntu-latest
             arch: x86_64
             output_name: npl-cli-linux-x86_64-${{needs.determine-version.outputs.version}}
+            static: true
           - os: ubuntu
             runner: linux-arm-64
             arch: aarch64
             output_name: npl-cli-linux-aarch64-${{needs.determine-version.outputs.version}}
+            static: false
           - os: macos
             runner: macos-13
             arch: x86_64
             output_name: npl-cli-macos-x86_64-${{needs.determine-version.outputs.version}}
             sign_and_notarize: true
+            static: false
           - os: macos
             runner: macos-latest
             arch: aarch64
             output_name: npl-cli-macos-aarch64-${{needs.determine-version.outputs.version}}
             sign_and_notarize: true
+            static: false
           - os: windows
             runner: windows-latest
             arch: x86_64
             output_name: npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe
+            static: false
 
     steps:
       - name: "Checkout"
@@ -111,7 +116,38 @@ jobs:
           java-version: "24"
           cache: "maven"
 
-      - name: "Build npl-cli native binary"
+      - name: "Install musl toolchain and build static zlib"
+        if: matrix.static == true
+        run: |
+          # Install musl toolchain
+          sudo apt-get update
+          sudo apt-get install -y musl musl-dev musl-tools build-essential wget
+
+          # Build zlib statically with musl
+          cd /tmp
+          wget https://zlib.net/zlib-1.3.1.tar.gz
+          tar -xzf zlib-1.3.1.tar.gz
+          cd zlib-1.3.1
+
+          # Configure and build zlib with musl
+          CC=musl-gcc ./configure --static --prefix=/usr/local/musl
+          make
+          sudo make install
+
+          # Create symlink for the linker to find it
+          sudo mkdir -p /usr/lib/x86_64-linux-musl
+          sudo ln -sf /usr/local/musl/lib/libz.a /usr/lib/x86_64-linux-musl/libz.a
+
+          # Verify installation
+          echo "Checking for musl zlib:"
+          ls -la /usr/lib/x86_64-linux-musl/libz.a
+
+      - name: "Build npl-cli native binary (static linking)"
+        if: matrix.static == true
+        run: mvn -Pnative,native-static-linux -Dstatic=true package -DskipTests
+
+      - name: "Build npl-cli native binary (standard/dynamic linking)"
+        if: matrix.static == false
         run: mvn -Pnative package -DskipTests
 
       - name: "Prepare binary for upload"
