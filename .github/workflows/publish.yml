@@ -115,6 +115,7 @@ jobs:
         run: mvn -Pnative package -DskipTests
 
       - name: "Prepare binary for upload"
+        if: matrix.os != 'windows'
         run: |
           mkdir -p dist
           if [ -f target/npl-${{needs.determine-version.outputs.version}} ]; then
