@@ -41,7 +41,8 @@ class CommandProcessorServiceTest :
                                  --sourceDir <directory>  Source directory containing NPL tests to run (defaults to current directory)
                                  --coverage  Report test coverage details (printed to console as well as coverage.xml)
                     openapi    Generate the openapi specifications of NPL api
-                                 <directory>  Source directory containing NPL protocols (defaults to current directory)
+                                 --sourceDir <directory>  Source directory containing NPL protocols (defaults to current directory)
+                                 --rules <rules descriptor path>  Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system
                     puml       Generate a puml diagram from source in the given directory
                                  <directory>  Source directory containing NPL protocols (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance

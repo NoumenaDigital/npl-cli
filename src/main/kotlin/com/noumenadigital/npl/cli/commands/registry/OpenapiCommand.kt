@@ -5,18 +5,27 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.ProtocolProto
+import com.noumenadigital.npl.lang.Type
+import com.noumenadigital.npl.naming.TaggerUtils.untagged
+import com.noumenadigital.npl.party.assignment.models.PartyAssignments
+import com.noumenadigital.npl.party.assignment.parsing.PartyAssignmentRulesParser.parseYamlString
+import com.noumenadigital.npl.party.assignment.validation.PartyAssignmentRulesValidator
 import com.noumenadigital.platform.nplapi.ApiConfiguration
 import com.noumenadigital.platform.nplapi.openapi.OpenAPIGenerator
 import io.swagger.v3.core.util.Yaml
+import java.io.File
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.notExists
 
 data class OpenapiCommand(
     private val srcDir: String = ".",
+    private val ruleDescriptorPath: String? = null,
     private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir)),
 ) : CommandExecutor {
     override val commandName: String = "openapi"
@@ -24,11 +33,19 @@ data class OpenapiCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            PositionalParameter(
-                name = "directory",
+            NamedParameter(
+                name = "--sourceDir",
                 description = "Source directory containing NPL protocols",
                 defaultValue = ".",
                 isRequired = false,
+                valuePlaceholder = "<directory>",
+            ),
+            NamedParameter(
+                name = "--rules",
+                description =
+                    "Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system",
+                isRequired = false,
+                valuePlaceholder = "<rules descriptor path>",
             ),
         )
 
@@ -38,13 +55,41 @@ data class OpenapiCommand(
     }
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val srcDir =
-            params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: CURRENT_DIRECTORY
-        return OpenapiCommand(srcDir = srcDir)
+        val parsedArgs = parseParams(params)
+
+        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+        }
+
+        val srcDir = parsedArgs.getValue("--sourceDir") ?: "."
+        val rules = parsedArgs.getValue("--rules")
+        return OpenapiCommand(srcDir, rules)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
+            val sourcePath = Paths.get(srcDir)
+            if (sourcePath.notExists()) {
+                output.error("Source directory does not exist: $srcDir")
+                return ExitCode.USAGE_ERROR
+            }
+
+            val partyAssignments =
+                ruleDescriptorPath?.let {
+                    val file = File(it)
+                    if (it.isBlank() || !file.exists() || file.isDirectory) {
+                        output.error("Rules descriptor is invalid, blank or does not exist: $it")
+                        return ExitCode.USAGE_ERROR
+                    }
+
+                    try {
+                        parseYamlString(file.readText()).toPartyAssignments()
+                    } catch (e: Exception) {
+                        output.error("Failed while parsing the party automation rules: ${e.message}")
+                        return ExitCode.GENERAL_ERROR
+                    }
+                } ?: PartyAssignments()
+
             val compilationResult = compilerService.compileAndReport(output = output)
             if (compilationResult.hasErrors) {
                 output.error("NPL openapi failed with errors.")
@@ -75,7 +120,14 @@ data class OpenapiCommand(
                         throw CommandExecutionException("Failed to run openapi generation", e)
                     }
 
-                val openApi = apiGen.generate(protocols)
+                try {
+                    validatePartyRules(partyAssignments, compilationResult.protos)
+                } catch (e: Exception) {
+                    output.error("Failed while validating the Party automation rules: ${e.message}")
+                    return ExitCode.GENERAL_ERROR
+                }
+
+                val openApi = apiGen.generate(protocols, partyAssignments)
                 val packageName = packagePath.removePrefix().replace("/", ".")
 
                 writeToFile(
@@ -92,6 +144,24 @@ data class OpenapiCommand(
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
         }
     }
+
+    private fun validatePartyRules(
+        rules: PartyAssignments,
+        allProtos: List<Proto<Type>?>,
+    ) {
+        val protosMap = allProtos.filterIsInstance<ProtocolProto>().associateBy { it.protoId.toString().untagged() }
+
+        rules.ruleSet.forEach { rule ->
+            val proto = protosMap[rule.untaggedPrototypeId.toString()]
+
+            if (proto == null) {
+                error("No matching prototype found matching [" + rule.untaggedPrototypeId + "]")
+            }
+            PartyAssignmentRulesValidator.validateParties(rule, proto.actualType.parties)
+        }
+    }
+
+    private fun parseParams(args: List<String>) = CommandArgumentParser().parse(args, parameters)
 
     private fun String.removePrefix(): String = removePrefix("/")
 
