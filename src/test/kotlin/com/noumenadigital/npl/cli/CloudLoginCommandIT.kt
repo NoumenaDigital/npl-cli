@@ -4,15 +4,24 @@ import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import okhttp3.mockwebserver.MockWebServer
 
 class CloudLoginCommandIT :
     FunSpec({
-        class TestContext
+
+        class TestContext {
+            lateinit var mockKeyCloakServer: MockWebServer
+        }
 
         fun withTestContext(test: TestContext.() -> Unit) {
             val context =
                 TestContext()
-            context.test()
+            try {
+                System.setProperty(IS_BROWSER_CAN_BE_OPENED_FROM_CLI, "true")
+                context.test()
+            } finally {
+                System.setProperty(IS_BROWSER_CAN_BE_OPENED_FROM_CLI, "false")
+            }
         }
 
         context("success") {
@@ -35,4 +44,8 @@ class CloudLoginCommandIT :
                 }
             }
         }
-    })
+    }) {
+    companion object {
+        const val IS_BROWSER_CAN_BE_OPENED_FROM_CLI = "java.awt.headless"
+    }
+}
