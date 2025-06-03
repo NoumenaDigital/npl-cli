@@ -1,9 +1,10 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
+import com.noumenadigital.npl.cli.commands.CommandParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 
-sealed interface CommandExecutor {
+interface CommandExecutor {
     val commandName: String
     val description: String
 

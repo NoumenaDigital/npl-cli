@@ -1,27 +1,15 @@
 package com.noumenadigital.npl.cli.commands
 
-import com.noumenadigital.npl.cli.commands.registry.CheckCommand
-import com.noumenadigital.npl.cli.commands.registry.CloudCommand
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
-import com.noumenadigital.npl.cli.commands.registry.DeployCommand
-import com.noumenadigital.npl.cli.commands.registry.HelpCommand
-import com.noumenadigital.npl.cli.commands.registry.OpenapiCommand
-import com.noumenadigital.npl.cli.commands.registry.PumlCommand
-import com.noumenadigital.npl.cli.commands.registry.TestCommand
-import com.noumenadigital.npl.cli.commands.registry.VersionCommand
+import com.noumenadigital.npl.cli.commands.registry.cloud.CloudHelpCommand
+import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLoginCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 
-enum class Commands(
+enum class CloudCommands(
     private val commandExecutorFactory: () -> CommandExecutor,
 ) {
-    VERSION({ VersionCommand }),
-    HELP({ HelpCommand() }),
-    CHECK({ CheckCommand() }),
-    TEST({ TestCommand() }),
-    OPENAPI({ OpenapiCommand() }),
-    PUML({ PumlCommand() }),
-    DEPLOY({ DeployCommand() }),
-    CLOUD({ CloudCommand() }),
+    LOGIN({ CloudLoginCommand() }),
+    CLOUD_HELP({ CloudHelpCommand }),
     ;
 
     val commandName: String

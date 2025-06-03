@@ -51,6 +51,9 @@
         <main.class>com.noumenadigital.npl.cli.MainKt</main.class>
         <swagger-parser-v3.version>2.1.26</swagger-parser-v3.version>
         <mockwebserver.version>4.12.0</mockwebserver.version>
+        <ktor-client-core.version>3.1.3</ktor-client-core.version>
+        <keycloak-authz-client.version>26.0.5</keycloak-authz-client.version>
+        <httpclient.version>4.5.14</httpclient.version>
     </properties>
 
     <dependencies>
@@ -104,6 +107,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
         </dependency>
 
         <!-- Test dependencies -->

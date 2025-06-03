@@ -1,8 +1,9 @@
 package com.noumenadigital.npl.cli
 
-import com.noumenadigital.npl.cli.commands.registry.CommandsParser
+import com.noumenadigital.npl.cli.commands.CommandsParser
 import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
+import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
@@ -51,6 +52,11 @@ class CommandProcessor(
                     is AuthorizationFailedException -> {
                         output.error(ex.buildOutputMessage())
                         return ExitCode.CONFIG_ERROR
+                    }
+
+                    is CloudCommandException -> {
+                        output.error(ex.buildOutputMessage())
+                        return ExitCode.GENERAL_ERROR
                     }
                 }
             } catch (ex: Exception) {

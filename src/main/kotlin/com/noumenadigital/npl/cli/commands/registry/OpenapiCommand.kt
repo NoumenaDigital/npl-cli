@@ -1,6 +1,9 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.CommandParameter
+import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
@@ -161,7 +164,7 @@ data class OpenapiCommand(
         }
     }
 
-    private fun parseParams(args: List<String>) = CommandArgumentParser().parse(args, parameters)
+    private fun parseParams(args: List<String>) = CommandArgumentParser.parse(args, parameters)
 
     private fun String.removePrefix(): String = removePrefix("/")
 
