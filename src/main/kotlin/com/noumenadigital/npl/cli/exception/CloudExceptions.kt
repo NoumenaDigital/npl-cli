@@ -9,3 +9,7 @@ open class CloudCommandException(
 class CloudAuthorizationPendingException : CloudCommandException()
 
 class CloudSlowDownException : CloudCommandException()
+
+class CloudRestCallException(
+    override val message: String?,
+) : CloudCommandException()

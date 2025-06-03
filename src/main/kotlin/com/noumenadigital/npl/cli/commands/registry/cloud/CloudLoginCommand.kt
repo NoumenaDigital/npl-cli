@@ -32,10 +32,10 @@ class CloudLoginCommand(
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "--serverUrl",
+                name = "--baseUrl",
                 description = "Noumena Cloud Auth URL",
                 isRequired = false,
-                valuePlaceholder = "<serverUrl>",
+                valuePlaceholder = "<baseUrl>",
             ),
             NamedParameter(
                 name = "--realm",
@@ -67,7 +67,7 @@ class CloudLoginCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             authManager?.login(output)
-            output.success("Successfully logged in to Noumena Cloud. Access token stored.")
+            output.success("Successfully logged in to Noumena Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
             throw CloudCommandException(ex.message, ex, "cloud login")

@@ -247,6 +247,59 @@
       ]
     },
     {
+      "type": "com.noumenadigital.npl.cli.model.DeviceCodeResponse",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.model.TokenResponse",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.Number",
+            "java.lang.Number",
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "getAccessToken",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExpiresIn",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRefreshExpiresIn",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRefreshToken",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTokenType",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.noumenadigital.platform.api.models.ApiModelError",
       "allDeclaredFields": true,
       "allDeclaredMethods": true,
@@ -1447,6 +1500,9 @@
       ]
     },
     {
+      "type": "kotlin.Number"
+    },
+    {
       "type": "kotlin.SafePublicationLazyImpl",
       "fields": [
         {
@@ -1921,6 +1977,15 @@
       ]
     },
     {
+      "type": "sun.security.ssl.SSLContextImpl$TLSContext",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
       "methods": [
         {
@@ -2249,7 +2314,31 @@
     },
     {
       "module": "java.base",
+      "glob": "sun/launcher/resources/launcher_en.properties"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/launcher/resources/launcher_en_US.properties"
+    },
+    {
+      "module": "java.base",
       "glob": "sun/net/www/content-types.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awt_en.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awt_en_US.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awtosx_en.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awtosx_en_US.properties"
     },
     {
       "module": "java.xml",
@@ -2292,9 +2381,46 @@
         "en-CH",
         "en-US"
       ]
+    },
+    {
+      "name": "sun.awt.resources.awt",
+      "locales": [
+        "en-US"
+      ]
+    },
+    {
+      "name": "sun.awt.resources.awtosx",
+      "locales": [
+        "en-US"
+      ]
     }
   ],
   "jni": [
+    {
+      "type": "com.apple.eawt._AppEventHandler",
+      "methods": [
+        {
+          "name": "handleNativeNotification",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.apple.eawt._AppMenuBarHandler",
+      "methods": [
+        {
+          "name": "initMenuStates",
+          "parameterTypes": [
+            "boolean",
+            "boolean",
+            "boolean",
+            "boolean"
+          ]
+        }
+      ]
+    },
     {
       "type": "com.noumenadigital.npl.cli.MainKt",
       "methods": [
@@ -2303,6 +2429,15 @@
           "parameterTypes": [
             "java.lang.String[]"
           ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.event.InputEvent",
+      "methods": [
+        {
+          "name": "getButtonDownMasks",
+          "parameterTypes": []
         }
       ]
     },
@@ -2339,6 +2474,12 @@
       "methods": [
         {
           "name": "getProperty",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "load",
           "parameterTypes": [
             "java.lang.String"
           ]
@@ -2463,6 +2604,28 @@
           "parameterTypes": [
             "java.lang.String"
           ]
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.AWTAutoShutdown",
+      "methods": [
+        {
+          "name": "notifyToolkitThreadBusy",
+          "parameterTypes": []
+        },
+        {
+          "name": "notifyToolkitThreadFree",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.lwawt.macosx.LWCToolkit",
+      "methods": [
+        {
+          "name": "installToolkitThreadInJava",
+          "parameterTypes": []
         }
       ]
     }

@@ -1,51 +1,148 @@
 package com.noumenadigital.npl.cli
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.model.TokenResponse
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import okhttp3.mockwebserver.Dispatcher
+import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
+import java.io.File
 
 class CloudLoginCommandIT :
     FunSpec({
 
         class TestContext {
-            lateinit var mockKeyCloakServer: MockWebServer
+            val objectMapper = jacksonObjectMapper()
+            var mockOidc: MockWebServer = MockWebServer()
+
+            fun readTempFile(): TokenResponse =
+                objectMapper.readValue(
+                    File(System.getProperty("user.home")).resolve(".noumena").resolve("npl.json"),
+                    TokenResponse::class.java,
+                )
+
+            fun setupMockServers(refreshTokenToVerify: String) {
+                mockOidc.start()
+
+                mockOidc.dispatcher =
+                    object : Dispatcher() {
+                        override fun dispatch(request: RecordedRequest): MockResponse {
+                            when (request.path) {
+                                "/realms/paas/protocol/openid-connect/auth/device" -> {
+                                    return MockResponse()
+                                        .setResponseCode(200)
+                                        .setHeader("Content-Type", "application/json")
+                                        .setBody(
+                                            """
+                                            {
+                                              "device_code": "mock-device-code",
+                                              "user_code": "mock-user-code",
+                                              "verification_uri": "https://verification-uri.com",
+                                              "verification_uri_complete": "verification-uri-complete",
+                                              "expires_in": 600,
+                                              "interval": 5
+                                            }
+                                            """.trimIndent(),
+                                        )
+                                }
+
+                                "/realms/paas/protocol/openid-connect/token" -> {
+                                    return MockResponse()
+                                        .setResponseCode(200)
+                                        .setHeader("Content-Type", "application/json")
+                                        .setBody(
+                                            """
+                                            {
+                                                "access_token": "mock-access-token",
+                                                "refresh_token": "$refreshTokenToVerify",
+                                                "token_type": "bearer",
+                                                "expires_in": 3600
+                                            }
+                                            """.trimIndent(),
+                                        )
+                                }
+                            }
+                            return MockResponse().setResponseCode(404)
+                        }
+                    }
+            }
+
+            fun cleanupMockServers() {
+                mockOidc.shutdown()
+            }
         }
 
-        fun withTestContext(test: TestContext.() -> Unit) {
+        fun withTestContext(
+            refreshTokenToVerify: String,
+            test: TestContext.() -> Unit,
+        ) {
             val context =
                 TestContext()
             try {
-                System.setProperty(IS_BROWSER_CAN_BE_OPENED_FROM_CLI, "true")
+                System.setProperty(NPL_CLI_BROWSER_DISABLED, "true")
+                context.setupMockServers(refreshTokenToVerify = refreshTokenToVerify)
                 context.test()
             } finally {
-                System.setProperty(IS_BROWSER_CAN_BE_OPENED_FROM_CLI, "false")
+                context.cleanupMockServers()
+                File(System.getProperty("user.home")).resolve(".noumena").deleteRecursively()
             }
         }
 
         context("success") {
             test("cloud login") {
-                withTestContext {
+                val refreshTokenToVerify = "success-refresh-token"
+                withTestContext(refreshTokenToVerify) {
                     runCommand(
-                        commands = listOf("cloud", "login"),
+                        commands = listOf("cloud", "login", "--baseUrl", "${mockOidc.url("")}"),
+                        env =
+                            mapOf(
+                                NPL_CLI_BROWSER_DISABLED to "true",
+                            ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
                             """
-                                Completed compilation for 1 file in XXX ms
-
-                                No NPL protocols found in the target directory.
-                                """.normalize()
+                            Please open the following URL in your browser: https://verification-uri.com
+                            Successfully logged in to Noumena Cloud.
+                            """.normalize()
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        refreshTokenToVerify shouldBe readTempFile().refreshToken
+                    }
+                }
+            }
+        }
+
+        context("error") {
+            test("wrong base url") {
+                val refreshTokenToVerify = "success-refresh-token"
+                withTestContext(refreshTokenToVerify) {
+                    runCommand(
+                        commands = listOf("cloud", "login", "--baseUrl", "nonexistent-url"),
+                        env =
+                            mapOf(
+                                NPL_CLI_BROWSER_DISABLED to "true",
+                            ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
+                            Command cloud login failed: Target host is not specified
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                     }
                 }
             }
         }
     }) {
     companion object {
-        const val IS_BROWSER_CAN_BE_OPENED_FROM_CLI = "java.awt.headless"
+        private const val NPL_CLI_BROWSER_DISABLED = "NPL_CLI_BROWSER_DISABLED"
     }
 }
