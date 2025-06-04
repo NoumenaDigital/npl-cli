@@ -10,6 +10,7 @@ import com.noumenadigital.npl.cli.http.NoumenaCloudClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudConfig
 import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.ColorWriter
+import kotlinx.coroutines.runBlocking
 
 class CloudLoginCommand(
     private val authManager: CloudAuthManager? = null,
@@ -66,7 +67,7 @@ class CloudLoginCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            authManager?.login(output)
+            runBlocking { authManager?.login(output) }
             output.success("Successfully logged in to Noumena Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {

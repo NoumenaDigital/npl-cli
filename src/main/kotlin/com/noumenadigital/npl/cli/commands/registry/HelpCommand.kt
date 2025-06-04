@@ -11,20 +11,21 @@ open class HelpCommand : CommandExecutor {
     override val description: String = "Display the description for npl-cli commands"
 
     override fun execute(output: ColorWriter): ExitCode {
-        val entries = Commands.entries
-        val commandPadding = entries.maxOf { it.commandName.length } + 4
+        printHelp(Commands.entries.map { it.commandExecutorFactory() }, output)
+        return ExitCode.SUCCESS
+    }
 
+    protected fun printHelp(
+        entries: List<CommandExecutor>,
+        output: ColorWriter,
+    ) {
+        val commandPadding = entries.maxOf { it.commandName.length } + 4
         entries.forEach { command ->
-            // Print command name and description
             val name = command.commandName.padEnd(commandPadding)
             output.info("$name${command.description}")
-
-            // Display parameter descriptions if any
-            val executor = Commands.commandFromString(command.commandName)
+            val executor = command
             executor.parameters.forEach { param ->
                 val paramIndent = " ".repeat(commandPadding + 2)
-
-                // Format parameter details
                 val requiredMark = if (param.isRequired) " (required)" else ""
                 val defaultValue = param.defaultValue
                 val defaultText =
@@ -33,7 +34,6 @@ open class HelpCommand : CommandExecutor {
                         defaultValue != null -> " (defaults to $defaultValue)"
                         else -> ""
                     }
-
                 val formattedName =
                     when (param) {
                         is NamedParameter -> {
@@ -46,11 +46,8 @@ open class HelpCommand : CommandExecutor {
 
                         is PositionalParameter -> "<${param.name}>"
                     }
-
                 output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
             }
         }
-
-        return ExitCode.SUCCESS
     }
 }

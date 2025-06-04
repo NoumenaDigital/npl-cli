@@ -7,33 +7,31 @@ import com.noumenadigital.npl.cli.http.NoumenaCloudClient
 import com.noumenadigital.npl.cli.model.DeviceCodeResponse
 import com.noumenadigital.npl.cli.model.TokenResponse
 import com.noumenadigital.npl.cli.util.IOUtils
+import kotlinx.coroutines.delay
 import java.nio.file.Path
 import kotlin.io.path.Path
 
 class CloudAuthManager(
-    val noumenaCloudClient: NoumenaCloudClient,
-    val jsonFilePath: Path = Path(System.getProperty("user.home"), ".noumena", "npl.json"),
+    private val noumenaCloudClient: NoumenaCloudClient,
+    private val jsonFilePath: Path = Path(System.getProperty("user.home"), ".noumena", "noumena.yaml"),
 ) {
-    fun login(output: ColorWriter) {
+    suspend fun login(output: ColorWriter) {
         val deviceCode = noumenaCloudClient.requestDeviceCode()
         openBrowser(deviceCode.verificationUri, output)
-        val token = pollForToken(deviceCode, output)
+        output.info("Please use the following code to complete authentication in your browser: ${deviceCode.userCode}")
+        val token = pollForToken(deviceCode)
         IOUtils.writeObjectToFile(jsonFilePath.toFile(), token)
     }
 
-    fun pollForToken(
-        deviceCode: DeviceCodeResponse,
-        output: ColorWriter,
-    ): TokenResponse {
-        val intervalMillis = deviceCode.interval * 1000L
-        var currentInterval = intervalMillis
-        val maxExpiry = System.currentTimeMillis() + deviceCode.expiresIn * 1000L
+    private suspend fun pollForToken(deviceCode: DeviceCodeResponse): TokenResponse {
+        val baseInterval = deviceCode.interval * 1_000L
+        var currentInterval = baseInterval
+        val maxExpiry = System.currentTimeMillis() + deviceCode.expiresIn * 1_000L
 
         while (true) {
             try {
-                return noumenaCloudClient.requestToken(deviceCode) // return if successful
+                return noumenaCloudClient.requestToken(deviceCode)
             } catch (e: CloudAuthorizationPendingException) {
-                // continue polling
             } catch (e: CloudSlowDownException) {
                 currentInterval += 1000
             } catch (e: RuntimeException) {
@@ -41,10 +39,10 @@ class CloudAuthManager(
             }
 
             if (System.currentTimeMillis() > maxExpiry) {
-                throw CloudCommandException("Device flow expired, please try again")
+                throw CloudCommandException("Device flow expired, please try again.")
             }
 
-            Thread.sleep(currentInterval)
+            delay(currentInterval)
         }
     }
 
@@ -55,17 +53,16 @@ class CloudAuthManager(
         if (shouldOpenBrowser()) {
             if (tryOpenBrowser(url)) {
                 output.info("Opened browser to: $url")
-                return
             }
+        } else {
+            output.info("Please open the following URL in your browser: $url")
         }
-        output.info("Please open the following URL in your browser: $url")
     }
 
     private fun shouldOpenBrowser(): Boolean =
         (
-            System.getProperty("NPL_CLI_BROWSER_DISABLED")?.lowercase() ?: System
-                .getenv("NPL_CLI_BROWSER_DISABLED")
-                ?.lowercase()
+            System.getProperty("NPL_CLI_BROWSER_DISABLED")?.lowercase()
+                ?: System.getenv("NPL_CLI_BROWSER_DISABLED")?.lowercase()
         ) != "true"
 
     private fun tryOpenBrowser(url: String): Boolean {

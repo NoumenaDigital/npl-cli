@@ -6,4 +6,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class TokenResponse(
     @JsonProperty("refresh_token") val refreshToken: String,
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) val accessToken: String? = null,
 )

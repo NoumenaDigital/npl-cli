@@ -1,6 +1,8 @@
 package com.noumenadigital.npl.cli
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import com.noumenadigital.npl.cli.model.TokenResponse
@@ -16,12 +18,12 @@ class CloudLoginCommandIT :
     FunSpec({
 
         class TestContext {
-            val objectMapper = jacksonObjectMapper()
+            val objectMapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
             var mockOidc: MockWebServer = MockWebServer()
 
             fun readTempFile(): TokenResponse =
                 objectMapper.readValue(
-                    File(System.getProperty("user.home")).resolve(".noumena").resolve("npl.json"),
+                    File(System.getProperty("user.home")).resolve(".noumena").resolve("noumena.yaml"),
                     TokenResponse::class.java,
                 )
 
@@ -107,6 +109,7 @@ class CloudLoginCommandIT :
                         val expectedOutput =
                             """
                             Please open the following URL in your browser: https://verification-uri.com
+                            Please use the following code to complete authentication in your browser: mock-user-code
                             Successfully logged in to Noumena Cloud.
                             """.normalize()
 

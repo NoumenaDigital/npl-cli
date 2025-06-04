@@ -21,7 +21,7 @@ data class NoumenaCloudConfig(
     val realm: String,
 )
 
-class NoumenaCloudClient(
+open class NoumenaCloudClient(
     config: NoumenaCloudConfig,
 ) {
     private val clientId = config.clientId
@@ -31,67 +31,67 @@ class NoumenaCloudClient(
     private val keycloakUrl = "$baseUrl/realms/$realm/protocol/openid-connect"
     private val deviceGrantType = "urn:ietf:params:oauth:grant-type:device_code"
     private val scope = "openid offline_access"
-    val objectMapper = jacksonObjectMapper()
+    private val objectMapper = jacksonObjectMapper()
+    private val client = HttpClients.createDefault() // ✅ Reuse this
 
-    fun requestDeviceCode(): DeviceCodeResponse {
+    open fun requestDeviceCode(): DeviceCodeResponse {
         try {
-            val client = HttpClients.createDefault()
             val httpPost = HttpPost("$keycloakUrl/auth/device")
-
-            val params =
-                listOf(
-                    BasicNameValuePair("client_id", clientId),
-                    BasicNameValuePair("scope", "openid"),
+            httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded")
+            httpPost.entity =
+                UrlEncodedFormEntity(
+                    listOf(
+                        BasicNameValuePair("client_id", clientId),
+                        BasicNameValuePair("scope", "openid"),
+                    ),
                 )
-            httpPost.entity = UrlEncodedFormEntity(params)
 
             client.execute(httpPost).use { response ->
-                val json = EntityUtils.toString(response.entity)
+                val entity = response.entity ?: throw CloudRestCallException("Empty response entity")
+                val json = EntityUtils.toString(entity)
                 if (response.statusLine.statusCode != 200) {
                     throw CloudRestCallException("Error: ${response.statusLine.statusCode} - $json")
                 }
                 return objectMapper.readValue(json)
             }
         } catch (ex: Exception) {
-            throw CloudRestCallException("${ex.message ?: ex.cause?.message}")
+            throw CloudRestCallException(ex.message ?: ex.cause?.message ?: "Unknown error")
         }
     }
 
-    fun requestToken(deviceCode: DeviceCodeResponse): TokenResponse {
-        try {
-            val client = HttpClients.createDefault()
-            val httpPost = HttpPost("$keycloakUrl/token")
-
-            val params =
+    open fun requestToken(deviceCode: DeviceCodeResponse): TokenResponse {
+        val httpPost = HttpPost("$keycloakUrl/token")
+        httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded")
+        httpPost.entity =
+            UrlEncodedFormEntity(
                 listOf(
                     BasicNameValuePair("client_id", clientId),
                     BasicNameValuePair("grant_type", deviceGrantType),
                     BasicNameValuePair("device_code", deviceCode.deviceCode),
                     BasicNameValuePair("client_secret", clientSecret),
                     BasicNameValuePair("scope", scope),
-                )
-            httpPost.entity = UrlEncodedFormEntity(params)
-            httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded")
+                ),
+            )
 
-            client.execute(httpPost).use { response ->
-                val json = EntityUtils.toString(response.entity)
+        client.execute(httpPost).use { response ->
+            val entity = response.entity ?: throw CloudRestCallException("Empty response entity")
+            val json = EntityUtils.toString(entity)
 
-                if (response.statusLine.statusCode == 200) {
-                    return objectMapper.readValue(json)
-                } else {
+            return when (response.statusLine.statusCode) {
+                200 -> objectMapper.readValue(json)
+                400 -> {
                     val node = objectMapper.readTree(json)
                     when (node["error"]?.asText()?.lowercase()) {
                         "authorization_pending" -> throw CloudAuthorizationPendingException()
                         "slow_down" -> throw CloudSlowDownException()
-                        else -> {
-                            val message = node["error_description"]?.asText() ?: "Authorization failed"
-                            throw CloudCommandException(message)
-                        }
+                        else -> throw CloudCommandException(
+                            node["error_description"]?.asText() ?: "Authorization failed",
+                        )
                     }
                 }
+
+                else -> throw CloudRestCallException("Error: ${response.statusLine.statusCode} - $json")
             }
-        } catch (ex: Exception) {
-            throw CloudRestCallException("${ex.message ?: ex.cause?.message}")
         }
     }
 }
