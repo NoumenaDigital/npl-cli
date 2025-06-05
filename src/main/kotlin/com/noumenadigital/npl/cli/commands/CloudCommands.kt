@@ -17,7 +17,7 @@ enum class CloudCommands(
             command: String,
             params: List<String> = emptyList(),
         ): CommandExecutor {
-            val normalizedCommand = command.lowercase()
+            val normalizedCommand = "cloud ${command.lowercase()}"
             val matchedCommand =
                 CloudCommands.entries.find { it.commandName.equals(normalizedCommand, ignoreCase = true) }
                     ?: throw CommandNotFoundException(normalizedCommand)

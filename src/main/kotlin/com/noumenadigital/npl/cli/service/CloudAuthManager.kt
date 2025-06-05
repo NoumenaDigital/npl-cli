@@ -17,8 +17,7 @@ class CloudAuthManager(
 ) {
     suspend fun login(output: ColorWriter) {
         val deviceCode = noumenaCloudClient.requestDeviceCode()
-        openBrowser(deviceCode.verificationUri, output)
-        output.info("Please use the following code to complete authentication in your browser: ${deviceCode.userCode}")
+        openBrowser(deviceCode.verificationUriComplete, output)
         val token = pollForToken(deviceCode)
         IOUtils.writeObjectToFile(jsonFilePath.toFile(), token)
     }
@@ -52,7 +51,7 @@ class CloudAuthManager(
     ) {
         if (shouldOpenBrowser()) {
             if (tryOpenBrowser(url)) {
-                output.info("Opened browser to: $url")
+                output.info("Attempted to open $url in your browser. If the link was not opened, please open it manually.")
             }
         } else {
             output.info("Please open the following URL in your browser: $url")

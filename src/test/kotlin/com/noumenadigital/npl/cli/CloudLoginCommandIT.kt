@@ -99,7 +99,7 @@ class CloudLoginCommandIT :
                 val refreshTokenToVerify = "success-refresh-token"
                 withTestContext(refreshTokenToVerify) {
                     runCommand(
-                        commands = listOf("cloud", "login", "--baseUrl", "${mockOidc.url("")}"),
+                        commands = listOf("cloud", "login", "--url", "${mockOidc.url("/realms/paas/")}"),
                         env =
                             mapOf(
                                 NPL_CLI_BROWSER_DISABLED to "true",
@@ -108,9 +108,8 @@ class CloudLoginCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Please open the following URL in your browser: https://verification-uri.com
-                            Please use the following code to complete authentication in your browser: mock-user-code
-                            Successfully logged in to Noumena Cloud.
+                            Please open the following URL in your browser: verification-uri-complete
+                            Successfully logged in to NOUMENA Cloud.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -126,7 +125,7 @@ class CloudLoginCommandIT :
                 val refreshTokenToVerify = "success-refresh-token"
                 withTestContext(refreshTokenToVerify) {
                     runCommand(
-                        commands = listOf("cloud", "login", "--baseUrl", "nonexistent-url"),
+                        commands = listOf("cloud", "login", "--url", "nonexistent-url"),
                         env =
                             mapOf(
                                 NPL_CLI_BROWSER_DISABLED to "true",

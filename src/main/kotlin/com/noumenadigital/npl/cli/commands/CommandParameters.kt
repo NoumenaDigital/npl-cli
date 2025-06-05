@@ -5,6 +5,7 @@ sealed interface CommandParameter {
     val description: String
     val defaultValue: String?
     val isRequired: Boolean
+    val isHidden: Boolean
 }
 
 data class NamedParameter(
@@ -12,7 +13,8 @@ data class NamedParameter(
     override val description: String,
     override val defaultValue: String? = null,
     override val isRequired: Boolean = false,
-    val valuePlaceholder: String? = null, // e.g., "<value>"
+    override val isHidden: Boolean = false,
+    val valuePlaceholder: String? = null,
 ) : CommandParameter {
     init {
         require(name.startsWith("--")) { "Named parameters must start with '--'" }
@@ -26,6 +28,7 @@ data class PositionalParameter(
     override val description: String,
     override val defaultValue: String? = null,
     override val isRequired: Boolean = false,
+    override val isHidden: Boolean = false,
 ) : CommandParameter {
     init {
         require(!name.startsWith("--")) { "Positional parameters must not start with '--'" }

@@ -20,8 +20,7 @@ class FakeNoumenaCloudClient(
             NoumenaCloudConfig(
                 clientId = "test-client",
                 clientSecret = "test-client-secret",
-                baseUrl = "http://localhost:8080",
-                realm = "test-realm",
+                url = "http://localhost:8080",
             ),
     ) {
     private var tokenCallCount = 0
@@ -70,7 +69,7 @@ class CloudAuthManagerTest :
                         TokenResponse(refreshToken = "refresh-token", accessToken = "access-token"),
                     )
                 runBlocking { manager.login(colorWriter) }
-                writer.toString().contains("user-code") shouldBe true
+                writer.toString().contains("http://verify/complete") shouldBe true
             }
         }
 
@@ -82,7 +81,7 @@ class CloudAuthManagerTest :
                         TokenResponse(refreshToken = "refresh-token", accessToken = "access-token"),
                     )
                 runBlocking { manager.login(colorWriter) }
-                writer.toString().contains("user-code") shouldBe true
+                writer.toString().contains("http://verify/complete") shouldBe true
             }
         }
 

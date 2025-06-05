@@ -17,8 +17,7 @@ import org.apache.http.util.EntityUtils
 data class NoumenaCloudConfig(
     val clientId: String,
     val clientSecret: String,
-    val baseUrl: String,
-    val realm: String,
+    val url: String,
 )
 
 open class NoumenaCloudClient(
@@ -26,13 +25,12 @@ open class NoumenaCloudClient(
 ) {
     private val clientId = config.clientId
     private val clientSecret = config.clientSecret
-    private val baseUrl = config.baseUrl
-    private val realm = config.realm
-    private val keycloakUrl = "$baseUrl/realms/$realm/protocol/openid-connect"
+    private val baseUrl = config.url
+    private val keycloakUrl = "$baseUrl/protocol/openid-connect"
     private val deviceGrantType = "urn:ietf:params:oauth:grant-type:device_code"
     private val scope = "openid offline_access"
     private val objectMapper = jacksonObjectMapper()
-    private val client = HttpClients.createDefault() // ✅ Reuse this
+    private val client = HttpClients.createDefault()
 
     open fun requestDeviceCode(): DeviceCodeResponse {
         try {
@@ -42,7 +40,7 @@ open class NoumenaCloudClient(
                 UrlEncodedFormEntity(
                     listOf(
                         BasicNameValuePair("client_id", clientId),
-                        BasicNameValuePair("scope", "openid"),
+                        BasicNameValuePair("scope", scope),
                     ),
                 )
 

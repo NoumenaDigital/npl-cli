@@ -60,7 +60,7 @@ class BinaryCommandsIT :
                                  --target <name>  Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.
                                  --sourceDir <directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
-                    cloud      Subset of commands for Noumena Cloud. For full list of commands, use npl-cli cloud help
+                    cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
                     """.normalize()
 
                 output.normalize() shouldBe expectedOutput

@@ -15,7 +15,7 @@ import kotlinx.coroutines.runBlocking
 class CloudLoginCommand(
     private val authManager: CloudAuthManager? = null,
 ) : CommandExecutor {
-    override val commandName: String = "login"
+    override val commandName: String = "cloud login"
     override val description: String = "Login to Noumena Cloud"
 
     override val parameters: List<CommandParameter> =
@@ -24,25 +24,22 @@ class CloudLoginCommand(
                 name = "--clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
+                isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
                 name = "--clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
+                isHidden = true,
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "--baseUrl",
-                description = "Noumena Cloud Auth URL",
+                name = "--url",
+                description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
-                valuePlaceholder = "<baseUrl>",
-            ),
-            NamedParameter(
-                name = "--realm",
-                description = "Noumena Cloud realm",
-                isRequired = false,
-                valuePlaceholder = "<realm>",
+                isHidden = true,
+                valuePlaceholder = "<url>",
             ),
         )
 
@@ -50,15 +47,13 @@ class CloudLoginCommand(
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val clientId = parsedArgs.getValue("--clientId") ?: "paas"
         val clientSecret = parsedArgs.getValue("--clientSecret") ?: "paas"
-        val baseUrl = parsedArgs.getValue("--baseUrl") ?: "https://keycloak.noumena.cloud"
-        val realm = parsedArgs.getValue("--realm") ?: "paas"
+        val url = parsedArgs.getValue("--url") ?: "https://keycloak.noumena.cloud/realms/paas"
         val noumenaCloudClient =
             NoumenaCloudClient(
                 NoumenaCloudConfig(
                     clientId = clientId,
                     clientSecret = clientSecret,
-                    baseUrl = baseUrl,
-                    realm = realm,
+                    url = url,
                 ),
             )
         val authManager = CloudAuthManager(noumenaCloudClient)
@@ -68,18 +63,10 @@ class CloudLoginCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             runBlocking { authManager?.login(output) }
-            output.success("Successfully logged in to Noumena Cloud.")
+            output.success("Successfully logged in to NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
             throw CloudCommandException(ex.message, ex, "cloud login")
         }
-    }
-
-    private fun displayUsage(writer: ColorWriter) {
-        writer.info(
-            """
-            Usage: cloud login --clientId <clientId> --clientSecret <clientSecret> --url <url>
-            """.trimIndent(),
-        )
     }
 }

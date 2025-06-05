@@ -24,30 +24,32 @@ open class HelpCommand : CommandExecutor {
             val name = command.commandName.padEnd(commandPadding)
             output.info("$name${command.description}")
             val executor = command
-            executor.parameters.forEach { param ->
-                val paramIndent = " ".repeat(commandPadding + 2)
-                val requiredMark = if (param.isRequired) " (required)" else ""
-                val defaultValue = param.defaultValue
-                val defaultText =
-                    when {
-                        defaultValue == "." -> " (defaults to current directory)"
-                        defaultValue != null -> " (defaults to $defaultValue)"
-                        else -> ""
-                    }
-                val formattedName =
-                    when (param) {
-                        is NamedParameter -> {
-                            if (param.valuePlaceholder != null) {
-                                "${param.name} ${param.valuePlaceholder}"
-                            } else {
-                                param.name
-                            }
+            executor.parameters
+                .filter { !it.isHidden }
+                .forEach { param ->
+                    val paramIndent = " ".repeat(commandPadding + 2)
+                    val requiredMark = if (param.isRequired) " (required)" else ""
+                    val defaultValue = param.defaultValue
+                    val defaultText =
+                        when {
+                            defaultValue == "." -> " (defaults to current directory)"
+                            defaultValue != null -> " (defaults to $defaultValue)"
+                            else -> ""
                         }
+                    val formattedName =
+                        when (param) {
+                            is NamedParameter -> {
+                                if (param.valuePlaceholder != null) {
+                                    "${param.name} ${param.valuePlaceholder}"
+                                } else {
+                                    param.name
+                                }
+                            }
 
-                        is PositionalParameter -> "<${param.name}>"
-                    }
-                output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
-            }
+                            is PositionalParameter -> "<${param.name}>"
+                        }
+                    output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
+                }
         }
     }
 }
