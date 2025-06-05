@@ -64,25 +64,31 @@ object TestUtils {
 
     fun runCommand(
         commands: List<String>,
+        env: Map<String, String> = emptyMap(),
         test: TestContext.() -> Unit,
     ) {
         val testMode = getTestMode()
 
         val testContext =
             when (testMode) {
-                "binary" -> runWithBinary(commands)
-                "jar" -> runWithJar(commands)
+                "binary" -> runWithBinary(commands, env)
+                "jar" -> runWithJar(commands, env)
                 else -> runDirect(commands)
             }
 
         testContext.apply(test)
     }
 
-    private fun runWithBinary(commands: List<String>): TestContext {
+    private fun runWithBinary(
+        commands: List<String>,
+        env: Map<String, String>,
+    ): TestContext {
         val process =
             ProcessBuilder(getNplPath(), *commands.toTypedArray())
                 .redirectErrorStream(true)
-                .start()
+                .apply {
+                    environment().putAll(env)
+                }.start()
 
         val output =
             process.inputStream
@@ -97,7 +103,10 @@ object TestUtils {
         )
     }
 
-    private fun runWithJar(commands: List<String>): TestContext {
+    private fun runWithJar(
+        commands: List<String>,
+        env: Map<String, String>,
+    ): TestContext {
         // Get the JAR file path
         val jarPath = getJarPath()
 
@@ -117,6 +126,7 @@ object TestUtils {
                 "-Duser.home=${System.getProperty("user.home")}",
                 "--enable-native-access=ALL-UNNAMED",
                 "--sun-misc-unsafe-memory-access=allow",
+                "-Djava.awt.headless=true",
                 "-jar",
                 jarPath,
             )
@@ -126,7 +136,9 @@ object TestUtils {
         val process =
             ProcessBuilder(commandList)
                 .redirectErrorStream(true)
-                .start()
+                .apply {
+                    environment().putAll(env)
+                }.start()
 
         // Read the output
         val output =

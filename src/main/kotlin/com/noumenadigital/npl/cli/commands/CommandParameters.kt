@@ -1,12 +1,11 @@
-package com.noumenadigital.npl.cli.commands.registry
-
-import com.noumenadigital.npl.cli.commands.Commands
+package com.noumenadigital.npl.cli.commands
 
 sealed interface CommandParameter {
     val name: String
     val description: String
     val defaultValue: String?
     val isRequired: Boolean
+    val isHidden: Boolean
 }
 
 data class NamedParameter(
@@ -14,7 +13,8 @@ data class NamedParameter(
     override val description: String,
     override val defaultValue: String? = null,
     override val isRequired: Boolean = false,
-    val valuePlaceholder: String? = null, // e.g., "<value>"
+    override val isHidden: Boolean = false,
+    val valuePlaceholder: String? = null,
 ) : CommandParameter {
     init {
         require(name.startsWith("--")) { "Named parameters must start with '--'" }
@@ -28,6 +28,7 @@ data class PositionalParameter(
     override val description: String,
     override val defaultValue: String? = null,
     override val isRequired: Boolean = false,
+    override val isHidden: Boolean = false,
 ) : CommandParameter {
     init {
         require(!name.startsWith("--")) { "Positional parameters must not start with '--'" }
@@ -37,7 +38,7 @@ data class PositionalParameter(
 /**
  * Simple command line argument parser supporting "--param value" format.
  */
-class CommandArgumentParser {
+object CommandArgumentParser {
     fun parse(
         args: List<String>,
         parameters: List<CommandParameter>,
@@ -90,15 +91,5 @@ class CommandArgumentParser {
         fun hasFlag(name: String): Boolean = values.containsKey(name)
 
         fun getValue(name: String): String? = values[name]
-    }
-}
-
-object CommandsParser {
-    fun parse(command: List<String>): CommandExecutor {
-        val commandName = command.firstOrNull() ?: return Commands.HELP.getBaseExecutor().createInstance(emptyList())
-
-        val arguments = if (command.size > 1) command.drop(1) else emptyList()
-
-        return Commands.commandFromString(commandName, arguments)
     }
 }

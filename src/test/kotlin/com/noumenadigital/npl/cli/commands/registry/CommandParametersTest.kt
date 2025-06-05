@@ -1,6 +1,10 @@
 package com.noumenadigital.npl.cli.commands.registry
 
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.Commands
+import com.noumenadigital.npl.cli.commands.CommandsParser
+import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.commands.PositionalParameter
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
@@ -34,8 +38,9 @@ class CommandParametersTest :
         }
 
         context("CommandArgumentParser") {
-            val parser = CommandArgumentParser()
-            val namedParamWithValue = NamedParameter(name = "--file", description = "File path", valuePlaceholder = "<path>")
+            val parser = CommandArgumentParser
+            val namedParamWithValue =
+                NamedParameter(name = "--file", description = "File path", valuePlaceholder = "<path>")
             val namedFlag = NamedParameter(name = "--verbose", description = "Enable verbose mode")
             val positionalParam = PositionalParameter(name = "command", description = "The command")
 
@@ -125,7 +130,8 @@ class CommandParametersTest :
 
                 val result = parser.parse(input)
 
-                result shouldBe Commands.commandFromString("help", emptyList())
+                result.commandName shouldBe Commands.commandFromString("help", emptyList()).commandName
+                result.description shouldBe Commands.commandFromString("help", emptyList()).description
             }
 
             test("should execute help command when input list is empty") {
@@ -133,7 +139,8 @@ class CommandParametersTest :
                 val input = emptyList<String>()
 
                 val result = parser.parse(input)
-                result shouldBe Commands.commandFromString("help", emptyList())
+                result.commandName shouldBe Commands.commandFromString("help", emptyList()).commandName
+                result.description shouldBe Commands.commandFromString("help", emptyList()).description
             }
         }
     })

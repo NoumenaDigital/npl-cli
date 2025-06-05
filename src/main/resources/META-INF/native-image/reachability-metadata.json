@@ -247,6 +247,74 @@
       ]
     },
     {
+      "type": "com.noumenadigital.npl.cli.model.DeviceCodeResponse",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.model.TokenResponse",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.Number",
+            "java.lang.Number",
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "int",
+            "kotlin.jvm.internal.DefaultConstructorMarker"
+          ]
+        },
+        {
+          "name": "getAccessToken",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExpiresIn",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRefreshExpiresIn",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRefreshToken",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTokenType",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.noumenadigital.platform.api.models.ApiModelError",
       "allDeclaredFields": true,
       "allDeclaredMethods": true,
@@ -1447,6 +1515,9 @@
       ]
     },
     {
+      "type": "kotlin.Number"
+    },
+    {
       "type": "kotlin.SafePublicationLazyImpl",
       "fields": [
         {
@@ -1491,6 +1562,116 @@
     {
       "type": "kotlin.reflect.jvm.internal.impl.resolve.scopes.DescriptorKindFilter",
       "allPublicFields": true
+    },
+    {
+      "type": "kotlinx.coroutines.CompletedExceptionally",
+      "fields": [
+        {
+          "name": "_handled$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.EventLoopImplBase",
+      "fields": [
+        {
+          "name": "_delayed$volatile"
+        },
+        {
+          "name": "_isCompleted$volatile"
+        },
+        {
+          "name": "_queue$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.JobSupport",
+      "fields": [
+        {
+          "name": "_parentHandle$volatile"
+        },
+        {
+          "name": "_state$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.JobSupport$Finishing",
+      "fields": [
+        {
+          "name": "_exceptionsHolder$volatile"
+        },
+        {
+          "name": "_isCompleting$volatile"
+        },
+        {
+          "name": "_rootCause$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.internal.DispatchedContinuation",
+      "fields": [
+        {
+          "name": "_reusableCancellableContinuation$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.internal.LimitedDispatcher",
+      "fields": [
+        {
+          "name": "runningWorkers$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.internal.LockFreeLinkedListNode",
+      "fields": [
+        {
+          "name": "_next$volatile"
+        },
+        {
+          "name": "_prev$volatile"
+        },
+        {
+          "name": "_removedRef$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.internal.LockFreeTaskQueue",
+      "fields": [
+        {
+          "name": "_cur$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.internal.LockFreeTaskQueueCore",
+      "fields": [
+        {
+          "name": "_next$volatile"
+        },
+        {
+          "name": "_state$volatile"
+        }
+      ]
+    },
+    {
+      "type": "kotlinx.coroutines.scheduling.CoroutineScheduler",
+      "fields": [
+        {
+          "name": "_isTerminated$volatile"
+        },
+        {
+          "name": "controlState$volatile"
+        },
+        {
+          "name": "parkedWorkersStack$volatile"
+        }
+      ]
     },
     {
       "type": "libcore.io.Memory"
@@ -1921,6 +2102,15 @@
       ]
     },
     {
+      "type": "sun.security.ssl.SSLContextImpl$TLSContext",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
       "methods": [
         {
@@ -2249,7 +2439,31 @@
     },
     {
       "module": "java.base",
+      "glob": "sun/launcher/resources/launcher_en.properties"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/launcher/resources/launcher_en_US.properties"
+    },
+    {
+      "module": "java.base",
       "glob": "sun/net/www/content-types.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awt_en.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awt_en_US.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awtosx_en.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awtosx_en_US.properties"
     },
     {
       "module": "java.xml",
@@ -2292,9 +2506,46 @@
         "en-CH",
         "en-US"
       ]
+    },
+    {
+      "name": "sun.awt.resources.awt",
+      "locales": [
+        "en-US"
+      ]
+    },
+    {
+      "name": "sun.awt.resources.awtosx",
+      "locales": [
+        "en-US"
+      ]
     }
   ],
   "jni": [
+    {
+      "type": "com.apple.eawt._AppEventHandler",
+      "methods": [
+        {
+          "name": "handleNativeNotification",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.apple.eawt._AppMenuBarHandler",
+      "methods": [
+        {
+          "name": "initMenuStates",
+          "parameterTypes": [
+            "boolean",
+            "boolean",
+            "boolean",
+            "boolean"
+          ]
+        }
+      ]
+    },
     {
       "type": "com.noumenadigital.npl.cli.MainKt",
       "methods": [
@@ -2303,6 +2554,15 @@
           "parameterTypes": [
             "java.lang.String[]"
           ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.event.InputEvent",
+      "methods": [
+        {
+          "name": "getButtonDownMasks",
+          "parameterTypes": []
         }
       ]
     },
@@ -2339,6 +2599,12 @@
       "methods": [
         {
           "name": "getProperty",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "load",
           "parameterTypes": [
             "java.lang.String"
           ]
@@ -2463,6 +2729,28 @@
           "parameterTypes": [
             "java.lang.String"
           ]
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.AWTAutoShutdown",
+      "methods": [
+        {
+          "name": "notifyToolkitThreadBusy",
+          "parameterTypes": []
+        },
+        {
+          "name": "notifyToolkitThreadFree",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.lwawt.macosx.LWCToolkit",
+      "methods": [
+        {
+          "name": "installToolkitThreadInJava",
+          "parameterTypes": []
         }
       ]
     }

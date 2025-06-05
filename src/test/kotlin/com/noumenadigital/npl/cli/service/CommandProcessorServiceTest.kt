@@ -2,7 +2,7 @@ package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.CommandProcessor
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.registry.CommandsParser
+import com.noumenadigital.npl.cli.commands.CommandsParser
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.StringWriter
@@ -49,6 +49,7 @@ class CommandProcessorServiceTest :
                                  --target <name>  Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.
                                  --sourceDir <directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
+                    cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
                     """.trimIndent()
 
                 writer.toString().trimIndent() shouldBe expectedOutput

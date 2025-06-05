@@ -1,6 +1,9 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.CommandParameter
+import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
@@ -45,8 +48,7 @@ data class TestCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            val parser = CommandArgumentParser()
-            val parsedArgs = parser.parse(params, parameters)
+            val parsedArgs = CommandArgumentParser.parse(params, parameters)
 
             if (parsedArgs.unexpectedArgs.isNotEmpty()) {
                 output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
@@ -108,7 +110,8 @@ data class TestCommand(
         testResults: List<TestHarness.TestHarnessResults>,
         output: ColorWriter,
     ) {
-        val paddingResult = maxOf(testResults.maxOfOrNull { it.description.normalizeWindowsPath().length } ?: 0, MIN_PADDING)
+        val paddingResult =
+            maxOf(testResults.maxOfOrNull { it.description.normalizeWindowsPath().length } ?: 0, MIN_PADDING)
         testResults.forEach {
             val success = !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut()
             if (success) {

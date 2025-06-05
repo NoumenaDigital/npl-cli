@@ -17,21 +17,25 @@ class ColorWriter(
     fun warning(text: String) {
         writer.write(formatWithColor(text, Ansi::fgYellow))
         writer.write("\n")
+        writer.flush()
     }
 
     fun error(text: String) {
         writer.write(formatWithColor(text, Ansi::fgRed))
         writer.write("\n")
+        writer.flush()
     }
 
     fun success(text: String) {
         writer.write(formatWithColor(text, Ansi::fgGreen))
         writer.write("\n")
+        writer.flush()
     }
 
     fun info(text: String = "") {
         writer.write(text)
         writer.write("\n")
+        writer.flush()
     }
 
     private fun formatWithColor(

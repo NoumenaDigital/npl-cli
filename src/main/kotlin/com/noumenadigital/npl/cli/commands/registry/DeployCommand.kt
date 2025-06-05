@@ -1,6 +1,9 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.CommandParameter
+import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import com.noumenadigital.npl.cli.exception.DeployConfigException
@@ -41,7 +44,7 @@ class DeployCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         // Parse arguments using the simpler parameter-based parser
-        val parser = CommandArgumentParser()
+        val parser = CommandArgumentParser
         val parsedArgs = parser.parse(args, parameters)
 
         if (parsedArgs.unexpectedArgs.isNotEmpty()) {

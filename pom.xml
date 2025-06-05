@@ -42,7 +42,6 @@
         <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <jansi.version>2.4.1</jansi.version>
@@ -51,6 +50,7 @@
         <main.class>com.noumenadigital.npl.cli.MainKt</main.class>
         <swagger-parser-v3.version>2.1.26</swagger-parser-v3.version>
         <mockwebserver.version>4.12.0</mockwebserver.version>
+        <httpclient.version>4.5.14</httpclient.version>
     </properties>
 
     <dependencies>
@@ -104,6 +104,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
