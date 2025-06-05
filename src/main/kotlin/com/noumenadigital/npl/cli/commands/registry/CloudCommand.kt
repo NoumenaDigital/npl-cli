@@ -10,7 +10,7 @@ class CloudCommand(
     override val commandName: String
         get() = "cloud"
     override val description: String
-        get() = "Subset of commands for Noumena Cloud. For full list of commands, use npl-cli cloud help"
+        get() = "Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`"
 
     override fun createInstance(params: List<String>): CommandExecutor = CloudCommand(args = params)
 
