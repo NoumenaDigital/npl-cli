@@ -1,21 +1,26 @@
 package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
+import com.noumenadigital.npl.cli.util.normalizeWindowsPath
 import com.noumenadigital.npl.lang.Source
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 class SourcesManager(
-    private val projectDirectoryPath: String,
+    private val srcPath: String,
 ) {
     companion object {
         private const val NPL_EXTENSION = ".npl"
     }
 
-    val nplContribLibrary: String = File(projectDirectoryPath, "npl-contrib").path
+    val nplContribLibrary: String = File(srcPath, "npl-contrib").path
 
     fun getNplSources(): List<Source> {
-        collectSourcesFromDirectory(projectDirectoryPath).let { sources ->
+        collectSourcesFromDirectory(srcPath).let { sources ->
             if (sources.isEmpty()) {
                 throw CommandExecutionException("No NPL source files found")
             }
@@ -37,5 +42,24 @@ class SourcesManager(
                 sources.add(Source.create(it.toUri().toURL()))
             }
         return sources
+    }
+
+    fun getArchivedSources(): ByteArray {
+        val basePath = Paths.get(srcPath)
+        val outputStream = ByteArrayOutputStream()
+
+        ZipOutputStream(outputStream).use { zipOut ->
+            Files.walk(basePath).forEach { path ->
+                if (Files.isRegularFile(path)) {
+                    val relativePath = basePath.relativize(path).toString().normalizeWindowsPath()
+                    zipOut.putNextEntry(ZipEntry(relativePath))
+                    Files.newInputStream(path).use { input ->
+                        input.copyTo(zipOut)
+                    }
+                    zipOut.closeEntry()
+                }
+            }
+        }
+        return outputStream.toByteArray()
     }
 }

@@ -15,4 +15,6 @@ object IOUtils {
         file.parentFile?.mkdirs()
         objectMapper.writeValue(file, obj)
     }
+
+    inline fun <reified T> readObjectFromFile(file: File): T = objectMapper.readValue(file, T::class.java)
 }

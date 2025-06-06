@@ -12,4 +12,5 @@ class CloudSlowDownException : CloudCommandException()
 
 class CloudRestCallException(
     override val message: String?,
+    val e: Exception? = null,
 ) : CloudCommandException()
