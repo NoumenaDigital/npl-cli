@@ -1,6 +1,5 @@
 package com.noumenadigital.npl.cli.service
 
-import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.CloudAuthorizationPendingException
 import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.exception.CloudSlowDownException
@@ -47,17 +46,12 @@ class CloudAuthManager(
         }
     }
 
-    fun getToken(): TokenResponse {
-        if (!noumenaConfigFilePath.toFile().exists()) {
-            throw AuthorizationFailedException("Please login again.")
-        }
+    fun getAccessAccessToken(): TokenResponse {
         val storedToken = readObjectFromFile<TokenResponse>(noumenaConfigFilePath.toFile())
         if (storedToken.refreshToken == null) {
             throw CloudCommandException("No refresh token found in the stored configuration. Please login again.")
         }
-        val updatedToken = noumenaCloudAuthClient.getAccessTokenByRefreshToken(storedToken.refreshToken)
-        IOUtils.writeObjectToFile(noumenaConfigFilePath.toFile(), updatedToken)
-        return updatedToken
+        return noumenaCloudAuthClient.getAccessTokenByRefreshToken(storedToken.refreshToken)
     }
 
     private fun openBrowser(
