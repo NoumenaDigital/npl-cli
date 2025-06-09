@@ -12,14 +12,27 @@ import java.util.UUID
 data class NoumenaCloudConfig(
     val app: String = "",
     val tenant: String = "",
-    val url: String = "https://portal.noumena.cloud/api",
-)
+    val ncUrl: String = "https://portal.noumena.cloud",
+) {
+    companion object {
+        fun get(
+            app: String,
+            tenant: String,
+            ncUrl: String? = null,
+        ): NoumenaCloudConfig =
+            NoumenaCloudConfig(
+                app = app,
+                tenant = tenant,
+                ncUrl = ncUrl ?: "https://keycloak.noumena.cloud/realms/paas",
+            )
+    }
+}
 
 open class NoumenaCloudClient(
     val config: NoumenaCloudConfig,
 ) {
     private val deployUrl =
-        "${config.url}/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}/deploy"
+        "${config.ncUrl}/api/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}/deploy"
     private val client = HttpClients.createDefault()
 
     fun uploadApplicationArchive(
@@ -45,7 +58,6 @@ open class NoumenaCloudClient(
             val httpPost = HttpPost(deployUrl)
             httpPost.setHeader("Authorization", "Bearer $accessToken")
             httpPost.setHeader("Content-Type", "multipart/form-data; boundary=$boundary")
-            httpPost.setHeader("Content-Length", body.size.toString())
             httpPost.entity = ByteArrayEntity(body)
 
             client.execute(httpPost).use { response ->
@@ -56,7 +68,7 @@ open class NoumenaCloudClient(
                 }
             }
         } catch (e: Exception) {
-            throw CloudRestCallException("Failed to upload application archive: ${e.message}", e)
+            throw CloudRestCallException("Failed to upload application archive: ${e.message ?: e.cause?.message}.", e)
         }
     }
 }

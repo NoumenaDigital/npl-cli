@@ -50,7 +50,7 @@ class CloudLoginCommand(
         val url = parsedArgs.getValue("--url")
         val noumenaCloudAuthClient =
             NoumenaCloudAuthClient(
-                NoumenaCloudAuthConfig.getInstance(
+                NoumenaCloudAuthConfig.get(
                     clientId = clientId,
                     clientSecret = clientSecret,
                     url = url,

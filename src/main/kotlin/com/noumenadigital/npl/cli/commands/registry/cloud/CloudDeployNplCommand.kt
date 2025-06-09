@@ -48,11 +48,11 @@ class CloudDeployNplCommand(
                 valuePlaceholder = "<migration>",
             ),
             NamedParameter(
-                name = "--nclUrl",
+                name = "--ncUrl",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
-                valuePlaceholder = "<nclUrl>",
+                valuePlaceholder = "<ncUrl>",
             ),
             NamedParameter(
                 name = "--clientId",
@@ -85,12 +85,23 @@ class CloudDeployNplCommand(
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
-        val srcDir = File(migration).parent.toString()
+        val ncUrl = parsedArgs.getValue("--ncUrl")
+        val migrationFile = File(migration)
+        if (!migrationFile.exists()) {
+            throw CloudCommandException(
+                message = "Migration file does not exist: $migration",
+                commandName = "cloud deploy-npl",
+            )
+        }
+        val srcDir = migrationFile.parent.toString()
         val sourcesManager = SourcesManager(srcDir)
-        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.getInstance(clientId, clientSecret, authUrl)
+        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
-            CloudDeployService(CloudAuthManager(noumenaCloudAuthClient), NoumenaCloudClient(NoumenaCloudConfig(app, tenant)))
+            CloudDeployService(
+                CloudAuthManager(noumenaCloudAuthClient),
+                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, ncUrl)),
+            )
         return CloudDeployNplCommand(sourcesManager, cloudDeployService)
     }
 

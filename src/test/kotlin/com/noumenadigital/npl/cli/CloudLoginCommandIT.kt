@@ -114,7 +114,7 @@ class CloudLoginCommandIT :
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
-                        refreshTokenToVerify shouldBe readTempFile().refreshToken
+                        readTempFile().refreshToken shouldBe refreshTokenToVerify
                     }
                 }
             }

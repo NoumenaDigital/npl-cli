@@ -20,7 +20,7 @@ data class NoumenaCloudAuthConfig(
     val url: String,
 ) {
     companion object {
-        fun getInstance(
+        fun get(
             clientId: String? = null,
             clientSecret: String? = null,
             url: String? = null,
@@ -34,7 +34,7 @@ data class NoumenaCloudAuthConfig(
 }
 
 open class NoumenaCloudAuthClient(
-    config: NoumenaCloudAuthConfig = NoumenaCloudAuthConfig.getInstance(),
+    config: NoumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(),
 ) {
     private val clientId = config.clientId
     private val clientSecret = config.clientSecret
@@ -59,7 +59,7 @@ open class NoumenaCloudAuthClient(
                 )
 
             client.execute(httpPost).use { response ->
-                val entity = response.entity ?: throw CloudRestCallException("Empty response entity")
+                val entity = response.entity ?: throw CloudRestCallException("Empty response entity.")
                 val json = EntityUtils.toString(entity)
                 if (response.statusLine.statusCode != 200) {
                     throw CloudRestCallException("Error: ${response.statusLine.statusCode} - $json")
@@ -86,7 +86,7 @@ open class NoumenaCloudAuthClient(
             )
 
         client.execute(httpPost).use { response ->
-            val entity = response.entity ?: throw CloudRestCallException("Empty response entity")
+            val entity = response.entity ?: throw CloudRestCallException("Empty response entity.")
             val json = EntityUtils.toString(entity)
 
             return when (response.statusLine.statusCode) {
@@ -97,35 +97,44 @@ open class NoumenaCloudAuthClient(
                         "authorization_pending" -> throw CloudAuthorizationPendingException()
                         "slow_down" -> throw CloudSlowDownException()
                         else -> throw CloudCommandException(
-                            node["error_description"]?.asText() ?: "Authorization failed",
+                            node["error_description"]?.asText() ?: "Authorization failed.",
                         )
                     }
                 }
 
-                else -> throw CloudRestCallException("Error: ${response.statusLine.statusCode} - $json")
+                else -> throw CloudRestCallException("Cannot authorize ${response.statusLine.statusCode} - $json")
             }
         }
     }
 
     fun getAccessTokenByRefreshToken(refreshToken: String): TokenResponse {
-        val httpPost = HttpPost("$keycloakUrl/token")
-        httpPost.setHeader("Content-Type", contentType)
-        httpPost.entity =
-            UrlEncodedFormEntity(
-                listOf(
-                    BasicNameValuePair("client_id", clientId),
-                    BasicNameValuePair("grant_type", "refresh_token"),
-                    BasicNameValuePair("refresh_token", refreshToken),
-                    BasicNameValuePair("client_secret", clientSecret),
-                    BasicNameValuePair("scope", scope),
-                ),
-            )
+        try {
+            val httpPost = HttpPost("$keycloakUrl/token")
+            httpPost.setHeader("Content-Type", contentType)
+            httpPost.entity =
+                UrlEncodedFormEntity(
+                    listOf(
+                        BasicNameValuePair("client_id", clientId),
+                        BasicNameValuePair("grant_type", "refresh_token"),
+                        BasicNameValuePair("refresh_token", refreshToken),
+                        BasicNameValuePair("client_secret", clientSecret),
+                        BasicNameValuePair("scope", scope),
+                    ),
+                )
 
-        client.execute(httpPost).use { response ->
-            val entity = response.entity ?: throw CloudRestCallException("Empty response entity")
-            entity.content.use { inputStream ->
-                return objectMapper.readValue(inputStream, TokenResponse::class.java)
+            client.execute(httpPost).use { response ->
+                if (response.statusLine.statusCode != 200) {
+                    throw CloudRestCallException(
+                        "Cannot get access token ${response.statusLine.statusCode} - ${response.statusLine.reasonPhrase}.",
+                    )
+                }
+                val entity = response.entity ?: throw CloudRestCallException("Empty response entity.")
+                entity.content.use { inputStream ->
+                    return objectMapper.readValue(inputStream, TokenResponse::class.java)
+                }
             }
+        } catch (ex: Exception) {
+            throw CloudRestCallException(ex.message ?: ex.cause?.message ?: "Unknown error.", ex)
         }
     }
 }
