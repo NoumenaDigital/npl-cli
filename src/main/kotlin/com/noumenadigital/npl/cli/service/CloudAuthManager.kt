@@ -47,7 +47,7 @@ class CloudAuthManager(
         }
     }
 
-    fun getAccessAccessToken(): TokenResponse {
+    fun getToken(): TokenResponse {
         if (!noumenaConfigFilePath.toFile().exists()) {
             throw AuthorizationFailedException("Please login again.")
         }
