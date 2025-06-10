@@ -18,7 +18,7 @@ curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
 ## How to use?
 
 You can find more examples and details about the commands in our tracks: follow the
-[link](../../tracks/developing-NPL-local.md)
+[link](../../../tracks/developing-NPL-local.md)
 
 ## Commands
 
