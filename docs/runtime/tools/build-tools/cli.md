@@ -2,10 +2,23 @@
 weight: 20
 ---
 
-# NPL Command Line Interface (CLI)
+# NPL CLI
 
 The NPL CLI is a command line tool to support the development of projects written in Noumena Protocol Language (NPL). It
 offers several useful commands for interacting with your NPL projects.
+
+## How to install?
+
+You can install the NPL CLI using
+
+```shell
+curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
+```
+
+## How to use?
+
+You can find more examples and details about the commands in our tracks: follow the
+[link](/content/docs/tracks/developing-NPL-local.md)
 
 ## Commands
 
@@ -27,8 +40,3 @@ To see a description of how to use each command, run `npl help`
 | ----- | ------ | ------ |
 | MacOS | Yes    | Yes    |
 | Linux | Yes    | Yes    |
-
-## How to use?
-
-You can find more examples and details about the commands in our tracks: follow the
-[link](/tracks/developing-NPL-local.md)
