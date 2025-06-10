@@ -37,14 +37,14 @@ class CloudDeployNplCommand(
             ),
             NamedParameter(
                 name = "--appId",
-                description = "NOUMENA Cloud Application name",
+                description = "NOUMENA Cloud Application appId",
                 isRequired = true,
                 valuePlaceholder = "<appId>",
             ),
             NamedParameter(
                 name = "--migration",
                 description = "NOUMENA Cloud Auth URL",
-                isRequired = true,
+                isRequired = false,
                 valuePlaceholder = "<migration>",
             ),
             NamedParameter(
