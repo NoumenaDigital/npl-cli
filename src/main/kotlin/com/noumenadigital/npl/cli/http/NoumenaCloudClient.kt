@@ -23,7 +23,7 @@ data class NoumenaCloudConfig(
             NoumenaCloudConfig(
                 app = app,
                 tenant = tenant,
-                ncUrl = ncUrl ?: "https://keycloak.noumena.cloud/realms/paas",
+                ncUrl = ncUrl ?: "https://portal.noumena.cloud",
             )
     }
 }
