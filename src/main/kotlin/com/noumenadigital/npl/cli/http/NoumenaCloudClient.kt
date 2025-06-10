@@ -1,6 +1,7 @@
 package com.noumenadigital.npl.cli.http
 
 import com.noumenadigital.npl.cli.exception.CloudRestCallException
+import org.apache.http.client.methods.HttpDelete
 import com.noumenadigital.npl.cli.model.DeviceCodeResponse
 import com.noumenadigital.npl.cli.model.TokenResponse
 import org.apache.http.client.entity.UrlEncodedFormEntity
@@ -32,8 +33,10 @@ data class NoumenaCloudConfig(
 open class NoumenaCloudClient(
     config: NoumenaCloudConfig,
 ) {
-    private val deployUrl =
-        "${config.url}/api/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}/deploy"
+    val ncBaseUrl =
+        "${config.ncUrl}/api/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}"
+    private val deployUrl = "$ncBaseUrl/deploy"
+    private val clearUrl = "$ncBaseUrl/clear"
     private val client = HttpClients.createDefault()
 
     fun uploadApplicationArchive(
@@ -69,7 +72,25 @@ open class NoumenaCloudClient(
                 }
             }
         } catch (e: Exception) {
-            throw CloudRestCallException("Failed to upload application archive: ${e.message ?: e.cause?.message}.", e)
+            throw CloudRestCallException("Failed to upload application archive - ${e.message ?: e.cause?.message}.", e)
+        }
+    }
+
+    fun clearApplication(token: String) {
+        try {
+            val httpDelete = HttpDelete(clearUrl)
+            httpDelete.setHeader("Accept", "application/json")
+            httpDelete.setHeader("Authorization", "Bearer $token")
+
+            client.execute(httpDelete).use { response ->
+                val status = response.statusLine.statusCode
+                val responseText = response.entity?.let { EntityUtils.toString(it) } ?: ""
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Clear application failed with status $status: $responseText")
+                }
+            }
+        } catch (e: Exception) {
+            throw CloudRestCallException("Failed to remove the application -  ${e.message ?: e.cause?.message}.", e)
         }
     }
 }

@@ -10,7 +10,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import java.io.File
 
-class CloudDeployCommandIT :
+class CloudClearCommandIT :
     FunSpec({
 
         class TestContext {
@@ -70,14 +70,14 @@ class CloudDeployCommandIT :
                     object : Dispatcher() {
                         override fun dispatch(request: RecordedRequest): MockResponse {
                             when (request.path) {
-                                "/api/v1/applications/$APP_ID_OK/deploy" -> {
+                                "/api/v1/applications/$APP_ID_OK/clear" -> {
                                     return MockResponse()
                                         .setResponseCode(200)
                                         .setHeader("Content-Type", "application/json")
                                         .setBody(
                                             """
                                             {
-                                              "status": "deployed",
+                                              "status": "removed",
                                             }
                                             """.trimIndent(),
                                         )
@@ -116,18 +116,18 @@ class CloudDeployCommandIT :
         }
 
         context("success") {
-            test("cloud deploy success") {
+            test("cloud clear success") {
                 withTestContext {
                     runCommand(
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy",
+                                "clear-npl",
+                                "--tenant",
+                                "Training",
                                 "--appId",
                                 APP_ID_OK,
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                "--url",
+                                "--ncUrl",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
@@ -136,7 +136,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            NPL Application successfully deployed to NOUMENA Cloud.
+                            NPL Application successfully deleted from NOUMENA Cloud.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -147,20 +147,20 @@ class CloudDeployCommandIT :
         }
 
         context("error") {
-            test("cloud deploy failed wrong clientId") {
+            test("cloud clear failed wrong clientId") {
                 withTestContext {
                     runCommand(
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy",
+                                "clear-npl",
                                 "--clientId",
                                 "wrong",
+                                "--tenant",
+                                "Training",
                                 "--appId",
                                 APP_ID_OK,
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                "--url",
+                                "--ncUrl",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
@@ -169,7 +169,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Cannot get access token 401 - Client Error.
+                            Command cloud deploy-npl failed: Cannot get access token 401 - Client Error.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -178,18 +178,18 @@ class CloudDeployCommandIT :
                 }
             }
 
-            test("cloud deploy failed deploy command") {
+            test("cloud clear failed clear command") {
                 withTestContext {
                     runCommand(
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy",
+                                "clear-npl",
+                                "--tenant",
+                                "Training",
                                 "--appId",
                                 APP_ID_OK,
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                "--url",
+                                "--ncUrl",
                                 "non-url",
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
@@ -198,7 +198,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Failed to upload application archive - Target host is not specified.
+                            Command cloud deploy-npl failed: Failed to remove the application -  Target host is not specified.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -214,12 +214,12 @@ class CloudDeployCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy",
+                                "clear-npl",
+                                "--tenant",
+                                "Training",
                                 "--appId",
                                 APP_ID_OK,
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                "--url",
+                                "--ncUrl",
                                 "non-url",
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
@@ -228,36 +228,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Please login again.
-                            """.normalize()
-
-                        output.normalize() shouldBe expectedOutput
-                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-                    }
-                }
-            }
-
-            test("cloud deploy no sources found") {
-                withTestContext {
-                    runCommand(
-                        commands =
-                            listOf(
-                                "cloud",
-                                "deploy",
-                                "--appId",
-                                APP_ID_OK,
-                                "--migration",
-                                "notexists",
-                                "--url",
-                                mockNC.url("/").toString(),
-                                "--authUrl",
-                                mockOidc.url("/realms/paas/").toString(),
-                            ),
-                    ) {
-                        process.waitFor()
-                        val expectedOutput =
-                            """
-                            Command cloud deploy failed: Migration file does not exist - notexists
+                            Command cloud deploy-npl failed: Please login again.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput

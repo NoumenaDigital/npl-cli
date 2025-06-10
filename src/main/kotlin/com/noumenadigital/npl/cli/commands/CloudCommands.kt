@@ -1,6 +1,7 @@
 package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
+import com.noumenadigital.npl.cli.commands.registry.cloud.CloudClearNplCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudDeployNplCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudHelpCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLoginCommand
@@ -12,6 +13,7 @@ enum class CloudCommands(
     LOGIN({ CloudLoginCommand() }),
     CLOUD_HELP({ CloudHelpCommand }),
     CLOUD_DEPLOY_NPL({ CloudDeployNplCommand() }),
+    CLOUD_CLEAR_NPL({ CloudClearNplCommand() }),
     ;
 
     companion object {

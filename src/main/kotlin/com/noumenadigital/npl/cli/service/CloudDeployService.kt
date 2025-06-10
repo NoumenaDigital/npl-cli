@@ -7,10 +7,20 @@ class CloudDeployService(
     val noumenaCloudClient: NoumenaCloudClient,
 ) {
     fun deployNplApplication(archive: ByteArray) {
+        val token = getAccessToken()
+        noumenaCloudClient.uploadApplicationArchive(token, archive)
+    }
+
+    fun clearApp() {
+        val token = getAccessToken()
+        noumenaCloudClient.clearApplication(token)
+    }
+
+    private fun getAccessToken(): String {
         val token = cloudAuthManager.getToken()
         if (token.accessToken == null) {
             throw IllegalStateException("Access token is not available. Please authenticate with `npl cloud login` command first.")
         }
-        noumenaCloudClient.uploadApplicationArchive(token.accessToken, archive)
+        return token.accessToken
     }
 }
