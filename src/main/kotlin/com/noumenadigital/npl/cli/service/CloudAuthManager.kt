@@ -24,6 +24,11 @@ class CloudAuthManager(
         IOUtils.writeObjectToFile(noumenaConfigFilePath.toFile(), token)
     }
 
+    fun logout() {
+        val emptyToken = TokenResponse(null)
+        IOUtils.writeObjectToFile(noumenaConfigFilePath.toFile(), emptyToken)
+    }
+
     private suspend fun pollForToken(deviceCode: DeviceCodeResponse): TokenResponse {
         val baseInterval = deviceCode.interval * 1_000L
         var currentInterval = baseInterval

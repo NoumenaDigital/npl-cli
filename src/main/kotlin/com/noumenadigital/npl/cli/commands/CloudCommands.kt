@@ -5,12 +5,14 @@ import com.noumenadigital.npl.cli.commands.registry.cloud.CloudClearNplCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudDeployNplCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudHelpCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLoginCommand
+import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLogoutCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 
 enum class CloudCommands(
     override val commandExecutorFactory: () -> CommandExecutor,
 ) : CommandsRegistry {
-    LOGIN({ CloudLoginCommand() }),
+    CLOUT_LOGIN({ CloudLoginCommand() }),
+    CLOUD_LOGOUT({ CloudLogoutCommand() }),
     CLOUD_HELP({ CloudHelpCommand }),
     CLOUD_DEPLOY_NPL({ CloudDeployNplCommand() }),
     CLOUD_CLEAR_NPL({ CloudClearNplCommand() }),
