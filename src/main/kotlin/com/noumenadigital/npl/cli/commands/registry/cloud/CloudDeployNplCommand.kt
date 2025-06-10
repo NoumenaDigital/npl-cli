@@ -36,15 +36,15 @@ class CloudDeployNplCommand(
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
-                name = "--app",
+                name = "--appId",
                 description = "NOUMENA Cloud Application name",
                 isRequired = true,
-                valuePlaceholder = "<app>",
+                valuePlaceholder = "<appId>",
             ),
             NamedParameter(
                 name = "--migration",
                 description = "NOUMENA Cloud Auth URL",
-                isRequired = false,
+                isRequired = true,
                 valuePlaceholder = "<migration>",
             ),
             NamedParameter(
@@ -79,7 +79,7 @@ class CloudDeployNplCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val app = parsedArgs.getRequiredValue("--app")
+        val app = parsedArgs.getRequiredValue("--appId")
         val tenant = parsedArgs.getRequiredValue("--tenant")
         val migration = parsedArgs.getValue("--migration") ?: "./src/main/migration.yaml"
         val clientId = parsedArgs.getValue("--clientId")
