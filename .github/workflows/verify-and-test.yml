@@ -26,6 +26,9 @@ jobs:
           username: "${{ secrets.GH_USERNAME_PUBLIC_REPOS }}"
           password: "${{ secrets.GH_PASSWORD_PUBLIC_REPOS }}"
 
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
       - name: "Documentation link check"
         run: |
           cd docs && make -e htmltest
