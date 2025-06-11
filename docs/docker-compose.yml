@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   server:
     build:
@@ -7,7 +5,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # npl-idea-plugin currently does not use snippets, and ones provided elsewhere are not available when serving locally
       CHECK_SNIPPET_PATHS: false
     stop_signal: SIGKILL
 
@@ -17,7 +14,6 @@ services:
     volumes:
       - site-docs:/docs
     environment:
-      # npl-idea-plugin currently does not use snippets, and ones provided elsewhere are not available when serving locally
       CHECK_SNIPPET_PATHS: false
     entrypoint: ["mkdocs", "build", "--clean"]
 

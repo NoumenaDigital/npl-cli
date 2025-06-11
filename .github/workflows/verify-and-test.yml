@@ -44,6 +44,10 @@ jobs:
           java-version: "24"
           cache: "maven"
 
+      - name: "Documentation link check"
+        run: |
+          cd docs && make -e htmltest
+
       - name: "Validate native config diff"
         run: .github/scripts/validate-native-config-files.sh
 
