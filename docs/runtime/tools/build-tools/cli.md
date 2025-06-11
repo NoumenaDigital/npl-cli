@@ -24,15 +24,15 @@ You can find more examples and details about the commands in our tracks: follow 
 
 To see a description of how to use each command, run `npl help`
 
-| Command       | Description                                                                               |
-| ------------- | ----------------------------------------------------------------------------------------- |
-| `npl version` | Displays the current version of the NPL CLI                                               |
-| `npl help`    | Displays help information for the NPL CLI                                                 |
-| `npl check`   | Checks the NPL for compilation errors and warnings                                        |
-| `npl test`    | Runs the NPL tests                                                                        |
-| `npl puml`    | Generates a puml diagram from NPL source                                                  |
-| `npl openapi` | Generates the openapi specs for NPL protocols                                             |
-| `npl deploy`  | Deploys NPL sources to a configured Noumena Engine target. [See details](#deploy-command) |
+| Command       | Description                                               |
+| ------------- | --------------------------------------------------------- |
+| `npl version` | Displays the current version of the NPL CLI               |
+| `npl help`    | Displays help information for the NPL CLI                 |
+| `npl check`   | Checks the NPL for compilation errors and warnings        |
+| `npl test`    | Runs the NPL tests                                        |
+| `npl puml`    | Generates a puml diagram from NPL source                  |
+| `npl openapi` | Generates the openapi specs for NPL protocols             |
+| `npl deploy`  | Deploys NPL sources to a configured Noumena Engine target |
 
 ## Supported Operating Systems and architectures
 
