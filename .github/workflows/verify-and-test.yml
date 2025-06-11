@@ -10,6 +10,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  GITHUB_USER_NAME: ${{ secrets.GH_USERNAME }}
+  GITHUB_USER_PASS: ${{ secrets.GH_PASSWORD }}
+
 jobs:
   generic:
     name: "General validations"
