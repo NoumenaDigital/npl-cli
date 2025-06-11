@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GITHUB_USER_NAME: ${{ secrets.GH_USERNAME }}
-  GITHUB_USER_PASS: ${{ secrets.GH_PASSWORD }}
+  GITHUB_USER_NAME: "${{ secrets.GH_USERNAME_PUBLIC_REPOS }}"
+  GITHUB_USER_PASS: "${{ secrets.GH_PASSWORD_PUBLIC_REPOS }}"
 
 jobs:
   generic:
@@ -23,8 +23,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ secrets.GH_USERNAME }}
-          password: ${{ secrets.GH_PASSWORD }}
+          username: "${{ secrets.GH_USERNAME_PUBLIC_REPOS }}"
+          password: "${{ secrets.GH_PASSWORD_PUBLIC_REPOS }}"
 
       - name: "Documentation link check"
         run: |
