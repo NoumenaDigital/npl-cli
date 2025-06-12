@@ -59,11 +59,11 @@ open class NoumenaCloudAuthClient(
                 )
 
             client.execute(httpPost).use { response ->
+                if (response.statusLine.statusCode != 200) {
+                    throw CloudRestCallException("Error: ${response.statusLine.statusCode} - ${response.statusLine.reasonPhrase}.")
+                }
                 val entity = response.entity ?: throw CloudRestCallException("Empty response entity.")
                 val json = EntityUtils.toString(entity)
-                if (response.statusLine.statusCode != 200) {
-                    throw CloudRestCallException("Error: ${response.statusLine.statusCode} - $json")
-                }
                 return objectMapper.readValue(json)
             }
         } catch (ex: Exception) {

@@ -7,18 +7,18 @@ offers several useful commands for interacting with your NPL projects.
 
 To see a description of how to use each command, run `npl help`
 
-| Command                | Description                                                                               |
-| ---------------------- | ----------------------------------------------------------------------------------------- |
-| `npl version`          | Displays the current version of the NPL CLI                                               |
-| `npl help`             | Displays help information for the NPL CLI                                                 |
-| `npl check`            | Checks the NPL for compilation errors and warnings                                        |
-| `npl test`             | Runs the NPL tests                                                                        |
-| `npl puml`             | Generates a puml diagram from NPL source                                                  |
-| `npl openapi`          | Generates the openapi specs for NPL protocols                                             |
-| `npl deploy`           | Deploys NPL sources to a configured NOUMENA Engine target. [See details](#deploy-command) |
-| `npl cloud help`       | Displays help information for the NPL CLI cloud commands                                  |
-| `npl cloud login`      | Handles the login to NOUMENA cloud                                                        |
-| `npl cloud deploy-npl` | Deploys NPL sources to a NOUMENA cloud                                                    |
+| Command            | Description                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------- |
+| `npl version`      | Displays the current version of the NPL CLI                                               |
+| `npl help`         | Displays help information for the NPL CLI                                                 |
+| `npl check`        | Checks the NPL for compilation errors and warnings                                        |
+| `npl test`         | Runs the NPL tests                                                                        |
+| `npl puml`         | Generates a puml diagram from NPL source                                                  |
+| `npl openapi`      | Generates the openapi specs for NPL protocols                                             |
+| `npl deploy`       | Deploys NPL sources to a configured NOUMENA Engine target. [See details](#deploy-command) |
+| `npl cloud help`   | Displays help information for the NPL CLI cloud commands                                  |
+| `npl cloud login`  | Handles the login to NOUMENA cloud                                                        |
+| `npl cloud deploy` | Deploys NPL sources to a NOUMENA cloud                                                    |
 
 ## Supported Operating Systems and architectures
 
@@ -229,14 +229,14 @@ That command will login you to the NOUMENA cloud and store the access token in t
 | clientSecret | paas                                       | Yes               |
 | url          | https://keycloak.noumena.cloud/realms/paas | Yes               |
 
-## Cloud deploy-npl command
+## Cloud deploy command
 
 The `cloud login` command allows you to login to NOUMENA cloud with device token flow.
 
 ### Usage
 
 ```bash
-npl cloud deploy-npl --tenant <tenant> --appId <applicationUUID> --migration <directory>
+npl cloud deploy --tenant <tenant> --appId <applicationUUID> --migration <directory>
 ```
 
 That command will deploy your sources to the NOUMENA cloud application.

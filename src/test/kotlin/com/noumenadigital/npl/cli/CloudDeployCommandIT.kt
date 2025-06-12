@@ -122,7 +122,7 @@ class CloudDeployCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy-npl",
+                                "deploy",
                                 "--tenant",
                                 "Training",
                                 "--appId",
@@ -155,7 +155,7 @@ class CloudDeployCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy-npl",
+                                "deploy",
                                 "--clientId",
                                 "wrong",
                                 "--tenant",
@@ -173,7 +173,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy-npl failed: Cannot get access token 401 - Client Error.
+                            Command cloud deploy failed: Cannot get access token 401 - Client Error.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -188,7 +188,7 @@ class CloudDeployCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy-npl",
+                                "deploy",
                                 "--tenant",
                                 "Training",
                                 "--appId",
@@ -204,7 +204,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy-npl failed: Failed to upload application archive: Target host is not specified.
+                            Command cloud deploy failed: Failed to upload application archive: Target host is not specified.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -220,7 +220,7 @@ class CloudDeployCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy-npl",
+                                "deploy",
                                 "--tenant",
                                 "Training",
                                 "--appId",
@@ -236,7 +236,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy-npl failed: Please login again.
+                            Command cloud deploy failed: Please login again.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -251,7 +251,7 @@ class CloudDeployCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "deploy-npl",
+                                "deploy",
                                 "--tenant",
                                 "Training",
                                 "--appId",
@@ -267,7 +267,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy-npl failed: Migration file does not exist: notexists
+                            Command cloud deploy failed: Migration file does not exist: notexists
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput

@@ -24,7 +24,7 @@ class CloudDeployNplCommand(
             NoumenaCloudClient(NoumenaCloudConfig()),
         ),
 ) : CommandExecutor {
-    override val commandName: String = "cloud deploy-npl"
+    override val commandName: String = "cloud deploy"
     override val description: String = "Deploy NPL sources to a Noumena Cloud"
 
     override val parameters: List<CommandParameter> =
@@ -82,17 +82,17 @@ class CloudDeployNplCommand(
         val app = parsedArgs.getRequiredValue("--appId")
         val tenant = parsedArgs.getRequiredValue("--tenant")
         val migration = parsedArgs.getValue("--migration") ?: "./src/main/migration.yaml"
-        val clientId = parsedArgs.getValue("--clientId")
-        val clientSecret = parsedArgs.getValue("--clientSecret")
-        val authUrl = parsedArgs.getValue("--authUrl")
-        val ncUrl = parsedArgs.getValue("--ncUrl")
         val migrationFile = File(migration)
         if (!migrationFile.exists()) {
             throw CloudCommandException(
                 message = "Migration file does not exist: $migration",
-                commandName = "cloud deploy-npl",
+                commandName = "cloud deploy",
             )
         }
+        val clientId = parsedArgs.getValue("--clientId")
+        val clientSecret = parsedArgs.getValue("--clientSecret")
+        val authUrl = parsedArgs.getValue("--authUrl")
+        val ncUrl = parsedArgs.getValue("--ncUrl")
         val srcDir = migrationFile.parent.toString()
         val sourcesManager = SourcesManager(srcDir)
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
@@ -112,7 +112,7 @@ class CloudDeployNplCommand(
             output.success("NPL Application successfully deployed to NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
-            throw CloudCommandException(ex.message, ex, "cloud deploy-npl")
+            throw CloudCommandException(ex.message, ex, "cloud deploy")
         }
     }
 }
