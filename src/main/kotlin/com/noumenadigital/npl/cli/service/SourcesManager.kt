@@ -15,9 +15,10 @@ class SourcesManager(
 ) {
     companion object {
         private const val NPL_EXTENSION = ".npl"
+        private const val CONTRIB_PATH = "npl-contrib"
     }
 
-    val nplContribLibrary: String = File(srcPath, "npl-contrib").path
+    val nplContribLibrary: String = File(srcPath, CONTRIB_PATH).path
 
     fun getNplSources(): List<Source> {
         collectSourcesFromDirectory(srcPath).let { sources ->
