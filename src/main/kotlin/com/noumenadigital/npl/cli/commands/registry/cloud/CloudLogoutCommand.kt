@@ -15,7 +15,7 @@ class CloudLogoutCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             cloudAuthManager.logout()
-            output.success("Successfully logged out of NOUMENA Cloud.")
+            output.success("Successfully logged out of NOUMENA Cloud Cli Tool.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
             throw CloudCommandException(ex.message, ex, "cloud logout")

@@ -115,7 +115,7 @@ class CloudLogoutCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Successfully logged out of NOUMENA Cloud.
+                            Successfully logged out of NOUMENA Cloud Cli Tool.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -132,7 +132,7 @@ class CloudLogoutCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Successfully logged out of NOUMENA Cloud.
+                            Successfully logged out of NOUMENA Cloud Cli Tool.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
