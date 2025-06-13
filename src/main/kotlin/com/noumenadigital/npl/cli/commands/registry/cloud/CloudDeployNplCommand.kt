@@ -48,11 +48,11 @@ class CloudDeployNplCommand(
                 valuePlaceholder = "<migration>",
             ),
             NamedParameter(
-                name = "--ncUrl",
+                name = "--url",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
-                valuePlaceholder = "<ncUrl>",
+                valuePlaceholder = "<url>",
             ),
             NamedParameter(
                 name = "--clientId",
@@ -92,7 +92,7 @@ class CloudDeployNplCommand(
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
-        val ncUrl = parsedArgs.getValue("--ncUrl")
+        val url = parsedArgs.getValue("--url")
         val srcDir = migrationFile.parent.toString()
         val sourcesManager = SourcesManager(srcDir)
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
@@ -100,7 +100,7 @@ class CloudDeployNplCommand(
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, ncUrl)),
+                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
             )
         return CloudDeployNplCommand(sourcesManager, cloudDeployService)
     }

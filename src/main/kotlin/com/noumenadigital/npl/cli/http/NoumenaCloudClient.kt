@@ -12,18 +12,18 @@ import java.util.UUID
 data class NoumenaCloudConfig(
     val app: String = "",
     val tenant: String = "",
-    val ncUrl: String = "https://portal.noumena.cloud",
+    val url: String = "https://portal.noumena.cloud",
 ) {
     companion object {
         fun get(
             app: String,
             tenant: String,
-            ncUrl: String? = null,
+            url: String? = null,
         ): NoumenaCloudConfig =
             NoumenaCloudConfig(
                 app = app,
                 tenant = tenant,
-                ncUrl = ncUrl ?: "https://portal.noumena.cloud",
+                url = url ?: "https://portal.noumena.cloud",
             )
     }
 }
@@ -32,7 +32,7 @@ open class NoumenaCloudClient(
     val config: NoumenaCloudConfig,
 ) {
     private val deployUrl =
-        "${config.ncUrl}/api/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}/deploy"
+        "${config.url}/api/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}/deploy"
     private val client = HttpClients.createDefault()
 
     fun uploadApplicationArchive(
