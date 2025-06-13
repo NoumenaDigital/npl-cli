@@ -22,16 +22,12 @@ class CloudClearNplCommand(
         ),
 ) : CommandExecutor {
     override val commandName: String = "cloud clear"
-    override val description: String = "Deletes the NPL application from Noumena Cloud"
+    override val description: String =
+        "Deletes all source files and resets the application’s current state " +
+            "- including variables, temporary data, and any objects currently in use.'"
 
     override val parameters: List<CommandParameter> =
         listOf(
-            NamedParameter(
-                name = "--tenant",
-                description = "NOUMENA Cloud Tenant name",
-                isRequired = true,
-                valuePlaceholder = "<tenant>",
-            ),
             NamedParameter(
                 name = "--appId",
                 description = "NOUMENA Cloud Application id",
@@ -39,11 +35,11 @@ class CloudClearNplCommand(
                 valuePlaceholder = "<appId>",
             ),
             NamedParameter(
-                name = "--ncUrl",
+                name = "--url",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
-                valuePlaceholder = "<ncUrl>",
+                valuePlaceholder = "<url>",
             ),
             NamedParameter(
                 name = "--clientId",
@@ -71,17 +67,16 @@ class CloudClearNplCommand(
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("--appId")
-        val tenant = parsedArgs.getRequiredValue("--tenant")
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
-        val ncUrl = parsedArgs.getValue("--ncUrl")
+        val url = parsedArgs.getValue("--url")
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, ncUrl)),
+                NoumenaCloudClient(NoumenaCloudConfig.get(app, url)),
             )
         return CloudClearNplCommand(cloudDeployService = cloudDeployService)
     }

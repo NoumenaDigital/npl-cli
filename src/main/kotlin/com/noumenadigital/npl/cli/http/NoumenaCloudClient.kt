@@ -2,13 +2,9 @@ package com.noumenadigital.npl.cli.http
 
 import com.noumenadigital.npl.cli.exception.CloudRestCallException
 import org.apache.http.client.methods.HttpDelete
-import com.noumenadigital.npl.cli.model.DeviceCodeResponse
-import com.noumenadigital.npl.cli.model.TokenResponse
-import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.impl.client.HttpClients
-import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -34,7 +30,7 @@ open class NoumenaCloudClient(
     config: NoumenaCloudConfig,
 ) {
     val ncBaseUrl =
-        "${config.ncUrl}/api/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}"
+        "${config.url}/api/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}"
     private val deployUrl = "$ncBaseUrl/deploy"
     private val clearUrl = "$ncBaseUrl/clear"
     private val client = HttpClients.createDefault()

@@ -7,24 +7,24 @@ offers several useful commands for interacting with your NPL projects.
 
 To see a description of how to use each command, run `npl help`
 
-| Command            | Description                                                                               |
-|--------------------|-------------------------------------------------------------------------------------------|
-| `npl version`      | Displays the current version of the NPL CLI                                               |
-| `npl help`         | Displays help information for the NPL CLI                                                 |
-| `npl check`        | Checks the NPL for compilation errors and warnings                                        |
-| `npl test`         | Runs the NPL tests                                                                        |
-| `npl puml`         | Generates a puml diagram from NPL source                                                  |
-| `npl openapi`      | Generates the openapi specs for NPL protocols                                             |
-| `npl deploy`       | Deploys NPL sources to a configured NOUMENA Engine target. [See details](#deploy-command) |
-| `npl cloud help`   | Displays help information for the NPL CLI cloud commands                                  |
-| `npl cloud login`  | Handles the login to NOUMENA cloud                                                        |
-| `npl cloud deploy` | Deploys NPL sources to a NOUMENA cloud                                                    |
-| `npl cloud clear`  | Deletes NPL application from a NOUMENA cloud                                              |
+| Command            | Description                                                                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npl version`      | Displays the current version of the NPL CLI                                                                                                 |
+| `npl help`         | Displays help information for the NPL CLI                                                                                                   |
+| `npl check`        | Checks the NPL for compilation errors and warnings                                                                                          |
+| `npl test`         | Runs the NPL tests                                                                                                                          |
+| `npl puml`         | Generates a puml diagram from NPL source                                                                                                    |
+| `npl openapi`      | Generates the openapi specs for NPL protocols                                                                                               |
+| `npl deploy`       | Deploys NPL sources to a configured NOUMENA Engine target. [See details](#deploy-command)                                                   |
+| `npl cloud help`   | Displays help information for the NPL CLI cloud commands                                                                                    |
+| `npl cloud login`  | Handles the login to NOUMENA cloud                                                                                                          |
+| `npl cloud deploy` | Deploys NPL sources to a NOUMENA cloud                                                                                                      |
+| `npl cloud clear`  | Deletes all source files and resets the application’s current state — including variables, temporary data, and any objects currently in use |
 
 ## Supported Operating Systems and architectures
 
 |         | ARM 64 | AMD 64 |
-|---------|--------|--------|
+| ------- | ------ | ------ |
 | MacOS   | Yes    | Yes    |
 | Linux   | Yes    | Yes    |
 | Windows | Yes    | Yes    |
@@ -200,7 +200,7 @@ targets:
 #### Properties for Each Target
 
 | Property              | Description                              | Default Value                             |
-|-----------------------|------------------------------------------|-------------------------------------------|
+| --------------------- | ---------------------------------------- | ----------------------------------------- |
 | `engineManagementUrl` | URL of the Noumena Engine Management API | `"http://localhost:12400/realms/noumena"` |
 | `authUrl`             | URL of the authentication endpoint       | `"http://localhost:11000"`                |
 | `username`            | Username for authentication              | (Required)                                |
@@ -225,7 +225,7 @@ npl cloud login
 That command will login you to the NOUMENA cloud and store the access token in the ~/.noumena folder.
 
 | Args         | Default values                             | Can be overridden |
-|--------------|--------------------------------------------|-------------------|
+| ------------ | ------------------------------------------ | ----------------- |
 | clientId     | paas                                       | Yes               |
 | clientSecret | paas                                       | Yes               |
 | url          | https://keycloak.noumena.cloud/realms/paas | Yes               |
@@ -243,7 +243,7 @@ npl cloud deploy --appId <applicationUUID> --migration <directory>
 That command will deploy your sources to the NOUMENA cloud application.
 
 | Args         | Default values                             | Can be overridden |
-|--------------|--------------------------------------------|-------------------|
+| ------------ | ------------------------------------------ | ----------------- |
 | appId        | -                                          | Yes               |
 | url          | https://portal.noumena.cloud               | Yes               |
 | migration    | ./src/main/migration.yaml                  | Yes               |
@@ -264,7 +264,7 @@ npl cloud clear --appId <applicationUUID>
 That command will remove your application from the NOUMENA cloud.
 
 | Args         | Default values                             | Can be overridden |
-|--------------| ------------------------------------------ | ----------------- |
+| ------------ | ------------------------------------------ | ----------------- |
 | appId        | -                                          | Yes               |
 | url          | https://portal.noumena.cloud               | Yes               |
 | authUrl      | https://keycloak.noumena.cloud/realms/paas | Yes               |
