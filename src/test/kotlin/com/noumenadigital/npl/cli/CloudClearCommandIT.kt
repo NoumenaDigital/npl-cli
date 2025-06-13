@@ -122,7 +122,7 @@ class CloudClearCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "clear-npl",
+                                "clear",
                                 "--tenant",
                                 "Training",
                                 "--appId",
@@ -153,7 +153,7 @@ class CloudClearCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "clear-npl",
+                                "clear",
                                 "--clientId",
                                 "wrong",
                                 "--tenant",
@@ -184,7 +184,7 @@ class CloudClearCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "clear-npl",
+                                "clear",
                                 "--tenant",
                                 "Training",
                                 "--appId",
@@ -214,7 +214,7 @@ class CloudClearCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "clear-npl",
+                                "clear",
                                 "--tenant",
                                 "Training",
                                 "--appId",

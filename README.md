@@ -246,6 +246,7 @@ That command will deploy your sources to the NOUMENA cloud application.
 |--------------|--------------------------------------------|-------------------|
 | appId        | -                                          | Yes               |
 | url          | https://portal.noumena.cloud               | Yes               |
+| migration    | ./src/main/migration.yaml                  | Yes               |
 | authUrl      | https://keycloak.noumena.cloud/realms/paas | Yes               |
 | clientId     | paas                                       | Yes               |
 | clientSecret | paas                                       | Yes               |

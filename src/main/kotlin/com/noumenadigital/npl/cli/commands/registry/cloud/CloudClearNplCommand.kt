@@ -21,7 +21,7 @@ class CloudClearNplCommand(
             NoumenaCloudClient(NoumenaCloudConfig()),
         ),
 ) : CommandExecutor {
-    override val commandName: String = "cloud clear-npl"
+    override val commandName: String = "cloud clear"
     override val description: String = "Deletes the NPL application from Noumena Cloud"
 
     override val parameters: List<CommandParameter> =
