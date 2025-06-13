@@ -87,7 +87,7 @@ class CloudClearNplCommand(
             output.success("NPL Application successfully deleted from NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
-            throw CloudCommandException(ex.message, ex, "cloud deploy-npl")
+            throw CloudCommandException(ex.message, ex, "cloud clear")
         }
     }
 }
