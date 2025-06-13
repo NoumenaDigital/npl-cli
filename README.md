@@ -1,6 +1,6 @@
 # NPL CLI
 
-To check full CLI documentation go to: [cli.md](docs/runtime/tools/build-tools/cli.md)
+You can find the full CLI documentation here: [cli.md](docs/runtime/tools/build-tools/cli.md)
 
 ## Versioning
 
