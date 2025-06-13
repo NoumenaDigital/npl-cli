@@ -13,33 +13,26 @@ import com.noumenadigital.npl.cli.http.NoumenaCloudConfig
 import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
-import com.noumenadigital.npl.cli.service.SourcesManager
-import java.io.File
 
-class CloudDeployNplCommand(
-    val sourcesManager: SourcesManager = SourcesManager("."),
+class CloudClearNplCommand(
     val cloudDeployService: CloudDeployService =
         CloudDeployService(
             CloudAuthManager(),
             NoumenaCloudClient(NoumenaCloudConfig()),
         ),
 ) : CommandExecutor {
-    override val commandName: String = "cloud deploy"
-    override val description: String = "Deploy NPL sources to a Noumena Cloud"
+    override val commandName: String = "cloud clear"
+    override val description: String =
+        "Deletes all source files and resets the application’s current state " +
+            "- including variables, temporary data, and any objects currently in use.'"
 
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
                 name = "--appId",
-                description = "NOUMENA Cloud Application appId",
+                description = "NOUMENA Cloud Application id",
                 isRequired = true,
                 valuePlaceholder = "<appId>",
-            ),
-            NamedParameter(
-                name = "--migration",
-                description = "NOUMENA Cloud Auth URL",
-                isRequired = false,
-                valuePlaceholder = "<migration>",
             ),
             NamedParameter(
                 name = "--url",
@@ -74,20 +67,10 @@ class CloudDeployNplCommand(
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("--appId")
-        val migration = parsedArgs.getValue("--migration") ?: "./src/main/migration.yaml"
-        val migrationFile = File(migration)
-        if (!migrationFile.exists()) {
-            throw CloudCommandException(
-                message = "Migration file does not exist - $migration",
-                commandName = "cloud deploy",
-            )
-        }
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
         val url = parsedArgs.getValue("--url")
-        val srcDir = migrationFile.parent.toString()
-        val sourcesManager = SourcesManager(srcDir)
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
@@ -95,17 +78,16 @@ class CloudDeployNplCommand(
                 CloudAuthManager(noumenaCloudAuthClient),
                 NoumenaCloudClient(NoumenaCloudConfig.get(app, url)),
             )
-        return CloudDeployNplCommand(sourcesManager, cloudDeployService)
+        return CloudClearNplCommand(cloudDeployService = cloudDeployService)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            val archive = sourcesManager.getArchivedSources()
-            cloudDeployService.deployNplApplication(archive)
-            output.success("NPL Application successfully deployed to NOUMENA Cloud.")
+            cloudDeployService.clearApp()
+            output.success("NPL Application successfully deleted from NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
-            throw CloudCommandException(ex.message, ex, "cloud deploy")
+            throw CloudCommandException(ex.message, ex, "cloud deploy-npl")
         }
     }
 }
