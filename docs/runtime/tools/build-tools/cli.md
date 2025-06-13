@@ -7,36 +7,27 @@ weight: 20
 The NPL CLI is a command line tool to support the development of projects written in Noumena Protocol Language (NPL). It
 offers several useful commands for interacting with your NPL projects.
 
-## How to install?
-
-You can install the NPL CLI using
-
-```shell
-curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
-```
-
-## How to use?
-
-You can find more examples and details about the commands in our tracks: follow the
-[link](../../../tracks/developing-NPL-local.md)
-
 ## Commands
 
 To see a description of how to use each command, run `npl help`
 
-| Command       | Description                                               |
-| ------------- | --------------------------------------------------------- |
-| `npl version` | Displays the current version of the NPL CLI               |
-| `npl help`    | Displays help information for the NPL CLI                 |
-| `npl check`   | Checks the NPL for compilation errors and warnings        |
-| `npl test`    | Runs the NPL tests                                        |
-| `npl puml`    | Generates a puml diagram from NPL source                  |
-| `npl openapi` | Generates the openapi specs for NPL protocols             |
-| `npl deploy`  | Deploys NPL sources to a configured Noumena Engine target |
+| Command            | Description                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------- |
+| `npl version`      | Displays the current version of the NPL CLI                                               |
+| `npl help`         | Displays help information for the NPL CLI                                                 |
+| `npl check`        | Checks the NPL for compilation errors and warnings                                        |
+| `npl test`         | Runs the NPL tests                                                                        |
+| `npl puml`         | Generates a puml diagram from NPL source                                                  |
+| `npl openapi`      | Generates the openapi specs for NPL protocols                                             |
+| `npl deploy`       | Deploys NPL sources to a configured NOUMENA Engine target. [See details](#deploy-command) |
+| `npl cloud help`   | Displays help information for the NPL CLI cloud commands                                  |
+| `npl cloud login`  | Handles the login to NOUMENA cloud                                                        |
+| `npl cloud deploy` | Deploys NPL sources to a NOUMENA cloud                                                    |
 
 ## Supported Operating Systems and architectures
 
-|       | ARM 64 | AMD 64 |
-| ----- | ------ | ------ |
-| MacOS | Yes    | Yes    |
-| Linux | Yes    | Yes    |
+|         | ARM 64 | AMD 64 |
+| ------- | ------ | ------ |
+| MacOS   | Yes    | Yes    |
+| Linux   | Yes    | Yes    |
+| Windows | Yes    | Yes    |
