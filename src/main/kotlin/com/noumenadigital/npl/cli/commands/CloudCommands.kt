@@ -11,7 +11,7 @@ import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 enum class CloudCommands(
     override val commandExecutorFactory: () -> CommandExecutor,
 ) : CommandsRegistry {
-    CLOUT_LOGIN({ CloudLoginCommand() }),
+    CLOUD_LOGIN({ CloudLoginCommand() }),
     CLOUD_LOGOUT({ CloudLogoutCommand() }),
     CLOUD_HELP({ CloudHelpCommand }),
     CLOUD_DEPLOY_NPL({ CloudDeployNplCommand() }),
