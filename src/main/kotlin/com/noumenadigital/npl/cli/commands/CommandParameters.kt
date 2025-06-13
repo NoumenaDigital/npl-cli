@@ -1,5 +1,7 @@
 package com.noumenadigital.npl.cli.commands
 
+import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
+
 sealed interface CommandParameter {
     val name: String
     val description: String
@@ -91,5 +93,7 @@ object CommandArgumentParser {
         fun hasFlag(name: String): Boolean = values.containsKey(name)
 
         fun getValue(name: String): String? = values[name]
+
+        fun getRequiredValue(name: String): String = values[name] ?: throw RequiredParameterMissing(name)
     }
 }

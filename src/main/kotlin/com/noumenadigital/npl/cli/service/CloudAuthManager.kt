@@ -1,25 +1,27 @@
 package com.noumenadigital.npl.cli.service
 
+import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.CloudAuthorizationPendingException
 import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.exception.CloudSlowDownException
-import com.noumenadigital.npl.cli.http.NoumenaCloudClient
+import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.model.DeviceCodeResponse
 import com.noumenadigital.npl.cli.model.TokenResponse
 import com.noumenadigital.npl.cli.util.IOUtils
+import com.noumenadigital.npl.cli.util.IOUtils.readObjectFromFile
 import kotlinx.coroutines.delay
 import java.nio.file.Path
 import kotlin.io.path.Path
 
 class CloudAuthManager(
-    private val noumenaCloudClient: NoumenaCloudClient,
-    private val jsonFilePath: Path = Path(System.getProperty("user.home"), ".noumena", "noumena.yaml"),
+    private val noumenaCloudAuthClient: NoumenaCloudAuthClient = NoumenaCloudAuthClient(),
+    private val noumenaConfigFilePath: Path = Path(System.getProperty("user.home"), ".noumena", "noumena.yaml"),
 ) {
     suspend fun login(output: ColorWriter) {
-        val deviceCode = noumenaCloudClient.requestDeviceCode()
+        val deviceCode = noumenaCloudAuthClient.requestDeviceCode()
         openBrowser(deviceCode.verificationUriComplete, output)
         val token = pollForToken(deviceCode)
-        IOUtils.writeObjectToFile(jsonFilePath.toFile(), token)
+        IOUtils.writeObjectToFile(noumenaConfigFilePath.toFile(), token)
     }
 
     private suspend fun pollForToken(deviceCode: DeviceCodeResponse): TokenResponse {
@@ -29,7 +31,7 @@ class CloudAuthManager(
 
         while (true) {
             try {
-                return noumenaCloudClient.requestToken(deviceCode)
+                return noumenaCloudAuthClient.requestToken(deviceCode)
             } catch (e: CloudAuthorizationPendingException) {
             } catch (e: CloudSlowDownException) {
                 currentInterval += 1000
@@ -43,6 +45,19 @@ class CloudAuthManager(
 
             delay(currentInterval)
         }
+    }
+
+    fun getToken(): TokenResponse {
+        if (!noumenaConfigFilePath.toFile().exists()) {
+            throw AuthorizationFailedException("Please login again.")
+        }
+        val storedToken = readObjectFromFile<TokenResponse>(noumenaConfigFilePath.toFile())
+        if (storedToken.refreshToken == null) {
+            throw CloudCommandException("No refresh token found in the stored configuration. Please login again.")
+        }
+        val updatedToken = noumenaCloudAuthClient.getAccessTokenByRefreshToken(storedToken.refreshToken)
+        IOUtils.writeObjectToFile(noumenaConfigFilePath.toFile(), updatedToken)
+        return updatedToken
     }
 
     private fun openBrowser(

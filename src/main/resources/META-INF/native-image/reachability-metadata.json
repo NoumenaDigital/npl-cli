@@ -287,6 +287,13 @@
           "name": "<init>",
           "parameterTypes": [
             "java.lang.String",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
             "java.lang.String",
             "int",
             "kotlin.jvm.internal.DefaultConstructorMarker"

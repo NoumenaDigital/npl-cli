@@ -9,6 +9,7 @@ import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
 import com.noumenadigital.npl.cli.exception.DeployConfigException
 import com.noumenadigital.npl.cli.exception.InternalException
+import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.exception.buildOutputMessage
 import com.noumenadigital.npl.cli.service.ColorWriter
 
@@ -57,6 +58,11 @@ class CommandProcessor(
                     is CloudCommandException -> {
                         output.error(ex.buildOutputMessage())
                         return ExitCode.GENERAL_ERROR
+                    }
+
+                    is RequiredParameterMissing -> {
+                        output.error(ex.buildOutputMessage())
+                        return ExitCode.USAGE_ERROR
                     }
                 }
             } catch (ex: Exception) {

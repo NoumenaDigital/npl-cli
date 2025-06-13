@@ -2,8 +2,8 @@ package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.exception.CloudAuthorizationPendingException
 import com.noumenadigital.npl.cli.exception.CloudCommandException
-import com.noumenadigital.npl.cli.http.NoumenaCloudClient
-import com.noumenadigital.npl.cli.http.NoumenaCloudConfig
+import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
+import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.model.DeviceCodeResponse
 import com.noumenadigital.npl.cli.model.TokenResponse
 import io.kotest.assertions.throwables.shouldThrow
@@ -12,12 +12,12 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.StringWriter
 
-class FakeNoumenaCloudClient(
+class FakeNoumenaCloudAuthClient(
     var tokenResponses: List<Any> = listOf(),
     var deviceCodeResponse: DeviceCodeResponse? = null,
-) : NoumenaCloudClient(
+) : NoumenaCloudAuthClient(
         config =
-            NoumenaCloudConfig(
+            NoumenaCloudAuthConfig(
                 clientId = "test-client",
                 clientSecret = "test-client-secret",
                 url = "http://localhost:8080",
@@ -54,7 +54,7 @@ class CloudAuthManagerTest :
                 ),
             val writer: StringWriter = StringWriter(),
             val colorWriter: ColorWriter = ColorWriter(writer, useColor = false),
-            val fakeClient: FakeNoumenaCloudClient = FakeNoumenaCloudClient(tokenResponses, deviceCodeResponse),
+            val fakeClient: FakeNoumenaCloudAuthClient = FakeNoumenaCloudAuthClient(tokenResponses, deviceCodeResponse),
             val manager: CloudAuthManager = CloudAuthManager(fakeClient),
         )
 

@@ -61,3 +61,5 @@ fun ClientSetupException.buildOutputMessage(): String = "Client setup error: ${t
 fun AuthorizationFailedException.buildOutputMessage(): String = this.message
 
 fun CloudCommandException.buildOutputMessage(): String = "Command ${this.commandName} failed: ${this.message}"
+
+fun RequiredParameterMissing.buildOutputMessage(): String = "Command parsing failed: required parameter ${this.parameterName} is missing"

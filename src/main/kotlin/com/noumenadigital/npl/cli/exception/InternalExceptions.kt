@@ -24,6 +24,10 @@ data class ClientSetupException(
     override val cause: Throwable? = null,
 ) : InternalException()
 
+class RequiredParameterMissing(
+    val parameterName: String,
+) : InternalException()
+
 data class AuthorizationFailedException(
     override val message: String,
     override val cause: Throwable? = null,

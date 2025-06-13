@@ -1,6 +1,7 @@
 package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
+import com.noumenadigital.npl.cli.commands.registry.cloud.CloudDeployNplCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudHelpCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLoginCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
@@ -10,6 +11,7 @@ enum class CloudCommands(
 ) : CommandsRegistry {
     LOGIN({ CloudLoginCommand() }),
     CLOUD_HELP({ CloudHelpCommand }),
+    CLOUD_DEPLOY_NPL({ CloudDeployNplCommand() }),
     ;
 
     companion object {
