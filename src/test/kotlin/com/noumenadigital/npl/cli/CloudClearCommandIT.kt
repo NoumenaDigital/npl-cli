@@ -169,7 +169,7 @@ class CloudClearCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy-npl failed: Cannot get access token 401 - Client Error.
+                            Command cloud clear failed: Cannot get access token 401 - Client Error.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -198,7 +198,7 @@ class CloudClearCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy-npl failed: Failed to remove the application -  Target host is not specified.
+                            Command cloud clear failed: Failed to remove the application -  Target host is not specified.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -207,7 +207,7 @@ class CloudClearCommandIT :
                 }
             }
 
-            test("cloud deploy failed login required") {
+            test("cloud clear failed login required") {
                 withTestContext {
                     File(System.getProperty("user.home")).resolve(".noumena").deleteRecursively()
                     runCommand(
@@ -228,7 +228,7 @@ class CloudClearCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy-npl failed: Please login again.
+                            Command cloud clear failed: Please login again.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
