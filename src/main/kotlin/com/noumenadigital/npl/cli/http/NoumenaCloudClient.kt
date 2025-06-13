@@ -11,18 +11,15 @@ import java.util.UUID
 
 data class NoumenaCloudConfig(
     val app: String = "",
-    val tenant: String = "",
     val url: String = "https://portal.noumena.cloud",
 ) {
     companion object {
         fun get(
             app: String,
-            tenant: String,
             url: String? = null,
         ): NoumenaCloudConfig =
             NoumenaCloudConfig(
                 app = app,
-                tenant = tenant,
                 url = url ?: "https://portal.noumena.cloud",
             )
     }

@@ -236,14 +236,13 @@ The `cloud login` command allows you to login to NOUMENA cloud with device token
 ### Usage
 
 ```bash
-npl cloud deploy --tenant <tenant> --appId <applicationUUID> --migration <directory>
+npl cloud deploy --appId <applicationUUID> --migration <directory>
 ```
 
 That command will deploy your sources to the NOUMENA cloud application.
 
 | Args         | Default values                             | Can be overridden |
 | ------------ | ------------------------------------------ | ----------------- |
-| tenant       | -                                          | Yes               |
 | appId        | -                                          | Yes               |
 | url          | https://portal.noumena.cloud               | Yes               |
 | authUrl      | https://keycloak.noumena.cloud/realms/paas | Yes               |

@@ -30,12 +30,6 @@ class CloudDeployNplCommand(
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
-                name = "--tenant",
-                description = "NOUMENA Cloud Tenant name",
-                isRequired = true,
-                valuePlaceholder = "<tenant>",
-            ),
-            NamedParameter(
                 name = "--appId",
                 description = "NOUMENA Cloud Application appId",
                 isRequired = true,
@@ -80,7 +74,6 @@ class CloudDeployNplCommand(
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("--appId")
-        val tenant = parsedArgs.getRequiredValue("--tenant")
         val migration = parsedArgs.getValue("--migration") ?: "./src/main/migration.yaml"
         val migrationFile = File(migration)
         if (!migrationFile.exists()) {
@@ -100,7 +93,7 @@ class CloudDeployNplCommand(
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
+                NoumenaCloudClient(NoumenaCloudConfig.get(app, url)),
             )
         return CloudDeployNplCommand(sourcesManager, cloudDeployService)
     }

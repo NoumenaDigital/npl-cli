@@ -123,8 +123,6 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
-                                "--tenant",
-                                "Training",
                                 "--appId",
                                 APP_ID_OK,
                                 "--migration",
@@ -158,8 +156,6 @@ class CloudDeployCommandIT :
                                 "deploy",
                                 "--clientId",
                                 "wrong",
-                                "--tenant",
-                                "Training",
                                 "--appId",
                                 APP_ID_OK,
                                 "--migration",
@@ -189,8 +185,6 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
-                                "--tenant",
-                                "Training",
                                 "--appId",
                                 APP_ID_OK,
                                 "--migration",
@@ -221,8 +215,6 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
-                                "--tenant",
-                                "Training",
                                 "--appId",
                                 APP_ID_OK,
                                 "--migration",
@@ -252,8 +244,6 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
-                                "--tenant",
-                                "Training",
                                 "--appId",
                                 APP_ID_OK,
                                 "--migration",
