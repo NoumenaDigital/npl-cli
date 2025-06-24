@@ -57,7 +57,7 @@ class CloudClearNplCommand(
             ),
             NamedParameter(
                 name = "--authUrl",
-                description = "Path to migration.yml where NPL migrations are defined",
+                description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<authUrl>",
