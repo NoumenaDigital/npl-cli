@@ -36,7 +36,7 @@ class CloudLoginCommand(
             ),
             NamedParameter(
                 name = "--url",
-                description = "NOUMENA Cloud Auth URL",
+                description = "Path to migration.yml where NPL migrations are defined",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
