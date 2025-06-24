@@ -36,7 +36,7 @@ class CloudLoginCommand(
             ),
             NamedParameter(
                 name = "--url",
-                description = "NOUMENA Cloud portal URL",
+                description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
