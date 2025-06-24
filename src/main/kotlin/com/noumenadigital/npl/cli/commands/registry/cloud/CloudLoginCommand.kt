@@ -16,7 +16,7 @@ class CloudLoginCommand(
     private val authManager: CloudAuthManager = CloudAuthManager(),
 ) : CommandExecutor {
     override val commandName: String = "cloud login"
-    override val description: String = "Login to Noumena Cloud"
+    override val description: String = "Login to NOUMENA Cloud"
 
     override val parameters: List<CommandParameter> =
         listOf(
@@ -36,7 +36,7 @@ class CloudLoginCommand(
             ),
             NamedParameter(
                 name = "--url",
-                description = "Path to migration.yml where NPL migrations are defined",
+                description = "NOUMENA Cloud portal URL",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
