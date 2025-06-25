@@ -33,3 +33,15 @@ To see a description of how to use each command, run `npl help`
 | MacOS   | Yes    | Yes    |
 | Linux   | Yes    | Yes    |
 | Windows | Yes    | Yes    |
+
+## How to install
+
+For MacOS, Linux, and Windows running WSL, you can install the NPL CLI using
+
+```shell
+curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
+```
+
+or download the latest release [here](https://github.com/NoumenaDigital/npl-cli/releases) and add it to your $PATH. On Windows running WSL, you will need to manually add the `npl` executable to your PATH. The script above will not do that for you.
+
+For Windows without WSL, you may download the latest `.exe` executable [here](https://github.com/NoumenaDigital/npl-cli/releases)
