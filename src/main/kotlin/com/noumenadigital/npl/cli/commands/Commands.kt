@@ -5,6 +5,7 @@ import com.noumenadigital.npl.cli.commands.registry.CloudCommand
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.DeployCommand
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
+import com.noumenadigital.npl.cli.commands.registry.InitCommand
 import com.noumenadigital.npl.cli.commands.registry.McpCommand
 import com.noumenadigital.npl.cli.commands.registry.OpenapiCommand
 import com.noumenadigital.npl.cli.commands.registry.PumlCommand
@@ -17,6 +18,7 @@ enum class Commands(
 ) : CommandsRegistry {
     VERSION({ VersionCommand }),
     HELP({ HelpCommand() }),
+    INIT({ InitCommand() }),
     CHECK({ CheckCommand() }),
     TEST({ TestCommand() }),
     OPENAPI({ OpenapiCommand() }),

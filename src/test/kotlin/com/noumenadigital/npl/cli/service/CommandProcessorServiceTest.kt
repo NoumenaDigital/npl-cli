@@ -35,6 +35,9 @@ class CommandProcessorServiceTest :
                     """
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
+                    init       Initializes a new project
+                                 --project <project> (required)  Name of the project. A directory of this name will be created in the current directory
+                                 --bare  Installs an empty project structure
                     check      Validate the correctness of NPL sources
                                  --sourceDir <directory>  Directory containing NPL source files (defaults to current directory)
                     test       Run the NPL tests
