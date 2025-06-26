@@ -168,7 +168,7 @@ class InitCommandIT :
 
         test("Init command: Fail if process cannot create directory") {
             withInitTestContext(testDir = listOf("success")) {
-                projectDir.parentFile.setWritable(false)
+                projectDir.parentFile.setReadOnly()
                 runCommand(commands = listOf("init", "--project", projectDir.name)) {
                     process.waitFor()
 
