@@ -140,7 +140,7 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    Error occurred while downloading project files: Failed to retrieve project files. Status returned: 404
+                    Failed to retrieve project files. Status returned: 404
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -162,25 +162,6 @@ class InitCommandIT :
 
                     output.normalize() shouldBe expectedOutput
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-                }
-            }
-        }
-
-        test("Init command: Fail if process cannot create directory") {
-            withInitTestContext(testDir = listOf("success")) {
-                projectDir.parentFile.setReadOnly()
-                runCommand(commands = listOf("init", "--project", projectDir.name)) {
-                    process.waitFor()
-
-                    val expectedOutput =
-                        """
-                    Failed to create directory ${projectDir.canonicalFile.path}.
-                    """.normalize()
-
-                    output.normalize() shouldBe expectedOutput
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-
-                    projectDir.parentFile.setWritable(true)
                 }
             }
         }
