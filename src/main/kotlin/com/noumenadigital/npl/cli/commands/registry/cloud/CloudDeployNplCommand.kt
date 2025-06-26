@@ -74,7 +74,7 @@ class CloudDeployNplCommand(
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("--appId")
-        val migration = parsedArgs.getValue("--migration") ?: "./src/main/migration.yaml"
+        val migration = parsedArgs.getValue("--migration") ?: "src/main/migration.yml"
         val migrationFile = File(migration)
         if (!migrationFile.exists()) {
             throw CloudCommandException(
