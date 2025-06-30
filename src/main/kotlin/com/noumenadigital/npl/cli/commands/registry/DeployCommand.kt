@@ -170,8 +170,7 @@ class DeployCommand(
                                   ├── npl-1.0
                                   │   └── processes
                                   │       └── demo.npl
-                                  └── yaml
-                                      └── migration.yml
+                                  └── migration.yml
 
             Target Specification (one required):
               --target <name>     Named target from deploy.yml to deploy to.
