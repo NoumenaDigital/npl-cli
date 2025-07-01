@@ -5,11 +5,11 @@ import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient
+import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.NO_SAMPLES
+import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
 import com.noumenadigital.npl.cli.service.ColorWriter
+import com.noumenadigital.npl.cli.util.ZipExtractor
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.util.zip.ZipInputStream
 
 class InitCommand(
     private val args: List<String> = emptyList(),
@@ -22,22 +22,22 @@ class InitCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "--project",
+                name = "--name",
                 description = "Name of the project. A directory of this name will be created in the current directory",
                 isRequired = true,
-                valuePlaceholder = "<project>",
+                valuePlaceholder = "<name>",
             ),
             NamedParameter(
                 name = "--bare",
                 description = "Installs an empty project structure",
+                defaultValue = "false",
                 isRequired = false,
             ),
             NamedParameter(
-                name = "--test-url",
-                description = "URL used for testing - must be local.",
+                name = "--template-url",
+                description = "URL of repository containing a desired project template. Overrides the default template",
                 isRequired = false,
-                isHidden = true,
-                valuePlaceholder = "<test-url>",
+                valuePlaceholder = "<template-url>",
             ),
         )
 
@@ -45,10 +45,14 @@ class InitCommand(
         val parsedArgs = CommandArgumentParser.parse(args, parameters)
 
         if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+            if (parsedArgs.unexpectedArgs.contains("--name")) {
+                output.error("Project name cannot be empty.")
+                return ExitCode.GENERAL_ERROR
+            }
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
-        val projectName = parsedArgs.getRequiredValue("--project")
+        val projectName = parsedArgs.getRequiredValue("--name")
         val projectDir =
             File(projectName).apply {
                 if (exists()) {
@@ -64,16 +68,15 @@ class InitCommand(
         val archiveFile = projectDir.resolve("project.zip")
 
         try {
-            parsedArgs.getValue("--test-url")?.let {
-                repoClient.downloadTestArchive(it, archiveFile)
-            } ?: repoClient.downloadBranchArchive(getBranch(parsedArgs), archiveFile)
+            val templateUrl = parsedArgs.getValue("--template-url") ?: repoClient.getDefaultUrl(parsedArgs)
+            repoClient.downloadTemplateArchive(templateUrl, archiveFile)
             output.info("Successfully downloaded project files")
         } catch (e: Exception) {
             output.error(e.message.toString())
             return ExitCode.GENERAL_ERROR
         }
 
-        archiveFile.unzip()
+        ZipExtractor.unzip(archiveFile, skipTopDirectory = true)
         output.info("Project successfully saved to ${projectDir.absolutePath}")
 
         archiveFile.parentFile.cleanUp()
@@ -83,49 +86,14 @@ class InitCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor = InitCommand(params)
 
-    private fun getBranch(parsedArgs: CommandArgumentParser.ParsedArguments): String =
+    private fun NoumenaGitRepoClient.getDefaultUrl(parsedArgs: CommandArgumentParser.ParsedArguments): String =
         when (parsedArgs.getValue("--bare")) {
-            null -> SupportedBranches.NO_SAMPLES.branchName
-            else -> SupportedBranches.SAMPLES.branchName
+            null -> getBranchUrl(NO_SAMPLES)
+            else -> getBranchUrl(SAMPLES)
         }
 
     private fun File.cleanUp() {
         walk().filter { it.isFile && it.name in filesToCleanup }.forEach { it.delete() }
-    }
-
-    private fun File.unzip() {
-        fun String.removeTopDirectory() = split("/").drop(1).joinToString("/")
-
-        val targetDir = parentFile
-        ZipInputStream(FileInputStream(this)).use { zipIn ->
-            var entry = zipIn.nextEntry
-            while (entry != null) {
-                val adjustedPath = entry.name.removeTopDirectory()
-                if (adjustedPath.isBlank()) {
-                    entry = zipIn.nextEntry
-                    continue
-                }
-
-                val filePath = File(targetDir, adjustedPath)
-                if (entry.isDirectory) {
-                    filePath.mkdirs()
-                } else {
-                    filePath.parentFile.mkdirs()
-                    FileOutputStream(filePath).use { out ->
-                        zipIn.copyTo(out)
-                    }
-                }
-                zipIn.closeEntry()
-                entry = zipIn.nextEntry
-            }
-        }
-    }
-
-    private enum class SupportedBranches(
-        val branchName: String,
-    ) {
-        SAMPLES("samples"),
-        NO_SAMPLES("no-samples"),
     }
 
     companion object {

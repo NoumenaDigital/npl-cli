@@ -56,7 +56,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--project", "npl-app", "--test-url", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--name", "npl-app", "--template-url", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val projectDir = workingDirectory.resolve("npl-app")
@@ -68,6 +68,7 @@ class InitCommandIT :
 
                     output.normalize() shouldBe expectedOutput
                     projectDir.exists() shouldBe true
+                    projectDir.walk().filter { it.isDirectory }.count() shouldBe 11
                     projectDir.walk().filter { it.isFile }.count() shouldBe 11
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
@@ -89,7 +90,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--project", "npl-app", "--test-url", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--name", "npl-app", "--bare", "--template-url", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val projectDir = workingDirectory.resolve("npl-app")
@@ -101,6 +102,7 @@ class InitCommandIT :
 
                     output.normalize() shouldBe expectedOutput
                     projectDir.exists() shouldBe true
+                    projectDir.walk().filter { it.isDirectory }.count() shouldBe 5
                     projectDir.walk().filter { it.isFile }.count() shouldBe 0
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
@@ -108,15 +110,15 @@ class InitCommandIT :
             mockRepo.shutdown()
         }
 
-        test("Init command: test-url is not localhost") {
+        test("Init command: no name given") {
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--project", "npl-app", "--test-url", "https://github.com/some/api")) {
+                runCommand(commands = listOf("init", "--name")) {
                     process.destroy()
                     process.waitFor()
 
                     val expectedOutput =
                         """
-                    Only localhost or equivalent allowed for --test-url (was 'github.com')
+                    Project name cannot be empty.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -135,7 +137,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--project", projectDir.name, "--test-url", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--name", projectDir.name, "--template-url", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val expectedOutput =
@@ -152,7 +154,7 @@ class InitCommandIT :
         test("Init command: Fail if directory with project name already exists") {
             withInitTestContext(listOf("success")) {
                 projectDir.canonicalFile.mkdir()
-                runCommand(commands = listOf("init", "--project", projectDir.name)) {
+                runCommand(commands = listOf("init", "--name", projectDir.name)) {
                     process.waitFor()
 
                     val expectedOutput =

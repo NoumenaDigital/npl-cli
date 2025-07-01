@@ -11,23 +11,9 @@ class NoumenaGitRepoClient(
 ) {
     private val client = HttpClients.createDefault()
 
-    fun downloadBranchArchive(
-        branch: String,
-        archive: File,
-    ) {
-        val url = "$GIT_REPO_URL$repo/archive/refs/heads/$branch.zip"
-        downloadArchive(url, archive)
-    }
+    fun getBranchUrl(branch: SupportedBranches) = "$GIT_REPO_URL$repo/archive/refs/heads/${branch.branchName}.zip"
 
-    fun downloadTestArchive(
-        url: String,
-        archive: File,
-    ) {
-        validateTestUrl(url)
-        downloadArchive(url, archive)
-    }
-
-    private fun downloadArchive(
+    fun downloadTemplateArchive(
         url: String,
         archive: File,
     ) {
@@ -45,15 +31,14 @@ class NoumenaGitRepoClient(
         }
     }
 
-    private fun validateTestUrl(url: String) {
-        val host = URI.create(url).host
-
-        require(host == "localhost" || host == "127.0.0.1" || host == "::1") {
-            "Only localhost or equivalent allowed for --test-url (was '$host')"
-        }
-    }
-
     companion object {
-        private val GIT_REPO_URL = "https://github.com/NoumenaDigital/"
+        enum class SupportedBranches(
+            val branchName: String,
+        ) {
+            SAMPLES("samples"),
+            NO_SAMPLES("no-samples"),
+        }
+
+        private const val GIT_REPO_URL = "https://github.com/NoumenaDigital/"
     }
 }
