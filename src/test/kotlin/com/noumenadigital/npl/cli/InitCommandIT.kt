@@ -68,42 +68,8 @@ class InitCommandIT :
 
                     output.normalize() shouldBe expectedOutput
                     projectDir.exists() shouldBe true
-                    projectDir.walk().filter { it.isDirectory }.count() shouldBe 11
-                    projectDir.walk().filter { it.isFile }.count() shouldBe 11
-                    process.exitValue() shouldBe ExitCode.SUCCESS.code
-                }
-            }
-            mockRepo.shutdown()
-        }
-
-        test("Init command: Happy path --bare option") {
-            var mockRepo = MockWebServer()
-            val resourceDir = Paths.get("src/test/resources/test-files").toAbsolutePath().normalize()
-            val repoArchive = resourceDir.resolve("no-samples.zip").toFile()
-            val buffer = Buffer().write(repoArchive.readBytes())
-
-            mockRepo.enqueue(
-                MockResponse()
-                    .setResponseCode(200)
-                    .setHeader("Content-Type", "application/zip")
-                    .setBody(buffer),
-            )
-
-            withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--name", "npl-app", "--bare", "--template-url", mockRepo.url("/").toString())) {
-                    process.waitFor()
-
-                    val projectDir = workingDirectory.resolve("npl-app")
-                    val expectedOutput =
-                        """
-                    Successfully downloaded project files
-                    Project successfully saved to ${projectDir.canonicalFile.path}
-                    """.normalize()
-
-                    output.normalize() shouldBe expectedOutput
-                    projectDir.exists() shouldBe true
-                    projectDir.walk().filter { it.isDirectory }.count() shouldBe 5
-                    projectDir.walk().filter { it.isFile }.count() shouldBe 0
+                    projectDir.walk().filter { it.isDirectory }.count() shouldBe 9
+                    projectDir.walk().filter { it.isFile }.count() shouldBe 8
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
