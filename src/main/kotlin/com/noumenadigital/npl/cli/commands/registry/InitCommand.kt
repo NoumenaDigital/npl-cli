@@ -93,10 +93,19 @@ class InitCommand(
         }
 
     private fun File.cleanUp() {
-        walk().filter { it.isFile && it.name in filesToCleanup }.forEach { it.delete() }
+        walk()
+            .filter { f ->
+                f.name.startsWith(".") || f.isFile && (f.name in filesToCleanup)
+            }.forEach { f ->
+                if (f.isFile) {
+                    f.delete()
+                } else {
+                    f.deleteRecursively()
+                }
+            }
     }
 
     companion object {
-        private val filesToCleanup = listOf(".gitkeep", "project.zip")
+        private val filesToCleanup = listOf("project.zip")
     }
 }
