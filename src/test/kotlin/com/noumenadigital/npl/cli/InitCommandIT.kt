@@ -68,8 +68,8 @@ class InitCommandIT :
 
                     output.normalize() shouldBe expectedOutput
                     projectDir.exists() shouldBe true
-                    projectDir.walk().filter { it.isDirectory }.count() shouldBe 9
-                    projectDir.walk().filter { it.isFile }.count() shouldBe 8
+                    projectDir.walk().filter { it.isDirectory }.count() shouldBe 11
+                    projectDir.walk().filter { it.isFile }.count() shouldBe 11
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
@@ -130,6 +130,23 @@ class InitCommandIT :
 
                     output.normalize() shouldBe expectedOutput
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                }
+            }
+        }
+
+        test("Init command: --bare and --template-url options are mutually exclusive") {
+            withInitTestContext(testDir = listOf("success")) {
+                runCommand(commands = listOf("init", "--name", projectDir.name, "--bare", "--template-url", "https://example.com")) {
+                    process.destroy()
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    Cannot use --bare and --template-url together.
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
                 }
             }
         }

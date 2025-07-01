@@ -52,6 +52,11 @@ class InitCommand(
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
+        if (parsedArgs.getValue("--template-url") != null && parsedArgs.hasFlag("--bare")) {
+            output.error("Cannot use --bare and --template-url together.")
+            return ExitCode.USAGE_ERROR
+        }
+
         val projectName = parsedArgs.getRequiredValue("--name")
         val projectDir =
             File(projectName).apply {
@@ -87,22 +92,14 @@ class InitCommand(
     override fun createInstance(params: List<String>): CommandExecutor = InitCommand(params)
 
     private fun NoumenaGitRepoClient.getDefaultUrl(parsedArgs: CommandArgumentParser.ParsedArguments): String =
-        when (parsedArgs.getValue("--bare")) {
-            null -> getBranchUrl(NO_SAMPLES)
-            else -> getBranchUrl(SAMPLES)
+        if (parsedArgs.hasFlag("--bare")) {
+            getBranchUrl(NO_SAMPLES)
+        } else {
+            getBranchUrl(SAMPLES)
         }
 
     private fun File.cleanUp() {
-        walk()
-            .filter { f ->
-                f.name.startsWith(".") || f.isFile && (f.name in filesToCleanup)
-            }.forEach { f ->
-                if (f.isFile) {
-                    f.delete()
-                } else {
-                    f.deleteRecursively()
-                }
-            }
+        walk().filter { f -> f.isFile && (f.name in filesToCleanup) }.forEach { f -> f.delete() }
     }
 
     companion object {
