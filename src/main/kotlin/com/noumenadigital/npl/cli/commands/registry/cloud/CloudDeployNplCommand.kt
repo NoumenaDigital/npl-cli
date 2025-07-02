@@ -14,7 +14,6 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
-import java.io.File
 
 class CloudDeployNplCommand(
     val sourcesManager: SourcesManager = SourcesManager("."),
@@ -42,10 +41,10 @@ class CloudDeployNplCommand(
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
-                name = "--migration",
-                description = "Path to migration.yml where NPL migrations are defined",
+                name = "--sourceDir",
+                description = "Directory containing migration.yml",
                 isRequired = false,
-                valuePlaceholder = "<migration>",
+                valuePlaceholder = "<sourceDir>",
             ),
             NamedParameter(
                 name = "--url",
@@ -81,21 +80,11 @@ class CloudDeployNplCommand(
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("--app")
         val tenant = parsedArgs.getRequiredValue("--tenant")
-        val migration = parsedArgs.getValue("--migration") ?: "src/main/migration.yml"
-        val migrationFile = File(migration)
-        if (!migrationFile.exists()) {
-            throw CloudCommandException(
-                message = "Migration file does not exist - $migration",
-                commandName = "cloud deploy",
-            )
-        }
-
-        val srcDir = migrationFile.parent.toString()
+        val srcDir = parsedArgs.getValue("--sourceDir") ?: "."
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
         val url = parsedArgs.getValue("--url")
-
         val sourcesManager = SourcesManager(srcDir)
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)

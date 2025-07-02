@@ -210,16 +210,17 @@ The `cloud deploy` command allows you to deploy NPL sources to a NOUMENA cloud a
 ### Usage
 
 ```bash
-npl cloud deploy --appId <applicationUUID> --migration <directory>
+npl cloud deploy --appId <applicationUUID> --sourceDir <directory>
 ```
 
 That command will deploy your sources to the NOUMENA cloud application.
 
 | Args         | Default values                             | Can be overridden |
 | ------------ | ------------------------------------------ | ----------------- |
-| appId        | -                                          | Yes               |
+| app          | -                                          | Yes               |
+| tenant       | -                                          | Yes               |
 | url          | https://portal.noumena.cloud               | Yes               |
-| migration    | ./src/main/migration.yaml                  | Yes               |
+| sourceDir    | .                                          | Yes               |
 | authUrl      | https://keycloak.noumena.cloud/realms/paas | Yes               |
 | clientId     | paas                                       | Yes               |
 | clientSecret | paas                                       | Yes               |
@@ -238,7 +239,8 @@ That command will remove your application from the NOUMENA cloud.
 
 | Args         | Default values                             | Can be overridden |
 | ------------ | ------------------------------------------ | ----------------- |
-| appId        | -                                          | Yes               |
+| app          | -                                          | Yes               |
+| tenant       | -                                          | Yes               |
 | url          | https://portal.noumena.cloud               | Yes               |
 | authUrl      | https://keycloak.noumena.cloud/realms/paas | Yes               |
 | clientId     | paas                                       | Yes               |

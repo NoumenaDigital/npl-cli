@@ -223,8 +223,8 @@ class CloudDeployCommandIT :
                                 "existingName",
                                 "--tenant",
                                 "default_tenant",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--sourceDir",
+                                "src/test/resources/npl-sources/deploy-success/main/",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -258,8 +258,8 @@ class CloudDeployCommandIT :
                                 "existingName",
                                 "--tenant",
                                 "default_tenant",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--sourceDir",
+                                "src/test/resources/npl-sources/deploy-success/main",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -289,8 +289,8 @@ class CloudDeployCommandIT :
                                 "existingName",
                                 "--tenant",
                                 "default_tenant",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--sourceDir",
+                                "src/test/resources/npl-sources/deploy-success/main",
                                 "--url",
                                 "non-url",
                                 "--authUrl",
@@ -321,8 +321,8 @@ class CloudDeployCommandIT :
                                 "existingName",
                                 "--tenant",
                                 "default_tenant",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--sourceDir",
+                                "src/test/resources/npl-sources/deploy-success/main/",
                                 "--url",
                                 "non-url",
                                 "--authUrl",
@@ -352,8 +352,8 @@ class CloudDeployCommandIT :
                                 "existingName",
                                 "--tenant",
                                 "default_tenant",
-                                "--migration",
-                                "notexists",
+                                "--sourceDir",
+                                "doesntexists",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -363,7 +363,40 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Migration file does not exist - notexists
+                            Command cloud deploy failed: Source path 'doesntexists' does not exist or is not a directory.
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    }
+                }
+            }
+
+            test("cloud deploy multiple migration.yml") {
+                withTestContext {
+                    runCommand(
+                        commands =
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "--app",
+                                "existingName",
+                                "--tenant",
+                                "default_tenant",
+                                "--sourceDir",
+                                "src/test/resources/npl-sources/deploy-failure/multiple-migration",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
+                            Command cloud deploy failed: Multiple 'migration.yml' files found:
+                            src/test/resources/npl-sources/deploy-failure/multiple-migration/migration.yml
+                            src/test/resources/npl-sources/deploy-failure/multiple-migration/npl-1.0/objects/iou/migration.yml
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -383,8 +416,8 @@ class CloudDeployCommandIT :
                                 "notExistingName",
                                 "--tenant",
                                 "default_tenant",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--sourceDir",
+                                "src/test/resources/npl-sources/deploy-success/main",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",

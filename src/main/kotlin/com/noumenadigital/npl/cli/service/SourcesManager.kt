@@ -6,9 +6,12 @@ import com.noumenadigital.npl.lang.Source
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlin.io.path.isRegularFile
+import kotlin.streams.asSequence
 
 class SourcesManager(
     private val srcPath: String,
@@ -46,7 +49,8 @@ class SourcesManager(
     }
 
     fun getArchivedSources(): ByteArray {
-        val basePath = Paths.get(srcPath)
+        val migrationFile = findMigrationFile("migration.yml")
+        val basePath = Paths.get(migrationFile.parent)
         val outputStream = ByteArrayOutputStream()
 
         ZipOutputStream(outputStream).use { zipOut ->
@@ -62,5 +66,29 @@ class SourcesManager(
             }
         }
         return outputStream.toByteArray()
+    }
+
+    fun findMigrationFile(fileName: String): File {
+        val srcDir = Paths.get(srcPath).toFile()
+
+        if (!srcDir.exists() || !srcDir.isDirectory) {
+            throw CommandExecutionException("Source path '$srcPath' does not exist or is not a directory.")
+        }
+        val matchedFiles =
+            Files.walk(Paths.get(srcPath)).use { paths ->
+                paths
+                    .asSequence()
+                    .filter { it.isRegularFile() && it.fileName.toString() == fileName }
+                    .map(Path::toFile)
+                    .toList()
+            }
+
+        return when {
+            matchedFiles.isEmpty() -> throw CommandExecutionException("No '$fileName' file found in $srcPath")
+            matchedFiles.size > 1 -> throw CommandExecutionException(
+                "Multiple '$fileName' files found:\n${matchedFiles.joinToString("\n")}",
+            )
+            else -> matchedFiles.first()
+        }
     }
 }
