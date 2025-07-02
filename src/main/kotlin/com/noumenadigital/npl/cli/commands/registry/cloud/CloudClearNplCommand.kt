@@ -29,10 +29,16 @@ class CloudClearNplCommand(
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
-                name = "--appId",
-                description = "NOUMENA Cloud Application id",
+                name = "--app",
+                description = "NOUMENA Cloud Application name",
                 isRequired = true,
-                valuePlaceholder = "<appId>",
+                valuePlaceholder = "<app>",
+            ),
+            NamedParameter(
+                name = "--tenant",
+                description = "NOUMENA Cloud Tenant name",
+                isRequired = true,
+                valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
                 name = "--url",
@@ -66,7 +72,8 @@ class CloudClearNplCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val app = parsedArgs.getRequiredValue("--appId")
+        val app = parsedArgs.getRequiredValue("--app")
+        val tenant = parsedArgs.getRequiredValue("--tenant")
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
@@ -76,7 +83,7 @@ class CloudClearNplCommand(
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(app, url)),
+                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
             )
         return CloudClearNplCommand(cloudDeployService = cloudDeployService)
     }

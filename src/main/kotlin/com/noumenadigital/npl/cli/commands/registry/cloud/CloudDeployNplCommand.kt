@@ -30,10 +30,16 @@ class CloudDeployNplCommand(
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
-                name = "--appId",
-                description = "NOUMENA Cloud Application appId",
+                name = "--app",
+                description = "NOUMENA Cloud Application name",
                 isRequired = true,
-                valuePlaceholder = "<appId>",
+                valuePlaceholder = "<app>",
+            ),
+            NamedParameter(
+                name = "--tenant",
+                description = "NOUMENA Cloud Tenant name",
+                isRequired = true,
+                valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
                 name = "--migration",
@@ -73,7 +79,8 @@ class CloudDeployNplCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val app = parsedArgs.getRequiredValue("--appId")
+        val app = parsedArgs.getRequiredValue("--app")
+        val tenant = parsedArgs.getRequiredValue("--tenant")
         val migration = parsedArgs.getValue("--migration") ?: "src/main/migration.yml"
         val migrationFile = File(migration)
         if (!migrationFile.exists()) {
@@ -82,18 +89,20 @@ class CloudDeployNplCommand(
                 commandName = "cloud deploy",
             )
         }
+
+        val srcDir = migrationFile.parent.toString()
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
         val url = parsedArgs.getValue("--url")
-        val srcDir = migrationFile.parent.toString()
+
         val sourcesManager = SourcesManager(srcDir)
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(app, url)),
+                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
             )
         return CloudDeployNplCommand(sourcesManager, cloudDeployService)
     }
