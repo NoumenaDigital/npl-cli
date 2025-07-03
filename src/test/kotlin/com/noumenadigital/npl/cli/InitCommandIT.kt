@@ -83,7 +83,7 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    Project name cannot be empty.
+                    npl init: Project name cannot be empty.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -107,7 +107,7 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    Failed to retrieve project files. Status returned: 404
+                    npl init: Failed to retrieve project template
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -123,7 +123,7 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    Unknown arguments: --unexpected
+                    npl init: Unknown arguments found: --unexpected
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -140,7 +140,7 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    Directory ${projectDir.canonicalFile.path} already exists.
+                    npl init: Directory ${projectDir.canonicalFile.path} already exists.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -157,7 +157,7 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    Cannot use --bare and --templateUrl together.
+                    npl init: Cannot use --bare and --templateUrl together.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput

@@ -41,19 +41,21 @@ class InitCommand(
         )
 
     override fun execute(output: ColorWriter): ExitCode {
+        fun ColorWriter.displayError(message: String) = output.error("npl init: $message")
+
         val parsedArgs = CommandArgumentParser.parse(args, parameters)
 
         if (parsedArgs.unexpectedArgs.isNotEmpty()) {
             if (parsedArgs.unexpectedArgs.contains("--name")) {
-                output.error("Project name cannot be empty.")
+                output.displayError("Project name cannot be empty.")
                 return ExitCode.GENERAL_ERROR
             }
-            output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+            output.displayError("Unknown arguments found: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
             return ExitCode.GENERAL_ERROR
         }
 
         if (parsedArgs.getValue("--templateUrl") != null && parsedArgs.hasFlag("--bare")) {
-            output.error("Cannot use --bare and --templateUrl together.")
+            output.displayError("Cannot use --bare and --templateUrl together.")
             return ExitCode.USAGE_ERROR
         }
 
@@ -61,11 +63,11 @@ class InitCommand(
         val projectDir =
             File(projectName).apply {
                 if (exists()) {
-                    output.error("Directory $canonicalPath already exists.")
+                    output.displayError("Directory $canonicalPath already exists.")
                     return ExitCode.GENERAL_ERROR
                 }
                 if (!mkdir()) {
-                    output.error("Failed to create directory $canonicalFile.")
+                    output.displayError("Failed to create directory $canonicalFile.")
                     return ExitCode.GENERAL_ERROR
                 }
             }
@@ -77,7 +79,7 @@ class InitCommand(
             repoClient.downloadTemplateArchive(templateUrl, archiveFile)
             output.info("Successfully downloaded project files")
         } catch (e: Exception) {
-            output.error(e.message.toString())
+            output.displayError(e.message.toString())
             return ExitCode.GENERAL_ERROR
         }
 

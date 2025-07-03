@@ -26,7 +26,7 @@ class NoumenaGitRepoClient(
                     response.entity.content.copyTo(output)
                 }
             } else {
-                error("Failed to retrieve project files. Status returned: $statusCode")
+                error("Failed to retrieve project template")
             }
         }
     }
