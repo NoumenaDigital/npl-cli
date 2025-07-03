@@ -15,6 +15,7 @@ To see a description of how to use each command, run `npl help`
 | ------------------ | --------------------------------------------------------------------------------------------- |
 | `npl version`      | Displays the current version of the NPL CLI                                                   |
 | `npl help`         | Displays help information for the NPL CLI                                                     |
+| `npl init`         | Initializes a new project                                                                     |
 | `npl check`        | Checks the NPL for compilation errors and warnings                                            |
 | `npl test`         | Runs the NPL tests                                                                            |
 | `npl puml`         | Generates a puml diagram from NPL source                                                      |
