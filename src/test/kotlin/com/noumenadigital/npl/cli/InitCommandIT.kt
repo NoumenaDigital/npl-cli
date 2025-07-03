@@ -152,7 +152,6 @@ class InitCommandIT :
         test("Init command: --bare and --templateUrl options are mutually exclusive") {
             withInitTestContext(testDir = listOf("success")) {
                 runCommand(commands = listOf("init", "--name", projectDir.name, "--bare", "--templateUrl", "https://example.com")) {
-                    process.destroy()
                     process.waitFor()
 
                     val expectedOutput =
