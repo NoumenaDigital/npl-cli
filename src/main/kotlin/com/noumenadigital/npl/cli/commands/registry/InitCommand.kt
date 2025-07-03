@@ -3,7 +3,6 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
-import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.NO_SAMPLES
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
@@ -34,10 +33,10 @@ class InitCommand(
                 isRequired = false,
             ),
             NamedParameter(
-                name = "--template-url",
+                name = "--templateUrl",
                 description = "URL of repository containing a desired project template. Overrides the default template",
                 isRequired = false,
-                valuePlaceholder = "<template-url>",
+                valuePlaceholder = "<templateUrl>",
             ),
         )
 
@@ -49,11 +48,12 @@ class InitCommand(
                 output.error("Project name cannot be empty.")
                 return ExitCode.GENERAL_ERROR
             }
-            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+            output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+            return ExitCode.GENERAL_ERROR
         }
 
-        if (parsedArgs.getValue("--template-url") != null && parsedArgs.hasFlag("--bare")) {
-            output.error("Cannot use --bare and --template-url together.")
+        if (parsedArgs.getValue("--templateUrl") != null && parsedArgs.hasFlag("--bare")) {
+            output.error("Cannot use --bare and --templateUrl together.")
             return ExitCode.USAGE_ERROR
         }
 
@@ -73,7 +73,7 @@ class InitCommand(
         val archiveFile = projectDir.resolve("project.zip")
 
         try {
-            val templateUrl = parsedArgs.getValue("--template-url") ?: repoClient.getDefaultUrl(parsedArgs)
+            val templateUrl = parsedArgs.getValue("--templateUrl") ?: repoClient.getDefaultUrl(parsedArgs)
             repoClient.downloadTemplateArchive(templateUrl, archiveFile)
             output.info("Successfully downloaded project files")
         } catch (e: Exception) {

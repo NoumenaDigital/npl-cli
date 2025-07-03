@@ -49,7 +49,7 @@ class BinaryCommandsIT :
                     init       Initializes a new project
                                  --name <name> (required)  Name of the project. A directory of this name will be created in the current directory
                                  --bare  Installs an empty project structure (defaults to false)
-                                 --template-url <template-url>  URL of repository containing a desired project template. Overrides the default template
+                                 --templateUrl <templateUrl>  URL of repository containing a desired project template. Overrides the default template
                     check      Validate the correctness of NPL sources
                                  --sourceDir <directory>  Directory containing NPL source files (defaults to current directory)
                     test       Run the NPL tests

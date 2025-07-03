@@ -56,7 +56,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--name", "npl-app", "--template-url", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--name", "npl-app", "--templateUrl", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val projectDir = workingDirectory.resolve("npl-app")
@@ -79,7 +79,6 @@ class InitCommandIT :
         test("Init command: no name given") {
             withInitTestContext(testDir = listOf("success")) {
                 runCommand(commands = listOf("init", "--name")) {
-                    process.destroy()
                     process.waitFor()
 
                     val expectedOutput =
@@ -103,12 +102,28 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--name", projectDir.name, "--template-url", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--name", projectDir.name, "--templateUrl", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val expectedOutput =
                         """
                     Failed to retrieve project files. Status returned: 404
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                }
+            }
+        }
+
+        test("Init command: Fail if unexpected arguments are given") {
+            withInitTestContext(testDir = listOf("success")) {
+                runCommand(commands = listOf("init", "--name", projectDir.name, "--unexpected")) {
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    Unknown arguments: --unexpected
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -134,15 +149,15 @@ class InitCommandIT :
             }
         }
 
-        test("Init command: --bare and --template-url options are mutually exclusive") {
+        test("Init command: --bare and --templateUrl options are mutually exclusive") {
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--name", projectDir.name, "--bare", "--template-url", "https://example.com")) {
+                runCommand(commands = listOf("init", "--name", projectDir.name, "--bare", "--templateUrl", "https://example.com")) {
                     process.destroy()
                     process.waitFor()
 
                     val expectedOutput =
                         """
-                    Cannot use --bare and --template-url together.
+                    Cannot use --bare and --templateUrl together.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
