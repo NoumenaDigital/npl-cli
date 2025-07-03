@@ -232,7 +232,7 @@ class CloudClearCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            NPL Application successfully deleted from NOUMENA Cloud.
+                            NPL sources successfully cleared from NOUMENA Cloud app.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput

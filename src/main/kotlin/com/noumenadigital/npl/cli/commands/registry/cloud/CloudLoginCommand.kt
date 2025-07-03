@@ -16,7 +16,7 @@ class CloudLoginCommand(
     private val authManager: CloudAuthManager = CloudAuthManager(),
 ) : CommandExecutor {
     override val commandName: String = "cloud login"
-    override val description: String = "Login to NOUMENA Cloud"
+    override val description: String = "Handle the NPL CLI login to NOUMENA Сloud  "
 
     override val parameters: List<CommandParameter> =
         listOf(

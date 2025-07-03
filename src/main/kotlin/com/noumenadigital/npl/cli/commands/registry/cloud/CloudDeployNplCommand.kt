@@ -32,7 +32,7 @@ class CloudDeployNplCommand(
         ),
 ) : CommandExecutor {
     override val commandName: String = "cloud deploy"
-    override val description: String = "Deploy NPL sources to a Noumena Cloud"
+    override val description: String = "Deploy NPL sources to a NOUMENA Cloud Application"
     private val migrationFileName = "migration.yml"
 
     override val parameters: List<CommandParameter> =

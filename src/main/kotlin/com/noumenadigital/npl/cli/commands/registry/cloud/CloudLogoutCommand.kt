@@ -10,7 +10,7 @@ class CloudLogoutCommand(
     val cloudAuthManager: CloudAuthManager = CloudAuthManager(),
 ) : CommandExecutor {
     override val commandName: String = "cloud logout"
-    override val description: String = "Logout from Noumena Cloud"
+    override val description: String = "Handle the NPL CLI logout to NOUMENA Сloud  "
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
