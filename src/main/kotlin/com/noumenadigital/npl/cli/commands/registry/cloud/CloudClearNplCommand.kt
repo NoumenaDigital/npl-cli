@@ -22,9 +22,7 @@ class CloudClearNplCommand(
         ),
 ) : CommandExecutor {
     override val commandName: String = "cloud clear"
-    override val description: String =
-        "Deletes all source files and resets the application’s current state " +
-            "- including variables, temporary data, and any objects currently in use.'"
+    override val description: String = "Delete NPL sources and clears protocols from the database from the NOUMENA Cloud Application"
 
     override val parameters: List<CommandParameter> =
         listOf(
@@ -91,7 +89,7 @@ class CloudClearNplCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             cloudDeployService.clearApp()
-            output.success("NPL Application successfully deleted from NOUMENA Cloud.")
+            output.success("NPL sources successfully cleared from NOUMENA Cloud app.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
             throw CloudCommandException(ex.message, ex, "cloud clear")
