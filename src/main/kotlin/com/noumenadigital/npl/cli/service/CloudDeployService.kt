@@ -8,12 +8,14 @@ class CloudDeployService(
 ) {
     fun deployNplApplication(archive: ByteArray) {
         val token = getAccessToken()
-        noumenaCloudClient.uploadApplicationArchive(token, archive)
+        val tenants = noumenaCloudClient.fetchTenants(token)
+        noumenaCloudClient.uploadApplicationArchive(token, archive, tenants)
     }
 
     fun clearApp() {
         val token = getAccessToken()
-        noumenaCloudClient.clearApplication(token)
+        val tenants = noumenaCloudClient.fetchTenants(token)
+        noumenaCloudClient.clearApplication(token, tenants)
     }
 
     private fun getAccessToken(): String {

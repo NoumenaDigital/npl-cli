@@ -1,45 +1,79 @@
 package com.noumenadigital.npl.cli.http
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.noumenadigital.npl.cli.exception.CloudRestCallException
+import com.noumenadigital.npl.cli.model.Application
+import com.noumenadigital.npl.cli.model.Tenant
 import org.apache.http.client.methods.HttpDelete
+import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
-import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.UUID
 
 data class NoumenaCloudConfig(
     val app: String = "",
+    val tenant: String = "",
     val url: String = "https://portal.noumena.cloud",
 ) {
     companion object {
         fun get(
             app: String,
+            tenant: String,
             url: String? = null,
         ): NoumenaCloudConfig =
             NoumenaCloudConfig(
                 app = app,
+                tenant = tenant,
                 url = url ?: "https://portal.noumena.cloud",
             )
     }
 }
 
 open class NoumenaCloudClient(
-    config: NoumenaCloudConfig,
+    val config: NoumenaCloudConfig,
 ) {
-    val ncBaseUrl =
-        "${config.url}/api/v1/applications/${URLEncoder.encode(config.app, StandardCharsets.UTF_8.toString())}"
-    private val deployUrl = "$ncBaseUrl/deploy"
-    private val clearUrl = "$ncBaseUrl/clear"
+    val ncBaseUrl = "${config.url}/api/v1/applications/"
+    private val tenantsUrl = "${config.url}/api/v1/tenants"
     private val client = HttpClients.createDefault()
+    private val objectMapper = ObjectMapper().registerKotlinModule()
+
+    fun fetchTenants(accessToken: String): List<Tenant> {
+        try {
+            val httpGet = HttpGet(tenantsUrl)
+            httpGet.setHeader("Accept", "application/json")
+            httpGet.setHeader("Authorization", "Bearer $accessToken")
+
+            client.execute(httpGet).use { response ->
+                val status = response.statusLine.statusCode
+                val responseText = response.entity?.let { EntityUtils.toString(it) } ?: ""
+
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Get tenants request failed $status: $responseText")
+                }
+
+                return objectMapper.readValue(responseText, object : TypeReference<List<Tenant>>() {})
+            }
+        } catch (e: Exception) {
+            throw CloudRestCallException("Failed to fetch tenants - ${e.message ?: e.cause?.message}.", e)
+        }
+    }
 
     fun uploadApplicationArchive(
         accessToken: String,
         archive: ByteArray,
+        tenants: List<Tenant>,
     ) {
         try {
+            val ncApp = findApplication(tenants)
+            if (ncApp == null) {
+                throw CloudRestCallException("Application name ${config.app} doesn't exist for tenant ${config.tenant}")
+            }
+            val deployUrl = "$ncBaseUrl/${ncApp.id}/deploy"
             val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
 
             val newline = "\r\n"
@@ -72,8 +106,16 @@ open class NoumenaCloudClient(
         }
     }
 
-    fun clearApplication(token: String) {
+    fun clearApplication(
+        token: String,
+        tenants: List<Tenant>,
+    ) {
         try {
+            val ncApp = findApplication(tenants)
+            if (ncApp == null) {
+                throw CloudRestCallException("Application name ${config.app} doesn't exist for tenant ${config.tenant}")
+            }
+            val clearUrl = "$ncBaseUrl/${ncApp.id}/clear"
             val httpDelete = HttpDelete(clearUrl)
             httpDelete.setHeader("Accept", "application/json")
             httpDelete.setHeader("Authorization", "Bearer $token")
@@ -89,4 +131,10 @@ open class NoumenaCloudClient(
             throw CloudRestCallException("Failed to remove the application -  ${e.message ?: e.cause?.message}.", e)
         }
     }
+
+    private fun findApplication(tenants: List<Tenant>): Application? =
+        tenants
+            .find { it.name.equals(config.tenant, ignoreCase = true) }
+            ?.applications
+            ?.find { it.name.equals(config.app, ignoreCase = true) }
 }

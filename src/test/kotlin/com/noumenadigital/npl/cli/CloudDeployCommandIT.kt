@@ -70,6 +70,102 @@ class CloudDeployCommandIT :
                     object : Dispatcher() {
                         override fun dispatch(request: RecordedRequest): MockResponse {
                             when (request.path) {
+                                "/api/v1/tenants" -> {
+                                    return MockResponse()
+                                        .setResponseCode(200)
+                                        .setHeader("Content-Type", "application/json")
+                                        .setBody(
+                                            """
+                                            [
+                                              {
+                                                "id": "80031abc-641b-4330-a473-16fd6d5ae305",
+                                                "name": "Default_tenant",
+                                                "slug": "training",
+                                                "external_id": null,
+                                                "subscription": null,
+                                                "applications": [
+                                                  {
+                                                    "id": "$APP_ID_OK",
+                                                    "name": "existingName",
+                                                    "slug": "nplintegrations",
+                                                    "provider": "MicrosoftAzure",
+                                                    "engine_version": {
+                                                      "version": "2025.1.2",
+                                                      "deprecated": false
+                                                    },
+                                                    "owner_id": "a3893a2a-d75b-46ea-9c84-9109ab03c891",
+                                                    "trusted_issuers": [
+                                                      "https://keycloak-training-nplintegrations.noumena.cloud/realms/noumena",
+                                                      "https://keycloak-training-nplintegrations.noumena.cloud/realms/nplintegrations",
+                                                      "http://noumenadigital.com"
+                                                    ],
+                                                    "state": "active",
+                                                    "deployed_at": "2025-04-07T06:21:53.739573Z",
+                                                    "backup_records": [],
+                                                    "namespace": "training",
+                                                    "configuration_id": "0662db78-fb2a-4115-ab90-ab020343c30b",
+                                                    "deleted_at": null,
+                                                    "links": {
+                                                      "api": "https://engine-training-nplintegrations.noumena.cloud",
+                                                      "graphql": "https://engine-training-nplintegrations.noumena.cloud/graphql",
+                                                      "swagger": "https://engine-training-nplintegrations.noumena.cloud/swagger-ui/index.html",
+                                                      "inspector": "https://inspector-training-nplintegrations.noumena.cloud",
+                                                      "keycloak": "https://keycloak-training-nplintegrations.noumena.cloud/admin/master/console",
+                                                      "trusted_issuers": [
+                                                        "https://keycloak-training-nplintegrations.noumena.cloud/realms/noumena",
+                                                        "https://keycloak-training-nplintegrations.noumena.cloud/realms/nplintegrations",
+                                                        "http://noumenadigital.com"
+                                                      ]
+                                                    },
+                                                    "add_ons": [],
+                                                    "website_deployed_at": null,
+                                                    "website_file_name": null,
+                                                    "website_url": null
+                                                  },
+                                                  {
+                                                    "id": "18e3316d-8a70-42c5-8b97-310860151d94",
+                                                    "name": "test_old_version",
+                                                    "slug": "testoldversion",
+                                                    "provider": "MicrosoftAzure",
+                                                    "engine_version": {
+                                                      "version": "2024.2.7",
+                                                      "deprecated": true
+                                                    },
+                                                    "owner_id": "92309f7b-f9e1-42c4-a35f-ab97241d2d6c",
+                                                    "trusted_issuers": [
+                                                      "https://keycloak-training-testoldversion.noumena.cloud/realms/noumena",
+                                                      "https://keycloak-training-testoldversion.noumena.cloud/realms/testoldversion"
+                                                    ],
+                                                    "state": "active",
+                                                    "deployed_at": null,
+                                                    "backup_records": [],
+                                                    "namespace": "training",
+                                                    "configuration_id": "98ff3aed-bfac-433b-9960-a0a30b407052",
+                                                    "deleted_at": null,
+                                                    "links": {
+                                                      "api": "https://engine-training-testoldversion.noumena.cloud",
+                                                      "graphql": "https://engine-training-testoldversion.noumena.cloud/graphql",
+                                                      "swagger": "https://engine-training-testoldversion.noumena.cloud/swagger-ui/index.html",
+                                                      "inspector": "https://inspector-training-testoldversion.noumena.cloud",
+                                                      "keycloak": "https://keycloak-training-testoldversion.noumena.cloud/admin/master/console",
+                                                      "trusted_issuers": [
+                                                        "https://keycloak-training-testoldversion.noumena.cloud/realms/noumena",
+                                                        "https://keycloak-training-testoldversion.noumena.cloud/realms/testoldversion"
+                                                      ]
+                                                    },
+                                                    "add_ons": [],
+                                                    "website_deployed_at": null,
+                                                    "website_file_name": null,
+                                                    "website_url": null
+                                                  }
+                                                ],
+                                                "state": "active"
+                                              }
+                                            ]
+                                            """.trimIndent(),
+                                        )
+                                }
+
                                 "/api/v1/applications/$APP_ID_OK/deploy" -> {
                                     return MockResponse()
                                         .setResponseCode(200)
@@ -123,8 +219,10 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
-                                "--appId",
-                                APP_ID_OK,
+                                "--app",
+                                "existingName",
+                                "--tenant",
+                                "default_tenant",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -156,8 +254,10 @@ class CloudDeployCommandIT :
                                 "deploy",
                                 "--clientId",
                                 "wrong",
-                                "--appId",
-                                APP_ID_OK,
+                                "--app",
+                                "existingName",
+                                "--tenant",
+                                "default_tenant",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -185,8 +285,10 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
-                                "--appId",
-                                APP_ID_OK,
+                                "--app",
+                                "existingName",
+                                "--tenant",
+                                "default_tenant",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -198,7 +300,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Failed to upload application archive - Target host is not specified.
+                            Command cloud deploy failed: Failed to fetch tenants - Target host is not specified.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -215,8 +317,10 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
-                                "--appId",
-                                APP_ID_OK,
+                                "--app",
+                                "existingName",
+                                "--tenant",
+                                "default_tenant",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -237,17 +341,19 @@ class CloudDeployCommandIT :
                 }
             }
 
-            test("cloud deploy no sources found") {
+            test("cloud deploy no application found") {
                 withTestContext {
                     runCommand(
                         commands =
                             listOf(
                                 "cloud",
                                 "deploy",
-                                "--appId",
-                                APP_ID_OK,
+                                "--app",
+                                "notExistingName",
+                                "--tenant",
+                                "default_tenant",
                                 "--migration",
-                                "notexists",
+                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -257,7 +363,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Migration file does not exist - notexists
+                            Command cloud deploy failed: Failed to upload application archive - Application name notExistingName doesn't exist for tenant default_tenant.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
