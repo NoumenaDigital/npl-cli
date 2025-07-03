@@ -224,6 +224,10 @@
     {
       "type": "com.noumenadigital.npl.cli.config.EngineTargetConfig",
       "allDeclaredFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true,
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
       "methods": [
         {
           "name": "<init>",
@@ -292,6 +296,22 @@
         {
           "name": "<init>",
           "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.Number",
+            "java.lang.Number",
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
             "java.lang.String",
             "java.lang.String"
           ]
@@ -306,7 +326,23 @@
           ]
         },
         {
+          "name": "getAccessToken",
+          "parameterTypes": []
+        },
+        {
+          "name": "getExpiresIn",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRefreshExpiresIn",
+          "parameterTypes": []
+        },
+        {
           "name": "getRefreshToken",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTokenType",
           "parameterTypes": []
         }
       ]
@@ -396,6 +432,10 @@
     {
       "type": "com.noumenadigital.platform.client.auth.OpenIdConnectService$ErrorResponse",
       "allDeclaredFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true,
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
       "methods": [
         {
           "name": "<init>",
@@ -1506,6 +1546,9 @@
           "parameterTypes": []
         }
       ]
+    },
+    {
+      "type": "kotlin.Number"
     },
     {
       "type": "kotlin.SafePublicationLazyImpl",
