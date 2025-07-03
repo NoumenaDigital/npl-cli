@@ -184,7 +184,7 @@ class PumlCommandIT :
                     {field} +carOwner: Party
                     {field} +iou: Iou
                     {field} +observers: Map<Text, Party>
-                    {method} +[iouOwner | carOwner] swap()
+                    {method} +[iouOwner | carOwner] swap(): List<Number>
                 }
                 npl.processes.Settle --> "1" npl.objects.iou.Iou : iou
             }

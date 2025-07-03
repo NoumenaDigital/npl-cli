@@ -6,6 +6,7 @@ import com.noumenadigital.npl.cli.commands.CommandParameter
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
+import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
@@ -14,6 +15,13 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.isRegularFile
+import kotlin.streams.asSequence
+import kotlin.use
 
 class CloudDeployNplCommand(
     val sourcesManager: SourcesManager = SourcesManager("."),
@@ -25,6 +33,7 @@ class CloudDeployNplCommand(
 ) : CommandExecutor {
     override val commandName: String = "cloud deploy"
     override val description: String = "Deploy NPL sources to a Noumena Cloud"
+    private val migrationFileName = "migration.yml"
 
     override val parameters: List<CommandParameter> =
         listOf(
@@ -41,10 +50,10 @@ class CloudDeployNplCommand(
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
-                name = "--sourceDir",
-                description = "Directory containing migration.yml",
+                name = "--migration",
+                description = "Path to migration.yml",
                 isRequired = false,
-                valuePlaceholder = "<sourceDir>",
+                valuePlaceholder = "<migration>",
             ),
             NamedParameter(
                 name = "--url",
@@ -80,12 +89,12 @@ class CloudDeployNplCommand(
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("--app")
         val tenant = parsedArgs.getRequiredValue("--tenant")
-        val srcDir = parsedArgs.getValue("--sourceDir") ?: "."
+        val migration = parsedArgs.getValue("--migration") ?: findMigrationFile(migrationFileName).parentFile.toString()
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
         val url = parsedArgs.getValue("--url")
-        val sourcesManager = SourcesManager(srcDir)
+        val sourcesManager = SourcesManager(migration)
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
@@ -104,6 +113,31 @@ class CloudDeployNplCommand(
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
             throw CloudCommandException(ex.message, ex, "cloud deploy")
+        }
+    }
+
+    fun findMigrationFile(fileName: String): File {
+        val srcDir = Paths.get(".").toFile()
+
+        if (!srcDir.exists() || !srcDir.isDirectory) {
+            throw CommandExecutionException("Source path '$srcDir' does not exist or is not a directory.")
+        }
+        val matchedFiles =
+            Files.walk(Paths.get(srcDir.toURI())).use { paths ->
+                paths
+                    .asSequence()
+                    .filter { it.isRegularFile() && it.fileName.toString() == fileName }
+                    .map(Path::toFile)
+                    .toList()
+            }
+
+        return when {
+            matchedFiles.isEmpty() -> throw CommandExecutionException("No '$fileName' file found in $srcDir")
+            matchedFiles.size > 1 -> throw CommandExecutionException(
+                "Multiple '$fileName' files found:\n${matchedFiles.joinToString("\n")}",
+            )
+
+            else -> matchedFiles.first()
         }
     }
 }
