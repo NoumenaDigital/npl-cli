@@ -89,7 +89,7 @@ class CloudDeployNplCommand(
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("--app")
         val tenant = parsedArgs.getRequiredValue("--tenant")
-        val migration = parsedArgs.getValue("--migration") ?: findMigrationFile(migrationFileName).parentFile.toString()
+        val migration = parsedArgs.getValue("--migration") ?: findSingleFile(migrationFileName).parentFile.toString()
         val clientId = parsedArgs.getValue("--clientId")
         val clientSecret = parsedArgs.getValue("--clientSecret")
         val authUrl = parsedArgs.getValue("--authUrl")
@@ -116,8 +116,11 @@ class CloudDeployNplCommand(
         }
     }
 
-    fun findMigrationFile(fileName: String): File {
-        val srcDir = Paths.get(".").toFile()
+    fun findSingleFile(
+        fileName: String,
+        searchDir: String = ".",
+    ): File {
+        val srcDir = Paths.get(searchDir).toFile()
 
         if (!srcDir.exists() || !srcDir.isDirectory) {
             throw CommandExecutionException("Source path '$srcDir' does not exist or is not a directory.")
