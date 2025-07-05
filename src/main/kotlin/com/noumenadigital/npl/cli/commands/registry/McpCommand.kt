@@ -141,7 +141,6 @@ object McpCommand : CommandExecutor {
             if (executor.supportsMcp) {
                 val toolName = command.commandName
                 allCommands.add(toolName to executor)
-                System.err.println("Added MCP tool: $toolName")
             }
         }
 
@@ -150,13 +149,22 @@ object McpCommand : CommandExecutor {
             if (executor.supportsMcp) {
                 val toolName = command.commandName
                 allCommands.add(toolName to executor)
-                System.err.println("Added MCP tool: $toolName")
             }
         }
 
         allCommands.forEach { (toolName, executor) ->
             addTool(server, toolName, executor)
         }
+
+        server.addPrompt(
+            prompt =
+                Prompt(
+                    name = "NPL development",
+                    description = "How to develop NPL code",
+                    arguments = emptyList(),
+                ),
+            promptProvider = { getSystemPrompt() },
+        )
     }
 
     private fun addTool(
@@ -212,15 +220,6 @@ object McpCommand : CommandExecutor {
                 )
             }
         }
-        server.addPrompt(
-            prompt =
-                Prompt(
-                    name = "NPL development",
-                    description = "How to develop NPL code",
-                    arguments = emptyList(),
-                ),
-            promptProvider = { getSystemPrompt() },
-        )
     }
 
     fun getSystemPrompt(): GetPromptResult {
