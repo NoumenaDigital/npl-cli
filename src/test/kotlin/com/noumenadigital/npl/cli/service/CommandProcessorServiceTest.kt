@@ -50,6 +50,7 @@ class CommandProcessorServiceTest :
                                  --sourceDir <directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
                     cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
+                    mcp        Start an MCP server exposing NPL CLI functionality over stdio
                     """.trimIndent()
 
                 writer.toString().trimIndent() shouldBe expectedOutput

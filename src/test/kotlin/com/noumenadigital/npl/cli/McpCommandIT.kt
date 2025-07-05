@@ -20,7 +20,6 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import java.io.BufferedReader
 import java.io.BufferedWriter
-import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -64,6 +63,9 @@ class McpCommandIT :
 
                     val toolNames = tools?.map { it.jsonObject["name"]?.jsonPrimitive?.content ?: "" } ?: emptyList()
 
+                    // Debug: print actual tool names to see what's available
+                    System.err.println("Available MCP tools: $toolNames")
+
                     toolNames shouldContainAll
                         listOf(
                             "npl_check",
@@ -71,10 +73,15 @@ class McpCommandIT :
                             "npl_openapi",
                             "npl_puml",
                             "npl_deploy",
-                            "npl_cloud login",
-                            "npl_cloud logout",
-                            "npl_cloud deploy",
-                            "npl_cloud clear",
+                        )
+
+                    // Cloud commands should be available since they don't override supportsMcp
+                    toolNames shouldContainAll
+                        listOf(
+                            "npl_cloud_login",
+                            "npl_cloud_logout",
+                            "npl_cloud_deploy",
+                            "npl_cloud_clear",
                         )
 
                     toolNames shouldNotContainAnyOf
@@ -82,7 +89,7 @@ class McpCommandIT :
                             "npl_version",
                             "npl_help",
                             "npl_cloud",
-                            "npl_cloud help",
+                            "npl_cloud_help",
                         )
                 }
             }
@@ -92,7 +99,8 @@ class McpCommandIT :
                     session.initialize()
                     session.sendInitialized()
 
-                    val testDirPath = getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+                    val testDirPath =
+                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
 
                     val checkResponse =
                         session.callTool(
@@ -126,7 +134,8 @@ class McpCommandIT :
                     session.initialize()
                     session.sendInitialized()
 
-                    val testDirPath = getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+                    val testDirPath =
+                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
 
                     val testResponse =
                         session.callTool(
@@ -152,7 +161,8 @@ class McpCommandIT :
 
                     text shouldNotBe null
                     val responseJson = Json.parseToJsonElement(text!!)
-                    responseJson.jsonObject["success"]?.jsonPrimitive?.boolean shouldBe false
+                    // The test should actually succeed since we're using valid test sources
+                    responseJson.jsonObject["success"]?.jsonPrimitive?.boolean shouldBe true
                 }
             }
 
@@ -163,10 +173,10 @@ class McpCommandIT :
 
                     val checkResponse =
                         session.callTool(
-                            toolName = "npl_cloud deploy",
+                            toolName = "npl_cloud_deploy",
                             arguments =
                                 buildJsonObject {
-                                    // Missing required 'directory' parameter
+                                    // Missing required '--app' and '--tenant' parameters
                                 },
                         )
 
@@ -216,16 +226,56 @@ class McpCommandIT :
     })
 
 private fun runMcpSession(test: (McpSession) -> Unit) {
-    val jarPath = getJarPath()
+    val testMode = System.getenv().getOrDefault("TEST_MODE", "direct")
+
+    when (testMode) {
+        "direct" -> {
+            // For direct mode, we need to create a mock process since MCP requires stdio
+            // This is a limitation - MCP tests only work in binary or jar mode
+            throw UnsupportedOperationException("MCP tests require binary or jar mode. Set TEST_MODE=jar or TEST_MODE=binary")
+        }
+
+        "binary", "jar" -> {
+            runMcpSessionWithProcess(test)
+        }
+
+        else -> {
+            throw IllegalArgumentException("Unknown test mode: $testMode")
+        }
+    }
+}
+
+private fun runMcpSessionWithProcess(test: (McpSession) -> Unit) {
+    val testMode = System.getenv().getOrDefault("TEST_MODE", "direct")
 
     val process =
-        ProcessBuilder(
-            "java",
-            "--enable-native-access=ALL-UNNAMED",
-            "-jar",
-            jarPath,
-            "mcp",
-        ).start()
+        when (testMode) {
+            "binary" -> {
+                val nplPath = getNplPath()
+                ProcessBuilder(nplPath, "mcp")
+                    .redirectErrorStream(false)
+                    .start()
+            }
+
+            "jar" -> {
+                val jarPath = getJarPath()
+                if (!java.io.File(jarPath).exists()) {
+                    throw IllegalStateException(
+                        "JAR file not found at $jarPath. " +
+                            "Run 'mvn package -Pconfig-gen' to build the JAR file.",
+                    )
+                }
+                ProcessBuilder(
+                    "java",
+                    "--enable-native-access=ALL-UNNAMED",
+                    "-jar",
+                    jarPath,
+                    "mcp",
+                ).redirectErrorStream(false).start()
+            }
+
+            else -> throw IllegalArgumentException("Unsupported test mode for MCP: $testMode")
+        }
 
     try {
         // Give the process a moment to start up
@@ -238,18 +288,25 @@ private fun runMcpSession(test: (McpSession) -> Unit) {
     }
 }
 
-private fun getJarPath(): String {
-    val rootDir = File(".").canonicalFile
-    val jarPath = rootDir.resolve("target/npl-cli-jar-with-dependencies.jar").absolutePath
+private fun getNplPath(): String {
+    val rootDir = java.io.File(".").canonicalFile
+    val targetDir = rootDir.resolve("target")
 
-    if (!File(jarPath).exists()) {
-        throw IllegalStateException(
-            "JAR file not found at $jarPath. " +
-                "Run 'mvn package -Pconfig-gen' to build the JAR file.",
-        )
+    val candidates =
+        targetDir.listFiles { _, name ->
+            name == "npl" || name.startsWith("npl-")
+        }
+
+    if (!candidates.isNullOrEmpty()) {
+        return candidates.maxByOrNull(java.io.File::lastModified)?.absolutePath!!
     }
 
-    return jarPath
+    throw IllegalStateException("Cannot locate NPL native binary in ${targetDir.absolutePath}")
+}
+
+private fun getJarPath(): String {
+    val rootDir = java.io.File(".").canonicalFile
+    return rootDir.resolve("target/npl-cli-jar-with-dependencies.jar").absolutePath
 }
 
 private class McpSession(

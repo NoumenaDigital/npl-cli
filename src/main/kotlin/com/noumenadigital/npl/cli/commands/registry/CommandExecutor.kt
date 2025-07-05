@@ -2,6 +2,8 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandParameter
+import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.commands.PositionalParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import kotlinx.serialization.json.buildJsonObject
@@ -27,16 +29,16 @@ interface CommandExecutor {
             properties =
                 buildJsonObject {
                     parameters.filter { !it.isHidden }.forEach { parameter ->
-                        putJsonObject(parameter.name) {
+                        putJsonObject(parameter.name.removePrefix("--")) {
                             when (parameter) {
-                                is com.noumenadigital.npl.cli.commands.NamedParameter -> {
+                                is NamedParameter -> {
                                     if (parameter.takesValue) {
                                         put("type", "string")
                                     } else {
                                         put("type", "boolean")
                                     }
                                 }
-                                is com.noumenadigital.npl.cli.commands.PositionalParameter -> {
+                                is PositionalParameter -> {
                                     put("type", "string")
                                 }
                             }

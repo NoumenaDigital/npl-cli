@@ -1,12 +1,20 @@
 package com.noumenadigital.npl.cli.commands.registry
 
+import ch.qos.logback.classic.LoggerContext
+import ch.qos.logback.core.ConsoleAppender
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CloudCommands
 import com.noumenadigital.npl.cli.commands.Commands
+import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.commands.PositionalParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
+import io.modelcontextprotocol.kotlin.sdk.GetPromptResult
 import io.modelcontextprotocol.kotlin.sdk.Implementation
+import io.modelcontextprotocol.kotlin.sdk.Prompt
+import io.modelcontextprotocol.kotlin.sdk.PromptMessage
+import io.modelcontextprotocol.kotlin.sdk.Role
 import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.server.Server
@@ -22,6 +30,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.PrintStream
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -29,18 +39,19 @@ import java.io.StringWriter
 object McpCommand : CommandExecutor {
     override val commandName: String = "mcp"
     override val description: String = "Start an MCP server exposing NPL CLI functionality over stdio"
+    override val supportsMcp: Boolean = false
 
     override fun execute(output: ColorWriter): ExitCode {
         // Only for MCP: reconfigure Logback to log to System.err
         try {
-            val loggerFactory = org.slf4j.LoggerFactory.getILoggerFactory()
-            if (loggerFactory is ch.qos.logback.classic.LoggerContext) {
+            val loggerFactory = LoggerFactory.getILoggerFactory()
+            if (loggerFactory is LoggerContext) {
                 val context = loggerFactory
-                val rootLogger = context.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
+                val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
                 val appenders = rootLogger.iteratorForAppenders()
                 while (appenders.hasNext()) {
                     val appender = appenders.next()
-                    if (appender is ch.qos.logback.core.ConsoleAppender<*>) {
+                    if (appender is ConsoleAppender<*>) {
                         appender.setTarget("System.err")
                         appender.start()
                     }
@@ -128,7 +139,7 @@ object McpCommand : CommandExecutor {
         Commands.entries.forEach { command ->
             val executor = command.getBaseExecutor()
             if (executor.supportsMcp) {
-                val toolName = "npl_${command.commandName.replace(" ", "_")}"
+                val toolName = command.commandName
                 allCommands.add(toolName to executor)
                 System.err.println("Added MCP tool: $toolName")
             }
@@ -137,7 +148,7 @@ object McpCommand : CommandExecutor {
         CloudCommands.entries.forEach { command ->
             val executor = command.getBaseExecutor()
             if (executor.supportsMcp) {
-                val toolName = "npl_${command.commandName.replace(" ", "_")}"
+                val toolName = command.commandName
                 allCommands.add(toolName to executor)
                 System.err.println("Added MCP tool: $toolName")
             }
@@ -201,6 +212,40 @@ object McpCommand : CommandExecutor {
                 )
             }
         }
+        server.addPrompt(
+            prompt =
+                Prompt(
+                    name = "NPL development",
+                    description = "How to develop NPL code",
+                    arguments = emptyList(),
+                ),
+            promptProvider = { getSystemPrompt() },
+        )
+    }
+
+    fun getSystemPrompt(): GetPromptResult {
+        val instructionsText =
+            try {
+                val inputStream = javaClass.classLoader.getResourceAsStream("npl-instructions.md")
+                inputStream?.bufferedReader()?.use { it.readText() }
+                    ?: "NPL (NOUMENA Protocol Language) development instructions not found in resources."
+            } catch (e: Exception) {
+                "Error reading NPL instructions: ${e.message}"
+            }
+
+        return GetPromptResult(
+            messages =
+                listOf(
+                    PromptMessage(
+                        role = Role.assistant,
+                        content =
+                            TextContent(
+                                text = instructionsText,
+                            ),
+                    ),
+                ),
+            description = "NPL development",
+        )
     }
 
     private fun buildCommandArgs(
@@ -213,7 +258,7 @@ object McpCommand : CommandExecutor {
             val jsonElement = args[parameter.name]
 
             when (parameter) {
-                is com.noumenadigital.npl.cli.commands.NamedParameter -> {
+                is NamedParameter -> {
                     if (jsonElement != null) {
                         if (parameter.takesValue) {
                             val argValue = jsonElement.jsonPrimitive.contentOrNull
@@ -221,7 +266,7 @@ object McpCommand : CommandExecutor {
                                 cmdArgs.add(parameter.name)
                                 cmdArgs.add(argValue)
                             } else if (parameter.isRequired) {
-                                throw IllegalArgumentException("Required parameter ${parameter.name} is missing")
+                                throw IllegalArgumentException("Required parameter `${parameter.name.removePrefix("--")}` is missing")
                             }
                         } else {
                             val isFlagSet = jsonElement.jsonPrimitive.booleanOrNull ?: false
@@ -230,15 +275,16 @@ object McpCommand : CommandExecutor {
                             }
                         }
                     } else if (parameter.isRequired) {
-                        throw IllegalArgumentException("Required parameter ${parameter.name} is missing")
+                        throw IllegalArgumentException("Required parameter `${parameter.name.removePrefix("--")}` is missing")
                     }
                 }
-                is com.noumenadigital.npl.cli.commands.PositionalParameter -> {
+
+                is PositionalParameter -> {
                     val argValue = jsonElement?.jsonPrimitive?.contentOrNull
                     if (argValue != null) {
                         cmdArgs.add(argValue)
                     } else if (parameter.isRequired) {
-                        throw IllegalArgumentException("Required parameter ${parameter.name} is missing")
+                        throw IllegalArgumentException("Required parameter `${parameter.name.removePrefix("--")}` is missing")
                     }
                 }
             }
