@@ -5,6 +5,7 @@ import com.noumenadigital.npl.cli.commands.registry.CloudCommand
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.commands.registry.DeployCommand
 import com.noumenadigital.npl.cli.commands.registry.HelpCommand
+import com.noumenadigital.npl.cli.commands.registry.McpCommand
 import com.noumenadigital.npl.cli.commands.registry.OpenapiCommand
 import com.noumenadigital.npl.cli.commands.registry.PumlCommand
 import com.noumenadigital.npl.cli.commands.registry.TestCommand
@@ -22,6 +23,7 @@ enum class Commands(
     PUML({ PumlCommand() }),
     DEPLOY({ DeployCommand() }),
     CLOUD({ CloudCommand() }),
+    MCP({ McpCommand }),
     ;
 
     companion object {

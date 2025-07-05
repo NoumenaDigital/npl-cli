@@ -9,6 +9,7 @@ import com.noumenadigital.npl.cli.service.ColorWriter
 open class HelpCommand : CommandExecutor {
     override val commandName: String = "help"
     override val description: String = "Display the description for npl-cli commands"
+    override val supportsMcp: Boolean = false
 
     override fun execute(output: ColorWriter): ExitCode {
         printHelp(Commands.entries.map { it.commandExecutorFactory() }, output)
