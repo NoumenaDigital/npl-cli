@@ -10,6 +10,7 @@ val logger = logger {}
 data object VersionCommand : CommandExecutor {
     override val commandName: String = "version"
     override val description: String = "Display the current version of the NPL CLI"
+    override val supportsMcp: Boolean = false
 
     override fun execute(output: ColorWriter): ExitCode {
         val version = getVersionFromPom()
@@ -20,7 +21,7 @@ data object VersionCommand : CommandExecutor {
         return ExitCode.SUCCESS
     }
 
-    private fun getVersionFromPom(): String? =
+    internal fun getVersionFromPom(): String? =
         try {
             this::class.java
                 .getResourceAsStream(
