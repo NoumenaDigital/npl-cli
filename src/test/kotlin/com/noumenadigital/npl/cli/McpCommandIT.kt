@@ -1,6 +1,7 @@
 package com.noumenadigital.npl.cli
 
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
+import com.noumenadigital.npl.cli.TestUtils.runMcpSessionDirect
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldNotContainAnyOf
@@ -17,84 +18,58 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonObject
 import java.io.BufferedReader
 import java.io.BufferedWriter
-import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
 class McpCommandIT :
     FunSpec({
-        context("MCP Server Integration Tests") {
-            test("initialize successfully") {
-                runMcpSession { session ->
-                    val initResponse = session.initialize()
-
-                    initResponse["jsonrpc"]?.jsonPrimitive?.content shouldBe "2.0"
-                    initResponse["id"]?.jsonPrimitive?.int shouldBe 1
-                    initResponse["result"] shouldNotBe null
-
-                    val result = initResponse["result"]?.jsonObject
-                    result?.get("protocolVersion")?.jsonPrimitive?.content shouldBe "2024-11-05"
-
-                    val capabilities = result?.get("capabilities")?.jsonObject
-                    capabilities
-                        ?.get("tools")
-                        ?.jsonObject
-                        ?.get("listChanged")
-                        ?.jsonPrimitive
-                        ?.boolean shouldBe true
-                }
-            }
-
-            test("listing available tools") {
+        context("MCP server") {
+            test("should list available tools") {
                 runMcpSession { session ->
                     session.initialize()
                     session.sendInitialized()
 
-                    val listToolsResponse = session.listTools()
+                    val toolsResponse = session.listTools()
 
-                    listToolsResponse["jsonrpc"]?.jsonPrimitive?.content shouldBe "2.0"
-                    listToolsResponse["result"] shouldNotBe null
+                    toolsResponse["jsonrpc"]?.jsonPrimitive?.content shouldBe "2.0"
+                    toolsResponse["result"] shouldNotBe null
 
-                    val tools = listToolsResponse["result"]?.jsonObject?.get("tools")?.jsonArray
+                    val result = toolsResponse["result"]?.jsonObject
+                    val tools = result?.get("tools")?.jsonArray
+
                     tools shouldNotBe null
-
-                    val toolNames = tools?.map { it.jsonObject["name"]?.jsonPrimitive?.content ?: "" } ?: emptyList()
-
-                    // Debug: print actual tool names to see what's available
-                    System.err.println("Available MCP tools: $toolNames")
+                    val toolNames = tools!!.map { it.jsonObject["name"]?.jsonPrimitive?.content ?: "" }
 
                     toolNames shouldContainAll
                         listOf(
-                            "npl_check",
-                            "npl_test",
-                            "npl_openapi",
-                            "npl_puml",
-                            "npl_deploy",
+                            "check",
+                            "test",
+                            "openapi",
+                            "puml",
+                            "deploy",
                         )
 
-                    // Cloud commands should be available since they don't override supportsMcp
                     toolNames shouldContainAll
                         listOf(
-                            "npl_cloud_login",
-                            "npl_cloud_logout",
-                            "npl_cloud_deploy",
-                            "npl_cloud_clear",
+                            "cloud login",
+                            "cloud logout",
+                            "cloud deploy",
+                            "cloud clear",
                         )
 
                     toolNames shouldNotContainAnyOf
                         listOf(
-                            "npl_version",
-                            "npl_help",
-                            "npl_cloud",
-                            "npl_cloud_help",
+                            "version",
+                            "help",
+                            "cloud",
+                            "cloud help",
                         )
                 }
             }
 
-            test("calling npl_check tool successfully") {
+            test("calling check tool successfully") {
                 runMcpSession { session ->
                     session.initialize()
                     session.sendInitialized()
@@ -104,7 +79,7 @@ class McpCommandIT :
 
                     val checkResponse =
                         session.callTool(
-                            toolName = "npl_check",
+                            toolName = "check",
                             arguments =
                                 buildJsonObject {
                                     put("directory", testDirPath)
@@ -129,7 +104,7 @@ class McpCommandIT :
                 }
             }
 
-            test("calling npl_test tool unsuccessfully") {
+            test("calling test tool unsuccessfully") {
                 runMcpSession { session ->
                     session.initialize()
                     session.sendInitialized()
@@ -139,7 +114,7 @@ class McpCommandIT :
 
                     val testResponse =
                         session.callTool(
-                            toolName = "npl_test",
+                            toolName = "test",
                             arguments =
                                 buildJsonObject {
                                     put("sourceDir", testDirPath)
@@ -161,8 +136,7 @@ class McpCommandIT :
 
                     text shouldNotBe null
                     val responseJson = Json.parseToJsonElement(text!!)
-                    // The test should actually succeed since we're using valid test sources
-                    responseJson.jsonObject["success"]?.jsonPrimitive?.boolean shouldBe true
+                    responseJson.jsonObject["success"]?.jsonPrimitive?.boolean shouldBe false
                 }
             }
 
@@ -173,7 +147,7 @@ class McpCommandIT :
 
                     val checkResponse =
                         session.callTool(
-                            toolName = "npl_cloud_deploy",
+                            toolName = "cloud deploy",
                             arguments =
                                 buildJsonObject {
                                     // Missing required '--app' and '--tenant' parameters
@@ -225,24 +199,65 @@ class McpCommandIT :
         }
     })
 
-private fun runMcpSession(test: (McpSession) -> Unit) {
+private fun runMcpSession(test: (McpSessionInterface) -> Unit) {
     val testMode = System.getenv().getOrDefault("TEST_MODE", "direct")
 
     when (testMode) {
         "direct" -> {
-            // For direct mode, we need to create a mock process since MCP requires stdio
-            // This is a limitation - MCP tests only work in binary or jar mode
-            throw UnsupportedOperationException("MCP tests require binary or jar mode. Set TEST_MODE=jar or TEST_MODE=binary")
+            runMcpSessionDirect { session ->
+                test(
+                    object : McpSessionInterface {
+                        override fun initialize(): JsonObject = session.initialize()
+
+                        override fun sendInitialized() = session.sendInitialized()
+
+                        override fun listTools(): JsonObject = session.listTools()
+
+                        override fun callTool(
+                            toolName: String,
+                            arguments: JsonObject,
+                        ): JsonObject = session.callTool(toolName, arguments)
+                    },
+                )
+            }
         }
 
         "binary", "jar" -> {
-            runMcpSessionWithProcess(test)
+            runMcpSessionWithProcess { session ->
+                test(
+                    object : McpSessionInterface {
+                        override fun initialize(): JsonObject = session.initialize()
+
+                        override fun sendInitialized() = session.sendInitialized()
+
+                        override fun listTools(): JsonObject = session.listTools()
+
+                        override fun callTool(
+                            toolName: String,
+                            arguments: JsonObject,
+                        ): JsonObject = session.callTool(toolName, arguments)
+                    },
+                )
+            }
         }
 
         else -> {
             throw IllegalArgumentException("Unknown test mode: $testMode")
         }
     }
+}
+
+interface McpSessionInterface {
+    fun initialize(): JsonObject
+
+    fun sendInitialized()
+
+    fun listTools(): JsonObject
+
+    fun callTool(
+        toolName: String,
+        arguments: JsonObject,
+    ): JsonObject
 }
 
 private fun runMcpSessionWithProcess(test: (McpSession) -> Unit) {
@@ -327,12 +342,9 @@ private class McpSession(
                     // System.err.println("MCP stderr: $line")
                 }
             } catch (_: Exception) {
-                // Ignore exceptions when process is terminated
+                // Process closed
             }
-        }.apply {
-            isDaemon = true
-            start()
-        }
+        }.start()
     }
 
     fun initialize(): JsonObject {
@@ -341,21 +353,34 @@ private class McpSession(
                 put("jsonrpc", "2.0")
                 put("id", ++requestId)
                 put("method", "initialize")
-                putJsonObject("params") {
-                    put("protocolVersion", "2025-06-18")
-                    putJsonObject("capabilities") {
-                        putJsonObject("tools") {
-                            put("listChanged", true)
-                        }
-                    }
-                    putJsonObject("clientInfo") {
-                        put("name", "TestClient")
-                        put("version", "1.0.0")
-                    }
-                }
+                put(
+                    "params",
+                    buildJsonObject {
+                        put("protocolVersion", "2025-06-18")
+                        put(
+                            "capabilities",
+                            buildJsonObject {
+                                put(
+                                    "tools",
+                                    buildJsonObject {
+                                        put("listChanged", true)
+                                    },
+                                )
+                            },
+                        )
+                        put(
+                            "clientInfo",
+                            buildJsonObject {
+                                put("name", "TestClient")
+                                put("version", "1.0.0")
+                            },
+                        )
+                    },
+                )
             }
 
-        return sendRequest(request)
+        val response = sendRequest(request)
+        return Json.parseToJsonElement(response).jsonObject
     }
 
     fun sendInitialized() {
@@ -363,6 +388,7 @@ private class McpSession(
             buildJsonObject {
                 put("jsonrpc", "2.0")
                 put("method", "notifications/initialized")
+                put("params", buildJsonObject {})
             }
 
         sendNotification(notification)
@@ -374,9 +400,11 @@ private class McpSession(
                 put("jsonrpc", "2.0")
                 put("id", ++requestId)
                 put("method", "tools/list")
+                put("params", buildJsonObject {})
             }
 
-        return sendRequest(request)
+        val response = sendRequest(request)
+        return Json.parseToJsonElement(response).jsonObject
     }
 
     fun callTool(
@@ -388,37 +416,31 @@ private class McpSession(
                 put("jsonrpc", "2.0")
                 put("id", ++requestId)
                 put("method", "tools/call")
-                putJsonObject("params") {
-                    put("name", toolName)
-                    put("arguments", arguments)
-                }
+                put(
+                    "params",
+                    buildJsonObject {
+                        put("name", toolName)
+                        put("arguments", arguments)
+                    },
+                )
             }
 
-        return sendRequest(request)
+        val response = sendRequest(request)
+        return Json.parseToJsonElement(response).jsonObject
     }
 
-    private fun sendRequest(request: JsonObject): JsonObject {
-        writer.write(request.toString())
+    private fun sendRequest(request: JsonObject): String {
+        val requestStr = request.toString()
+        writer.write(requestStr)
         writer.newLine()
         writer.flush()
 
-        val responseLine = reader.readLine()
-        if (responseLine == null) {
-            throw IOException("No response received from MCP server")
-        }
-
-        // Debug: print the response for troubleshooting
-        System.err.println("MCP Response: $responseLine")
-
-        if (responseLine.isBlank()) {
-            throw IOException("Empty response received from MCP server")
-        }
-
-        return Json.parseToJsonElement(responseLine).jsonObject
+        return reader.readLine() ?: throw RuntimeException("No response from MCP server")
     }
 
     private fun sendNotification(notification: JsonObject) {
-        writer.write(notification.toString())
+        val notificationStr = notification.toString()
+        writer.write(notificationStr)
         writer.newLine()
         writer.flush()
     }

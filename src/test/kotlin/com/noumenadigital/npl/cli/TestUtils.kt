@@ -1,7 +1,22 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.commands.registry.McpCommand
 import com.noumenadigital.npl.cli.service.ColorWriter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
 import java.io.File
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
+import java.io.PrintStream
+import java.io.PrintWriter
 import java.io.StringWriter
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -190,5 +205,146 @@ object TestUtils {
             process = process,
             output = output,
         )
+    }
+
+    fun runMcpSessionDirect(test: (DirectMcpSession) -> Unit) {
+        val serverInput = PipedInputStream()
+        val clientOutput = PipedOutputStream(serverInput)
+        val serverOutput = PipedOutputStream()
+        val clientInput = PipedInputStream(serverOutput)
+
+        val colorWriter = ColorWriter(PrintWriter(System.err), false)
+
+        val serverJob =
+            CoroutineScope(Dispatchers.Default).launch {
+                // Redirect System.in and System.out for the MCP server
+                val originalIn = System.`in`
+                val originalOut = System.out
+                System.setIn(serverInput)
+                System.setOut(PrintStream(serverOutput))
+
+                try {
+                    McpCommand.execute(colorWriter)
+                } finally {
+                    // Restore original streams
+                    System.setIn(originalIn)
+                    System.setOut(originalOut)
+                }
+            }
+
+        try {
+            // Give the server a moment to start
+            runBlocking { delay(100) }
+
+            val session = DirectMcpSession(clientOutput, clientInput)
+            test(session)
+        } finally {
+            serverJob.cancel()
+        }
+    }
+
+    class DirectMcpSession(
+        private val outputWriter: PipedOutputStream,
+        private val inputReader: PipedInputStream,
+    ) {
+        private var requestId = 0
+
+        fun initialize(): JsonObject {
+            val request =
+                buildJsonObject {
+                    put("jsonrpc", "2.0")
+                    put("id", ++requestId)
+                    put("method", "initialize")
+                    put(
+                        "params",
+                        buildJsonObject {
+                            put("protocolVersion", "2025-06-18")
+                            put(
+                                "capabilities",
+                                buildJsonObject {
+                                    put(
+                                        "tools",
+                                        buildJsonObject {
+                                            put("listChanged", true)
+                                        },
+                                    )
+                                },
+                            )
+                            put(
+                                "clientInfo",
+                                buildJsonObject {
+                                    put("name", "TestClient")
+                                    put("version", "1.0.0")
+                                },
+                            )
+                        },
+                    )
+                }
+
+            val response = sendRequest(request)
+            return Json.parseToJsonElement(response).jsonObject
+        }
+
+        fun sendInitialized() {
+            val notification =
+                buildJsonObject {
+                    put("jsonrpc", "2.0")
+                    put("method", "notifications/initialized")
+                    put("params", buildJsonObject {})
+                }
+
+            sendNotification(notification)
+        }
+
+        fun listTools(): JsonObject {
+            val request =
+                buildJsonObject {
+                    put("jsonrpc", "2.0")
+                    put("id", ++requestId)
+                    put("method", "tools/list")
+                    put("params", buildJsonObject {})
+                }
+
+            val response = sendRequest(request)
+            return Json.parseToJsonElement(response).jsonObject
+        }
+
+        fun callTool(
+            toolName: String,
+            arguments: JsonObject,
+        ): JsonObject {
+            val request =
+                buildJsonObject {
+                    put("jsonrpc", "2.0")
+                    put("id", ++requestId)
+                    put("method", "tools/call")
+                    put(
+                        "params",
+                        buildJsonObject {
+                            put("name", toolName)
+                            put("arguments", arguments)
+                        },
+                    )
+                }
+
+            val response = sendRequest(request)
+            return Json.parseToJsonElement(response).jsonObject
+        }
+
+        private fun sendRequest(request: JsonObject): String {
+            val requestStr = request.toString()
+            outputWriter.write(requestStr.toByteArray())
+            outputWriter.write('\n'.code)
+            outputWriter.flush()
+
+            return inputReader.bufferedReader().readLine() ?: throw RuntimeException("No response from MCP server")
+        }
+
+        private fun sendNotification(notification: JsonObject) {
+            val notificationStr = notification.toString()
+            outputWriter.write(notificationStr.toByteArray())
+            outputWriter.write('\n'.code)
+            outputWriter.flush()
+        }
     }
 }
