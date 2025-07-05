@@ -53,10 +53,10 @@ class McpCommandIT :
 
                     toolNames shouldContainAll
                         listOf(
-                            "cloud login",
-                            "cloud logout",
-                            "cloud deploy",
-                            "cloud clear",
+                            "cloud_login",
+                            "cloud_logout",
+                            "cloud_deploy",
+                            "cloud_clear",
                         )
 
                     toolNames shouldNotContainAnyOf
@@ -64,7 +64,7 @@ class McpCommandIT :
                             "version",
                             "help",
                             "cloud",
-                            "cloud help",
+                            "cloud_help",
                         )
                 }
             }
@@ -147,7 +147,7 @@ class McpCommandIT :
 
                     val checkResponse =
                         session.callTool(
-                            toolName = "cloud deploy",
+                            toolName = "cloud_deploy",
                             arguments =
                                 buildJsonObject {
                                     // Missing required '--app' and '--tenant' parameters

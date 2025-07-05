@@ -139,7 +139,7 @@ object McpCommand : CommandExecutor {
         Commands.entries.forEach { command ->
             val executor = command.getBaseExecutor()
             if (executor.supportsMcp) {
-                val toolName = command.commandName
+                val toolName = command.commandName.replace(" ", "_")
                 allCommands.add(toolName to executor)
             }
         }
@@ -147,7 +147,7 @@ object McpCommand : CommandExecutor {
         CloudCommands.entries.forEach { command ->
             val executor = command.getBaseExecutor()
             if (executor.supportsMcp) {
-                val toolName = command.commandName
+                val toolName = command.commandName.replace(" ", "_")
                 allCommands.add(toolName to executor)
             }
         }
