@@ -38,7 +38,7 @@ class CommandProcessorServiceTest :
                     check      Validate the correctness of NPL sources
                                  --sourceDir <directory>  Source directory containing NPL protocols (defaults to current directory)
                     test       Run the NPL tests
-                                 --sourceDir <directory>  Source directory containing NPL tests to run (defaults to current directory)
+                                 --sourceDir <directory>  Source directory containing NPL tests to run. Must be a parent directory of all required sources (both production and test). (defaults to current directory)
                                  --coverage  Report test coverage details (printed to console as well as coverage.xml)
                                  --outputDir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     openapi    Generate the openapi specifications of NPL api

@@ -31,7 +31,9 @@ data class TestCommand(
         listOf(
             NamedParameter(
                 name = "sourceDir",
-                description = "Source directory containing NPL tests to run",
+                description =
+                    "Source directory containing NPL tests to run." +
+                        "Must be a parent directory of all required sources (both production and test).",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
