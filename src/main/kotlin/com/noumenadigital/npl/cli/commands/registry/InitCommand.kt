@@ -9,6 +9,7 @@ import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedB
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.util.ZipExtractor
 import java.io.File
+import java.util.UUID
 
 class InitCommand(
     private val args: List<String> = emptyList(),
@@ -23,7 +24,6 @@ class InitCommand(
             NamedParameter(
                 name = "--name",
                 description = "Name of the project. A directory of this name will be created in the current directory",
-                isRequired = true,
                 valuePlaceholder = "<name>",
             ),
             NamedParameter(
@@ -41,7 +41,7 @@ class InitCommand(
         )
 
     override fun execute(output: ColorWriter): ExitCode {
-        fun ColorWriter.displayError(message: String) = output.error("npl init: $message")
+        fun ColorWriter.displayError(message: String) = error("npl init: $message")
 
         val parsedArgs = CommandArgumentParser.parse(args, parameters)
 
@@ -59,20 +59,22 @@ class InitCommand(
             return ExitCode.USAGE_ERROR
         }
 
-        val projectName = parsedArgs.getRequiredValue("--name")
+        val projectName = parsedArgs.getValue("--name")
         val projectDir =
-            File(projectName).apply {
-                if (exists()) {
-                    output.displayError("Directory $canonicalPath already exists.")
-                    return ExitCode.GENERAL_ERROR
+            projectName?.let {
+                File(it).apply {
+                    if (exists()) {
+                        output.displayError("Directory $canonicalPath already exists.")
+                        return ExitCode.GENERAL_ERROR
+                    }
+                    if (!mkdir()) {
+                        output.displayError("Failed to create directory $canonicalFile.")
+                        return ExitCode.GENERAL_ERROR
+                    }
                 }
-                if (!mkdir()) {
-                    output.displayError("Failed to create directory $canonicalFile.")
-                    return ExitCode.GENERAL_ERROR
-                }
-            }
+            } ?: File(".")
 
-        val archiveFile = projectDir.resolve("project.zip")
+        val archiveFile = projectDir.resolve("project${UUID.randomUUID()}.zip")
 
         try {
             val templateUrl = parsedArgs.getValue("--templateUrl") ?: repoClient.getDefaultUrl(parsedArgs)
@@ -83,10 +85,22 @@ class InitCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        ZipExtractor.unzip(archiveFile, skipTopDirectory = true)
-        output.info("Project successfully saved to ${projectDir.absolutePath}")
+        try {
+            ZipExtractor.unzip(archiveFile, skipTopDirectory = true, errorOnConflict = true)
+            output.info("Project successfully saved to ${projectDir.absolutePath}")
+        } catch (e: Exception) {
+            output.displayError("Failed to extract project files. ${e.message}")
+            return ExitCode.GENERAL_ERROR
+        }
 
-        archiveFile.parentFile.cleanUp()
+        try {
+            archiveFile.run {
+                parentFile.cleanUp()
+                delete()
+            }
+        } catch (_: Exception) {
+            output.displayError("Failed to cleanup temporary files")
+        }
 
         return ExitCode.SUCCESS
     }

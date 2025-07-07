@@ -11,15 +11,23 @@ class ZipExtractor {
         fun unzip(
             archiveFile: File,
             skipTopDirectory: Boolean = false,
+            errorOnConflict: Boolean = false,
         ) = apply {
+            if (errorOnConflict) {
+                testForConflicts(archiveFile, skipTopDirectory)
+            }
+            extract(archiveFile, skipTopDirectory)
+        }
+
+        private fun extract(
+            archiveFile: File,
+            skipTopDirectory: Boolean,
+        ) {
             val targetDir = archiveFile.parentFile
             ZipInputStream(FileInputStream(archiveFile)).use { zipIn ->
                 var entry = zipIn.nextEntry
                 while (entry != null) {
-                    val relativePath =
-                        entry.name.let {
-                            if (!skipTopDirectory) it else it.split("/").drop(1).joinToString("/")
-                        }
+                    val relativePath = determineRelativePath(entry, skipTopDirectory)
                     if (relativePath.isBlank()) {
                         entry = zipIn.nextEntry
                         continue
@@ -31,6 +39,11 @@ class ZipExtractor {
                 }
             }
         }
+
+        private fun determineRelativePath(
+            entry: ZipEntry,
+            skipTopDirectory: Boolean,
+        ): String = entry.name.let { if (!skipTopDirectory) it else it.split("/").drop(1).joinToString("/") }
 
         private fun File.extractZipEntry(
             relativePath: String,
@@ -44,6 +57,28 @@ class ZipExtractor {
                 filePath.parentFile.mkdirs()
                 FileOutputStream(filePath).use { out ->
                     zipIn.copyTo(out)
+                }
+            }
+        }
+
+        private fun testForConflicts(
+            archiveFile: File,
+            skipTopDirectory: Boolean = false,
+        ) {
+            ZipInputStream(FileInputStream(archiveFile)).use { zipIn ->
+                var entry = zipIn.nextEntry
+                while (entry != null) {
+                    val relativePath = determineRelativePath(entry, skipTopDirectory)
+                    if (relativePath.isBlank()) {
+                        entry = zipIn.nextEntry
+                        continue
+                    }
+
+                    val targetFile = File(archiveFile.parentFile, relativePath)
+                    if (targetFile.isFile && targetFile.exists()) {
+                        error("File $relativePath already exists")
+                    }
+                    entry = zipIn.nextEntry
                 }
             }
         }
