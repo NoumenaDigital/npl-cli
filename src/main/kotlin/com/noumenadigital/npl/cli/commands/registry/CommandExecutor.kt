@@ -28,16 +28,18 @@ interface CommandExecutor {
                 buildJsonObject {
                     parameters.filter { !it.isHidden }.forEach { parameter ->
                         putJsonObject(parameter.name) {
-                            when (parameter) {
-                                is NamedParameter -> {
-                                    if (parameter.takesValue) {
-                                        put("type", "string")
-                                    } else {
-                                        put("type", "boolean")
-                                    }
-                                }
+                            if (parameter.takesValue) {
+                                put("type", "string")
+                            } else {
+                                put("type", "boolean")
                             }
-                            put("description", parameter.description)
+                            val description =
+                                if (parameter.name == "sourceDir") {
+                                    "${parameter.description} (should be an absolute path)"
+                                } else {
+                                    parameter.description
+                                }
+                            put("description", description)
                         }
                     }
                 },
