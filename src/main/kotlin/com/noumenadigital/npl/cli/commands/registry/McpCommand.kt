@@ -31,6 +31,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 
 object McpCommand : CommandExecutor {
+    private val logger = LoggerFactory.getLogger(McpCommand::class.java)
     override val commandName: String = "mcp"
     override val description: String = "Start an MCP server exposing NPL CLI functionality over stdio"
     override val supportsMcp: Boolean = false
@@ -145,18 +146,18 @@ object McpCommand : CommandExecutor {
             description = executor.description,
             inputSchema = schema,
         ) { req ->
-            System.err.println("MCP tool called: $toolName with args: ${req.arguments}")
+            logger.info("MCP tool called: $toolName with args: ${req.arguments}")
             val args = req.arguments
             val outputBuffer = StringWriter()
             val colorWriter = ColorWriter(PrintWriter(outputBuffer))
 
             try {
                 val cmdArgs = buildCommandArgs(args, executor)
-                System.err.println("Built command args: $cmdArgs")
+                logger.info("Built command args: $cmdArgs")
                 val commandInstance = executor.createInstance(cmdArgs)
                 val exitCode = commandInstance.execute(colorWriter)
 
-                System.err.println("Tool execution completed with exit code: $exitCode")
+                logger.info("Tool execution completed with exit code: $exitCode")
                 CallToolResult(
                     content =
                         listOf(
@@ -170,8 +171,7 @@ object McpCommand : CommandExecutor {
                         ),
                 )
             } catch (e: Exception) {
-                System.err.println("Tool execution failed with exception: ${e.message}")
-                e.printStackTrace()
+                logger.error("Tool execution failed with exception: ${e.message}", e)
                 CallToolResult(
                     content =
                         listOf(
