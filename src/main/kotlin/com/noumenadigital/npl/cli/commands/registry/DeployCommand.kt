@@ -32,6 +32,7 @@ class DeployCommand(
                 isRequired = true,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
+                isRequiredForMcp = true,
             ),
             NamedParameter(
                 name = "clear",

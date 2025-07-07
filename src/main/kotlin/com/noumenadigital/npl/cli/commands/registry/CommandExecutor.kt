@@ -43,6 +43,6 @@ interface CommandExecutor {
                         }
                     }
                 },
-            required = parameters.filter { (it.isRequired || it.takesPath) && !it.isHidden }.map { it.name },
+            required = parameters.filter { it.isRequiredForMcp }.map { it.name },
         )
 }

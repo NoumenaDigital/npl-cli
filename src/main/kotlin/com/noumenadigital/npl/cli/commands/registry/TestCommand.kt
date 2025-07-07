@@ -38,6 +38,7 @@ data class TestCommand(
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
+                isRequiredForMcp = true,
             ),
             NamedParameter(
                 name = "coverage",
@@ -51,6 +52,7 @@ data class TestCommand(
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
+                isRequiredForMcp = false,
             ),
         )
 

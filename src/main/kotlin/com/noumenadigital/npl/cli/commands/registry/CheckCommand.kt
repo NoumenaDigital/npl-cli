@@ -25,6 +25,7 @@ data class CheckCommand(
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
+                isRequiredForMcp = true,
             ),
         )
 

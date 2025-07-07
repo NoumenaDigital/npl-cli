@@ -43,6 +43,7 @@ data class OpenapiCommand(
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
+                isRequiredForMcp = true,
             ),
             NamedParameter(
                 name = "rules",
@@ -51,6 +52,7 @@ data class OpenapiCommand(
                 isRequired = false,
                 valuePlaceholder = "<rules descriptor path>",
                 takesPath = true,
+                isRequiredForMcp = false,
             ),
             NamedParameter(
                 name = "outputDir",
@@ -59,6 +61,7 @@ data class OpenapiCommand(
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
+                isRequiredForMcp = true,
             ),
         )
 
