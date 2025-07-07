@@ -27,6 +27,7 @@ data class PumlCommand(
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
+                takesPath = true,
             ),
             NamedParameter(
                 name = "outputDir",
@@ -34,6 +35,7 @@ data class PumlCommand(
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
+                takesPath = true,
             ),
         )
 

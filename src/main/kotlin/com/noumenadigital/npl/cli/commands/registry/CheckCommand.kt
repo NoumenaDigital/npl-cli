@@ -24,6 +24,7 @@ data class CheckCommand(
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
+                takesPath = true,
             ),
         )
 

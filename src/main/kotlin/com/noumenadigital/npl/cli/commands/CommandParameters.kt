@@ -9,6 +9,7 @@ data class NamedParameter(
     val isRequired: Boolean = false,
     val isHidden: Boolean = false,
     val valuePlaceholder: String? = null,
+    val takesPath: Boolean = false,
 ) {
     init {
         require(!name.startsWith("--")) { "Named parameters should not start with '--' in definition" }

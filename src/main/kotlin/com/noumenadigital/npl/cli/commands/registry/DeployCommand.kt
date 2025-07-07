@@ -31,6 +31,7 @@ class DeployCommand(
                 description = "Directory containing NPL sources",
                 isRequired = true,
                 valuePlaceholder = "<directory>",
+                takesPath = true,
             ),
             NamedParameter(
                 name = "clear",

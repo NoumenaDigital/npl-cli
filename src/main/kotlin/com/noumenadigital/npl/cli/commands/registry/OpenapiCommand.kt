@@ -42,6 +42,7 @@ data class OpenapiCommand(
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
+                takesPath = true,
             ),
             NamedParameter(
                 name = "rules",
@@ -49,6 +50,7 @@ data class OpenapiCommand(
                     "Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system",
                 isRequired = false,
                 valuePlaceholder = "<rules descriptor path>",
+                takesPath = true,
             ),
             NamedParameter(
                 name = "outputDir",
@@ -56,6 +58,7 @@ data class OpenapiCommand(
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
+                takesPath = true,
             ),
         )
 

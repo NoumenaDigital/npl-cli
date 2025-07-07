@@ -53,6 +53,7 @@ class CloudDeployNplCommand(
                 description = "Path to migration.yml",
                 isRequired = false,
                 valuePlaceholder = "<migration>",
+                takesPath = true,
             ),
             NamedParameter(
                 name = "url",

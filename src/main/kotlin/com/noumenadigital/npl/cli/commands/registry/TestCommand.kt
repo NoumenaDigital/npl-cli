@@ -33,10 +33,11 @@ data class TestCommand(
                 name = "sourceDir",
                 description =
                     "Source directory containing NPL tests to run." +
-                        "Must be a parent directory of all required sources (both production and test).",
+                        " Must be a parent directory of all required sources (both production and test).",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
+                takesPath = true,
             ),
             NamedParameter(
                 name = "coverage",
@@ -49,6 +50,7 @@ data class TestCommand(
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
+                takesPath = true,
             ),
         )
 

@@ -2,7 +2,6 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.Commands
-import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 
 open class HelpCommand : CommandExecutor {
@@ -37,14 +36,10 @@ open class HelpCommand : CommandExecutor {
                             else -> ""
                         }
                     val formattedName =
-                        when (param) {
-                            is NamedParameter -> {
-                                if (param.valuePlaceholder != null) {
-                                    "${param.cliName} ${param.valuePlaceholder}"
-                                } else {
-                                    param.cliName
-                                }
-                            }
+                        if (param.valuePlaceholder != null) {
+                            "${param.cliName} ${param.valuePlaceholder}"
+                        } else {
+                            param.cliName
                         }
                     output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
                 }

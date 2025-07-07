@@ -34,7 +34,7 @@ interface CommandExecutor {
                                 put("type", "boolean")
                             }
                             val description =
-                                if (parameter.name in setOf("sourceDir", "outputDir", "target")) {
+                                if (parameter.takesPath) {
                                     "${parameter.description} (should be an absolute path)"
                                 } else {
                                     parameter.description
@@ -43,6 +43,6 @@ interface CommandExecutor {
                         }
                     }
                 },
-            required = parameters.filter { it.isRequired && !it.isHidden }.map { it.name },
+            required = parameters.filter { (it.isRequired || it.takesPath) && !it.isHidden }.map { it.name },
         )
 }
