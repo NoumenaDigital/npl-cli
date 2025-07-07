@@ -38,7 +38,7 @@ data class OpenapiCommand(
         listOf(
             NamedParameter(
                 name = "sourceDir",
-                description = "Source directory containing NPL protocols",
+                description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
