@@ -265,7 +265,7 @@ object McpCommand : CommandExecutor {
                                 cmdArgs.add(parameter.name)
                                 cmdArgs.add(argValue)
                             } else if (parameter.isRequired) {
-                                throw IllegalArgumentException("Required parameter `${parameter.name.removePrefix("--")}` is missing")
+                                throw IllegalArgumentException("Required parameter `${parameter.name}` is missing")
                             }
                         } else {
                             val isFlagSet = jsonElement.jsonPrimitive.booleanOrNull ?: false
@@ -274,7 +274,7 @@ object McpCommand : CommandExecutor {
                             }
                         }
                     } else if (parameter.isRequired) {
-                        throw IllegalArgumentException("Required parameter `${parameter.name.removePrefix("--")}` is missing")
+                        throw IllegalArgumentException("Required parameter `${parameter.name}` is missing")
                     }
                 }
 
@@ -283,7 +283,7 @@ object McpCommand : CommandExecutor {
                     if (argValue != null) {
                         cmdArgs.add(argValue)
                     } else if (parameter.isRequired) {
-                        throw IllegalArgumentException("Required parameter `${parameter.name.removePrefix("--")}` is missing")
+                        throw IllegalArgumentException("Required parameter `${parameter.name}` is missing")
                     }
                 }
             }

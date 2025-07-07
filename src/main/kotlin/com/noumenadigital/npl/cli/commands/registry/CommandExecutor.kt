@@ -29,7 +29,7 @@ interface CommandExecutor {
             properties =
                 buildJsonObject {
                     parameters.filter { !it.isHidden }.forEach { parameter ->
-                        putJsonObject(parameter.name.removePrefix("--")) {
+                        putJsonObject(parameter.name) {
                             when (parameter) {
                                 is NamedParameter -> {
                                     if (parameter.takesValue) {
