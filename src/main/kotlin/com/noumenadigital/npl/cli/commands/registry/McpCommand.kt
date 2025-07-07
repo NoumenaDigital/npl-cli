@@ -124,26 +124,12 @@ object McpCommand : CommandExecutor {
     }
 
     private fun addAllTools(server: Server) {
-        val allCommands = mutableListOf<Pair<String, CommandExecutor>>()
-
-        Commands.entries.forEach { command ->
+        (Commands.entries + CloudCommands.entries).forEach { command ->
             val executor = command.getBaseExecutor()
             if (executor.supportsMcp) {
                 val toolName = command.commandName.replace(" ", "_")
-                allCommands.add(toolName to executor)
+                addTool(server, toolName, executor)
             }
-        }
-
-        CloudCommands.entries.forEach { command ->
-            val executor = command.getBaseExecutor()
-            if (executor.supportsMcp) {
-                val toolName = command.commandName.replace(" ", "_")
-                allCommands.add(toolName to executor)
-            }
-        }
-
-        allCommands.forEach { (toolName, executor) ->
-            addTool(server, toolName, executor)
         }
     }
 
