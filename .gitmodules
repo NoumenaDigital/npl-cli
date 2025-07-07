@@ -1,4 +1,0 @@
-[submodule "npl-vscode-extension"]
-	path = npl-vscode-extension
-	url = https://github.com/NoumenaDigital/npl-vscode-extension.git
-	branch = master

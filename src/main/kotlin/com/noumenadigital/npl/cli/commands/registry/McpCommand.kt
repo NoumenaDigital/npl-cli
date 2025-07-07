@@ -8,11 +8,7 @@ import com.noumenadigital.npl.cli.commands.Commands
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.GetPromptResult
 import io.modelcontextprotocol.kotlin.sdk.Implementation
-import io.modelcontextprotocol.kotlin.sdk.Prompt
-import io.modelcontextprotocol.kotlin.sdk.PromptMessage
-import io.modelcontextprotocol.kotlin.sdk.Role
 import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.server.Server
@@ -119,10 +115,6 @@ object McpCommand : CommandExecutor {
                                         subscribe = false,
                                         listChanged = false,
                                     ),
-                                prompts =
-                                    ServerCapabilities.Prompts(
-                                        listChanged = false,
-                                    ),
                             ),
                     ),
             )
@@ -153,16 +145,6 @@ object McpCommand : CommandExecutor {
         allCommands.forEach { (toolName, executor) ->
             addTool(server, toolName, executor)
         }
-
-        server.addPrompt(
-            prompt =
-                Prompt(
-                    name = "NPL development",
-                    description = "How to develop NPL code",
-                    arguments = emptyList(),
-                ),
-            promptProvider = { getSystemPrompt() },
-        )
     }
 
     private fun addTool(
@@ -218,31 +200,6 @@ object McpCommand : CommandExecutor {
                 )
             }
         }
-    }
-
-    fun getSystemPrompt(): GetPromptResult {
-        val instructionsText =
-            try {
-                val inputStream = javaClass.classLoader.getResourceAsStream("npl-instructions.md")
-                inputStream?.bufferedReader()?.use { it.readText() }
-                    ?: "NPL (NOUMENA Protocol Language) development instructions not found in resources."
-            } catch (e: Exception) {
-                "Error reading NPL instructions: ${e.message}"
-            }
-
-        return GetPromptResult(
-            messages =
-                listOf(
-                    PromptMessage(
-                        role = Role.assistant,
-                        content =
-                            TextContent(
-                                text = instructionsText,
-                            ),
-                    ),
-                ),
-            description = "NPL development",
-        )
     }
 
     private fun buildCommandArgs(
