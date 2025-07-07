@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandParameter
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.modelcontextprotocol.kotlin.sdk.Tool
@@ -13,7 +12,7 @@ interface CommandExecutor {
     val commandName: String
     val description: String
 
-    val parameters: List<CommandParameter>
+    val parameters: List<NamedParameter>
         get() = emptyList()
 
     val supportsMcp: Boolean

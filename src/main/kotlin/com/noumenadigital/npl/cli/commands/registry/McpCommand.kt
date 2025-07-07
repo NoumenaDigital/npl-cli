@@ -5,7 +5,6 @@ import ch.qos.logback.core.ConsoleAppender
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CloudCommands
 import com.noumenadigital.npl.cli.commands.Commands
-import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
@@ -254,7 +253,6 @@ object McpCommand : CommandExecutor {
 
         executor.parameters.filter { !it.isHidden }.forEach { parameter ->
             val jsonElement = args[parameter.name]
-            check(parameter is NamedParameter)
 
             if (jsonElement != null) {
                 if (parameter.takesValue) {

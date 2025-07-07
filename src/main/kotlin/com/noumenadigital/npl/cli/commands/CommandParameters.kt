@@ -2,22 +2,14 @@ package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 
-sealed interface CommandParameter {
-    val name: String
-    val description: String
-    val defaultValue: String?
-    val isRequired: Boolean
-    val isHidden: Boolean
-}
-
 data class NamedParameter(
-    override val name: String,
-    override val description: String,
-    override val defaultValue: String? = null,
-    override val isRequired: Boolean = false,
-    override val isHidden: Boolean = false,
+    val name: String,
+    val description: String,
+    val defaultValue: String? = null,
+    val isRequired: Boolean = false,
+    val isHidden: Boolean = false,
     val valuePlaceholder: String? = null,
-) : CommandParameter {
+) {
     init {
         require(!name.startsWith("--")) { "Named parameters should not start with '--' in definition" }
     }
@@ -33,12 +25,9 @@ data class NamedParameter(
 object CommandArgumentParser {
     fun parse(
         args: List<String>,
-        parameters: List<CommandParameter>,
+        parameters: List<NamedParameter>,
     ): ParsedArguments {
-        val paramDefs =
-            parameters
-                .filterIsInstance<NamedParameter>()
-                .associateBy { it.cliName }
+        val paramDefs = parameters.associateBy { it.cliName }
 
         val parsed = mutableMapOf<String, String>()
         val consumedIndices = mutableSetOf<Int>()
