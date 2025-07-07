@@ -41,6 +41,13 @@ data class TestCommand(
                 description = "Report test coverage details (printed to console as well as coverage.xml)",
                 isRequired = false,
             ),
+            NamedParameter(
+                name = "outputDir",
+                description = "Directory to place generated output files (optional)",
+                defaultValue = ".",
+                isRequired = false,
+                valuePlaceholder = "<output directory>",
+            ),
         )
 
     override fun createInstance(params: List<String>): CommandExecutor = TestCommand(params)
@@ -62,7 +69,8 @@ data class TestCommand(
             }
 
             val showCoverage = parsedArgs.hasFlag("coverage")
-            val coverageAnalyzer: CoverageAnalyzer = coverageAnalyzer(showCoverage, sourceDir)
+            val outputDir = parsedArgs.getValue("outputDir") ?: "."
+            val coverageAnalyzer: CoverageAnalyzer = coverageAnalyzer(showCoverage, sourceDir, outputDir)
             val testHarness = TestHarness(SourcesManager(sourceDir.absolutePath), coverageAnalyzer)
 
             val start = System.nanoTime()
@@ -97,9 +105,10 @@ data class TestCommand(
     private fun coverageAnalyzer(
         showCoverage: Boolean,
         sourceDir: File,
+        outputDir: String = ".",
     ): CoverageAnalyzer =
         if (showCoverage) {
-            val coverageFile = File(".").canonicalFile.resolve(COVERAGE_FILE)
+            val coverageFile = File(outputDir).canonicalFile.resolve(COVERAGE_FILE)
             LineCoverageAnalyzer(sourceDir.canonicalFile, SonarQubeReporter(coverageFile))
         } else {
             NoCoverageAnalyzer

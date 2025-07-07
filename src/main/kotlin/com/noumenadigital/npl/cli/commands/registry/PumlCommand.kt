@@ -28,6 +28,13 @@ data class PumlCommand(
                 isRequired = false,
                 valuePlaceholder = "<directory>",
             ),
+            NamedParameter(
+                name = "outputDir",
+                description = "Directory to place generated output files (optional)",
+                defaultValue = ".",
+                isRequired = false,
+                valuePlaceholder = "<output directory>",
+            ),
         )
 
     override fun execute(output: ColorWriter): ExitCode {
@@ -36,7 +43,7 @@ data class PumlCommand(
                 throw CommandExecutionException("Source directory does not exist or is not a directory: $srcDir")
             }
 
-            val outputDir = File(outputDir).resolve("puml")
+            val outputDirFile = File(outputDir).resolve("puml")
             val protosMap = CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
 
             if (protosMap == null) {
@@ -45,12 +52,12 @@ data class PumlCommand(
 
             val pumlFiles = generateFiles(protosMap)
 
-            outputDir.mkdirs()
-            output.info("Writing Puml files to ${outputDir.canonicalPath}\n")
+            outputDirFile.mkdirs()
+            output.info("Writing Puml files to ${outputDirFile.canonicalPath}\n")
 
             pumlFiles.forEach {
                 try {
-                    it.write(outputDir.toPath())
+                    it.write(outputDirFile.toPath())
                 } catch (e: Exception) {
                     throw CommandExecutionException(e.message!!, e.cause)
                 }
@@ -74,6 +81,7 @@ data class PumlCommand(
         }
 
         val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
+        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
         return PumlCommand(srcDir = srcDir, outputDir = outputDir)
     }
 

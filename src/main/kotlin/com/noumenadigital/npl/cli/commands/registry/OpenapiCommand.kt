@@ -28,6 +28,7 @@ import kotlin.io.path.notExists
 data class OpenapiCommand(
     private val srcDir: String = ".",
     private val ruleDescriptorPath: String? = null,
+    private val outputDir: String = ".",
     private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir)),
 ) : CommandExecutor {
     override val commandName: String = "openapi"
@@ -49,6 +50,13 @@ data class OpenapiCommand(
                 isRequired = false,
                 valuePlaceholder = "<rules descriptor path>",
             ),
+            NamedParameter(
+                name = "outputDir",
+                description = "Directory to place generated output files (optional)",
+                defaultValue = ".",
+                isRequired = false,
+                valuePlaceholder = "<output directory>",
+            ),
         )
 
     companion object {
@@ -65,7 +73,8 @@ data class OpenapiCommand(
 
         val srcDir = parsedArgs.getValue("sourceDir") ?: "."
         val rules = parsedArgs.getValue("rules")
-        return OpenapiCommand(srcDir, rules)
+        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
+        return OpenapiCommand(srcDir, rules, outputDir)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
@@ -134,7 +143,7 @@ data class OpenapiCommand(
 
                 writeToFile(
                     Yaml.pretty(openApi),
-                    Paths.get(CURRENT_DIRECTORY, "openapi", "$packageName-openapi.yml"),
+                    Paths.get(outputDir, "openapi", "$packageName-openapi.yml"),
                 )
             }
             output.success("NPL openapi completed successfully.")
