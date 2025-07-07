@@ -633,6 +633,23 @@
       ]
     },
     {
+      "type": "io.modelcontextprotocol.kotlin.sdk.EmptyRequestResult",
+      "fields": [
+        {
+          "name": "Companion"
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.kotlin.sdk.EmptyRequestResult$Companion",
+      "methods": [
+        {
+          "name": "serializer",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "io.modelcontextprotocol.kotlin.sdk.GetPromptRequest",
       "fields": [
         {
