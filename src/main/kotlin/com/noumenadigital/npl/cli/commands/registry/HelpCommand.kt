@@ -3,7 +3,6 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.Commands
 import com.noumenadigital.npl.cli.commands.NamedParameter
-import com.noumenadigital.npl.cli.commands.PositionalParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 
 open class HelpCommand : CommandExecutor {
@@ -46,8 +45,6 @@ open class HelpCommand : CommandExecutor {
                                     param.name
                                 }
                             }
-
-                            is PositionalParameter -> "<${param.name}>"
                         }
                     output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
                 }

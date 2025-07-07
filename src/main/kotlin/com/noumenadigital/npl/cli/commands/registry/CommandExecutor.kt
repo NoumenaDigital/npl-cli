@@ -3,7 +3,6 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandParameter
 import com.noumenadigital.npl.cli.commands.NamedParameter
-import com.noumenadigital.npl.cli.commands.PositionalParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import kotlinx.serialization.json.buildJsonObject
@@ -37,9 +36,6 @@ interface CommandExecutor {
                                     } else {
                                         put("type", "boolean")
                                     }
-                                }
-                                is PositionalParameter -> {
-                                    put("type", "string")
                                 }
                             }
                             put("description", parameter.description)

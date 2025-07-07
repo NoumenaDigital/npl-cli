@@ -36,7 +36,7 @@ class CommandProcessorServiceTest :
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
                     check      Validate the correctness of NPL sources
-                                 <directory>  Target directory containing NPL source files to check (defaults to current directory)
+                                 --sourceDir <directory>  Source directory containing NPL protocols (defaults to current directory)
                     test       Run the NPL tests
                                  --sourceDir <directory>  Source directory containing NPL tests to run (defaults to current directory)
                                  --coverage  Report test coverage details (printed to console as well as coverage.xml)
@@ -44,7 +44,7 @@ class CommandProcessorServiceTest :
                                  --sourceDir <directory>  Source directory containing NPL protocols (defaults to current directory)
                                  --rules <rules descriptor path>  Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system
                     puml       Generate a puml diagram from source in the given directory
-                                 <directory>  Source directory containing NPL protocols (defaults to current directory)
+                                 --sourceDir <directory>  Source directory containing NPL protocols (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
                                  --target <name>  Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.
                                  --sourceDir <directory> (required)  Directory containing NPL sources

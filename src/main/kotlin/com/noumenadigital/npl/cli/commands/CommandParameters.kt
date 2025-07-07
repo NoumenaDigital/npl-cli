@@ -25,18 +25,6 @@ data class NamedParameter(
     val takesValue: Boolean = valuePlaceholder != null
 }
 
-data class PositionalParameter(
-    override val name: String,
-    override val description: String,
-    override val defaultValue: String? = null,
-    override val isRequired: Boolean = false,
-    override val isHidden: Boolean = false,
-) : CommandParameter {
-    init {
-        require(!name.startsWith("--")) { "Positional parameters must not start with '--'" }
-    }
-}
-
 /**
  * Simple command line argument parser supporting "--param value" format.
  */

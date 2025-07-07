@@ -82,7 +82,7 @@ class McpCommandIT :
                             toolName = "check",
                             arguments =
                                 buildJsonObject {
-                                    put("directory", testDirPath)
+                                    put("--sourceDir", testDirPath)
                                 },
                         )
 
@@ -104,7 +104,7 @@ class McpCommandIT :
                 }
             }
 
-            test("calling test tool unsuccessfully") {
+            test("calling test tool successfully") {
                 runMcpSession { session ->
                     session.initialize()
                     session.sendInitialized()
@@ -117,8 +117,8 @@ class McpCommandIT :
                             toolName = "test",
                             arguments =
                                 buildJsonObject {
-                                    put("sourceDir", testDirPath)
-                                    put("coverage", false)
+                                    put("--sourceDir", testDirPath)
+                                    put("--coverage", false)
                                 },
                         )
 
@@ -136,7 +136,7 @@ class McpCommandIT :
 
                     text shouldNotBe null
                     val responseJson = Json.parseToJsonElement(text!!)
-                    responseJson.jsonObject["success"]?.jsonPrimitive?.boolean shouldBe false
+                    responseJson.jsonObject["success"]?.jsonPrimitive?.boolean shouldBe true
                 }
             }
 

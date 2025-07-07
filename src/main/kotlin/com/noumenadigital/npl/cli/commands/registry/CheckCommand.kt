@@ -1,8 +1,9 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandParameter
-import com.noumenadigital.npl.cli.commands.PositionalParameter
+import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
@@ -18,19 +19,24 @@ data class CheckCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            PositionalParameter(
-                name = "directory",
-                description = "Target directory containing NPL source files to check",
+            NamedParameter(
+                name = "--sourceDir",
+                description = "Source directory containing NPL protocols",
                 defaultValue = ".",
                 isRequired = false,
+                valuePlaceholder = "<directory>",
             ),
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val srcDir = params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: "."
-        return CheckCommand(
-            srcDir = srcDir,
-        )
+        val parsedArgs = CommandArgumentParser.parse(params, parameters)
+
+        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+        }
+
+        val srcDir = parsedArgs.getValue("--sourceDir") ?: "."
+        return CheckCommand(srcDir = srcDir)
     }
 
     override fun execute(output: ColorWriter): ExitCode {

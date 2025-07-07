@@ -3,8 +3,9 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.ExitCode.GENERAL_ERROR
 import com.noumenadigital.npl.cli.ExitCode.SUCCESS
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandParameter
-import com.noumenadigital.npl.cli.commands.PositionalParameter
+import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
@@ -21,11 +22,12 @@ data class PumlCommand(
 
     override val parameters: List<CommandParameter> =
         listOf(
-            PositionalParameter(
-                name = "directory",
+            NamedParameter(
+                name = "--sourceDir",
                 description = "Source directory containing NPL protocols",
                 defaultValue = ".",
                 isRequired = false,
+                valuePlaceholder = "<directory>",
             ),
         )
 
@@ -66,9 +68,14 @@ data class PumlCommand(
     }
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val srcDir =
-            params.firstOrNull() ?: parameters.find { it.name == "directory" }?.defaultValue ?: CURRENT_DIRECTORY
-        return PumlCommand(srcDir = srcDir)
+        val parsedArgs = CommandArgumentParser.parse(params, parameters)
+
+        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+        }
+
+        val srcDir = parsedArgs.getValue("--sourceDir") ?: CURRENT_DIRECTORY
+        return PumlCommand(srcDir = srcDir, outputDir = outputDir)
     }
 
     companion object {

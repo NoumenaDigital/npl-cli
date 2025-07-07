@@ -6,7 +6,6 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CloudCommands
 import com.noumenadigital.npl.cli.commands.Commands
 import com.noumenadigital.npl.cli.commands.NamedParameter
-import com.noumenadigital.npl.cli.commands.PositionalParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
@@ -273,15 +272,6 @@ object McpCommand : CommandExecutor {
                                 cmdArgs.add(parameter.name)
                             }
                         }
-                    } else if (parameter.isRequired) {
-                        throw IllegalArgumentException("Required parameter `${parameter.name}` is missing")
-                    }
-                }
-
-                is PositionalParameter -> {
-                    val argValue = jsonElement?.jsonPrimitive?.contentOrNull
-                    if (argValue != null) {
-                        cmdArgs.add(argValue)
                     } else if (parameter.isRequired) {
                         throw IllegalArgumentException("Required parameter `${parameter.name}` is missing")
                     }

@@ -4,7 +4,6 @@ import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.Commands
 import com.noumenadigital.npl.cli.commands.CommandsParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
-import com.noumenadigital.npl.cli.commands.PositionalParameter
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
@@ -24,13 +23,6 @@ class CommandParametersTest :
                 NamedParameter(name = "--param", description = "desc") // Should not throw
             }
 
-            test("PositionalParameter should not allow '--' prefix") {
-                shouldThrow<IllegalArgumentException> {
-                    PositionalParameter(name = "--param", description = "desc")
-                }
-                PositionalParameter(name = "param", description = "desc") // Should not throw
-            }
-
             test("NamedParameter takesValue should be true only if valuePlaceholder is not null") {
                 NamedParameter(name = "--param", description = "desc").takesValue.shouldBeFalse()
                 NamedParameter(name = "--param", description = "desc", valuePlaceholder = "<val>").takesValue.shouldBeTrue()
@@ -42,9 +34,8 @@ class CommandParametersTest :
             val namedParamWithValue =
                 NamedParameter(name = "--file", description = "File path", valuePlaceholder = "<path>")
             val namedFlag = NamedParameter(name = "--verbose", description = "Enable verbose mode")
-            val positionalParam = PositionalParameter(name = "command", description = "The command")
 
-            val parameters = listOf(namedParamWithValue, namedFlag, positionalParam)
+            val parameters = listOf(namedParamWithValue, namedFlag)
 
             test("should parse named parameter with value") {
                 val args = listOf("--file", "my/path.txt", "other")
