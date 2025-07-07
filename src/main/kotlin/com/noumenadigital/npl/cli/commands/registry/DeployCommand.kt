@@ -22,19 +22,19 @@ class DeployCommand(
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
-                name = "--target",
+                name = "target",
                 description = "Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.",
                 isRequired = false,
                 valuePlaceholder = "<name>",
             ),
             NamedParameter(
-                name = "--sourceDir",
+                name = "sourceDir",
                 description = "Directory containing NPL sources",
                 isRequired = true,
                 valuePlaceholder = "<directory>",
             ),
             NamedParameter(
-                name = "--clear",
+                name = "clear",
                 description = "Clear application contents before deployment",
                 isRequired = false,
             ),
@@ -53,9 +53,9 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        val clearFlag = parsedArgs.hasFlag("--clear")
-        val targetValue = parsedArgs.getValue("--target")
-        val sourceDirValue = parsedArgs.getValue("--sourceDir")
+        val clearFlag = parsedArgs.hasFlag("clear")
+        val targetValue = parsedArgs.getValue("target")
+        val sourceDirValue = parsedArgs.getValue("sourceDir")
 
         if (sourceDirValue == null) {
             output.error("Missing required parameter: --sourceDir <directory>")

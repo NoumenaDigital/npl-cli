@@ -23,7 +23,7 @@ data class PumlCommand(
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
-                name = "--sourceDir",
+                name = "sourceDir",
                 description = "Source directory containing NPL protocols",
                 defaultValue = ".",
                 isRequired = false,
@@ -74,7 +74,7 @@ data class PumlCommand(
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
-        val srcDir = parsedArgs.getValue("--sourceDir") ?: CURRENT_DIRECTORY
+        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
         return PumlCommand(srcDir = srcDir, outputDir = outputDir)
     }
 

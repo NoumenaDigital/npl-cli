@@ -37,14 +37,14 @@ data class OpenapiCommand(
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
-                name = "--sourceDir",
+                name = "sourceDir",
                 description = "Source directory containing NPL protocols",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
             ),
             NamedParameter(
-                name = "--rules",
+                name = "rules",
                 description =
                     "Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system",
                 isRequired = false,
@@ -64,8 +64,8 @@ data class OpenapiCommand(
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
-        val srcDir = parsedArgs.getValue("--sourceDir") ?: "."
-        val rules = parsedArgs.getValue("--rules")
+        val srcDir = parsedArgs.getValue("sourceDir") ?: "."
+        val rules = parsedArgs.getValue("rules")
         return OpenapiCommand(srcDir, rules)
     }
 

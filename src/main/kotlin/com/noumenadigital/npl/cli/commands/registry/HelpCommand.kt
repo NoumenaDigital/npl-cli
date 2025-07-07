@@ -40,9 +40,9 @@ open class HelpCommand : CommandExecutor {
                         when (param) {
                             is NamedParameter -> {
                                 if (param.valuePlaceholder != null) {
-                                    "${param.name} ${param.valuePlaceholder}"
+                                    "${param.cliName} ${param.valuePlaceholder}"
                                 } else {
-                                    param.name
+                                    param.cliName
                                 }
                             }
                         }

@@ -21,21 +21,21 @@ class CloudLoginCommand(
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
-                name = "--clientId",
+                name = "clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
-                name = "--clientSecret",
+                name = "clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "--url",
+                name = "url",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -45,9 +45,9 @@ class CloudLoginCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val clientId = parsedArgs.getValue("--clientId")
-        val clientSecret = parsedArgs.getValue("--clientSecret")
-        val url = parsedArgs.getValue("--url")
+        val clientId = parsedArgs.getValue("clientId")
+        val clientSecret = parsedArgs.getValue("clientSecret")
+        val url = parsedArgs.getValue("url")
         val noumenaCloudAuthClient =
             NoumenaCloudAuthClient(
                 NoumenaCloudAuthConfig.get(

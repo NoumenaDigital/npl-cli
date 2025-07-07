@@ -19,10 +19,12 @@ data class NamedParameter(
     val valuePlaceholder: String? = null,
 ) : CommandParameter {
     init {
-        require(name.startsWith("--")) { "Named parameters must start with '--'" }
+        require(!name.startsWith("--")) { "Named parameters should not start with '--' in definition" }
     }
 
     val takesValue: Boolean = valuePlaceholder != null
+
+    val cliName: String = "--$name"
 }
 
 /**
@@ -36,7 +38,7 @@ object CommandArgumentParser {
         val paramDefs =
             parameters
                 .filterIsInstance<NamedParameter>()
-                .associateBy { it.name }
+                .associateBy { it.cliName }
 
         val parsed = mutableMapOf<String, String>()
         val consumedIndices = mutableSetOf<Int>()
@@ -50,7 +52,7 @@ object CommandArgumentParser {
             val paramDef = if (arg.startsWith("--")) paramDefs[arg] else null
 
             if (paramDef != null && paramDef.takesValue && !nextArg.startsWith("--")) {
-                parsed[arg] = nextArg
+                parsed[paramDef.name] = nextArg
                 consumedIndices.add(i)
                 consumedIndices.add(i + 1)
             }
@@ -65,7 +67,7 @@ object CommandArgumentParser {
             val paramDef = if (arg.startsWith("--")) paramDefs[arg] else null
 
             if (paramDef != null && !paramDef.takesValue) {
-                parsed[arg] = ""
+                parsed[paramDef.name] = ""
             } else {
                 unexpected.add(arg)
             }

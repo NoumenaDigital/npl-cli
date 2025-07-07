@@ -254,28 +254,25 @@ object McpCommand : CommandExecutor {
 
         executor.parameters.filter { !it.isHidden }.forEach { parameter ->
             val jsonElement = args[parameter.name]
+            check(parameter is NamedParameter)
 
-            when (parameter) {
-                is NamedParameter -> {
-                    if (jsonElement != null) {
-                        if (parameter.takesValue) {
-                            val argValue = jsonElement.jsonPrimitive.contentOrNull
-                            if (argValue != null) {
-                                cmdArgs.add(parameter.name)
-                                cmdArgs.add(argValue)
-                            } else if (parameter.isRequired) {
-                                throw IllegalArgumentException("Required parameter `${parameter.name}` is missing")
-                            }
-                        } else {
-                            val isFlagSet = jsonElement.jsonPrimitive.booleanOrNull ?: false
-                            if (isFlagSet) {
-                                cmdArgs.add(parameter.name)
-                            }
-                        }
+            if (jsonElement != null) {
+                if (parameter.takesValue) {
+                    val argValue = jsonElement.jsonPrimitive.contentOrNull
+                    if (argValue != null) {
+                        cmdArgs.add(parameter.cliName)
+                        cmdArgs.add(argValue)
                     } else if (parameter.isRequired) {
                         throw IllegalArgumentException("Required parameter `${parameter.name}` is missing")
                     }
+                } else {
+                    val isFlagSet = jsonElement.jsonPrimitive.booleanOrNull ?: false
+                    if (isFlagSet) {
+                        cmdArgs.add(parameter.cliName)
+                    }
                 }
+            } else if (parameter.isRequired) {
+                throw IllegalArgumentException("Required parameter `${parameter.name}` is missing")
             }
         }
 

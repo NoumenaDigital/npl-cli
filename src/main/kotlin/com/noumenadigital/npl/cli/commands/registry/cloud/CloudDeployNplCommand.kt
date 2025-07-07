@@ -38,46 +38,46 @@ class CloudDeployNplCommand(
     override val parameters: List<CommandParameter> =
         listOf(
             NamedParameter(
-                name = "--app",
+                name = "app",
                 description = "NOUMENA Cloud Application name",
                 isRequired = true,
                 valuePlaceholder = "<app>",
             ),
             NamedParameter(
-                name = "--tenant",
+                name = "tenant",
                 description = "NOUMENA Cloud Tenant name",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
-                name = "--migration",
+                name = "migration",
                 description = "Path to migration.yml",
                 isRequired = false,
                 valuePlaceholder = "<migration>",
             ),
             NamedParameter(
-                name = "--url",
+                name = "url",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
             ),
             NamedParameter(
-                name = "--clientId",
+                name = "clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
-                name = "--clientSecret",
+                name = "clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "--authUrl",
+                name = "authUrl",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -87,9 +87,9 @@ class CloudDeployNplCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val app = parsedArgs.getRequiredValue("--app")
-        val tenant = parsedArgs.getRequiredValue("--tenant")
-        val migration = parsedArgs.getValue("--migration") ?: findSingleFile(migrationFileName).toString()
+        val app = parsedArgs.getRequiredValue("app")
+        val tenant = parsedArgs.getRequiredValue("tenant")
+        val migration = parsedArgs.getValue("migration") ?: findSingleFile(migrationFileName).toString()
         val migrationFile = File(migration)
         if (!migrationFile.exists()) {
             throw CloudCommandException(
@@ -97,10 +97,10 @@ class CloudDeployNplCommand(
                 commandName = "cloud deploy",
             )
         }
-        val clientId = parsedArgs.getValue("--clientId")
-        val clientSecret = parsedArgs.getValue("--clientSecret")
-        val authUrl = parsedArgs.getValue("--authUrl")
-        val url = parsedArgs.getValue("--url")
+        val clientId = parsedArgs.getValue("clientId")
+        val clientSecret = parsedArgs.getValue("clientSecret")
+        val authUrl = parsedArgs.getValue("authUrl")
+        val url = parsedArgs.getValue("url")
         val sourcesManager = SourcesManager(migrationFile.parent.toString())
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)

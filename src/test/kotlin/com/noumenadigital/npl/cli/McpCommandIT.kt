@@ -82,7 +82,7 @@ class McpCommandIT :
                             toolName = "check",
                             arguments =
                                 buildJsonObject {
-                                    put("--sourceDir", testDirPath)
+                                    put("sourceDir", testDirPath)
                                 },
                         )
 
@@ -117,8 +117,8 @@ class McpCommandIT :
                             toolName = "test",
                             arguments =
                                 buildJsonObject {
-                                    put("--sourceDir", testDirPath)
-                                    put("--coverage", false)
+                                    put("sourceDir", testDirPath)
+                                    put("coverage", false)
                                 },
                         )
 
@@ -150,7 +150,7 @@ class McpCommandIT :
                             toolName = "cloud_deploy",
                             arguments =
                                 buildJsonObject {
-                                    // Missing required '--app' and '--tenant' parameters
+                                    // Missing required 'app' and 'tenant' parameters
                                 },
                         )
 
