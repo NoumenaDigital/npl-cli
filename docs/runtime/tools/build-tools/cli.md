@@ -49,13 +49,13 @@ for you.
 For Windows without WSL, you may download the latest `.exe` executable
 [here](https://github.com/NoumenaDigital/npl-cli/releases)
 
-### MCP installation
-
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=npl-cli&config=ewogICAgIm5wbC1jbGkiOiB7CiAgICAgICJjb21tYW5kIjogIm5wbCIsCiAgICAgICJhcmdzIjogWyJtY3AiXQogICAgfQp9Cg==)
-
-[Install in VS Code](vscode:mcp/install?%7B%22name%22%3A%22NPL%20CLI%22%2C%22command%22%3A%22npl%22%2C%22args%22%3A%5B%22mcp%22%5D%7D)
+## Model Context Protocol (MCP) server
 
 Once you've installed the CLI, you can use it in MCP mode with your local AI tools.
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=npl-cli&config=ewogICAgImNvbW1hbmQiOiAibnBsIiwKICAgICJhcmdzIjogWyJtY3AiXQp9Cg==)
+
+[Install in VS Code](vscode:mcp/install?%7B%22name%22%3A%22NPL%20CLI%22%2C%22command%22%3A%22npl%22%2C%22args%22%3A%5B%22mcp%22%5D%7D)
 
 Simply add `npl-cli` to your MCP configuration file, e.g.
 
