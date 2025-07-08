@@ -35,6 +35,14 @@ class DeployCommand(
                 isRequiredForMcp = true,
             ),
             NamedParameter(
+                name = "configFile",
+                description = "Path to deploy.yml configuration file",
+                isRequired = false,
+                valuePlaceholder = "<path>",
+                takesPath = true,
+                isRequiredForMcp = true,
+            ),
+            NamedParameter(
                 name = "clear",
                 description = "Clear application contents before deployment",
                 isRequired = false,
@@ -57,6 +65,7 @@ class DeployCommand(
         val clearFlag = parsedArgs.hasFlag("clear")
         val targetValue = parsedArgs.getValue("target")
         val sourceDirValue = parsedArgs.getValue("sourceDir")
+        val configFileValue = parsedArgs.getValue("configFile")
 
         if (sourceDirValue == null) {
             output.error("Missing required parameter: --sourceDir <directory>")
@@ -75,7 +84,22 @@ class DeployCommand(
         }
 
         val targetConfig: EngineTargetConfig
-        val config = DeployConfig.load()
+        val config =
+            if (configFileValue != null) {
+                val configFile = File(configFileValue)
+                if (!configFile.exists()) {
+                    output.error("Configuration file does not exist: $configFileValue")
+                    return ExitCode.GENERAL_ERROR
+                }
+                try {
+                    DeployConfig.load(configFile)
+                } catch (e: DeployConfigException) {
+                    output.error("Configuration error: ${e.message}")
+                    return ExitCode.CONFIG_ERROR
+                }
+            } else {
+                DeployConfig.load()
+            }
 
         when {
             targetValue != null -> {
@@ -159,7 +183,7 @@ class DeployCommand(
     companion object {
         val USAGE_STRING =
             """
-            Usage: deploy --sourceDir <directory> [--target <name>] [--clear]
+            Usage: deploy --sourceDir <directory> [--target <name>] [--configFile <path>] [--clear]
 
             Deploys NPL sources to a Noumena Engine instance.
 
@@ -178,9 +202,11 @@ class DeployCommand(
                                 If --target is omitted, the 'defaultTarget' from deploy.yml is used if set.
 
             Options:
-              --clear            Clear application contents before deployment.
+              --configFile <path> Path to deploy.yml configuration file.
+                                  If not specified, looks for .npl/deploy.yml in current directory or home directory.
+              --clear             Clear application contents before deployment.
 
-            Configuration for --target is read from .npl/deploy.yml (current dir or home dir).
+            Configuration for --target is read from .npl/deploy.yml (current dir or home dir) unless --configFile is specified.
             """.trimIndent()
     }
 }
