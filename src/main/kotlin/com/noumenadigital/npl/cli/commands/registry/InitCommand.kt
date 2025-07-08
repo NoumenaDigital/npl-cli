@@ -18,23 +18,24 @@ class InitCommand(
 
     override val commandName: String = "init"
     override val description: String = "Initializes a new project"
+    override val supportsMcp: Boolean = false // TODO: ST-4767
 
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "--name",
+                name = "name",
                 description = "Name of the project. A directory of this name will be created in the current directory",
                 valuePlaceholder = "<name>",
             ),
             NamedParameter(
-                name = "--bare",
+                name = "bare",
                 description = "Installs an empty project structure",
                 defaultValue = "false",
                 isRequired = false,
             ),
             NamedParameter(
-                name = "--templateUrl",
-                description = "URL of repository containing a desired project template. Overrides the default template",
+                name = "templateUrl",
+                description = "URL of a repository containing a ZIP archive of the project template. Overrides the default template",
                 isRequired = false,
                 valuePlaceholder = "<templateUrl>",
             ),
@@ -46,7 +47,7 @@ class InitCommand(
         val parsedArgs = CommandArgumentParser.parse(args, parameters)
 
         if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            if (parsedArgs.unexpectedArgs.contains("--name")) {
+            if (parsedArgs.unexpectedArgs.contains("name")) {
                 output.displayError("Project name cannot be empty.")
                 return ExitCode.GENERAL_ERROR
             }
@@ -54,12 +55,12 @@ class InitCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        if (parsedArgs.getValue("--templateUrl") != null && parsedArgs.hasFlag("--bare")) {
+        if (parsedArgs.getValue("templateUrl") != null && parsedArgs.hasFlag("bare")) {
             output.displayError("Cannot use --bare and --templateUrl together.")
             return ExitCode.USAGE_ERROR
         }
 
-        val projectName = parsedArgs.getValue("--name")
+        val projectName = parsedArgs.getValue("name")
         val projectDir =
             projectName?.let {
                 File(it).apply {
@@ -77,7 +78,7 @@ class InitCommand(
         val archiveFile = projectDir.resolve("project${UUID.randomUUID()}.zip")
 
         try {
-            val templateUrl = parsedArgs.getValue("--templateUrl") ?: repoClient.getDefaultUrl(parsedArgs)
+            val templateUrl = parsedArgs.getValue("templateUrl") ?: repoClient.getDefaultUrl(parsedArgs)
             repoClient.downloadTemplateArchive(templateUrl, archiveFile)
             output.info("Successfully downloaded project files")
         } catch (e: Exception) {
@@ -108,7 +109,7 @@ class InitCommand(
     override fun createInstance(params: List<String>): CommandExecutor = InitCommand(params)
 
     private fun NoumenaGitRepoClient.getDefaultUrl(parsedArgs: CommandArgumentParser.ParsedArguments): String =
-        if (parsedArgs.hasFlag("--bare")) {
+        if (parsedArgs.hasFlag("bare")) {
             getBranchUrl(NO_SAMPLES)
         } else {
             getBranchUrl(SAMPLES)

@@ -1754,6 +1754,12 @@
       "type": "java.security.SecurityPermission"
     },
     {
+      "type": "java.security.interfaces.ECPrivateKey"
+    },
+    {
+      "type": "java.security.interfaces.ECPublicKey"
+    },
+    {
       "type": "java.security.interfaces.RSAPrivateKey"
     },
     {
