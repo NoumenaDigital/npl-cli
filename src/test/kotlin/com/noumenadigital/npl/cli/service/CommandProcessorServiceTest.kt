@@ -55,6 +55,7 @@ class CommandProcessorServiceTest :
                     deploy     Deploy NPL sources to a Noumena Engine instance
                                  --target <name>  Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.
                                  --sourceDir <directory> (required)  Directory containing NPL sources
+                                 --configFile <path>  Path to deploy.yml configuration file
                                  --clear  Clear application contents before deployment
                     cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
                     mcp        Start an MCP server exposing NPL CLI functionality over stdio
