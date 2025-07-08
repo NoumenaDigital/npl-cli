@@ -69,6 +69,13 @@ data class DeployConfig(
             }
         }
 
+        fun load(configFile: File): DeployConfig =
+            try {
+                mapper.readValue(configFile)
+            } catch (e: Exception) {
+                throw DeployConfigException("Failed to load configuration from ${configFile.path}: ${e.message}")
+            }
+
         fun validateTarget(
             config: DeployConfig,
             targetLabel: String,
