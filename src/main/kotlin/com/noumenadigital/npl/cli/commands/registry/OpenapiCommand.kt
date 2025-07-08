@@ -2,7 +2,6 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
-import com.noumenadigital.npl.cli.commands.CommandParameter
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -29,26 +28,40 @@ import kotlin.io.path.notExists
 data class OpenapiCommand(
     private val srcDir: String = ".",
     private val ruleDescriptorPath: String? = null,
+    private val outputDir: String = ".",
     private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir)),
 ) : CommandExecutor {
     override val commandName: String = "openapi"
     override val description: String = "Generate the openapi specifications of NPL api"
 
-    override val parameters: List<CommandParameter> =
+    override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "--sourceDir",
-                description = "Source directory containing NPL protocols",
+                name = "sourceDir",
+                description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
+                takesPath = true,
+                isRequiredForMcp = true,
             ),
             NamedParameter(
-                name = "--rules",
+                name = "rules",
                 description =
                     "Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system",
                 isRequired = false,
                 valuePlaceholder = "<rules descriptor path>",
+                takesPath = true,
+                isRequiredForMcp = false,
+            ),
+            NamedParameter(
+                name = "outputDir",
+                description = "Directory to place generated output files (optional)",
+                defaultValue = ".",
+                isRequired = false,
+                valuePlaceholder = "<output directory>",
+                takesPath = true,
+                isRequiredForMcp = true,
             ),
         )
 
@@ -64,9 +77,10 @@ data class OpenapiCommand(
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
-        val srcDir = parsedArgs.getValue("--sourceDir") ?: "."
-        val rules = parsedArgs.getValue("--rules")
-        return OpenapiCommand(srcDir, rules)
+        val srcDir = parsedArgs.getValue("sourceDir") ?: "."
+        val rules = parsedArgs.getValue("rules")
+        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
+        return OpenapiCommand(srcDir, rules, outputDir)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
@@ -135,7 +149,7 @@ data class OpenapiCommand(
 
                 writeToFile(
                     Yaml.pretty(openApi),
-                    Paths.get(CURRENT_DIRECTORY, "openapi", "$packageName-openapi.yml"),
+                    Paths.get(outputDir, "openapi", "$packageName-openapi.yml"),
                 )
             }
             output.success("NPL openapi completed successfully.")

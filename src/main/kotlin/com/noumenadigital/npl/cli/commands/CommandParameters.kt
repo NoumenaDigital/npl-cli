@@ -2,39 +2,23 @@ package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 
-sealed interface CommandParameter {
-    val name: String
-    val description: String
-    val defaultValue: String?
-    val isRequired: Boolean
-    val isHidden: Boolean
-}
-
 data class NamedParameter(
-    override val name: String,
-    override val description: String,
-    override val defaultValue: String? = null,
-    override val isRequired: Boolean = false,
-    override val isHidden: Boolean = false,
+    val name: String,
+    val description: String,
+    val defaultValue: String? = null,
+    val isRequired: Boolean = false,
+    val isHidden: Boolean = false,
     val valuePlaceholder: String? = null,
-) : CommandParameter {
+    val takesPath: Boolean = false,
+    val isRequiredForMcp: Boolean = isRequired && !isHidden,
+) {
     init {
-        require(name.startsWith("--")) { "Named parameters must start with '--'" }
+        require(!name.startsWith("--")) { "Named parameters should not start with '--' in definition" }
     }
 
     val takesValue: Boolean = valuePlaceholder != null
-}
 
-data class PositionalParameter(
-    override val name: String,
-    override val description: String,
-    override val defaultValue: String? = null,
-    override val isRequired: Boolean = false,
-    override val isHidden: Boolean = false,
-) : CommandParameter {
-    init {
-        require(!name.startsWith("--")) { "Positional parameters must not start with '--'" }
-    }
+    val cliName: String = "--$name"
 }
 
 /**
@@ -43,12 +27,9 @@ data class PositionalParameter(
 object CommandArgumentParser {
     fun parse(
         args: List<String>,
-        parameters: List<CommandParameter>,
+        parameters: List<NamedParameter>,
     ): ParsedArguments {
-        val paramDefs =
-            parameters
-                .filterIsInstance<NamedParameter>()
-                .associateBy { it.name }
+        val paramDefs = parameters.associateBy { it.cliName }
 
         val parsed = mutableMapOf<String, String>()
         val consumedIndices = mutableSetOf<Int>()
@@ -62,7 +43,7 @@ object CommandArgumentParser {
             val paramDef = if (arg.startsWith("--")) paramDefs[arg] else null
 
             if (paramDef != null && paramDef.takesValue && !nextArg.startsWith("--")) {
-                parsed[arg] = nextArg
+                parsed[paramDef.name] = nextArg
                 consumedIndices.add(i)
                 consumedIndices.add(i + 1)
             }
@@ -77,7 +58,7 @@ object CommandArgumentParser {
             val paramDef = if (arg.startsWith("--")) paramDefs[arg] else null
 
             if (paramDef != null && !paramDef.takesValue) {
-                parsed[arg] = ""
+                parsed[paramDef.name] = ""
             } else {
                 unexpected.add(arg)
             }

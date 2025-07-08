@@ -2,7 +2,6 @@ package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
-import com.noumenadigital.npl.cli.commands.CommandParameter
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -24,43 +23,43 @@ class CloudClearNplCommand(
     override val commandName: String = "cloud clear"
     override val description: String = "Delete NPL sources and clears protocols from the database from the NOUMENA Cloud Application"
 
-    override val parameters: List<CommandParameter> =
+    override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "--app",
+                name = "app",
                 description = "NOUMENA Cloud Application name",
                 isRequired = true,
                 valuePlaceholder = "<app>",
             ),
             NamedParameter(
-                name = "--tenant",
+                name = "tenant",
                 description = "NOUMENA Cloud Tenant name",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
-                name = "--url",
+                name = "url",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
             ),
             NamedParameter(
-                name = "--clientId",
+                name = "clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
-                name = "--clientSecret",
+                name = "clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "--authUrl",
+                name = "authUrl",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -70,12 +69,12 @@ class CloudClearNplCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val app = parsedArgs.getRequiredValue("--app")
-        val tenant = parsedArgs.getRequiredValue("--tenant")
-        val clientId = parsedArgs.getValue("--clientId")
-        val clientSecret = parsedArgs.getValue("--clientSecret")
-        val authUrl = parsedArgs.getValue("--authUrl")
-        val url = parsedArgs.getValue("--url")
+        val app = parsedArgs.getRequiredValue("app")
+        val tenant = parsedArgs.getRequiredValue("tenant")
+        val clientId = parsedArgs.getValue("clientId")
+        val clientSecret = parsedArgs.getValue("clientSecret")
+        val authUrl = parsedArgs.getValue("authUrl")
+        val url = parsedArgs.getValue("url")
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =

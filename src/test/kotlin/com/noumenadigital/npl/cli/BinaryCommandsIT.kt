@@ -47,20 +47,24 @@ class BinaryCommandsIT :
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
                     check      Validate the correctness of NPL sources
-                                 <directory>  Target directory containing NPL source files to check (defaults to current directory)
+                                 --sourceDir <directory>  Directory containing NPL source files (defaults to current directory)
                     test       Run the NPL tests
-                                 --sourceDir <directory>  Source directory containing NPL tests to run (defaults to current directory)
+                                 --sourceDir <directory>  Source directory containing NPL tests to run. Must be a parent directory of all required sources (both production and test). (defaults to current directory)
                                  --coverage  Report test coverage details (printed to console as well as coverage.xml)
+                                 --outputDir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     openapi    Generate the openapi specifications of NPL api
-                                 --sourceDir <directory>  Source directory containing NPL protocols (defaults to current directory)
+                                 --sourceDir <directory>  Directory containing NPL source files (defaults to current directory)
                                  --rules <rules descriptor path>  Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system
+                                 --outputDir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     puml       Generate a puml diagram from source in the given directory
-                                 <directory>  Source directory containing NPL protocols (defaults to current directory)
+                                 --sourceDir <directory>  Directory containing NPL source files (defaults to current directory)
+                                 --outputDir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
                                  --target <name>  Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.
                                  --sourceDir <directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
                     cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
+                    mcp        Start an MCP server exposing NPL CLI functionality over stdio
                     """.normalize()
 
                 output.normalize() shouldBe expectedOutput

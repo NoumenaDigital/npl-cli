@@ -2,7 +2,6 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
-import com.noumenadigital.npl.cli.commands.CommandParameter
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -28,19 +27,32 @@ data class TestCommand(
     override val commandName: String = "test"
     override val description: String = "Run the NPL tests"
 
-    override val parameters: List<CommandParameter> =
+    override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "--sourceDir",
-                description = "Source directory containing NPL tests to run",
+                name = "sourceDir",
+                description =
+                    "Source directory containing NPL tests to run." +
+                        " Must be a parent directory of all required sources (both production and test).",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
+                takesPath = true,
+                isRequiredForMcp = true,
             ),
             NamedParameter(
-                name = "--coverage",
+                name = "coverage",
                 description = "Report test coverage details (printed to console as well as coverage.xml)",
                 isRequired = false,
+            ),
+            NamedParameter(
+                name = "outputDir",
+                description = "Directory to place generated output files (optional)",
+                defaultValue = ".",
+                isRequired = false,
+                valuePlaceholder = "<output directory>",
+                takesPath = true,
+                isRequiredForMcp = false,
             ),
         )
 
@@ -55,15 +67,16 @@ data class TestCommand(
                 return ExitCode.USAGE_ERROR
             }
 
-            val sourcePath = parsedArgs.getValue("--sourceDir") ?: "."
+            val sourcePath = parsedArgs.getValue("sourceDir") ?: "."
             val sourceDir = File(sourcePath)
             if (!sourceDir.isDirectory || !sourceDir.exists()) {
                 output.error("Given source directory is either not a directory or does not exist. ${sourceDir.canonicalPath}")
                 return ExitCode.GENERAL_ERROR
             }
 
-            val showCoverage = parsedArgs.hasFlag("--coverage")
-            val coverageAnalyzer: CoverageAnalyzer = coverageAnalyzer(showCoverage, sourceDir)
+            val showCoverage = parsedArgs.hasFlag("coverage")
+            val outputDir = parsedArgs.getValue("outputDir") ?: "."
+            val coverageAnalyzer: CoverageAnalyzer = coverageAnalyzer(showCoverage, sourceDir, outputDir)
             val testHarness = TestHarness(SourcesManager(sourceDir.absolutePath), coverageAnalyzer)
 
             val start = System.nanoTime()
@@ -98,9 +111,10 @@ data class TestCommand(
     private fun coverageAnalyzer(
         showCoverage: Boolean,
         sourceDir: File,
+        outputDir: String = ".",
     ): CoverageAnalyzer =
         if (showCoverage) {
-            val coverageFile = File(".").canonicalFile.resolve(COVERAGE_FILE)
+            val coverageFile = File(outputDir).canonicalFile.resolve(COVERAGE_FILE)
             LineCoverageAnalyzer(sourceDir.canonicalFile, SonarQubeReporter(coverageFile))
         } else {
             NoCoverageAnalyzer

@@ -2,13 +2,12 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.Commands
-import com.noumenadigital.npl.cli.commands.NamedParameter
-import com.noumenadigital.npl.cli.commands.PositionalParameter
 import com.noumenadigital.npl.cli.service.ColorWriter
 
 open class HelpCommand : CommandExecutor {
     override val commandName: String = "help"
     override val description: String = "Display the description for npl-cli commands"
+    override val supportsMcp: Boolean = false
 
     override fun execute(output: ColorWriter): ExitCode {
         printHelp(Commands.entries.map { it.commandExecutorFactory() }, output)
@@ -37,16 +36,10 @@ open class HelpCommand : CommandExecutor {
                             else -> ""
                         }
                     val formattedName =
-                        when (param) {
-                            is NamedParameter -> {
-                                if (param.valuePlaceholder != null) {
-                                    "${param.name} ${param.valuePlaceholder}"
-                                } else {
-                                    param.name
-                                }
-                            }
-
-                            is PositionalParameter -> "<${param.name}>"
+                        if (param.valuePlaceholder != null) {
+                            "${param.cliName} ${param.valuePlaceholder}"
+                        } else {
+                            param.cliName
                         }
                     output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
                 }

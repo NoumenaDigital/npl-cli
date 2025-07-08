@@ -2,7 +2,6 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
-import com.noumenadigital.npl.cli.commands.CommandParameter
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
@@ -19,22 +18,24 @@ class DeployCommand(
     override val commandName: String = "deploy"
     override val description: String = "Deploy NPL sources to a Noumena Engine instance"
 
-    override val parameters: List<CommandParameter> =
+    override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "--target",
+                name = "target",
                 description = "Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.",
                 isRequired = false,
                 valuePlaceholder = "<name>",
             ),
             NamedParameter(
-                name = "--sourceDir",
+                name = "sourceDir",
                 description = "Directory containing NPL sources",
                 isRequired = true,
                 valuePlaceholder = "<directory>",
+                takesPath = true,
+                isRequiredForMcp = true,
             ),
             NamedParameter(
-                name = "--clear",
+                name = "clear",
                 description = "Clear application contents before deployment",
                 isRequired = false,
             ),
@@ -53,9 +54,9 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        val clearFlag = parsedArgs.hasFlag("--clear")
-        val targetValue = parsedArgs.getValue("--target")
-        val sourceDirValue = parsedArgs.getValue("--sourceDir")
+        val clearFlag = parsedArgs.hasFlag("clear")
+        val targetValue = parsedArgs.getValue("target")
+        val sourceDirValue = parsedArgs.getValue("sourceDir")
 
         if (sourceDirValue == null) {
             output.error("Missing required parameter: --sourceDir <directory>")

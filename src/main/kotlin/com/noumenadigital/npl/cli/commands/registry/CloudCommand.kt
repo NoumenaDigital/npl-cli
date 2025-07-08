@@ -11,6 +11,7 @@ class CloudCommand(
         get() = "cloud"
     override val description: String
         get() = "Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`"
+    override val supportsMcp: Boolean = false
 
     override fun createInstance(params: List<String>): CommandExecutor = CloudCommand(args = params)
 

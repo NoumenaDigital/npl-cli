@@ -8,6 +8,7 @@ import com.noumenadigital.npl.cli.service.ColorWriter
 data object CloudHelpCommand : HelpCommand() {
     override val commandName: String = "cloud help"
     override val description: String = "Display the description for npl-cli cloud commands"
+    override val supportsMcp: Boolean = false
 
     override fun execute(output: ColorWriter): ExitCode {
         printHelp(CloudCommands.entries.map { it.commandExecutorFactory() }, output)
