@@ -10,7 +10,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import java.io.File
 
-class CloudDeployCommandIT :
+class CloudDeployNplCommandIT :
     FunSpec({
 
         class TestContext {
@@ -219,6 +219,7 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "npl",
                                 "--app",
                                 "appslug",
                                 "--tenant",
@@ -252,6 +253,7 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "npl",
                                 "--clientId",
                                 "wrong",
                                 "--app",
@@ -269,7 +271,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Cannot get access token 401 - Client Error.
+                            Command cloud deploy npl failed: Cannot get access token 401 - Client Error.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -285,6 +287,7 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "npl",
                                 "--app",
                                 "appslug",
                                 "--tenant",
@@ -300,7 +303,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Failed to fetch tenants - Target host is not specified.
+                            Command cloud deploy npl failed: Failed to fetch tenants - Target host is not specified.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -317,6 +320,7 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "npl",
                                 "--app",
                                 "appslug",
                                 "--tenant",
@@ -332,7 +336,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Please login again.
+                            Command cloud deploy npl failed: Please login again.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -348,6 +352,7 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "npl",
                                 "--app",
                                 "notExistingName",
                                 "--tenant",
@@ -363,7 +368,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Failed to upload application archive - Application slug notExistingName doesn't exist for tenant slug tenantslug.
+                            Command cloud deploy npl failed: Failed to upload application archive - Application slug notExistingName doesn't exist for tenant slug tenantslug.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput

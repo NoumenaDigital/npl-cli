@@ -1,0 +1,14 @@
+package com.noumenadigital.npl.cli.commands
+
+import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
+
+object CloudDeployCommandsParser {
+    fun parse(command: List<String>): CommandExecutor {
+        val commandName =
+            command.firstOrNull() ?: return CloudDeployCommands.CLOUD_DEPLOY_HELP.getBaseExecutor().createInstance(emptyList())
+
+        val arguments = if (command.size > 1) command.drop(1) else emptyList()
+
+        return CloudDeployCommands.commandFromString(commandName, arguments)
+    }
+}

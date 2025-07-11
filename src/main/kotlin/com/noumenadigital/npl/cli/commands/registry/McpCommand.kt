@@ -4,6 +4,7 @@ import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.core.ConsoleAppender
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CloudCommands
+import com.noumenadigital.npl.cli.commands.CloudDeployCommands
 import com.noumenadigital.npl.cli.commands.Commands
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.ktor.utils.io.streams.asInput
@@ -125,7 +126,7 @@ object McpCommand : CommandExecutor {
     }
 
     private fun addAllTools(server: Server) {
-        (Commands.entries + CloudCommands.entries).forEach { command ->
+        (Commands.entries + CloudCommands.entries + CloudDeployCommands.entries).forEach { command ->
             val executor = command.getBaseExecutor()
             if (executor.supportsMcp) {
                 val toolName = command.commandName.replace(" ", "_")
