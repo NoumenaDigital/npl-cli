@@ -1,11 +1,10 @@
-package com.noumenadigital.npl.cli.commands.registry.cloud
+package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
-import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
@@ -15,14 +14,8 @@ import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.isRegularFile
-import kotlin.streams.asSequence
-import kotlin.use
 
-class CloudDeployNplCommand(
+class CloudDeployFrontendCommand(
     val sourcesManager: SourcesManager = SourcesManager("."),
     val cloudDeployService: CloudDeployService =
         CloudDeployService(
@@ -30,9 +23,8 @@ class CloudDeployNplCommand(
             NoumenaCloudClient(NoumenaCloudConfig()),
         ),
 ) : CommandExecutor {
-    override val commandName: String = "cloud deploy"
-    override val description: String = "Deploy NPL sources to a NOUMENA Cloud Application"
-    private val migrationFileName = "migration.yml"
+    override val commandName: String = "cloud deploy frontend"
+    override val description: String = "Deploy frontend sources to a NOUMENA Cloud Application"
 
     override val parameters: List<NamedParameter> =
         listOf(
@@ -49,10 +41,10 @@ class CloudDeployNplCommand(
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
-                name = "migration",
-                description = "Path to migration.yml",
+                name = "buildDir",
+                description = "Path to built frontend sources directory",
                 isRequired = false,
-                valuePlaceholder = "<migration>",
+                valuePlaceholder = "<buildDir>",
                 takesPath = true,
             ),
             NamedParameter(
@@ -89,19 +81,19 @@ class CloudDeployNplCommand(
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("app")
         val tenant = parsedArgs.getRequiredValue("tenant")
-        val migration = parsedArgs.getValue("migration") ?: findSingleFile(migrationFileName).toString()
-        val migrationFile = File(migration)
-        if (!migrationFile.exists()) {
+        val buildDir = parsedArgs.getValue("buildDir") ?: "."
+        val buildDirFile = File(buildDir)
+        if (!buildDirFile.exists() || !buildDirFile.isDirectory) {
             throw CloudCommandException(
-                message = "Migration file does not exist - $migration",
-                commandName = "cloud deploy",
+                message = "Build directory does not exist or is not a directory - $buildDir",
+                commandName = "cloud deploy frontend",
             )
         }
         val clientId = parsedArgs.getValue("clientId")
         val clientSecret = parsedArgs.getValue("clientSecret")
         val authUrl = parsedArgs.getValue("authUrl")
         val url = parsedArgs.getValue("url")
-        val sourcesManager = SourcesManager(migrationFile.parent.toString())
+        val sourcesManager = SourcesManager(buildDirFile.toString())
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
@@ -109,45 +101,17 @@ class CloudDeployNplCommand(
                 CloudAuthManager(noumenaCloudAuthClient),
                 NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
             )
-        return CloudDeployNplCommand(sourcesManager, cloudDeployService)
+        return CloudDeployFrontendCommand(sourcesManager, cloudDeployService)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
             val archive = sourcesManager.getArchivedSources()
-            cloudDeployService.deployNplApplication(archive)
-            output.success("NPL Application successfully deployed to NOUMENA Cloud.")
+            cloudDeployService.deployFrontend(archive)
+            output.success("Frontend successfully deployed to NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
-            throw CloudCommandException(ex.message, ex, "cloud deploy")
-        }
-    }
-
-    fun findSingleFile(
-        fileName: String,
-        searchDir: String = ".",
-    ): File {
-        val srcDir = Paths.get(searchDir).toFile()
-
-        if (!srcDir.exists() || !srcDir.isDirectory) {
-            throw CommandExecutionException("Source path '$srcDir' does not exist or is not a directory.")
-        }
-        val matchedFiles =
-            Files.walk(Paths.get(srcDir.toURI())).use { paths ->
-                paths
-                    .asSequence()
-                    .filter { it.isRegularFile() && it.fileName.toString() == fileName }
-                    .map(Path::toFile)
-                    .toList()
-            }
-
-        return when {
-            matchedFiles.isEmpty() -> throw CommandExecutionException("No '$fileName' file found in $srcDir")
-            matchedFiles.size > 1 -> throw CommandExecutionException(
-                "Multiple '$fileName' files found:\n${matchedFiles.joinToString("\n")}",
-            )
-
-            else -> matchedFiles.first()
+            throw CloudCommandException(ex.message, ex, "cloud deploy frontend")
         }
     }
 }
