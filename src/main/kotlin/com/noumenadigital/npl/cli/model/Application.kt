@@ -6,4 +6,5 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 data class Application(
     val id: String,
     val name: String,
+    val slug: String,
 )

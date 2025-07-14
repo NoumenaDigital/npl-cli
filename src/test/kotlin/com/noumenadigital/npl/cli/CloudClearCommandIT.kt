@@ -294,7 +294,7 @@ class CloudClearCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud clear failed: Failed to remove the application -  Application name existingName doesn't exist for tenant non-existing.
+                            Command cloud clear failed: Failed to remove the application -  Application slug existingName doesn't exist for tenant slug non-existing.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
