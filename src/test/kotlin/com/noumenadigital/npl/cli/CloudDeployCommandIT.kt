@@ -80,14 +80,14 @@ class CloudDeployCommandIT :
                                               {
                                                 "id": "80031abc-641b-4330-a473-16fd6d5ae305",
                                                 "name": "Default_tenant",
-                                                "slug": "training",
+                                                "slug": "tenantslug",
                                                 "external_id": null,
                                                 "subscription": null,
                                                 "applications": [
                                                   {
                                                     "id": "$APP_ID_OK",
                                                     "name": "existingName",
-                                                    "slug": "nplintegrations",
+                                                    "slug": "appslug",
                                                     "provider": "MicrosoftAzure",
                                                     "engine_version": {
                                                       "version": "2025.1.2",
@@ -220,9 +220,9 @@ class CloudDeployCommandIT :
                                 "cloud",
                                 "deploy",
                                 "--app",
-                                "existingName",
+                                "appslug",
                                 "--tenant",
-                                "default_tenant",
+                                "tenantslug",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -255,9 +255,9 @@ class CloudDeployCommandIT :
                                 "--clientId",
                                 "wrong",
                                 "--app",
-                                "existingName",
+                                "appslug",
                                 "--tenant",
-                                "default_tenant",
+                                "tenantslug",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -286,9 +286,9 @@ class CloudDeployCommandIT :
                                 "cloud",
                                 "deploy",
                                 "--app",
-                                "existingName",
+                                "appslug",
                                 "--tenant",
-                                "default_tenant",
+                                "tenantslug",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -318,9 +318,9 @@ class CloudDeployCommandIT :
                                 "cloud",
                                 "deploy",
                                 "--app",
-                                "existingName",
+                                "appslug",
                                 "--tenant",
-                                "default_tenant",
+                                "tenantslug",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -351,7 +351,7 @@ class CloudDeployCommandIT :
                                 "--app",
                                 "notExistingName",
                                 "--tenant",
-                                "default_tenant",
+                                "tenantslug",
                                 "--migration",
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
@@ -363,7 +363,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Failed to upload application archive - Application name notExistingName doesn't exist for tenant default_tenant.
+                            Command cloud deploy failed: Failed to upload application archive - Application slug notExistingName doesn't exist for tenant slug tenantslug.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput

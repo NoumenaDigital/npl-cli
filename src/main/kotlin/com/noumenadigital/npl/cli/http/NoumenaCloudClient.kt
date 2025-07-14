@@ -16,19 +16,19 @@ import java.nio.charset.StandardCharsets
 import java.util.UUID
 
 data class NoumenaCloudConfig(
-    val app: String = "",
-    val tenant: String = "",
+    val appSlug: String = "",
+    val tenantSlug: String = "",
     val url: String = "https://portal.noumena.cloud",
 ) {
     companion object {
         fun get(
-            app: String,
-            tenant: String,
+            appSlug: String,
+            tenantSlug: String,
             url: String? = null,
         ): NoumenaCloudConfig =
             NoumenaCloudConfig(
-                app = app,
-                tenant = tenant,
+                appSlug = appSlug,
+                tenantSlug = tenantSlug,
                 url = url ?: "https://portal.noumena.cloud",
             )
     }
@@ -71,7 +71,7 @@ open class NoumenaCloudClient(
         try {
             val ncApp = findApplication(tenants)
             if (ncApp == null) {
-                throw CloudRestCallException("Application name ${config.app} doesn't exist for tenant ${config.tenant}")
+                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
             }
             val deployUrl = "$ncBaseUrl/${ncApp.id}/deploy"
             val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
@@ -113,7 +113,7 @@ open class NoumenaCloudClient(
         try {
             val ncApp = findApplication(tenants)
             if (ncApp == null) {
-                throw CloudRestCallException("Application name ${config.app} doesn't exist for tenant ${config.tenant}")
+                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
             }
             val clearUrl = "$ncBaseUrl/${ncApp.id}/clear"
             val httpDelete = HttpDelete(clearUrl)
@@ -134,7 +134,7 @@ open class NoumenaCloudClient(
 
     private fun findApplication(tenants: List<Tenant>): Application? =
         tenants
-            .find { it.name.equals(config.tenant, ignoreCase = true) }
+            .find { it.slug.equals(config.tenantSlug, ignoreCase = true) }
             ?.applications
-            ?.find { it.name.equals(config.app, ignoreCase = true) }
+            ?.find { it.slug.equals(config.appSlug, ignoreCase = true) }
 }

@@ -70,8 +70,11 @@ class CloudAuthManager(
         output: ColorWriter,
     ) {
         if (shouldOpenBrowser()) {
+            output.info("Attempting to open $url in your browser...")
             if (tryOpenBrowser(url)) {
-                output.info("Attempted to open $url in your browser. If the link was not opened, please open it manually.")
+                output.info("Browser opened successfully.")
+            } else {
+                output.warning("Failed to open browser automatically. Please open the following URL manually: $url")
             }
         } else {
             output.info("Please open the following URL in your browser: $url")
@@ -86,15 +89,24 @@ class CloudAuthManager(
 
     private fun tryOpenBrowser(url: String): Boolean {
         val os = System.getProperty("os.name").lowercase()
-        return try {
-            when {
-                os.contains("mac") -> ProcessBuilder("open", url).start()
-                os.contains("win") -> ProcessBuilder("cmd", "/c", "start", url).start()
-                else -> ProcessBuilder("xdg-open", url).start()
-            }
-            true
+        return when {
+            os.contains("mac") -> executeCommand("open", url)
+            os.contains("win") -> executeCommand("cmd", "/c", "start", url)
+            else -> executeCommand("xdg-open", url) || executeBrowserFallback(url)
+        }
+    }
+
+    private fun executeCommand(vararg command: String): Boolean =
+        try {
+            val process = ProcessBuilder(*command).start()
+            process.waitFor()
+            process.exitValue() == 0
         } catch (_: Exception) {
             false
         }
+
+    private fun executeBrowserFallback(url: String): Boolean {
+        val browser = System.getenv("BROWSER") ?: return false
+        return executeCommand(browser, url)
     }
 }
