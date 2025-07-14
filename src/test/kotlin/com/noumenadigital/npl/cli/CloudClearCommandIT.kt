@@ -80,14 +80,14 @@ class CloudClearCommandIT :
                                               {
                                                 "id": "80031abc-641b-4330-a473-16fd6d5ae305",
                                                 "name": "Default_tenant",
-                                                "slug": "training",
+                                                "slug": "tenantslug",
                                                 "external_id": null,
                                                 "subscription": null,
                                                 "applications": [
                                                   {
                                                     "id": "$APP_ID_OK",
                                                     "name": "existingName",
-                                                    "slug": "nplintegrations",
+                                                    "slug": "appslug",
                                                     "provider": "MicrosoftAzure",
                                                     "engine_version": {
                                                       "version": "2025.1.2",
@@ -220,9 +220,9 @@ class CloudClearCommandIT :
                                 "cloud",
                                 "clear",
                                 "--app",
-                                "existingName",
+                                "appslug",
                                 "--tenant",
-                                "default_tenant",
+                                "tenantslug",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -253,9 +253,9 @@ class CloudClearCommandIT :
                                 "--clientId",
                                 "wrong",
                                 "--app",
-                                "existingName",
+                                "appslug",
                                 "--tenant",
-                                "default_tenant",
+                                "tenantslug",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -294,7 +294,7 @@ class CloudClearCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud clear failed: Failed to remove the application -  Application name existingName doesn't exist for tenant non-existing.
+                            Command cloud clear failed: Failed to remove the application -  Application slug existingName doesn't exist for tenant slug non-existing.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -311,7 +311,7 @@ class CloudClearCommandIT :
                                 "cloud",
                                 "clear",
                                 "--app",
-                                "existingName",
+                                "appslug",
                                 "--tenant",
                                 "default_tenant",
                                 "--url",
@@ -341,7 +341,7 @@ class CloudClearCommandIT :
                                 "cloud",
                                 "clear",
                                 "--app",
-                                "existingName",
+                                "appslug",
                                 "--tenant",
                                 "default_tenant",
                                 "--url",

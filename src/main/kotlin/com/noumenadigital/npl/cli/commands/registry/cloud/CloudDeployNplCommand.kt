@@ -38,13 +38,13 @@ class CloudDeployNplCommand(
         listOf(
             NamedParameter(
                 name = "app",
-                description = "NOUMENA Cloud Application name",
+                description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
             ),
             NamedParameter(
                 name = "tenant",
-                description = "NOUMENA Cloud Tenant name",
+                description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
             ),
