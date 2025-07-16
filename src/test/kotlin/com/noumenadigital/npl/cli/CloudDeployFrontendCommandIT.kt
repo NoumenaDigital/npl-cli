@@ -412,6 +412,38 @@ class CloudDeployFrontendCommandIT :
                     }
                 }
             }
+
+            test("cloud deploy no build dir found") {
+                withTestContext {
+                    runCommand(
+                        commands =
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "frontend",
+                                "--app",
+                                "notExistingName",
+                                "--tenant",
+                                "default_tenant",
+                                "--buildDir",
+                                "other-build",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
+                            Command cloud deploy frontend failed: Build directory does not exist or is not a directory - other-build
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    }
+                }
+            }
         }
     }) {
     companion object {

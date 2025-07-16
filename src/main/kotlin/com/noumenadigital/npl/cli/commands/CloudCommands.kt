@@ -15,7 +15,7 @@ enum class CloudCommands(
     CLOUD_LOGOUT({ CloudLogoutCommand() }),
     CLOUD_HELP({ CloudHelpCommand }),
     CLOUD_CLEAR_NPL({ CloudClearNplCommand() }),
-    CLOUD_DELOY({ CloudDeployCommand() }),
+    CLOUD_DEPLOY({ CloudDeployCommand() }),
     ;
 
     companion object {

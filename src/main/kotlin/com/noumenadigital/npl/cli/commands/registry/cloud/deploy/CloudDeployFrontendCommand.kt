@@ -43,7 +43,7 @@ class CloudDeployFrontendCommand(
             NamedParameter(
                 name = "buildDir",
                 description = "Path to built frontend sources directory",
-                isRequired = false,
+                isRequired = true,
                 valuePlaceholder = "<buildDir>",
                 takesPath = true,
             ),
@@ -81,7 +81,7 @@ class CloudDeployFrontendCommand(
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("app")
         val tenant = parsedArgs.getRequiredValue("tenant")
-        val buildDir = parsedArgs.getValue("buildDir") ?: "."
+        val buildDir = parsedArgs.getRequiredValue("buildDir")
         val buildDirFile = File(buildDir)
         if (!buildDirFile.exists() || !buildDirFile.isDirectory) {
             throw CloudCommandException(

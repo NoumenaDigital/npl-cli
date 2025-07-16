@@ -376,6 +376,38 @@ class CloudDeployNplCommandIT :
                     }
                 }
             }
+
+            test("cloud deploy no migration found") {
+                withTestContext {
+                    runCommand(
+                        commands =
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "npl",
+                                "--app",
+                                "notExistingName",
+                                "--tenant",
+                                "default_tenant",
+                                "--migration",
+                                "other-migration.yml",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
+                            Command cloud deploy failed: Migration file does not exist - other-migration.yml
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    }
+                }
+            }
         }
     }) {
     companion object {
