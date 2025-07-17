@@ -140,7 +140,7 @@ open class NoumenaCloudClient(
         try {
             val ncApp = findApplication(tenants)
             if (ncApp == null) {
-                throw CloudRestCallException("Application name ${config.app} doesn't exist for tenant ${config.tenant}")
+                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant ${config.tenantSlug}")
             }
             val deployUrl = "$ncBaseUrl/${ncApp.id}/uploadwebsite"
             val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
