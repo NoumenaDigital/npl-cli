@@ -132,6 +132,49 @@ open class NoumenaCloudClient(
         }
     }
 
+    fun uploadFrontendArchive(
+        accessToken: String,
+        archive: ByteArray,
+        tenants: List<Tenant>,
+    ) {
+        try {
+            val ncApp = findApplication(tenants)
+            if (ncApp == null) {
+                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant ${config.tenantSlug}")
+            }
+            val deployUrl = "$ncBaseUrl/${ncApp.id}/uploadwebsite"
+            val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
+
+            val newline = "\r\n"
+
+            val preamble =
+                (
+                    "--$boundary$newline" +
+                        "Content-Disposition: form-data; name=\"website_zip\"; filename=\"archive.zip\"$newline" +
+                        "Content-Type: application/zip$newline$newline"
+                ).toByteArray(StandardCharsets.UTF_8)
+
+            val epilogue = "$newline--$boundary--$newline".toByteArray(StandardCharsets.UTF_8)
+
+            val body = preamble + archive + epilogue
+
+            val httpPost = HttpPost(deployUrl)
+            httpPost.setHeader("Authorization", "Bearer $accessToken")
+            httpPost.setHeader("Content-Type", "multipart/form-data; boundary=$boundary")
+            httpPost.entity = ByteArrayEntity(body)
+
+            client.execute(httpPost).use { response ->
+                val status = response.statusLine.statusCode
+                val responseText = response.entity?.let { EntityUtils.toString(it) } ?: ""
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Deploy failed with status $status: $responseText")
+                }
+            }
+        } catch (e: Exception) {
+            throw CloudRestCallException("Failed to upload application archive - ${e.message ?: e.cause?.message}.", e)
+        }
+    }
+
     private fun findApplication(tenants: List<Tenant>): Application? =
         tenants
             .find { it.slug.equals(config.tenantSlug, ignoreCase = true) }

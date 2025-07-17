@@ -1,4 +1,4 @@
-package com.noumenadigital.npl.cli.commands.registry.cloud
+package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
@@ -30,7 +30,7 @@ class CloudDeployNplCommand(
             NoumenaCloudClient(NoumenaCloudConfig()),
         ),
 ) : CommandExecutor {
-    override val commandName: String = "cloud deploy"
+    override val commandName: String = "cloud deploy npl"
     override val description: String = "Deploy NPL sources to a NOUMENA Cloud Application"
     private val migrationFileName = "migration.yml"
 
@@ -119,7 +119,7 @@ class CloudDeployNplCommand(
             output.success("NPL Application successfully deployed to NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
-            throw CloudCommandException(ex.message, ex, "cloud deploy")
+            throw CloudCommandException(ex.message, ex, "cloud deploy npl")
         }
     }
 
