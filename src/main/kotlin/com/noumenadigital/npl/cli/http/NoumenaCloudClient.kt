@@ -71,7 +71,7 @@ open class NoumenaCloudClient(
         try {
             val ncApp = findApplication(tenants)
             if (ncApp == null) {
-                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
+                throw CloudRestCallException(buildNotFoundErrorMessage(tenants))
             }
             val deployUrl = "$ncBaseUrl/${ncApp.id}/deploy"
             val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
@@ -113,7 +113,7 @@ open class NoumenaCloudClient(
         try {
             val ncApp = findApplication(tenants)
             if (ncApp == null) {
-                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
+                throw CloudRestCallException(buildNotFoundErrorMessage(tenants))
             }
             val clearUrl = "$ncBaseUrl/${ncApp.id}/clear"
             val httpDelete = HttpDelete(clearUrl)
@@ -130,6 +130,30 @@ open class NoumenaCloudClient(
         } catch (e: Exception) {
             throw CloudRestCallException("Failed to remove the application -  ${e.message ?: e.cause?.message}.", e)
         }
+    }
+
+    private fun buildNotFoundErrorMessage(tenants: List<Tenant>): String {
+        val errorMessage = StringBuilder()
+        errorMessage.append("Application slug '${config.appSlug}' doesn't exist for tenant slug '${config.tenantSlug}'.\n\n")
+        
+        if (tenants.isEmpty()) {
+            errorMessage.append("No tenants are available.")
+        } else {
+            errorMessage.append("Available tenants and applications:\n\n")
+            tenants.forEach { tenant ->
+                errorMessage.append("Tenant: ${tenant.name} (slug: ${tenant.slug})\n")
+                if (tenant.applications.isEmpty()) {
+                    errorMessage.append("  No applications available\n")
+                } else {
+                    tenant.applications.forEach { app ->
+                        errorMessage.append("  Application: ${app.name} (slug: ${app.slug})\n")
+                    }
+                }
+                errorMessage.append("\n")
+            }
+        }
+        
+        return errorMessage.toString().trim()
     }
 
     private fun findApplication(tenants: List<Tenant>): Application? =

@@ -363,7 +363,12 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Failed to upload application archive - Application slug notExistingName doesn't exist for tenant slug tenantslug.
+                            Command cloud deploy failed: Failed to upload application archive - Application slug 'notExistingName' doesn't exist for tenant slug 'tenantslug'.
+
+                            Available tenants and applications:
+
+                            Tenant: Default_tenant (slug: tenantslug)
+                              Application: existingName (slug: appslug)
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
