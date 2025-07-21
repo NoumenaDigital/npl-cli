@@ -40,7 +40,7 @@ class PumlCommandIT :
 
         fun File.listAllFilesNames() = walk().filter { it.isFile }.map { it.name }.toList()
 
-        fun File.validateContents(contents: String) = contents shouldBe readText().normalize()
+        fun File.validateContents(expected: String) = readText().normalize() shouldBe expected
 
         fun File.findFile(
             fileName: String,
@@ -143,27 +143,43 @@ class PumlCommandIT :
     }) {
     companion object {
         val IOU_PUML_CONTENTS: String =
-            """@startuml
-                |hide empty members
-                |namespace npl.objects.iou {
-                |    class TimestampedAmount << (s,green) >> {
-                |        {field} +amount: Number
-                |        {field} +timestamp: DateTime
-                |    }
-                |    class Iou << (p,orchid) >> {
-                |        {field} +issuer: Party
-                |        {field} +payee: Party
-                |        {field} +payments: List<TimestampedAmount>
-                |        {field} +forAmount: Number
-                |        {field} +observers: Map<Text, Party>
-                |        {method} +[issuer] pay(amount: Number)
-                |        {method} +[payee] forgive()
-                |        {method} +[issuer | payee] getAmountOwed(): Number
-                |    }
-                |    npl.objects.iou.Iou --> "*" npl.objects.iou.TimestampedAmount : payments
-                |}
-                |@enduml
-            """.trimMargin()
+            """
+            @startuml
+            hide empty members
+            namespace npl.objects.iou {
+                class TimestampedAmount << (s,green) >> {
+                    {field} +amount: Number
+                    {field} +timestamp: DateTime
+                }
+                class PaymentConfirmation << (s,green) >> {
+                    {field} +confirmed: Boolean
+                    {field} +payment: TimestampedAmount
+                }
+                class PaymentDetails << (s,green) >> {
+                    {field} +description: Text
+                    {field} +forAmount: Number
+                    {field} +paymentAmount: TimestampedAmount
+                    {field} +remainingAmount: Number
+                }
+                class Iou << (p,orchid) >> {
+                    {field} +issuer: Party
+                    {field} +payee: Party
+                    {field} +payments: List<TimestampedAmount>
+                    {field} +paymentToBeConfirmed: Optional<TimestampedAmount>
+                    {field} +amountOwed: Number
+                    {field} +description: Text
+                    {field} +forAmount: Number
+                    {field} +observers: Map<Text, Party>
+                    {method} +[issuer] pay(amount: Number)
+                    {method} +[payee] confirmPayment()
+                    {method} +[payee] confirmPaymentMultiNode(r: PaymentConfirmation)
+                    {method} +[payee] forgive()
+                }
+                npl.objects.iou.Iou --> "*" npl.objects.iou.TimestampedAmount : payments
+                npl.objects.iou.Iou --> "0..padding..1" npl.objects.iou.TimestampedAmount : paymentToBeConfirmed
+            }
+            @enduml
+            """.trimIndent()
 
         val INCLUDES_PUML_CONTENTS =
             """

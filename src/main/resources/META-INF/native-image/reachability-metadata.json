@@ -1253,6 +1253,10 @@
       "allDeclaredFields": true
     },
     {
+      "type": "io.swagger.v3.oas.models.media.ComposedSchema",
+      "allDeclaredFields": true
+    },
+    {
       "type": "io.swagger.v3.oas.models.media.Content",
       "allDeclaredFields": true
     },
