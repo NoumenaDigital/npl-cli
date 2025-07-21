@@ -230,3 +230,20 @@ jobs:
           prerelease: ${{ github.event.inputs.prerelease || false }}
           artifacts: "./individual-artifacts/*/*"
           artifactErrorsFailBuild: true
+
+  update-homebrew-formula:
+    name: "Trigger ${{ matrix.repo }}"
+    runs-on: "ubuntu-latest"
+    permissions: write-all
+    needs:
+      - publish_release
+    strategy:
+      matrix:
+        include:
+          - repo: "NoumenaDigital/homebrew-tools"
+            workflow: "bump-cli-version.yml"
+    steps:
+      - name: "Trigger ${{ matrix.repo }}"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: "gh workflow run ${{ matrix.workflow }} --repo ${{ matrix.repo }} -f 'CLI_VERSION=${{ needs.determine-version.outputs.release_tag }}'"
