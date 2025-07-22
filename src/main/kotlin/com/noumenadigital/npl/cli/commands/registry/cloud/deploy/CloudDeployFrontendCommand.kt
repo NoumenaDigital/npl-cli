@@ -30,21 +30,21 @@ class CloudDeployFrontendCommand(
         listOf(
             NamedParameter(
                 name = "app",
-                description = "NOUMENA Cloud Application name",
+                description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
             ),
             NamedParameter(
                 name = "tenant",
-                description = "NOUMENA Cloud Tenant name",
+                description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
-                name = "buildDir",
-                description = "Path to built frontend sources directory",
+                name = "frontend",
+                description = "Path to the frontend source directory containing the index.html file",
                 isRequired = true,
-                valuePlaceholder = "<buildDir>",
+                valuePlaceholder = "<frontend>",
                 takesPath = true,
             ),
             NamedParameter(
@@ -81,7 +81,7 @@ class CloudDeployFrontendCommand(
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("app")
         val tenant = parsedArgs.getRequiredValue("tenant")
-        val buildDir = parsedArgs.getRequiredValue("buildDir")
+        val buildDir = parsedArgs.getRequiredValue("frontend")
         val buildDirFile = File(buildDir)
         if (!buildDirFile.exists() || !buildDirFile.isDirectory) {
             throw CloudCommandException(
