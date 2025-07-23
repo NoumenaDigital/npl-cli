@@ -1,5 +1,6 @@
-package com.noumenadigital.npl.cli.commands
+package com.noumenadigital.npl.cli.commands.registry.cloud
 
+import com.noumenadigital.npl.cli.commands.CloudCommands
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 
 object CloudCommandsParser {
@@ -9,6 +10,6 @@ object CloudCommandsParser {
 
         val arguments = if (command.size > 1) command.drop(1) else emptyList()
 
-        return CloudCommands.commandFromString(commandName, arguments)
+        return CloudCommands.Companion.commandFromString(commandName, arguments)
     }
 }
