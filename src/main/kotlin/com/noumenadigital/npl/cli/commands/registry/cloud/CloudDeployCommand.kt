@@ -1,8 +1,8 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CloudDeployCommandsParser
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
+import com.noumenadigital.npl.cli.commands.registry.cloud.deploy.CloudDeployCommandsParser
 import com.noumenadigital.npl.cli.service.ColorWriter
 
 class CloudDeployCommand(
