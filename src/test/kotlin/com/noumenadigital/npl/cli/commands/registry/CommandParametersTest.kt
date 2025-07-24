@@ -2,7 +2,6 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.Commands
-import com.noumenadigital.npl.cli.commands.CommandsParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec

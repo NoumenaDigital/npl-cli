@@ -1,6 +1,6 @@
 package com.noumenadigital.npl.cli
 
-import com.noumenadigital.npl.cli.commands.CommandsParser
+import com.noumenadigital.npl.cli.commands.registry.CommandsParser
 import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
 import com.noumenadigital.npl.cli.exception.CloudCommandException

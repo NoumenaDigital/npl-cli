@@ -10,7 +10,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import java.io.File
 
-class CloudDeployCommandIT :
+class CloudDeployFrontendCommandIT :
     FunSpec({
 
         class TestContext {
@@ -79,14 +79,14 @@ class CloudDeployCommandIT :
                                             [
                                               {
                                                 "id": "80031abc-641b-4330-a473-16fd6d5ae305",
-                                                "name": "Default_tenant",
+                                                "name": "tenantname",
                                                 "slug": "tenantslug",
                                                 "external_id": null,
                                                 "subscription": null,
                                                 "applications": [
                                                   {
                                                     "id": "$APP_ID_OK",
-                                                    "name": "existingName",
+                                                    "name": "appname",
                                                     "slug": "appslug",
                                                     "provider": "MicrosoftAzure",
                                                     "engine_version": {
@@ -95,25 +95,25 @@ class CloudDeployCommandIT :
                                                     },
                                                     "owner_id": "a3893a2a-d75b-46ea-9c84-9109ab03c891",
                                                     "trusted_issuers": [
-                                                      "https://keycloak-training-nplintegrations.noumena.cloud/realms/noumena",
-                                                      "https://keycloak-training-nplintegrations.noumena.cloud/realms/nplintegrations",
+                                                      "https://keycloak-tenantslug-appslug.noumena.cloud/realms/noumena",
+                                                      "https://keycloak-tenantslug-appslug.noumena.cloud/realms/appslug",
                                                       "http://noumenadigital.com"
                                                     ],
                                                     "state": "active",
                                                     "deployed_at": "2025-04-07T06:21:53.739573Z",
                                                     "backup_records": [],
-                                                    "namespace": "training",
+                                                    "namespace": "tenantslug",
                                                     "configuration_id": "0662db78-fb2a-4115-ab90-ab020343c30b",
                                                     "deleted_at": null,
                                                     "links": {
-                                                      "api": "https://engine-training-nplintegrations.noumena.cloud",
-                                                      "graphql": "https://engine-training-nplintegrations.noumena.cloud/graphql",
-                                                      "swagger": "https://engine-training-nplintegrations.noumena.cloud/swagger-ui/index.html",
-                                                      "inspector": "https://inspector-training-nplintegrations.noumena.cloud",
-                                                      "keycloak": "https://keycloak-training-nplintegrations.noumena.cloud/admin/master/console",
+                                                      "api": "https://engine-tenantslug-appslug.noumena.cloud",
+                                                      "graphql": "https://engine-tenantslug-appslug.noumena.cloud/graphql",
+                                                      "swagger": "https://engine-tenantslug-appslug.noumena.cloud/swagger-ui/index.html",
+                                                      "inspector": "https://inspector-tenantslug-appslug.noumena.cloud",
+                                                      "keycloak": "https://keycloak-tenantslug-appslug.noumena.cloud/admin/master/console",
                                                       "trusted_issuers": [
-                                                        "https://keycloak-training-nplintegrations.noumena.cloud/realms/noumena",
-                                                        "https://keycloak-training-nplintegrations.noumena.cloud/realms/nplintegrations",
+                                                        "https://keycloak-tenantslug-appslug.noumena.cloud/realms/noumena",
+                                                        "https://keycloak-tenantslug-appslug.noumena.cloud/realms/appslug",
                                                         "http://noumenadigital.com"
                                                       ]
                                                     },
@@ -133,24 +133,24 @@ class CloudDeployCommandIT :
                                                     },
                                                     "owner_id": "92309f7b-f9e1-42c4-a35f-ab97241d2d6c",
                                                     "trusted_issuers": [
-                                                      "https://keycloak-training-testoldversion.noumena.cloud/realms/noumena",
-                                                      "https://keycloak-training-testoldversion.noumena.cloud/realms/testoldversion"
+                                                      "https://keycloak-tenantslug-testoldversion.noumena.cloud/realms/noumena",
+                                                      "https://keycloak-tenantslug-testoldversion.noumena.cloud/realms/testoldversion"
                                                     ],
                                                     "state": "active",
                                                     "deployed_at": null,
                                                     "backup_records": [],
-                                                    "namespace": "training",
+                                                    "namespace": "tenantslug",
                                                     "configuration_id": "98ff3aed-bfac-433b-9960-a0a30b407052",
                                                     "deleted_at": null,
                                                     "links": {
-                                                      "api": "https://engine-training-testoldversion.noumena.cloud",
-                                                      "graphql": "https://engine-training-testoldversion.noumena.cloud/graphql",
-                                                      "swagger": "https://engine-training-testoldversion.noumena.cloud/swagger-ui/index.html",
-                                                      "inspector": "https://inspector-training-testoldversion.noumena.cloud",
-                                                      "keycloak": "https://keycloak-training-testoldversion.noumena.cloud/admin/master/console",
+                                                      "api": "https://engine-tenantslug-testoldversion.noumena.cloud",
+                                                      "graphql": "https://engine-tenantslug-testoldversion.noumena.cloud/graphql",
+                                                      "swagger": "https://engine-tenantslug-testoldversion.noumena.cloud/swagger-ui/index.html",
+                                                      "inspector": "https://inspector-tenantslug-testoldversion.noumena.cloud",
+                                                      "keycloak": "https://keycloak-tenantslug-testoldversion.noumena.cloud/admin/master/console",
                                                       "trusted_issuers": [
-                                                        "https://keycloak-training-testoldversion.noumena.cloud/realms/noumena",
-                                                        "https://keycloak-training-testoldversion.noumena.cloud/realms/testoldversion"
+                                                        "https://keycloak-tenantslug-testoldversion.noumena.cloud/realms/noumena",
+                                                        "https://keycloak-tenantslug-testoldversion.noumena.cloud/realms/testoldversion"
                                                       ]
                                                     },
                                                     "add_ons": [],
@@ -166,14 +166,50 @@ class CloudDeployCommandIT :
                                         )
                                 }
 
-                                "/api/v1/applications/$APP_ID_OK/deploy" -> {
+                                "/api/v1/applications/$APP_ID_OK/uploadwebsite" -> {
                                     return MockResponse()
                                         .setResponseCode(200)
                                         .setHeader("Content-Type", "application/json")
                                         .setBody(
                                             """
                                             {
-                                              "status": "deployed",
+                                                "id": "$APP_ID_OK",
+                                                "name": "appname",
+                                                "slug": "appslug",
+                                                "provider": "MicrosoftAzure",
+                                                "engine_version": {
+                                                  "version": "2025.1.2",
+                                                  "deprecated": false
+                                                },
+                                                "owner_id": "a3893a2a-d75b-46ea-9c84-9109ab03c891",
+                                                "trusted_issuers": [
+                                                  "https://keycloak-tenantslug-appslug.noumena.cloud/realms/noumena",
+                                                  "https://keycloak-tenantslug-appslug.noumena.cloud/realms/appslug",
+                                                  "http://noumenadigital.com"
+                                                ],
+                                                "state": "active",
+                                                "deployed_at": "2025-04-07T06:21:53.739573Z",
+                                                "backup_records": [],
+                                                "namespace": "tenantslug",
+                                                "configuration_id": "0662db78-fb2a-4115-ab90-ab020343c30b",
+                                                "deleted_at": null,
+                                                "links": {
+                                                  "api": "https://engine-tenantslug-appslug.noumena.cloud",
+                                                  "graphql": "https://engine-tenantslug-appslug.noumena.cloud/graphql",
+                                                  "swagger": "https://engine-tenantslug-appslug.noumena.cloud/swagger-ui/index.html",
+                                                  "inspector": "https://inspector-tenantslug-appslug.noumena.cloud",
+                                                  "keycloak": "https://keycloak-tenantslug-appslug.noumena.cloud/admin/master/console",
+                                                  "trusted_issuers": [
+                                                    "https://keycloak-tenantslug-appslug.noumena.cloud/realms/noumena",
+                                                    "https://keycloak-tenantslug-appslug.noumena.cloud/realms/appslug",
+                                                    "http://noumenadigital.com"
+                                                  ]
+                                                },
+                                                "add_ons": [],
+                                                "website_deployed_at": "2025-07-11T08:23:27.339077571Z",
+                                                "website_file_name": "tenantslug_appslug_20250711_082327.zip",
+                                                "website_url": "https://tenantslug-appslug.noumena.cloud",
+                                                "tenant_id": "80031abc-641b-4330-a473-16fd6d5ae305"
                                             }
                                             """.trimIndent(),
                                         )
@@ -219,12 +255,13 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "frontend",
                                 "--app",
                                 "appslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--frontend",
+                                "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -234,7 +271,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            NPL Application successfully deployed to NOUMENA Cloud.
+                            Frontend successfully deployed to NOUMENA Cloud.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -252,14 +289,15 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "frontend",
                                 "--clientId",
                                 "wrong",
                                 "--app",
                                 "appslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--frontend",
+                                "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -269,7 +307,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Cannot get access token 401 - Client Error.
+                            Command cloud deploy frontend failed: Cannot get access token 401 - Client Error.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -285,12 +323,13 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "frontend",
                                 "--app",
                                 "appslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--frontend",
+                                "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 "non-url",
                                 "--authUrl",
@@ -300,7 +339,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Failed to fetch tenants - Target host is not specified.
+                            Command cloud deploy frontend failed: Failed to fetch tenants - Target host is not specified.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -317,12 +356,13 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "frontend",
                                 "--app",
                                 "appslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--frontend",
+                                "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 "non-url",
                                 "--authUrl",
@@ -332,7 +372,7 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Please login again.
+                            Command cloud deploy frontend failed: Please login again.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -348,12 +388,13 @@ class CloudDeployCommandIT :
                             listOf(
                                 "cloud",
                                 "deploy",
+                                "frontend",
                                 "--app",
-                                "notExistingName",
+                                "notappslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--frontend",
+                                "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
                                 "--authUrl",
@@ -363,7 +404,39 @@ class CloudDeployCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Failed to upload application archive - Application slug notExistingName doesn't exist for tenant slug tenantslug.
+                            Command cloud deploy frontend failed: Failed to upload application archive - Application slug notappslug doesn't exist for tenant tenantslug.
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    }
+                }
+            }
+
+            test("cloud deploy no build dir found") {
+                withTestContext {
+                    runCommand(
+                        commands =
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "frontend",
+                                "--app",
+                                "notappslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--frontend",
+                                "other-build",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
+                            Command cloud deploy frontend failed: Build directory does not exist or is not a directory - other-build
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
