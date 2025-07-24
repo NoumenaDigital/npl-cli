@@ -17,12 +17,12 @@ import com.noumenadigital.npl.cli.service.ColorWriter
  * 
  * Accessible tenants and applications:
  * 
- * 🏢 Tenant: My Company (my-company)
- *    ├── 📱 Production App (prod-app)
- *    └── 📱 Development App (dev-app)
+ * Tenant: My Company (my-company)
+ *    ├── Production App (prod-app)
+ *    └── Development App (dev-app)
  * 
- * 🏢 Tenant: Demo Environment (demo-env)
- *    └── 📱 Demo Application (demo-app)
+ * Tenant: Demo Environment (demo-env)
+ *    └── Demo Application (demo-app)
  * 
  * Total: 2 tenant(s), 3 application(s)
  * 
@@ -73,14 +73,14 @@ class CloudStatusCommand(
             output.info("")
 
             tenants.forEach { tenant ->
-                output.info("🏢 Tenant: ${tenant.name} (${tenant.slug})")
+                output.info("Tenant: ${tenant.name} (${tenant.slug})")
                 
                 if (tenant.applications.isEmpty()) {
                     output.info("   └── No applications")
                 } else {
                     tenant.applications.forEachIndexed { index, app ->
                         val prefix = if (index == tenant.applications.size - 1) "   └──" else "   ├──"
-                        output.info("$prefix 📱 ${app.name} (${app.slug})")
+                        output.info("$prefix ${app.name} (${app.slug})")
                     }
                 }
                 output.info("")
