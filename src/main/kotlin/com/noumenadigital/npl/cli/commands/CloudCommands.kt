@@ -6,6 +6,7 @@ import com.noumenadigital.npl.cli.commands.registry.cloud.CloudDeployCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudHelpCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLoginCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLogoutCommand
+import com.noumenadigital.npl.cli.commands.registry.cloud.CloudStatusCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 
 enum class CloudCommands(
@@ -13,6 +14,7 @@ enum class CloudCommands(
 ) : CommandsRegistry {
     CLOUD_LOGIN({ CloudLoginCommand() }),
     CLOUD_LOGOUT({ CloudLogoutCommand() }),
+    CLOUD_STATUS({ CloudStatusCommand() }),
     CLOUD_HELP({ CloudHelpCommand }),
     CLOUD_CLEAR_NPL({ CloudClearNplCommand() }),
     CLOUD_DEPLOY({ CloudDeployCommand() }),

@@ -9,7 +9,6 @@ import com.noumenadigital.npl.cli.commands.registry.InitCommand
 import com.noumenadigital.npl.cli.commands.registry.McpCommand
 import com.noumenadigital.npl.cli.commands.registry.OpenapiCommand
 import com.noumenadigital.npl.cli.commands.registry.PumlCommand
-import com.noumenadigital.npl.cli.commands.registry.StatusCommand
 import com.noumenadigital.npl.cli.commands.registry.TestCommand
 import com.noumenadigital.npl.cli.commands.registry.VersionCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
@@ -26,7 +25,6 @@ enum class Commands(
     PUML({ PumlCommand() }),
     DEPLOY({ DeployCommand() }),
     CLOUD({ CloudCommand() }),
-    STATUS({ StatusCommand() }),
     MCP({ McpCommand }),
     ;
 

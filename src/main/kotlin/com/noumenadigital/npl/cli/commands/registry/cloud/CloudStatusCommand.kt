@@ -1,8 +1,9 @@
-package com.noumenadigital.npl.cli.commands.registry
+package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudConfig
@@ -10,7 +11,7 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.ColorWriter
 
 /**
- * Status command that shows which tenants and applications the user can access in NOUMENA Cloud.
+ * Cloud status command that shows which tenants and applications the user can access in NOUMENA Cloud.
  * 
  * Example output when logged in:
  * 
@@ -26,15 +27,15 @@ import com.noumenadigital.npl.cli.service.ColorWriter
  * Total: 2 tenant(s), 3 application(s)
  * 
  * Usage:
- *   npl status [--url <cloud-url>]
+ *   npl cloud status [--url <cloud-url>]
  * 
  * The command requires the user to be logged in via 'npl cloud login' first.
  */
-class StatusCommand(
+class CloudStatusCommand(
     private val authManager: CloudAuthManager = CloudAuthManager(),
     private val args: List<String> = emptyList(),
 ) : CommandExecutor {
-    override val commandName: String = "status"
+    override val commandName: String = "cloud status"
     override val description: String = "Show which tenants and applications you can access in NOUMENA Cloud"
 
     override val parameters: List<NamedParameter> =
@@ -47,7 +48,7 @@ class StatusCommand(
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor = StatusCommand(authManager, params)
+    override fun createInstance(params: List<String>): CommandExecutor = CloudStatusCommand(authManager, params)
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
