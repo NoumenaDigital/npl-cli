@@ -235,8 +235,7 @@ jobs:
     name: "Trigger ${{ matrix.repo }}"
     runs-on: "ubuntu-latest"
     permissions: write-all
-    needs:
-      - publish_release
+    needs: create-release
     strategy:
       matrix:
         include:
