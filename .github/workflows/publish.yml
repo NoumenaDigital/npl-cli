@@ -230,3 +230,17 @@ jobs:
           prerelease: ${{ github.event.inputs.prerelease || false }}
           artifacts: "./individual-artifacts/*/*"
           artifactErrorsFailBuild: true
+
+  update-homebrew-formula:
+    name: "Trigger NoumenaDigital/homebrew-tools"
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: create-release
+    steps:
+      - name: "Trigger bump-cli-version workflow"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run bump-cli-version.yml \
+            --repo NoumenaDigital/homebrew-tools \
+            -f CLI_VERSION=${{ needs.determine-version.outputs.release_tag }}
