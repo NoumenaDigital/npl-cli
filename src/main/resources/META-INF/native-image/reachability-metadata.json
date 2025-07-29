@@ -28,6 +28,9 @@
       "type": "[Ljava.lang.Object;"
     },
     {
+      "type": "[Ljava.lang.String;"
+    },
+    {
       "type": "[Ljava.util.HashMap$Node;"
     },
     {
@@ -1801,6 +1804,10 @@
     },
     {
       "type": "java.util.AbstractMap",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.Arrays$ArrayList",
       "allDeclaredFields": true
     },
     {

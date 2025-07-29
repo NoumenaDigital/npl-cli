@@ -1,0 +1,19 @@
+package objects.foo;
+
+const WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
+
+enum HttpMethod { GET, POST, PUT, DELETE };
+
+notification FetchWeatherForecase(method: HttpMethod, url: Text, city: Text) returns Text;
+
+protocol[you, me] Foo() {
+    permission[you] foo()  {
+        notify FetchWeatherForecase(HttpMethod.GET, WEATHER_URL, "London") resume bar;
+    };
+
+    @api
+    permission[you | me] bar(r: NotifyResult<Text>)  {
+        // do something
+
+    };
+};

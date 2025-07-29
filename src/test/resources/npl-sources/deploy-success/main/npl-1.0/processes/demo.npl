@@ -8,12 +8,12 @@ const bob = 'Bob';
 const alice = 'Alice';
 
 function demoIou() -> {
-    Iou[bob, alice](100);
+    Iou[bob, alice]("load 1", 100);
 };
 
 function demoSettle() -> {
     var car = Car[bob]("VW Beetle", Color.Red);
-    var iou = Iou[bob, alice](5000);
+    var iou = Iou[bob, alice]("loan 2", 5000);
 
     Settle[alice, bob](iou, car);
 };
