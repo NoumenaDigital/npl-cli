@@ -95,6 +95,32 @@ class OpenapiCommandIT :
                 }
             }
 
+            test("multiple files deploy success") {
+                withOpenapiTestContext(testDir = listOf("deploy-success")) {
+                    runCommand(
+                        commands = listOf("openapi", "--sourceDir", absolutePath),
+                    ) {
+                        process.waitFor()
+
+                        val expectedOutput =
+                            """
+                            Completed compilation for 5 files in XXX ms
+
+                            Generating openapi for objects/car
+                            Generating openapi for objects/foo
+                            Generating openapi for objects/iou
+                            Generating openapi for processes
+                            NPL openapi completed successfully.
+                        """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        validateOpenapiSpec("objects.iou-openapi.yml").messages.size shouldBe 0
+                        validateOpenapiSpec("processes-openapi.yml").messages.size shouldBe 0
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
+            }
+
             test("multiple packages") {
                 withOpenapiTestContext(testDir = listOf("success", "multiple_packages")) {
                     runCommand(
