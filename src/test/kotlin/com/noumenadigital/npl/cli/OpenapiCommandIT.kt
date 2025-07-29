@@ -95,7 +95,7 @@ class OpenapiCommandIT :
                 }
             }
 
-            test("multiple files deploy success") {
+            test("can generate openapi specs for multiple files successfully") {
                 withOpenapiTestContext(testDir = listOf("deploy-success")) {
                     runCommand(
                         commands = listOf("openapi", "--sourceDir", absolutePath),
