@@ -11,21 +11,22 @@ offers several useful commands for interacting with your NPL projects.
 
 To see a description of how to use each command, run `npl help`
 
-| Command            | Description                                                                                   |
-| ------------------ | --------------------------------------------------------------------------------------------- |
-| `npl version`      | Displays the current version of the NPL CLI                                                   |
-| `npl help`         | Displays help information for the NPL CLI                                                     |
-| `npl init`         | Initializes a new project                                                                     |
-| `npl check`        | Checks the NPL for compilation errors and warnings                                            |
-| `npl test`         | Runs the NPL tests                                                                            |
-| `npl puml`         | Generates a puml diagram from NPL source                                                      |
-| `npl openapi`      | Generates the openapi specs for NPL protocols                                                 |
-| `npl deploy`       | Deploys NPL sources to a configured NOUMENA Engine target                                     |
-| `npl cloud help`   | Displays help information for the NPL CLI cloud commands                                      |
-| `npl cloud login`  | Handles the NPL CLI login to NOUMENA Сloud                                                    |
-| `npl cloud logout` | Handles the NPL CLI logout from NOUMENA Cloud                                                 |
-| `npl cloud deploy` | Deploys NPL sources to a NOUMENA Cloud Application                                            |
-| `npl cloud clear`  | Deletes NPL sources and clears protocols from the database from the NOUMENA Cloud Application |
+| Command                     | Description                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| `npl version`               | Displays the current version of the NPL CLI                                                   |
+| `npl help`                  | Displays help information for the NPL CLI                                                     |
+| `npl init`                  | Initializes a new project                                                                     |
+| `npl check`                 | Checks the NPL for compilation errors and warnings                                            |
+| `npl test`                  | Runs the NPL tests                                                                            |
+| `npl puml`                  | Generates a puml diagram from NPL source                                                      |
+| `npl openapi`               | Generates the openapi specs for NPL protocols                                                 |
+| `npl deploy`                | Deploys NPL sources to a configured NOUMENA Engine target                                     |
+| `npl cloud help`            | Displays help information for the NPL CLI cloud commands                                      |
+| `npl cloud login`           | Handles the NPL CLI login to NOUMENA Сloud                                                    |
+| `npl cloud logout`          | Handles the NPL CLI logout from NOUMENA Cloud                                                 |
+| `npl cloud deploy npl`      | Deploys NPL sources to a NOUMENA Cloud Application                                            |
+| `npl cloud deploy frontend` | Deploys frontend build sources to a NOUMENA Cloud Application                                 |
+| `npl cloud clear`           | Deletes NPL sources and clears protocols from the database from the NOUMENA Cloud Application |
 
 ## Supported Operating Systems and architectures
 
