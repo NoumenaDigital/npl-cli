@@ -63,11 +63,6 @@
         </dependency>
         <dependency>
             <groupId>com.noumenadigital.platform</groupId>
-            <artifactId>language-stdlib-extra</artifactId>
-            <version>${platform.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.noumenadigital.platform</groupId>
             <artifactId>npl-api</artifactId>
             <version>${platform.version}</version>
         </dependency>
