@@ -68,6 +68,8 @@ object TestUtils {
         replace("\r\n", "\n")
             // Normalize path separators to forward slashes
             .replace('\\', '/')
+            // Normalize windows drive letters
+            .replace(Regex("[A-Z]:/"), "/")
             // Normalize durations
             .replace(Regex("in \\d+ ms"), "in XXX ms")
             .replace(Regex("\\d+%"), "XXX%")
