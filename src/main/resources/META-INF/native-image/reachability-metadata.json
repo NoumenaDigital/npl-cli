@@ -3046,6 +3046,18 @@
       "glob": "mozilla/public-suffix-list.txt"
     },
     {
+      "glob": "/npl-contrib-native"
+    },
+    {
+      "glob": "/npl-contrib-native/stdlib/v1/collection/collection.npl"
+    },
+    {
+      "glob": "/npl-contrib-native/stdlib/v1/math/math.npl"
+    },
+    {
+      "glob": "/npl-contrib-native/stdlib/v1/text/text.npl"
+    },
+    {
       "glob": "npl-instructions.md"
     },
     {
