@@ -30,6 +30,29 @@ class CheckCommandIT :
                 }
             }
 
+            test("single file - relative path") {
+                val testDirPath =
+                    getTestResourcesPath(listOf("success", "single_file"))
+                        .let {
+                            File(".").canonicalFile.toPath().relativize(it)
+                        }.toString()
+                runCommand(
+                    commands = listOf("check", "--sourceDir", testDirPath),
+                ) {
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    Completed compilation for 1 file in XXX ms
+
+                    NPL check completed successfully.
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+
             test("multiple files") {
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()

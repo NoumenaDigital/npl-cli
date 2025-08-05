@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
@@ -57,7 +58,7 @@ class PumlCommandIT :
                         """
                     Completed compilation for 4 files in XXX ms
 
-                    Writing Puml files to ${pumlDir.canonicalFile.path}
+                    Writing Puml files to ${pumlDir.relativeToCurrentOrAbsolute()}
 
                     Puml diagram generated successfully.
                     """.normalize()
@@ -86,7 +87,7 @@ class PumlCommandIT :
                         """
                         Completed compilation for 4 files in XXX ms
 
-                        Writing Puml files to ${pumlDir.canonicalFile.path}
+                        Writing Puml files to ${pumlDir.relativeToCurrentOrAbsolute()}
 
                         Puml diagram generated successfully.
                         """.normalize()

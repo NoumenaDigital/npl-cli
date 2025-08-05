@@ -7,6 +7,7 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
 import java.io.File
 
 data class CheckCommand(
@@ -45,20 +46,20 @@ data class CheckCommand(
             checkDirectory(srcDir)
             val result = compilerService.compileAndReport(output = output)
 
-            when {
+            return when {
                 result.hasErrors -> {
                     output.error("NPL check failed with errors.")
-                    return ExitCode.COMPILATION_ERROR
+                    ExitCode.COMPILATION_ERROR
                 }
 
                 result.hasWarnings -> {
                     output.warning("NPL check completed with warnings.")
-                    return ExitCode.GENERAL_ERROR
+                    ExitCode.GENERAL_ERROR
                 }
 
                 else -> {
                     output.success("NPL check completed successfully.")
-                    return ExitCode.SUCCESS
+                    ExitCode.SUCCESS
                 }
             }
         } catch (e: CommandExecutionException) {
@@ -73,11 +74,11 @@ data class CheckCommand(
         val dir = File(directory)
 
         if (!dir.exists()) {
-            throw CommandExecutionException("Target directory does not exist: $directory")
+            throw CommandExecutionException("Target directory does not exist: ${dir.relativeToCurrentOrAbsolute()}")
         }
 
         if (!dir.isDirectory) {
-            throw CommandExecutionException("Target path is not a directory: $directory")
+            throw CommandExecutionException("Target path is not a directory: ${dir.relativeToCurrentOrAbsolute()}")
         }
     }
 }

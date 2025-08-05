@@ -9,6 +9,7 @@ import com.noumenadigital.npl.cli.exception.DeployConfigException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.DeployResult
 import com.noumenadigital.npl.cli.service.DeployService
+import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
 import java.io.File
 
 class DeployCommand(
@@ -75,11 +76,11 @@ class DeployCommand(
 
         val sourceDirFile = File(sourceDirValue)
         if (!sourceDirFile.exists()) {
-            output.error("Source directory does not exist: $sourceDirValue")
+            output.error("Source directory does not exist: ${sourceDirFile.relativeToCurrentOrAbsolute()}")
             return ExitCode.GENERAL_ERROR
         }
         if (!sourceDirFile.isDirectory) {
-            output.error("Source path is not a directory: $sourceDirValue")
+            output.error("Source path is not a directory: ${sourceDirFile.relativeToCurrentOrAbsolute()}")
             return ExitCode.GENERAL_ERROR
         }
 
@@ -150,20 +151,20 @@ class DeployCommand(
             }
         }
 
-        when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, sourceDirValue)) {
+        return when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, sourceDirValue)) {
             is DeployResult.Success -> {
                 output.success("Successfully deployed NPL sources and migrations to ${targetConfig.engineManagementUrl}.")
-                return ExitCode.SUCCESS
+                ExitCode.SUCCESS
             }
 
             is DeployResult.DeploymentFailed -> {
                 output.error("Error deploying NPL sources: ${deployResult.exception.message ?: "Unknown deployment failure"}")
-                return ExitCode.GENERAL_ERROR
+                ExitCode.GENERAL_ERROR
             }
 
             else -> {
                 output.error("Internal error: Unhandled deployment result state: $deployResult")
-                return ExitCode.INTERNAL_ERROR
+                ExitCode.INTERNAL_ERROR
             }
         }
     }

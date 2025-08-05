@@ -9,6 +9,7 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
 import com.noumenadigital.pumlgen.NplPumlObjectGenerator.generateFiles
 import java.io.File
 
@@ -43,8 +44,12 @@ data class PumlCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            if (!File(srcDir).isDirectory() || !File(srcDir).exists()) {
-                throw CommandExecutionException("Source directory does not exist or is not a directory: $srcDir")
+            File(srcDir).let {
+                if (!it.isDirectory() || !it.exists()) {
+                    throw CommandExecutionException(
+                        "Source directory does not exist or is not a directory: ${it.relativeToCurrentOrAbsolute()}",
+                    )
+                }
             }
 
             val outputDirFile = File(outputDir).resolve("puml")
@@ -57,7 +62,7 @@ data class PumlCommand(
             val pumlFiles = generateFiles(protosMap)
 
             outputDirFile.mkdirs()
-            output.info("Writing Puml files to ${outputDirFile.canonicalPath}\n")
+            output.info("Writing Puml files to ${outputDirFile.relativeToCurrentOrAbsolute()}\n")
 
             pumlFiles.forEach {
                 try {
