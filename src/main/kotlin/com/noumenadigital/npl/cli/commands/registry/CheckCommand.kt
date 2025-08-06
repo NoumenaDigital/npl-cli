@@ -7,7 +7,7 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
-import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 
 data class CheckCommand(
@@ -74,11 +74,11 @@ data class CheckCommand(
         val dir = File(directory)
 
         if (!dir.exists()) {
-            throw CommandExecutionException("Target directory does not exist: ${dir.relativeToCurrentOrAbsolute()}")
+            throw CommandExecutionException("Target directory does not exist: ${dir.relativeOrAbsolute()}")
         }
 
         if (!dir.isDirectory) {
-            throw CommandExecutionException("Target path is not a directory: ${dir.relativeToCurrentOrAbsolute()}")
+            throw CommandExecutionException("Target path is not a directory: ${dir.relativeOrAbsolute()}")
         }
     }
 }

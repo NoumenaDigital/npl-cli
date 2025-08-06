@@ -3,7 +3,7 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
-import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
@@ -63,7 +63,7 @@ class InitCommandIT :
                     val expectedOutput =
                         """
                     Successfully downloaded project files
-                    Project successfully saved to ${projectDir.relativeToCurrentOrAbsolute()}
+                    Project successfully saved to ${projectDir.relativeOrAbsolute()}
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -97,7 +97,7 @@ class InitCommandIT :
                     val expectedOutput =
                         """
                     Successfully downloaded project files
-                    Project successfully saved to ${projectDir.relativeToCurrentOrAbsolute()}
+                    Project successfully saved to ${projectDir.relativeOrAbsolute()}
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -170,7 +170,7 @@ class InitCommandIT :
                     val expectedOutput =
                         """
                     Successfully downloaded project files
-                    Project successfully saved to ${workingDirectory.absolutePath}
+                    Project successfully saved to ${workingDirectory.normalize().absolutePath}
                     """.normalize()
 
                     (commonFiles + newFiles).forEach {
@@ -261,7 +261,7 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    npl init: Directory ${projectDir.relativeToCurrentOrAbsolute()} already exists.
+                    npl init: Directory ${projectDir.relativeOrAbsolute()} already exists.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput

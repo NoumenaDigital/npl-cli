@@ -7,7 +7,7 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
-import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.ProtocolProto
 import com.noumenadigital.npl.lang.Type
@@ -88,7 +88,7 @@ data class OpenapiCommand(
         try {
             val sourcePath = Paths.get(srcDir)
             if (sourcePath.notExists()) {
-                output.error("Source directory does not exist: ${File(srcDir).relativeToCurrentOrAbsolute()}")
+                output.error("Source directory does not exist: ${File(srcDir).relativeOrAbsolute()}")
                 return ExitCode.USAGE_ERROR
             }
 

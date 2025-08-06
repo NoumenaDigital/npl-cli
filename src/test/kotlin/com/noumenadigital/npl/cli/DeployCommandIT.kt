@@ -9,7 +9,7 @@ import com.noumenadigital.npl.cli.TestUtils.runCommand
 import com.noumenadigital.npl.cli.commands.registry.DeployCommand
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
-import com.noumenadigital.npl.cli.util.relativeToCurrent
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.Dispatcher
@@ -222,7 +222,7 @@ class DeployCommandIT :
                     createConfigFile(tempDir, engineUrl, oidcUrl)
 
                     val testDirPath =
-                        getTestResourcesPath(listOf("deploy-success", "main")).relativeToCurrent().toString()
+                        getTestResourcesPath(listOf("deploy-success", "main")).toFile().relativeOrAbsolute().toString()
 
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath)
 

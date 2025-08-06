@@ -8,7 +8,7 @@ import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.service.TestHarness
 import com.noumenadigital.npl.cli.util.normalizeWindowsPath
-import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import com.noumenadigital.npl.testing.coverage.CoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.LineCoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.NoCoverageAnalyzer
@@ -72,7 +72,7 @@ data class TestCommand(
             val sourceDir = File(sourcePath)
             if (!sourceDir.isDirectory || !sourceDir.exists()) {
                 output.error(
-                    "Given source directory is either not a directory or does not exist. ${sourceDir.relativeToCurrentOrAbsolute()}",
+                    "Given source directory is either not a directory or does not exist. ${sourceDir.relativeOrAbsolute()}",
                 )
                 return ExitCode.GENERAL_ERROR
             }

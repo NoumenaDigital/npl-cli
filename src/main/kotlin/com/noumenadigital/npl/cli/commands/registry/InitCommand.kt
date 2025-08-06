@@ -8,7 +8,7 @@ import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedB
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.util.ZipExtractor
-import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 import java.util.UUID
 
@@ -66,11 +66,11 @@ class InitCommand(
             projectPath?.let {
                 File(it).apply {
                     if (exists()) {
-                        output.displayError("Directory ${relativeToCurrentOrAbsolute()} already exists.")
+                        output.displayError("Directory ${relativeOrAbsolute()} already exists.")
                         return ExitCode.GENERAL_ERROR
                     }
                     if (!mkdir()) {
-                        output.displayError("Failed to create directory ${relativeToCurrentOrAbsolute()}.")
+                        output.displayError("Failed to create directory ${relativeOrAbsolute()}.")
                         return ExitCode.GENERAL_ERROR
                     }
                 }
@@ -89,7 +89,7 @@ class InitCommand(
 
         try {
             ZipExtractor.unzip(archiveFile, skipTopDirectory = true, errorOnConflict = true)
-            output.info("Project successfully saved to ${projectDir.relativeToCurrentOrAbsolute()}")
+            output.info("Project successfully saved to ${projectDir.relativeOrAbsolute()}")
         } catch (e: Exception) {
             output.displayError("Failed to extract project files. ${e.message}")
             return ExitCode.GENERAL_ERROR

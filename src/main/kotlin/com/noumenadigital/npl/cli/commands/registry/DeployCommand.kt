@@ -9,7 +9,7 @@ import com.noumenadigital.npl.cli.exception.DeployConfigException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.DeployResult
 import com.noumenadigital.npl.cli.service.DeployService
-import com.noumenadigital.npl.cli.util.relativeToCurrentOrAbsolute
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 
 class DeployCommand(
@@ -76,11 +76,11 @@ class DeployCommand(
 
         val sourceDirFile = File(sourceDirValue)
         if (!sourceDirFile.exists()) {
-            output.error("Source directory does not exist: ${sourceDirFile.relativeToCurrentOrAbsolute()}")
+            output.error("Source directory does not exist: ${sourceDirFile.relativeOrAbsolute()}")
             return ExitCode.GENERAL_ERROR
         }
         if (!sourceDirFile.isDirectory) {
-            output.error("Source path is not a directory: ${sourceDirFile.relativeToCurrentOrAbsolute()}")
+            output.error("Source path is not a directory: ${sourceDirFile.relativeOrAbsolute()}")
             return ExitCode.GENERAL_ERROR
         }
 
