@@ -7,6 +7,7 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.ProtocolProto
 import com.noumenadigital.npl.lang.Type
@@ -77,7 +78,7 @@ data class OpenapiCommand(
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
-        val srcDir = parsedArgs.getValue("sourceDir") ?: "."
+        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
         val rules = parsedArgs.getValue("rules")
         val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
         return OpenapiCommand(srcDir, rules, outputDir)
@@ -87,7 +88,7 @@ data class OpenapiCommand(
         try {
             val sourcePath = Paths.get(srcDir)
             if (sourcePath.notExists()) {
-                output.error("Source directory does not exist: $srcDir")
+                output.error("Source directory does not exist: ${File(srcDir).relativeOrAbsolute()}")
                 return ExitCode.USAGE_ERROR
             }
 

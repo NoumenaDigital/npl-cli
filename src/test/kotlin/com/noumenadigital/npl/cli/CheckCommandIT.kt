@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
@@ -13,6 +14,29 @@ class CheckCommandIT :
             test("single file") {
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "single_file")).toAbsolutePath().toString()
+                runCommand(
+                    commands = listOf("check", "--sourceDir", testDirPath),
+                ) {
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    Completed compilation for 1 file in XXX ms
+
+                    NPL check completed successfully.
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+
+            test("single file - relative path") {
+                val testDirPath =
+                    getTestResourcesPath(listOf("success", "single_file"))
+                        .let {
+                            File(".").canonicalFile.toPath().relativize(it)
+                        }.toString()
                 runCommand(
                     commands = listOf("check", "--sourceDir", testDirPath),
                 ) {
@@ -272,7 +296,7 @@ class CheckCommandIT :
 
                     val expectedOutput =
                         """
-                    Target directory does not exist: $nonExistentPath
+                    Target directory does not exist: ${nonExistentPath.toFile().relativeOrAbsolute()}
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -292,7 +316,7 @@ class CheckCommandIT :
 
                     val expectedOutput =
                         """
-                    Target path is not a directory: ${tempFile.absolutePath}
+                    Target path is not a directory: ${tempFile.relativeOrAbsolute()}
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput

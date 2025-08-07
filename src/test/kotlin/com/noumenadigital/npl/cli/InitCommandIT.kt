@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
@@ -41,7 +42,7 @@ class InitCommandIT :
             }
         }
 
-        test("Init command: Happy path using --name arg") {
+        test("Init command: Happy path using --path relative path") {
             var mockRepo = MockWebServer()
             val resourceDir = Paths.get("src/test/resources/test-files").toAbsolutePath().normalize()
             val repoArchive = resourceDir.resolve("samples.zip").toFile()
@@ -55,14 +56,14 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--name", "npl-app", "--templateUrl", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--projectDir", "npl-app", "--templateUrl", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val projectDir = workingDirectory.resolve("npl-app")
                     val expectedOutput =
                         """
                     Successfully downloaded project files
-                    Project successfully saved to ${projectDir.canonicalFile.path}
+                    Project successfully saved to ${projectDir.relativeOrAbsolute()}
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -75,7 +76,41 @@ class InitCommandIT :
             mockRepo.shutdown()
         }
 
-        test("Init command: Happy path with no --name arg") {
+        test("Init command: Happy path using --path arg") {
+            var mockRepo = MockWebServer()
+            val resourceDir = Paths.get("src/test/resources/test-files").toAbsolutePath().normalize()
+            val repoArchive = resourceDir.resolve("samples.zip").toFile()
+            val buffer = Buffer().write(repoArchive.readBytes())
+
+            mockRepo.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setHeader("Content-Type", "application/zip")
+                    .setBody(buffer),
+            )
+
+            withInitTestContext(testDir = listOf("success")) {
+                runCommand(commands = listOf("init", "--projectDir", "npl-app", "--templateUrl", mockRepo.url("/").toString())) {
+                    process.waitFor()
+
+                    val projectDir = workingDirectory.resolve("npl-app")
+                    val expectedOutput =
+                        """
+                    Successfully downloaded project files
+                    Project successfully saved to ${projectDir.relativeOrAbsolute()}
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    projectDir.exists() shouldBe true
+                    projectDir.walk().filter { it.isDirectory }.count() shouldBe 11
+                    projectDir.walk().filter { it.isFile }.count() shouldBe 11
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+            mockRepo.shutdown()
+        }
+
+        test("Init command: Happy path with no --projectDir arg") {
             var mockRepo = MockWebServer()
             val resourceDir = Paths.get("src/test/resources/test-files").toAbsolutePath().normalize()
             val repoArchive = resourceDir.resolve("samples.zip").toFile()
@@ -135,7 +170,7 @@ class InitCommandIT :
                     val expectedOutput =
                         """
                     Successfully downloaded project files
-                    Project successfully saved to ${workingDirectory.absolutePath}
+                    Project successfully saved to ${workingDirectory.absolutePath.normalize()}
                     """.normalize()
 
                     (commonFiles + newFiles).forEach {
@@ -159,7 +194,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--name", projectDir.name, "--templateUrl", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--projectDir", projectDir.name, "--templateUrl", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val expectedOutput =
@@ -204,7 +239,7 @@ class InitCommandIT :
 
         test("Init command: Fail if unexpected arguments are given") {
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--name", projectDir.name, "--unexpected")) {
+                runCommand(commands = listOf("init", "--projectDir", projectDir.name, "--unexpected")) {
                     process.waitFor()
 
                     val expectedOutput =
@@ -221,12 +256,12 @@ class InitCommandIT :
         test("Init command: Fail if directory with project name already exists") {
             withInitTestContext(listOf("success")) {
                 projectDir.canonicalFile.mkdir()
-                runCommand(commands = listOf("init", "--name", projectDir.name)) {
+                runCommand(commands = listOf("init", "--projectDir", projectDir.name)) {
                     process.waitFor()
 
                     val expectedOutput =
                         """
-                    npl init: Directory ${projectDir.canonicalFile.path} already exists.
+                    npl init: Directory ${projectDir.relativeOrAbsolute()} already exists.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
@@ -237,7 +272,7 @@ class InitCommandIT :
 
         test("Init command: --bare and --templateUrl options are mutually exclusive") {
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--name", projectDir.name, "--bare", "--templateUrl", "https://example.com")) {
+                runCommand(commands = listOf("init", "--projectDir", projectDir.name, "--bare", "--templateUrl", "https://example.com")) {
                     process.waitFor()
 
                     val expectedOutput =
