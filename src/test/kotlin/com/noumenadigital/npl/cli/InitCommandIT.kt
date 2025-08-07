@@ -170,7 +170,7 @@ class InitCommandIT :
                     val expectedOutput =
                         """
                     Successfully downloaded project files
-                    Project successfully saved to ${workingDirectory.normalize().absolutePath}
+                    Project successfully saved to ${workingDirectory.absolutePath.normalize()}
                     """.normalize()
 
                     (commonFiles + newFiles).forEach {

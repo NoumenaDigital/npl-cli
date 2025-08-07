@@ -1,7 +1,7 @@
 package com.noumenadigital.npl.cli.util
 
-import kotlinx.io.files.SystemPathSeparator
 import java.io.File
+import java.nio.file.Paths
 
 object FileUtils {
     fun findFiles(
@@ -18,8 +18,8 @@ fun File.relativeOrAbsolute(): String {
     val dirPath = normalize().absolutePath
     val currentPath = File(".").normalize().absolutePath
 
-    return if (dirPath.startsWith(currentPath)) {
-        dirPath.replace(currentPath.plus(SystemPathSeparator), "")
+    return if (dirPath != currentPath && dirPath.startsWith(currentPath)) {
+        Paths.get(currentPath).relativize(Paths.get(dirPath)).toString()
     } else {
         absolutePath
     }
