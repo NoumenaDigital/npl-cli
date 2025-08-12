@@ -36,7 +36,7 @@ class CommandProcessorServiceTest :
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
                     init       Initializes a new project
-                                 --name <name>  Name of the project. A directory of this name will be created in the current directory
+                                 --projectDir <projectDir>  Directory where project files will be stored. Created if it doesn’t exist
                                  --bare  Installs an empty project structure (defaults to false)
                                  --templateUrl <templateUrl>  URL of a repository containing a ZIP archive of the project template. Overrides the default template
                     check      Validate the correctness of NPL sources
