@@ -206,9 +206,45 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  create-windows-installer:
+    name: "Create Windows Installer"
+    needs: [determine-version, build-native]
+    if: needs.determine-version.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./windows-installer
+    steps:
+      - name: "Download and link EnVar plugin"
+        run: |
+          curl -LO https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip
+          unzip EnVar_plugin.zip
+          ln -s EnVar_plugin/Plugins Plugins
+
+      - name: "Copy LICENSE.md"
+        run: |
+          mkdir -p build
+          cp ../LICENSE.md build
+
+      - name: "Copy windows executable"
+        run: |
+          cp ../individual-artifacts/npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe build
+
+      - name: "Build installer"
+        run: |
+          docker run \
+          -v .:/npl-cli-installer \
+          -v ./EnVar_plugin/Plugins:/usr/share/nsis/Plugins \
+          hp41/nsis:3.01-1 \
+          -DVERSION=${{needs.determine-version.outputs.version}} /npl-cli-installer/npl-cli.nsi
+
+      - name: "Copy installer to release artifacts"
+        run: |
+          cp dist/npl-cli-installer.exe ../individual-artifacts
+
   create-release:
     name: "Create GitHub Release"
-    needs: [determine-version, build-native]
+    needs: [determine-version, build-native, create-windows-installer]
     if: needs.determine-version.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
