@@ -38,8 +38,8 @@ To build the installer, follow the steps listed below. All steps are written in 
         curl -L --output-dir build -O https://github.com/NoumenaDigital/npl-cli/releases/download/$VERSION/npl-cli-windows-x86_64-$VERSION.exe
      ```
 
-3. Run the following command to build the installer using the NSIS docker. Replace `2025.1.10` with the version of the
-   artifact:
+3. Run the following command to build the installer using the NSIS docker. Replace `2025.1.10` with the desired version
+   of the artifact:
    ```bash
       export VERSION=2025.1.10
       docker run \
