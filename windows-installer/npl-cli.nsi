@@ -4,6 +4,7 @@
   !define VERSION "dev"
 !endif
 
+; Define variables
 !define APP_NAME "NPL command line interface"
 !define APP_DIR "Npl-cli"
 !define APP_BUILD_EXE "npl-cli-windows-x86_64-${VERSION}.exe"
@@ -18,9 +19,11 @@
 !define BUILD_DIR "build"
 !define DIST_DIR "dist"
 
+; Create input/output directories
 !system 'mkdir dist 2>nul'
 !system 'mkdir build 2>nul'
 
+; Configure App parameters
 Name "${APP_NAME}"
 OutFile "${DIST_DIR}\${APP_INSTALLER}"
 LicenseData "build\LICENSE.md"
@@ -28,6 +31,7 @@ InstallDir "$PROGRAMFILES\NoumenaDigital"
 InstallDirRegKey ${REG_ROOT} "${REG_KEY}" "${REG_VAL}"
 RequestExecutionLevel admin
 
+; Configure Dialogs
 Page license
 Page directory
 PageEx InstFiles
@@ -35,6 +39,7 @@ PageEx InstFiles
        CompletedText 'NPL command line interface Installation Completed'
 PageExEnd
 
+; Configure installer
 Section "Install ${APP_NAME}" SecInstall
     SetOutPath "$INSTDIR"
 
@@ -78,21 +83,12 @@ Section "Uninstall" SecUninstall
     ; remove Uninstaller
     Delete "$INSTDIR\Uninstall.exe"
 
-    ; Remove registry entries (only if it is the only one)
+    ; Remove registry entries
     DeleteRegKey /ifempty ${REG_ROOT} "${REG_KEY}"
-
     DeleteRegKey ${REG_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_DIR}"
 
     ; Remove Installation dir from PATH
-    EnVar::SetHKLM
-    EnVar::DeleteValue "PATH" "$INSTDIR"
-    Pop $0
-
-    ${If} "$0" == "0"
-        DetailPrint "Successfully removed $INSTDIR from PATH"
-    ${Else}
-        DetailPrint "Failed to remove $INSTDIR from PATH"
-    ${EndIf}
+    EnVar::Delete /GLOBAL "PATH" "$INSTDIR"
 
     ; remove installation dir
     RMDir /r "$INSTDIR"
