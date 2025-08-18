@@ -8,6 +8,7 @@ import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedB
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.util.ZipExtractor
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 import java.util.UUID
 
@@ -18,14 +19,14 @@ class InitCommand(
 
     override val commandName: String = "init"
     override val description: String = "Initializes a new project"
-    override val supportsMcp: Boolean = false // TODO: ST-4767
+    override val supportsMcp: Boolean = false
 
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "name",
-                description = "Name of the project. A directory of this name will be created in the current directory",
-                valuePlaceholder = "<name>",
+                name = "projectDir",
+                description = "Directory where project files will be stored. Created if it doesn’t exist",
+                valuePlaceholder = "<projectDir>",
             ),
             NamedParameter(
                 name = "bare",
@@ -60,16 +61,16 @@ class InitCommand(
             return ExitCode.USAGE_ERROR
         }
 
-        val projectName = parsedArgs.getValue("name")
+        val projectPath = parsedArgs.getValue("projectDir")
         val projectDir =
-            projectName?.let {
+            projectPath?.let {
                 File(it).apply {
                     if (exists()) {
-                        output.displayError("Directory $canonicalPath already exists.")
+                        output.displayError("Directory ${relativeOrAbsolute()} already exists.")
                         return ExitCode.GENERAL_ERROR
                     }
                     if (!mkdir()) {
-                        output.displayError("Failed to create directory $canonicalFile.")
+                        output.displayError("Failed to create directory ${relativeOrAbsolute()}.")
                         return ExitCode.GENERAL_ERROR
                     }
                 }
@@ -88,7 +89,7 @@ class InitCommand(
 
         try {
             ZipExtractor.unzip(archiveFile, skipTopDirectory = true, errorOnConflict = true)
-            output.info("Project successfully saved to ${projectDir.absolutePath}")
+            output.info("Project successfully saved to ${projectDir.relativeOrAbsolute()}")
         } catch (e: Exception) {
             output.displayError("Failed to extract project files. ${e.message}")
             return ExitCode.GENERAL_ERROR

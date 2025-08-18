@@ -974,6 +974,10 @@
       "allDeclaredFields": true
     },
     {
+      "type": "io.swagger.v3.core.jackson.mixin.DateSchemaMixin",
+      "allDeclaredFields": true
+    },
+    {
       "type": "io.swagger.v3.core.jackson.mixin.ExtensionsMixin",
       "allDeclaredFields": true
     },
@@ -1261,6 +1265,10 @@
     },
     {
       "type": "io.swagger.v3.oas.models.media.Content",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.DateSchema",
       "allDeclaredFields": true
     },
     {

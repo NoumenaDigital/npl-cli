@@ -9,6 +9,7 @@ import com.noumenadigital.npl.cli.TestUtils.runCommand
 import com.noumenadigital.npl.cli.commands.registry.DeployCommand
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
+import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.Dispatcher
@@ -192,6 +193,36 @@ class DeployCommandIT :
 
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+
+                    val (output, exitCode) = executeDeployCommand(tempDir, testDirPath)
+
+                    output.normalize() shouldBe
+                        """
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
+                } finally {
+                    tempDir.deleteRecursively()
+                }
+            }
+
+            test("simple deploy - relative path") {
+                mockEngine.enqueue(
+                    MockResponse()
+                        .setResponseCode(200)
+                        .setHeader("Content-Type", "application/json")
+                        .setBody("{}"),
+                )
+
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val tempDir = Files.createTempDirectory("npl-cli-test").toFile()
+                try {
+                    createConfigFile(tempDir, engineUrl, oidcUrl)
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("deploy-success", "main")).toFile().relativeOrAbsolute().toString()
 
                     val (output, exitCode) = executeDeployCommand(tempDir, testDirPath)
 

@@ -1,0 +1,22 @@
+package objects.iou
+
+struct PriceEvent {
+    price: Number,
+    startTimestamp: Number,
+    endTimestamp: Number,
+    date: LocalDate,
+}
+
+@api
+protocol[priceMaker] MarketPrice() {
+
+    var latestPrice: PriceEvent = PriceEvent(0,-1, -1, localDateOf(2025, 1, 1));
+    var allPrices: List<PriceEvent> = listOf<PriceEvent>();
+
+    @api
+    permission[priceMaker] submitNewPrice(newPrice: PriceEvent) {
+        latestPrice = newPrice;
+        allPrices = allPrices.with(newPrice);
+        // notify blockchain
+    }
+};

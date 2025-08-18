@@ -22,6 +22,12 @@ class OpenapiCommandIT :
             val openapiDir: File = File(".").resolve("openapi"),
         ) {
             val absolutePath: String get() = testResourcesPath.toAbsolutePath().toString()
+            val relativePath: String get() =
+                File(".")
+                    .canonicalFile
+                    .toPath()
+                    .relativize(testResourcesPath)
+                    .pathString
 
             fun validateOpenapiSpec(expectedFileName: String): SwaggerParseResult {
                 val file = openapiDir.resolve(expectedFileName)
@@ -80,7 +86,31 @@ class OpenapiCommandIT :
 
                         val expectedOutput =
                             """
-                        Completed compilation for 4 files in XXX ms
+                        Completed compilation for 5 files in XXX ms
+
+                        Generating openapi for objects/iou
+                        Generating openapi for processes
+                        NPL openapi completed successfully.
+                        """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        validateOpenapiSpec("objects.iou-openapi.yml").messages.size shouldBe 0
+                        validateOpenapiSpec("processes-openapi.yml").messages.size shouldBe 0
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
+            }
+
+            test("multiple files - relative path") {
+                withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                    runCommand(
+                        commands = listOf("openapi", "--sourceDir", relativePath),
+                    ) {
+                        process.waitFor()
+
+                        val expectedOutput =
+                            """
+                        Completed compilation for 5 files in XXX ms
 
                         Generating openapi for objects/iou
                         Generating openapi for processes
@@ -262,7 +292,7 @@ class OpenapiCommandIT :
 
                                 val expectedOutput =
                                     """
-                                Completed compilation for 4 files in XXX ms
+                                Completed compilation for 5 files in XXX ms
 
                                 Generating openapi for objects/iou
                                 Generating openapi for processes
@@ -295,7 +325,7 @@ class OpenapiCommandIT :
 
                                 val expectedOutput =
                                     """
-                            Completed compilation for 4 files in XXX ms
+                            Completed compilation for 5 files in XXX ms
 
                             Generating openapi for objects/iou
                             Generating openapi for processes
@@ -329,7 +359,7 @@ class OpenapiCommandIT :
 
                                 val expectedOutput =
                                     """
-                            Completed compilation for 4 files in XXX ms
+                            Completed compilation for 5 files in XXX ms
 
                             Generating openapi for objects/iou
                             Generating openapi for processes
@@ -364,7 +394,7 @@ class OpenapiCommandIT :
 
                                 val expectedOutput =
                                     """
-                            Completed compilation for 4 files in XXX ms
+                            Completed compilation for 5 files in XXX ms
 
                             Generating openapi for objects/iou
                             Failed while validating the Party automation rules: Invalid Party/Parties [[unknown]] specified on party assignment for rule [/objects/iou/Iou]
@@ -394,7 +424,7 @@ class OpenapiCommandIT :
 
                                 val expectedOutput =
                                     """
-                            Completed compilation for 4 files in XXX ms
+                            Completed compilation for 5 files in XXX ms
 
                             Generating openapi for objects/iou
                             Failed while validating the Party automation rules: No matching prototype found matching [/unknown/pkg/Iou]
