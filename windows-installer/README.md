@@ -17,14 +17,13 @@ To build the installer, follow the steps listed below. All steps are written in 
 
 1. Download [EnVar plugin](https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip), place it the current
    directory and expand
-2. Create a symbolic link to the `Plugin` sub directory of the expanded directory called `Plugin`
 
 ```bash
    curl -LO https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip
    unzip EnVar_plugin.zip
 ```
 
-3. Create `build` sub-directory and place the following artifacts there.
+2. Create `build` sub-directory and place the following artifacts there.
    1. Copy `License.md` from npl-cli root directory
    ```bash
       cp ../LICENSE.md build
@@ -35,7 +34,7 @@ To build the installer, follow the steps listed below. All steps are written in 
    ```
       curl -L --output-dir build -O https://github.com/NoumenaDigital/npl-cli/releases/download/{VERSION}/npl-cli-windows-x86_64-{VERSION}.exe
    ```
-4. Run the following command to build the installer using NSIS Replace `{VERSION}` with the actual version of the
+3. Run the following command to build the installer using the NSIS docker. Replace `{VERSION}` with the version of the
    artifact:
    ```
    docker run \
@@ -44,4 +43,4 @@ To build the installer, follow the steps listed below. All steps are written in 
     hp41/nsis:3.01-1 \
     -DVERSION={VERSION} /npl-cli-installer/npl-cli.nsi
    ```
-5. Upon a successful build, The resulting installer will be generated as: `dist/npl-cli-installer.exe`
+4. Upon a successful build, The resulting installer will be generated as: `dist/npl-cli-installer.exe`
