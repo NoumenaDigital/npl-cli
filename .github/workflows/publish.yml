@@ -213,13 +213,17 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./windows-installer
+        working-directory: windows-installer
     steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: "Download and link EnVar plugin"
         run: |
           curl -LO https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip
-          unzip EnVar_plugin.zip
-          ln -s EnVar_plugin/Plugins Plugins
+          unzip -d EnVar_plugin EnVar_plugin.zip
 
       - name: "Copy LICENSE.md"
         run: |
