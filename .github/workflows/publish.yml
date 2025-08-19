@@ -214,16 +214,23 @@ jobs:
     defaults:
       run:
         working-directory: windows-installer
+    env:
+      INSTALLER_NAME: npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: "Download individual artifacts"
+      - name: "Download versioned windows executable"
         uses: actions/download-artifact@v4
         with:
-          path: ./individual-artifacts
+          name: ${{ env.INSTALLER_NAME }}
+          path: ./windows-installer/build
+
+      - name: "Move exe into place"
+        run: |
+          mv ./build/${{ env.INSTALLER_NAME }} .
 
       - name: "Download and link EnVar plugin"
         run: |
@@ -231,13 +238,7 @@ jobs:
           unzip -d EnVar_plugin EnVar_plugin.zip
 
       - name: "Copy LICENSE.md"
-        run: |
-          mkdir -p build
-          cp ../LICENSE.md build
-
-      - name: "Copy windows executable"
-        run: |
-          cp ../individual-artifacts/npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe build
+        run: cp ../LICENSE.md .
 
       - name: "Build installer"
         run: |
@@ -247,15 +248,11 @@ jobs:
           hp41/nsis:3.01-1 \
           -DVERSION=${{needs.determine-version.outputs.version}} /npl-cli-installer/npl-cli.nsi
 
-      - name: "Copy installer to release artifacts"
-        run: |
-          cp dist/npl-cli-installer.exe ../individual-artifacts
-
-      - name: "Upload native binary artifact"
+      - name: "Upload windows installer artifact"
         uses: actions/upload-artifact@v4
         with:
-          name: windows-installer
-          path: dist/npl-cli-installer.exe
+          name: npl-cli-installer.exe
+          path: windows-installer/dist/npl-cli-installer.exe
           if-no-files-found: error
           retention-days: 30
 
