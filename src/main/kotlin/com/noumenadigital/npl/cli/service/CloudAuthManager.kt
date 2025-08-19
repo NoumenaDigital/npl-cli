@@ -65,6 +65,15 @@ class CloudAuthManager(
         return updatedToken
     }
 
+    fun getServiceAccountAccessToken(clientId: String, clientSecret: String): String {
+        val token = noumenaCloudAuthClient.getAccessTokenByClientCredentials(clientId, clientSecret)
+        val accessToken = token.accessToken
+        if (accessToken.isNullOrBlank()) {
+            throw CloudCommandException("Access token is not available for the provided service account credentials.")
+        }
+        return accessToken
+    }
+
     private fun openBrowser(
         url: String,
         output: ColorWriter,
