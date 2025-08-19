@@ -53,7 +53,7 @@ open class NoumenaCloudAuthClient(
             httpPost.entity =
                 UrlEncodedFormEntity(
                     listOf(
-                        BasicNameValuePair("client_id", clientId),
+                        BasicNameValuePair("client_id", this.clientId),
                         BasicNameValuePair("scope", scope),
                     ),
                 )
@@ -77,10 +77,10 @@ open class NoumenaCloudAuthClient(
         httpPost.entity =
             UrlEncodedFormEntity(
                 listOf(
-                    BasicNameValuePair("client_id", clientId),
+                    BasicNameValuePair("client_id", this.clientId),
                     BasicNameValuePair("grant_type", deviceGrantType),
                     BasicNameValuePair("device_code", deviceCode.deviceCode),
-                    BasicNameValuePair("client_secret", clientSecret),
+                    BasicNameValuePair("client_secret", this.clientSecret),
                     BasicNameValuePair("scope", scope),
                 ),
             )
@@ -114,10 +114,10 @@ open class NoumenaCloudAuthClient(
             httpPost.entity =
                 UrlEncodedFormEntity(
                     listOf(
-                        BasicNameValuePair("client_id", clientId),
+                        BasicNameValuePair("client_id", this.clientId),
                         BasicNameValuePair("grant_type", "refresh_token"),
                         BasicNameValuePair("refresh_token", refreshToken),
-                        BasicNameValuePair("client_secret", clientSecret),
+                        BasicNameValuePair("client_secret", this.clientSecret),
                         BasicNameValuePair("scope", scope),
                     ),
                 )
@@ -132,6 +132,33 @@ open class NoumenaCloudAuthClient(
                 entity.content.use { inputStream ->
                     return objectMapper.readValue(inputStream, TokenResponse::class.java)
                 }
+            }
+        } catch (ex: Exception) {
+            throw CloudRestCallException(ex.message ?: ex.cause?.message ?: "Unknown error.", ex)
+        }
+    }
+
+    open fun getAccessTokenByClientCredentials(serviceClientId: String, serviceClientSecret: String): TokenResponse {
+        try {
+            val httpPost = HttpPost("$keycloakUrl/token")
+            httpPost.setHeader("Content-Type", contentType)
+            httpPost.entity =
+                UrlEncodedFormEntity(
+                    listOf(
+                        BasicNameValuePair("client_id", serviceClientId),
+                        BasicNameValuePair("client_secret", serviceClientSecret),
+                        BasicNameValuePair("grant_type", "client_credentials"),
+                    ),
+                )
+
+            client.execute(httpPost).use { response ->
+                val status = response.statusLine.statusCode
+                val entity = response.entity ?: throw CloudRestCallException("Empty response entity.")
+                val json = EntityUtils.toString(entity)
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Cannot get access token using client credentials $status - $json")
+                }
+                return objectMapper.readValue(json)
             }
         } catch (ex: Exception) {
             throw CloudRestCallException(ex.message ?: ex.cause?.message ?: "Unknown error.", ex)
