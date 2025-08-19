@@ -16,17 +16,15 @@
 !define REG_ENV_KEY "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\"
 !define REG_VAL "InstallPath"
 
-!define BUILD_DIR "build"
 !define DIST_DIR "dist"
 
 ; Create input/output directories
 !system 'mkdir dist 2>nul'
-!system 'mkdir build 2>nul'
 
 ; Configure App parameters
 Name "${APP_NAME}"
 OutFile "${DIST_DIR}\${APP_INSTALLER}"
-LicenseData "build\LICENSE.md"
+LicenseData "LICENSE.md"
 InstallDir "$PROGRAMFILES\NoumenaDigital"
 InstallDirRegKey ${REG_ROOT} "${REG_KEY}" "${REG_VAL}"
 RequestExecutionLevel admin
@@ -44,7 +42,7 @@ Section "Install ${APP_NAME}" SecInstall
     SetOutPath "$INSTDIR"
 
     ;Rename target
-    File /oname=${APP_TARGET_EXE} "${BUILD_DIR}\${APP_BUILD_EXE}"
+    File /oname=${APP_TARGET_EXE} "${APP_BUILD_EXE}"
 
     ;Record installation directory in the windows registry
     WriteRegStr ${REG_ROOT} "${REG_KEY}" "${REG_VAL}" "$INSTDIR"

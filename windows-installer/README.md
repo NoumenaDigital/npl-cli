@@ -23,22 +23,20 @@ To build the installer, follow the steps listed below. All steps are written in 
       unzip -d EnVar_plugin EnVar_plugin.zip
    ```
 
-2. Create `build` sub-directory and place the following artifacts there.
+2. Copy `License.md` from npl-cli root directory
+   ```bash
+      cp ../LICENSE.md .
+   ```
+3. Download the `npl-cli` windows executable from the
+   [releases page](https://github.com/NoumenaDigital/npl-cli/releases/latest). Replace `{VERSION}` with your desired
+   version number. Do not rename, the result should be `build/npl-cli-windows-x86_64-{VERSION}.exe`
 
-   - Copy `License.md` from npl-cli root directory
-     ```bash
-        mkdir build
-        cp ../LICENSE.md build
-     ```
-   - Download the `npl-cli` windows executable from the
-     [releases page](https://github.com/NoumenaDigital/npl-cli/releases/latest). Replace `{VERSION}` with your desired
-     version number. Do not rename, the result should be `build/npl-cli-windows-x86_64-{VERSION}.exe`
-     ```bash
-        export VERSION=2025.1.10
-        curl -L --output-dir build -O https://github.com/NoumenaDigital/npl-cli/releases/download/$VERSION/npl-cli-windows-x86_64-$VERSION.exe
-     ```
+   ```bash
+      export VERSION=2025.1.10
+      curl -L --output-dir . -O https://github.com/NoumenaDigital/npl-cli/releases/download/$VERSION/npl-cli-windows-x86_64-$VERSION.exe
+   ```
 
-3. Run the following command to build the installer using the NSIS docker. Replace `2025.1.10` with the desired version
+4. Run the following command to build the installer using the NSIS docker. Replace `2025.1.10` with the desired version
    of the artifact:
    ```bash
       export VERSION=2025.1.10
@@ -48,4 +46,4 @@ To build the installer, follow the steps listed below. All steps are written in 
        hp41/nsis:3.01-1 \
        -DVERSION=$VERSION /npl-cli-installer/npl-cli.nsi
    ```
-4. Upon a successful build, The resulting installer will be generated as: `dist/npl-cli-installer.exe`
+5. Upon a successful build, The resulting installer will be generated as: `dist/npl-cli-installer.exe`
