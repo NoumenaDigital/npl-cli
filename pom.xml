@@ -403,6 +403,9 @@
                                 <include>**/IT*.*</include>
                                 <include>**/*IT.*</include>
                             </includes>
+                            <systemPropertyVariables>
+                                <TEST_MODE>jar</TEST_MODE>
+                            </systemPropertyVariables>
                             <environmentVariables>
                                 <TEST_MODE>jar</TEST_MODE>
                             </environmentVariables>

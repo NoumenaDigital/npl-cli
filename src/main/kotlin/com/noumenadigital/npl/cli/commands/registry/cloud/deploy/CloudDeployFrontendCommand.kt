@@ -106,8 +106,19 @@ class CloudDeployFrontendCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
+            val saClientId = System.getenv("NPL_SA_CLIENT_ID") ?: System.getProperty("NPL_SA_CLIENT_ID")
+            val saClientSecret = System.getenv("NPL_SA_CLIENT_SECRET") ?: System.getProperty("NPL_SA_CLIENT_SECRET")
             val archive = sourcesManager.getArchivedSources()
-            cloudDeployService.deployFrontend(archive)
+
+            if (!saClientId.isNullOrBlank() && !saClientSecret.isNullOrBlank()) {
+                output.info("Preparing to deploy frontend to NOUMENA Cloud using service account...")
+                val accessToken = cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
+                output.success("Successfully authenticated with service account credentials")
+                cloudDeployService.deployFrontendWithToken(archive, accessToken)
+            } else {
+                cloudDeployService.deployFrontend(archive)
+            }
+
             output.success("Frontend successfully deployed to NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {

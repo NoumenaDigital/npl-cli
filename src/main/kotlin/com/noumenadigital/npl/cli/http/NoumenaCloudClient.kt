@@ -37,7 +37,7 @@ data class NoumenaCloudConfig(
 open class NoumenaCloudClient(
     val config: NoumenaCloudConfig,
 ) {
-    val ncBaseUrl = "${config.url}/api/v1/applications/"
+    private val ncBaseUrl = "${config.url}/api/v1/applications/"
     private val tenantsUrl = "${config.url}/api/v1/tenants"
     private val client = HttpClients.createDefault()
     private val objectMapper = ObjectMapper().registerKotlinModule()
@@ -70,9 +70,7 @@ open class NoumenaCloudClient(
     ) {
         try {
             val ncApp = findApplication(tenants)
-            if (ncApp == null) {
-                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
-            }
+                ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
             val deployUrl = "$ncBaseUrl/${ncApp.id}/deploy"
             val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
 
@@ -112,9 +110,7 @@ open class NoumenaCloudClient(
     ) {
         try {
             val ncApp = findApplication(tenants)
-            if (ncApp == null) {
-                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
-            }
+                ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
             val clearUrl = "$ncBaseUrl/${ncApp.id}/clear"
             val httpDelete = HttpDelete(clearUrl)
             httpDelete.setHeader("Accept", "application/json")
@@ -139,9 +135,7 @@ open class NoumenaCloudClient(
     ) {
         try {
             val ncApp = findApplication(tenants)
-            if (ncApp == null) {
-                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant ${config.tenantSlug}")
-            }
+                ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant ${config.tenantSlug}")
             val deployUrl = "$ncBaseUrl/${ncApp.id}/uploadwebsite"
             val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
 
@@ -161,6 +155,7 @@ open class NoumenaCloudClient(
             val httpPost = HttpPost(deployUrl)
             httpPost.setHeader("Authorization", "Bearer $accessToken")
             httpPost.setHeader("Content-Type", "multipart/form-data; boundary=$boundary")
+
             httpPost.entity = ByteArrayEntity(body)
 
             client.execute(httpPost).use { response ->

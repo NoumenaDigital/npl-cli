@@ -23,8 +23,8 @@ import kotlin.streams.asSequence
 import kotlin.use
 
 class CloudDeployNplCommand(
-    val sourcesManager: SourcesManager = SourcesManager("."),
-    val cloudDeployService: CloudDeployService =
+    private val sourcesManager: SourcesManager = SourcesManager("."),
+    private val cloudDeployService: CloudDeployService =
         CloudDeployService(
             CloudAuthManager(),
             NoumenaCloudClient(NoumenaCloudConfig()),
@@ -114,8 +114,20 @@ class CloudDeployNplCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
+            // Read service account credentials first from env, then from system properties (used in tests direct mode)
+            val saClientId = System.getenv("NPL_SA_CLIENT_ID") ?: System.getProperty("NPL_SA_CLIENT_ID")
+            val saClientSecret = System.getenv("NPL_SA_CLIENT_SECRET") ?: System.getProperty("NPL_SA_CLIENT_SECRET")
             val archive = sourcesManager.getArchivedSources()
-            cloudDeployService.deployNplApplication(archive)
+
+            if (!saClientId.isNullOrBlank() && !saClientSecret.isNullOrBlank()) {
+                output.info("Preparing to deploy NPL application to NOUMENA Cloud using service account...")
+                val accessToken = cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
+                output.success("Successfully authenticated with service account credentials")
+                cloudDeployService.deployNplApplicationWithToken(archive, accessToken)
+            } else {
+                cloudDeployService.deployNplApplication(archive)
+            }
+
             output.success("NPL Application successfully deployed to NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
@@ -123,7 +135,7 @@ class CloudDeployNplCommand(
         }
     }
 
-    fun findSingleFile(
+    private fun findSingleFile(
         fileName: String,
         searchDir: String = ".",
     ): File {
