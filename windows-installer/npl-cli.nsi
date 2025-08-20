@@ -56,6 +56,10 @@ Section "Install ${APP_NAME}" SecInstall
     WriteRegDWORD ${REG_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_DIR}" "NoModify" 1
     WriteRegDWORD ${REG_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_DIR}" "NoRepair" 1
 
+    ; Add installationdirectory to the user PATH
+    EnVar::SetHKCU
+    EnVar::AddValue "PATH" "$INSTDIR"
+
     ; Add installation directory to the system PATH
     EnVar::SetHKLM
     EnVar::AddValue "PATH" "$INSTDIR"
@@ -87,6 +91,9 @@ Section "Uninstall" SecUninstall
 
     ; Remove Installation dir from PATH
     EnVar::Delete /GLOBAL "PATH" "$INSTDIR"
+
+    EnVar::SetHKCU
+    EnVar::Delete "PATH" "$INSTDIR"
 
     ; remove installation dir
     RMDir /r "$INSTDIR"
