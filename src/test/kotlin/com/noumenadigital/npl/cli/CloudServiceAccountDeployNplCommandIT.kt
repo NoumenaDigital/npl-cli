@@ -155,6 +155,46 @@ class CloudServiceAccountDeployNplCommandIT :
                     }
                 }
             }
+
+            test("cloud service-deploy success using system properties credentials") {
+                withTestContext {
+                    System.setProperty("NPL_SA_CLIENT_ID", "svc-id")
+                    System.setProperty("NPL_SA_CLIENT_SECRET", "svc-secret")
+                    try {
+                        runCommand(
+                            commands =
+                                listOf(
+                                    "cloud",
+                                    "service-deploy",
+                                    "--app",
+                                    "appslug",
+                                    "--tenant",
+                                    "tenantslug",
+                                    "--migration",
+                                    "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                    "--url",
+                                    mockNC.url("/").toString(),
+                                    "--authUrl",
+                                    mockOidc.url("/realms/paas/").toString(),
+                                ),
+                        ) {
+                            process.waitFor()
+                            val expectedOutput =
+                                """
+                                Preparing to deploy NPL application to NOUMENA Cloud using service account...
+                                Successfully authenticated with service account credentials
+                                NPL Application successfully deployed to NOUMENA Cloud.
+                                """.normalize()
+
+                            output.normalize() shouldBe expectedOutput
+                            process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        }
+                    } finally {
+                        System.clearProperty("NPL_SA_CLIENT_ID")
+                        System.clearProperty("NPL_SA_CLIENT_SECRET")
+                    }
+                }
+            }
         }
 
         context("error") {
@@ -308,4 +348,3 @@ class CloudServiceAccountDeployNplCommandIT :
         private const val APP_ID_OK = "1a978a70-1709-40c1-82d7-30114edfc46b"
     }
 }
-
