@@ -43,13 +43,13 @@ class CloudServiceAccountDeployFrontendCommand(
             ),
             NamedParameter(
                 name = "clientId",
-                description = "Service account client ID",
+                description = "Service account client ID (or env NPL_SA_CLIENT_ID)",
                 isRequired = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
                 name = "clientSecret",
-                description = "Service account client secret",
+                description = "Service account client secret (or env NPL_SA_CLIENT_SECRET)",
                 isRequired = true,
                 valuePlaceholder = "<clientSecret>",
             ),
@@ -80,8 +80,14 @@ class CloudServiceAccountDeployFrontendCommand(
         val parsedArgs = CommandArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("app")
         val tenant = parsedArgs.getRequiredValue("tenant")
-        val clientId = parsedArgs.getRequiredValue("clientId")
-        val clientSecret = parsedArgs.getRequiredValue("clientSecret")
+        val clientId = parsedArgs.getValue("clientId") ?: System.getenv("NPL_SA_CLIENT_ID")
+        val clientSecret = parsedArgs.getValue("clientSecret") ?: System.getenv("NPL_SA_CLIENT_SECRET")
+        if (clientId.isNullOrBlank()) {
+            throw CloudCommandException("Service account client ID is required (use --clientId or env NPL_SA_CLIENT_ID)")
+        }
+        if (clientSecret.isNullOrBlank()) {
+            throw CloudCommandException("Service account client secret is required (use --clientSecret or env NPL_SA_CLIENT_SECRET)")
+        }
         val frontendDir = parsedArgs.getRequiredValue("frontend")
         val dir = File(frontendDir)
         if (!dir.exists() || !dir.isDirectory) {
@@ -123,4 +129,3 @@ class CloudServiceAccountDeployFrontendCommand(
         }
     }
 }
-
