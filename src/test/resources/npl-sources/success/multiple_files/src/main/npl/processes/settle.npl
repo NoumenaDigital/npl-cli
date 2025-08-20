@@ -1,12 +1,17 @@
 package processes
 
 use objects.iou.Iou
+use stdlib.v1.collection.range
 
 @api
 protocol[iouOwner, carOwner] Settle(var iou: Iou) {
     @api
     permission[iouOwner | carOwner] swap() returns List<Number> {
         // Transfer logic.
+        range(1, 4, 1).forEach(function(i: Number) -> {
+            // This is just to show that we can use the range function
+            // and that it works with the NPL plugin.
+        });
         return listOf(1,2,3,4);
     };
 };
