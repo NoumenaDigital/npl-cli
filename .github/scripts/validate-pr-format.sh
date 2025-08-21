@@ -13,8 +13,8 @@ fi
 # Check Ticket format if present
 if echo "$PR_BODY" | grep -q "Ticket:"; then
   # Remove carriage returns before checking
-  if ! echo "$PR_BODY" | tr -d '\r' | grep -q "^Ticket: ST-[0-9]*$"; then
-    echo "Error: Ticket format is invalid. Should be 'Ticket: ST-XXXX' on its own line where XXXX are numbers."
+  if ! echo "$PR_BODY" | tr -d '\r' | grep -q "^Ticket: [A-Z]*-[0-9]*$"; then
+    echo "Error: Ticket format is invalid. Should be 'Ticket: AAA-XXXX' on its own line where AAA is the ticket prefix and XXXX are numbers."
     exit 1
   fi
 fi

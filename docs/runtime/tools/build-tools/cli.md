@@ -7,6 +7,44 @@ weight: 20
 The NPL CLI is a command line tool to support the development of projects written in Noumena Protocol Language (NPL). It
 offers several useful commands for interacting with your NPL projects.
 
+## How to install
+
+=== "Homebrew (MacOS)"
+
+    Simply run:
+
+    ``` shell
+    brew install NoumenaDigital/tools/npl
+    ```
+
+    > [!NOTE] If you have previously installed the NPL CLI using the `curl` command, you may need to remove the old version before installing the new one. You can do this by running `rm -rf ~/.npl` and then reinstalling the new version with brew.
+
+=== "binary (MacOS/Linux)"
+
+    Download and install the NPL CLI using the following command:
+
+    ``` shell
+    curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
+    ```
+
+    You may have to restart the terminal to ensure the CLI is available in your PATH after installing the NPL CLI.
+
+    Alternatively, download the latest release [here](https://github.com/NoumenaDigital/npl-cli/releases) and add it to your $PATH.
+
+=== "binary (Windows with WSL)"
+
+    Download and install the NPL CLI using the following command:
+
+    ``` shell
+    curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
+    ```
+
+    You will need to manually add the `npl` executable to your PATH. The script above will not do that for you.
+
+=== "Windows without WSL"
+
+    Download and install the latest `.exe` executable [here](https://github.com/NoumenaDigital/npl-cli/releases).
+
 ## Commands
 
 To see a description of how to use each command, run `npl help`
@@ -35,21 +73,6 @@ To see a description of how to use each command, run `npl help`
 | MacOS   | Yes    | Yes    |
 | Linux   | Yes    | Yes    |
 | Windows | Yes    | Yes    |
-
-## How to install
-
-For MacOS, Linux, and Windows running WSL, you can install the NPL CLI using
-
-```shell
-curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
-```
-
-or download the latest release [here](https://github.com/NoumenaDigital/npl-cli/releases) and add it to your $PATH. On
-Windows running WSL, you will need to manually add the `npl` executable to your PATH. The script above will not do that
-for you.
-
-For Windows without WSL, you may download the latest `.exe` executable
-[here](https://github.com/NoumenaDigital/npl-cli/releases)
 
 ## Model Context Protocol (MCP) server
 
