@@ -130,15 +130,12 @@ class CloudServiceAccountDeployFrontendCommandIT :
                         commands =
                             listOf(
                                 "cloud",
-                                "service-deploy-frontend",
+                                "deploy",
+                                "frontend",
                                 "--app",
                                 "appslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--clientId",
-                                "svc-id",
-                                "--clientSecret",
-                                "svc-secret",
                                 "--frontend",
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
@@ -146,6 +143,11 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "svc-id",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
@@ -163,17 +165,14 @@ class CloudServiceAccountDeployFrontendCommandIT :
         }
 
         context("error") {
-            test("cloud service-deploy-frontend failed wrong clientId") {
+            test("cloud deploy frontend via service account failed wrong clientId") {
                 withTestContext {
                     runCommand(
                         commands =
                             listOf(
                                 "cloud",
-                                "service-deploy-frontend",
-                                "--clientId",
-                                "wrong",
-                                "--clientSecret",
-                                "svc-secret",
+                                "deploy",
+                                "frontend",
                                 "--app",
                                 "appslug",
                                 "--tenant",
@@ -185,12 +184,17 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "wrong",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
                             """
                             Preparing to deploy frontend to NOUMENA Cloud using service account..
-                            Command cloud service-deploy-frontend failed: Cannot get access token using client credentials 401 - Client Error.
+                            Command cloud deploy frontend failed: Cannot get access token using client credentials 401 - Client Error.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -199,21 +203,18 @@ class CloudServiceAccountDeployFrontendCommandIT :
                 }
             }
 
-            test("cloud service-deploy-frontend failed deploy command") {
+            test("cloud deploy frontend via service account failed deploy command") {
                 withTestContext {
                     runCommand(
                         commands =
                             listOf(
                                 "cloud",
-                                "service-deploy-frontend",
+                                "deploy",
+                                "frontend",
                                 "--app",
                                 "appslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--clientId",
-                                "svc-id",
-                                "--clientSecret",
-                                "svc-secret",
                                 "--frontend",
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
@@ -221,13 +222,18 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "svc-id",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
                             """
                             Preparing to deploy frontend to NOUMENA Cloud using service account..
                             Successfully authenticated with service account credentials
-                            Command cloud service-deploy-frontend failed: Failed to fetch tenants - Target host is not specified.
+                            Command cloud deploy frontend failed: Failed to fetch tenants - Target host is not specified.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -236,21 +242,18 @@ class CloudServiceAccountDeployFrontendCommandIT :
                 }
             }
 
-            test("cloud service-deploy-frontend no application found") {
+            test("cloud deploy frontend via service account no application found") {
                 withTestContext {
                     runCommand(
                         commands =
                             listOf(
                                 "cloud",
-                                "service-deploy-frontend",
+                                "deploy",
+                                "frontend",
                                 "--app",
                                 "notappslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--clientId",
-                                "svc-id",
-                                "--clientSecret",
-                                "svc-secret",
                                 "--frontend",
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
@@ -258,13 +261,18 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "svc-id",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
                             """
                             Preparing to deploy frontend to NOUMENA Cloud using service account..
                             Successfully authenticated with service account credentials
-                            Command cloud service-deploy-frontend failed: Failed to upload application archive - Application slug notappslug doesn't exist for tenant tenantslug.
+                            Command cloud deploy frontend failed: Failed to upload application archive - Application slug notappslug doesn't exist for tenant tenantslug.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -273,21 +281,18 @@ class CloudServiceAccountDeployFrontendCommandIT :
                 }
             }
 
-            test("cloud service-deploy-frontend no build dir found") {
+            test("cloud deploy frontend via service account no build dir found") {
                 withTestContext {
                     runCommand(
                         commands =
                             listOf(
                                 "cloud",
-                                "service-deploy-frontend",
+                                "deploy",
+                                "frontend",
                                 "--app",
                                 "appslug",
                                 "--tenant",
                                 "tenantslug",
-                                "--clientId",
-                                "svc-id",
-                                "--clientSecret",
-                                "svc-secret",
                                 "--frontend",
                                 "other-build",
                                 "--url",
@@ -295,11 +300,16 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "--authUrl",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "svc-id",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud service-deploy-frontend failed: Build directory does not exist or is not a directory - other-build
+                            Command cloud deploy frontend failed: Build directory does not exist or is not a directory - other-build
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -313,4 +323,3 @@ class CloudServiceAccountDeployFrontendCommandIT :
         private const val APP_ID_OK = "1a978a70-1709-40c1-82d7-30114edfc46b"
     }
 }
-

@@ -29,3 +29,5 @@ replay_pid*
 .cursorrules
 
 **/.DS_Store
+
+.sdkmanrc

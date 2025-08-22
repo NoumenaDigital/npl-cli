@@ -6,8 +6,6 @@ import com.noumenadigital.npl.cli.commands.registry.cloud.CloudDeployCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudHelpCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLoginCommand
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLogoutCommand
-import com.noumenadigital.npl.cli.commands.registry.cloud.CloudServiceAccountDeployCommand
-import com.noumenadigital.npl.cli.commands.registry.cloud.CloudServiceAccountDeployFrontendCommand
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 
 enum class CloudCommands(
@@ -18,8 +16,6 @@ enum class CloudCommands(
     CLOUD_HELP({ CloudHelpCommand }),
     CLOUD_CLEAR_NPL({ CloudClearNplCommand() }),
     CLOUD_DEPLOY({ CloudDeployCommand() }),
-    CLOUD_SERVICE_DEPLOY({ CloudServiceAccountDeployCommand() }),
-    CLOUD_SERVICE_DEPLOY_FRONTEND({ CloudServiceAccountDeployFrontendCommand() }),
     ;
 
     companion object {
