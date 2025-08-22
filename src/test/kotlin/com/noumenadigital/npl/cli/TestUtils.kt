@@ -84,10 +84,11 @@ object TestUtils {
         env: Map<String, String> = emptyMap(),
         test: TestContext.() -> Unit,
     ) {
-        val testMode = getTestMode()
+        // Allow explicit override via provided env map; fall back to process environment
+        val effectiveTestMode = env["TEST_MODE"] ?: getTestMode()
 
         val testContext =
-            when (testMode) {
+            when (effectiveTestMode) {
                 "binary" -> runWithBinary(commands, env)
                 "jar" -> runWithJar(commands, env)
                 else -> runDirect(commands)
@@ -135,18 +136,35 @@ object TestUtils {
             )
         }
 
+        // Determine if we should enable Graal native-image agent (only when explicitly requested)
+        val useNativeAgent =
+            (env["USE_NATIVE_AGENT"] == "true") ||
+                (System.getenv("USE_NATIVE_AGENT") == "true") ||
+                (System.getProperty("USE_NATIVE_AGENT") == "true")
+
         // Build the command: java -jar <jar-path> <commands>
         val commandList =
             mutableListOf(
                 "java",
-                "-agentlib:native-image-agent=config-merge-dir=src/main/resources/META-INF/native-image",
+            )
+
+        if (useNativeAgent) {
+            commandList.add("-agentlib:native-image-agent=config-merge-dir=src/main/resources/META-INF/native-image")
+        }
+
+        commandList.addAll(
+            listOf(
                 "-Duser.home=${System.getProperty("user.home")}",
                 "--enable-native-access=ALL-UNNAMED",
-                "--sun-misc-unsafe-memory-access=allow",
                 "-Djava.awt.headless=true",
-                "-jar",
-                jarPath,
-            )
+            ),
+        )
+
+        // Add any environment variables as system properties for service account credentials
+        env["NPL_SA_CLIENT_ID"]?.let { commandList.add("-DNPL_SA_CLIENT_ID=$it") }
+        env["NPL_SA_CLIENT_SECRET"]?.let { commandList.add("-DNPL_SA_CLIENT_SECRET=$it") }
+
+        commandList.addAll(listOf("-jar", jarPath))
         commandList.addAll(commands)
 
         // Start the process
