@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.engine.test.logging.info
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -111,6 +112,15 @@ class CloudServiceAccountDeployNplCommandIT :
             val context = TestContext()
             try {
                 context.setupMockServers()
+                val testMode = System.getProperty("TEST_MODE")
+                if (testMode == "jar") {
+                    runCommand(
+                        commands = listOf("mvn", "package", "-Pconfig-gen"),
+                    ) {
+                        process.waitFor()
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
                 context.test()
             } finally {
                 context.cleanupMockServers()
@@ -119,28 +129,31 @@ class CloudServiceAccountDeployNplCommandIT :
         }
 
         context("success") {
-            test("cloud service-deploy success") {
+            test("cloud deploy npl via service account success") {
+                info { "test mode: " + System.getenv("TEST_MODE") }
                 withTestContext {
                     runCommand(
                         commands =
-                            listOf(
-                                "cloud",
-                                "service-deploy",
-                                "--app",
-                                "appslug",
-                                "--tenant",
-                                "tenantslug",
-                                "--clientId",
-                                "svc-id",
-                                "--clientSecret",
-                                "svc-secret",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                "--url",
-                                mockNC.url("/").toString(),
-                                "--authUrl",
-                                mockOidc.url("/realms/paas/").toString(),
-                            ),
+                        listOf(
+                            "cloud",
+                            "deploy",
+                            "npl",
+                            "--app",
+                            "appslug",
+                            "--tenant",
+                            "tenantslug",
+                            "--migration",
+                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                            "--url",
+                            mockNC.url("/").toString(),
+                            "--authUrl",
+                            mockOidc.url("/realms/paas/").toString(),
+                        ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "svc-id",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
@@ -155,77 +168,39 @@ class CloudServiceAccountDeployNplCommandIT :
                     }
                 }
             }
-
-            test("cloud service-deploy success using system properties credentials") {
-                withTestContext {
-                    System.setProperty("NPL_SA_CLIENT_ID", "svc-id")
-                    System.setProperty("NPL_SA_CLIENT_SECRET", "svc-secret")
-                    try {
-                        runCommand(
-                            commands =
-                                listOf(
-                                    "cloud",
-                                    "service-deploy",
-                                    "--app",
-                                    "appslug",
-                                    "--tenant",
-                                    "tenantslug",
-                                    "--migration",
-                                    "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                    "--url",
-                                    mockNC.url("/").toString(),
-                                    "--authUrl",
-                                    mockOidc.url("/realms/paas/").toString(),
-                                ),
-                        ) {
-                            process.waitFor()
-                            val expectedOutput =
-                                """
-                                Preparing to deploy NPL application to NOUMENA Cloud using service account...
-                                Successfully authenticated with service account credentials
-                                NPL Application successfully deployed to NOUMENA Cloud.
-                                """.normalize()
-
-                            output.normalize() shouldBe expectedOutput
-                            process.exitValue() shouldBe ExitCode.SUCCESS.code
-                        }
-                    } finally {
-                        System.clearProperty("NPL_SA_CLIENT_ID")
-                        System.clearProperty("NPL_SA_CLIENT_SECRET")
-                    }
-                }
-            }
         }
 
         context("error") {
-            test("cloud service-deploy failed wrong clientId") {
+            test("cloud deploy npl via service account failed wrong clientId") {
                 withTestContext {
                     runCommand(
                         commands =
-                            listOf(
-                                "cloud",
-                                "service-deploy",
-                                "--clientId",
-                                "wrong",
-                                "--clientSecret",
-                                "svc-secret",
-                                "--app",
-                                "appslug",
-                                "--tenant",
-                                "tenantslug",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                "--url",
-                                mockNC.url("/").toString(),
-                                "--authUrl",
-                                mockOidc.url("/realms/paas/").toString(),
-                            ),
+                        listOf(
+                            "cloud",
+                            "deploy",
+                            "npl",
+                            "--app",
+                            "appslug",
+                            "--tenant",
+                            "tenantslug",
+                            "--migration",
+                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                            "--url",
+                            mockNC.url("/").toString(),
+                            "--authUrl",
+                            mockOidc.url("/realms/paas/").toString(),
+                        ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "wrong",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
                             """
                             Preparing to deploy NPL application to NOUMENA Cloud using service account..
-                            Command cloud service-deploy failed: Cannot get access token using client credentials 401 - Client Error.
+                            Command cloud deploy npl failed: Cannot get access token using client credentials 401 - Client Error.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -234,72 +209,37 @@ class CloudServiceAccountDeployNplCommandIT :
                 }
             }
 
-            test("cloud service-deploy failed deploy command") {
+            test("cloud deploy npl via service account failed deploy command") {
                 withTestContext {
                     runCommand(
                         commands =
-                            listOf(
-                                "cloud",
-                                "service-deploy",
-                                "--app",
-                                "appslug",
-                                "--tenant",
-                                "tenantslug",
-                                "--clientId",
-                                "svc-id",
-                                "--clientSecret",
-                                "svc-secret",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                "--url",
-                                "non-url",
-                                "--authUrl",
-                                mockOidc.url("/realms/paas/").toString(),
-                            ),
-                    ) {
-                        process.waitFor()
-                        val expectedOutput =
-                            """
-                            Preparing to deploy NPL application to NOUMENA Cloud using service account..
-                            Successfully authenticated with service account credentials
-                            Command cloud service-deploy failed: Failed to fetch tenants - Target host is not specified.
-                            """.normalize()
-
-                        output.normalize() shouldBe expectedOutput
-                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-                    }
-                }
-            }
-
-            test("cloud service-deploy no application found") {
-                withTestContext {
-                    runCommand(
-                        commands =
-                            listOf(
-                                "cloud",
-                                "service-deploy",
-                                "--app",
-                                "notappslug",
-                                "--tenant",
-                                "tenantslug",
-                                "--clientId",
-                                "svc-id",
-                                "--clientSecret",
-                                "svc-secret",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                                "--url",
-                                mockNC.url("/").toString(),
-                                "--authUrl",
-                                mockOidc.url("/realms/paas/").toString(),
-                            ),
+                        listOf(
+                            "cloud",
+                            "deploy",
+                            "npl",
+                            "--app",
+                            "appslug",
+                            "--tenant",
+                            "tenantslug",
+                            "--migration",
+                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                            "--url",
+                            "non-url",
+                            "--authUrl",
+                            mockOidc.url("/realms/paas/").toString(),
+                        ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "svc-id",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
                             """
                             Preparing to deploy NPL application to NOUMENA Cloud using service account..
                             Successfully authenticated with service account credentials
-                            Command cloud service-deploy failed: Failed to upload application archive - Application slug notappslug doesn't exist for tenant slug tenantslug.
+                            Command cloud deploy npl failed: Failed to fetch tenants - Target host is not specified.
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -308,33 +248,74 @@ class CloudServiceAccountDeployNplCommandIT :
                 }
             }
 
-            test("cloud service-deploy no migration found") {
+            test("cloud deploy npl via service account no application found") {
                 withTestContext {
                     runCommand(
                         commands =
-                            listOf(
-                                "cloud",
-                                "service-deploy",
-                                "--app",
-                                "appslug",
-                                "--tenant",
-                                "tenantslug",
-                                "--clientId",
-                                "svc-id",
-                                "--clientSecret",
-                                "svc-secret",
-                                "--migration",
-                                "other-migration.yml",
-                                "--url",
-                                mockNC.url("/").toString(),
-                                "--authUrl",
-                                mockOidc.url("/realms/paas/").toString(),
-                            ),
+                        listOf(
+                            "cloud",
+                            "deploy",
+                            "npl",
+                            "--app",
+                            "notappslug",
+                            "--tenant",
+                            "tenantslug",
+                            "--migration",
+                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                            "--url",
+                            mockNC.url("/").toString(),
+                            "--authUrl",
+                            mockOidc.url("/realms/paas/").toString(),
+                        ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "svc-id",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud service-deploy failed: Migration file does not exist - other-migration.yml
+                            Preparing to deploy NPL application to NOUMENA Cloud using service account..
+                            Successfully authenticated with service account credentials
+                            Command cloud deploy npl failed: Failed to upload application archive - Application slug notappslug doesn't exist for tenant slug tenantslug.
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    }
+                }
+            }
+
+            test("cloud deploy npl via service account no migration found") {
+                withTestContext {
+                    runCommand(
+                        commands =
+                        listOf(
+                            "cloud",
+                            "deploy",
+                            "npl",
+                            "--app",
+                            "appslug",
+                            "--tenant",
+                            "tenantslug",
+                            "--migration",
+                            "other-migration.yml",
+                            "--url",
+                            mockNC.url("/").toString(),
+                            "--authUrl",
+                            mockOidc.url("/realms/paas/").toString(),
+                        ),
+                        env = mapOf(
+                            "TEST_MODE" to "jar",
+                            "NPL_SA_CLIENT_ID" to "svc-id",
+                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                        ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
+                            Command cloud deploy failed: Migration file does not exist - other-migration.yml
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
