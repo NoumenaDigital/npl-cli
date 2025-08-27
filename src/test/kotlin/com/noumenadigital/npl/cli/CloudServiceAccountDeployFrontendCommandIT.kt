@@ -144,7 +144,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env = mapOf(
-                            "TEST_MODE" to "jar",
                             "NPL_SA_CLIENT_ID" to "svc-id",
                             "NPL_SA_CLIENT_SECRET" to "svc-secret",
                         ),
@@ -185,7 +184,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env = mapOf(
-                            "TEST_MODE" to "jar",
                             "NPL_SA_CLIENT_ID" to "wrong",
                             "NPL_SA_CLIENT_SECRET" to "svc-secret",
                         ),
@@ -223,7 +221,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env = mapOf(
-                            "TEST_MODE" to "jar",
                             "NPL_SA_CLIENT_ID" to "svc-id",
                             "NPL_SA_CLIENT_SECRET" to "svc-secret",
                         ),
@@ -262,7 +259,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env = mapOf(
-                            "TEST_MODE" to "jar",
                             "NPL_SA_CLIENT_ID" to "svc-id",
                             "NPL_SA_CLIENT_SECRET" to "svc-secret",
                         ),
@@ -301,7 +297,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env = mapOf(
-                            "TEST_MODE" to "jar",
                             "NPL_SA_CLIENT_ID" to "svc-id",
                             "NPL_SA_CLIENT_SECRET" to "svc-secret",
                         ),
