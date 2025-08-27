@@ -242,7 +242,7 @@
                                 <include>**/*IT.*</include>
                             </includes>
                             <environmentVariables>
-                                <TEST_MODE>direct</TEST_MODE>
+                                <TEST_MODE>jar</TEST_MODE>
                             </environmentVariables>
                         </configuration>
                     </plugin>
@@ -377,6 +377,10 @@
                             <includes>
                                 <include>**/*Test.*</include>
                             </includes>
+                            <excludes>
+                                <exclude>**/*IT.*</exclude>
+                                <exclude>**/IT*.*</exclude>
+                            </excludes>
                             <environmentVariables>
                                 <TEST_MODE>direct</TEST_MODE>
                             </environmentVariables>

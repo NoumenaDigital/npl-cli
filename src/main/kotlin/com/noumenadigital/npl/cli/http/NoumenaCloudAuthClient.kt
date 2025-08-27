@@ -8,11 +8,14 @@ import com.noumenadigital.npl.cli.exception.CloudRestCallException
 import com.noumenadigital.npl.cli.exception.CloudSlowDownException
 import com.noumenadigital.npl.cli.model.DeviceCodeResponse
 import com.noumenadigital.npl.cli.model.TokenResponse
+import com.noumenadigital.npl.cli.service.ColorWriter
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
+import java.nio.charset.StandardCharsets
+import java.util.Base64
 
 data class NoumenaCloudAuthConfig(
     val clientId: String,
@@ -141,20 +144,25 @@ open class NoumenaCloudAuthClient(
     open fun getAccessTokenByClientCredentials(serviceClientId: String, serviceClientSecret: String): TokenResponse {
         try {
             val httpPost = HttpPost("$keycloakUrl/token")
-            httpPost.setHeader("Content-Type", contentType)
+
+            val credentials = "$serviceClientId:$serviceClientSecret"
+            val encoded = Base64.getEncoder().encodeToString(credentials.toByteArray(StandardCharsets.UTF_8))
+            httpPost.setHeader("Authorization", "Basic $encoded")
+
+            httpPost.setHeader("Content-Type", "$contentType; charset=UTF-8")
+            httpPost.setHeader("Accept", "application/json")
             httpPost.entity =
                 UrlEncodedFormEntity(
                     listOf(
-                        BasicNameValuePair("client_id", serviceClientId),
-                        BasicNameValuePair("client_secret", serviceClientSecret),
                         BasicNameValuePair("grant_type", "client_credentials"),
                     ),
+                    StandardCharsets.UTF_8,
                 )
 
             client.execute(httpPost).use { response ->
                 val status = response.statusLine.statusCode
                 val entity = response.entity ?: throw CloudRestCallException("Empty response entity.")
-                val json = EntityUtils.toString(entity)
+                val json = EntityUtils.toString(entity, StandardCharsets.UTF_8)
                 if (status !in 200..299) {
                     throw CloudRestCallException("Cannot get access token using client credentials $status - $json")
                 }
