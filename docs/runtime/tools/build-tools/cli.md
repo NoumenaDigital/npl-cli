@@ -17,8 +17,8 @@ offers several useful commands for interacting with your NPL projects.
     brew install NoumenaDigital/tools/npl
     ```
 
-    [!NOTE]
-    If you have previously installed the NPL CLI using the `curl` command, you may need to remove the old version before installing the new one. You can do this by running `rm -rf ~/.npl` and then reinstalling the new version with brew.
+    !!! note
+        If you have previously installed the NPL CLI using the `curl` command, you may need to remove the old version before installing the new one. You can do this by running `rm -rf ~/.npl` and then reinstalling the new version with brew.
 
 === "binary (MacOS/Linux)"
 
