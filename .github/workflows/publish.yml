@@ -234,12 +234,11 @@ jobs:
   update-homebrew-formula:
     name: "Trigger NoumenaDigital/homebrew-tools"
     runs-on: ubuntu-latest
-    permissions: write-all
-    needs: create-release
+    needs: [ determine-version, create-release ]
     steps:
       - name: "Trigger bump-cli-version workflow"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_BUMP_VERSION_PR_TOKEN }}
         run: |
           gh workflow run bump-cli-version.yml \
             --repo NoumenaDigital/homebrew-tools \
