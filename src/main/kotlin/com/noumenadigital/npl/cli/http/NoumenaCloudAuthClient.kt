@@ -56,7 +56,7 @@ open class NoumenaCloudAuthClient(
             httpPost.entity =
                 UrlEncodedFormEntity(
                     listOf(
-                        BasicNameValuePair("client_id", this.clientId),
+                        BasicNameValuePair("client_id", clientId),
                         BasicNameValuePair("scope", scope),
                     ),
                 )
@@ -80,10 +80,10 @@ open class NoumenaCloudAuthClient(
         httpPost.entity =
             UrlEncodedFormEntity(
                 listOf(
-                    BasicNameValuePair("client_id", this.clientId),
+                    BasicNameValuePair("client_id", clientId),
                     BasicNameValuePair("grant_type", deviceGrantType),
                     BasicNameValuePair("device_code", deviceCode.deviceCode),
-                    BasicNameValuePair("client_secret", this.clientSecret),
+                    BasicNameValuePair("client_secret", clientSecret),
                     BasicNameValuePair("scope", scope),
                 ),
             )
@@ -117,10 +117,10 @@ open class NoumenaCloudAuthClient(
             httpPost.entity =
                 UrlEncodedFormEntity(
                     listOf(
-                        BasicNameValuePair("client_id", this.clientId),
+                        BasicNameValuePair("client_id", clientId),
                         BasicNameValuePair("grant_type", "refresh_token"),
                         BasicNameValuePair("refresh_token", refreshToken),
-                        BasicNameValuePair("client_secret", this.clientSecret),
+                        BasicNameValuePair("client_secret", clientSecret),
                         BasicNameValuePair("scope", scope),
                     ),
                 )

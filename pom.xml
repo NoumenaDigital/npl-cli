@@ -32,7 +32,7 @@
 
     <properties>
         <platform.version>2025.1.11</platform.version>
-        <kotlin.version>2.1.0</kotlin.version>
+        <kotlin.version>2.1.20</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
@@ -242,7 +242,7 @@
                                 <include>**/*IT.*</include>
                             </includes>
                             <environmentVariables>
-                                <TEST_MODE>jar</TEST_MODE>
+                                <TEST_MODE>direct</TEST_MODE>
                             </environmentVariables>
                         </configuration>
                     </plugin>
@@ -377,10 +377,6 @@
                             <includes>
                                 <include>**/*Test.*</include>
                             </includes>
-                            <excludes>
-                                <exclude>**/*IT.*</exclude>
-                                <exclude>**/IT*.*</exclude>
-                            </excludes>
                             <environmentVariables>
                                 <TEST_MODE>direct</TEST_MODE>
                             </environmentVariables>
