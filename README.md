@@ -131,7 +131,7 @@ The `deploy` command allows you to deploy NPL sources to a Noumena Engine instan
 ### Usage
 
 ```bash
-npl deploy --target <target> --sourceDir <directory> [--clear]
+npl deploy --target <target> --source-dir <directory> [--clear]
 ```
 
 Where:
@@ -210,7 +210,7 @@ The `cloud deploy` command allows you to deploy NPL sources to a NOUMENA cloud a
 ### Usage
 
 ```bash
-npl cloud deploy --appId <applicationUUID> --sourceDir <directory>
+npl cloud deploy --appId <applicationUUID> --source-dir <directory>
 ```
 
 That command will deploy your sources to the NOUMENA cloud application.

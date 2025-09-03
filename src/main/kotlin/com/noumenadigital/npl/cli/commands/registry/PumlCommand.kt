@@ -94,6 +94,10 @@ data class PumlCommand(
                 )
             }
 
+//        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+//            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+//        }
+
         return PumlCommand(config.sourceDir.absolutePath, config.outputDir.absolutePath)
     }
 }
