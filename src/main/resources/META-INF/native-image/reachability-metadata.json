@@ -490,6 +490,27 @@
       ]
     },
     {
+      "type": "com.noumenadigital.npl.cli.model.Secrets",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "getIam_username",
+          "parameterTypes": []
+        },
+        {
+          "name": "getIam_password",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.noumenadigital.platform.client.auth.OpenIdConnectService$TokenResponse",
       "allDeclaredFields": true,
       "methods": [

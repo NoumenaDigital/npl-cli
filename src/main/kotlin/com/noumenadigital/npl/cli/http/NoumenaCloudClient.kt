@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.noumenadigital.npl.cli.exception.CloudRestCallException
 import com.noumenadigital.npl.cli.model.Application
+import com.noumenadigital.npl.cli.model.Secrets
 import com.noumenadigital.npl.cli.model.Tenant
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpGet
@@ -129,6 +130,40 @@ open class NoumenaCloudClient(
             }
         } catch (e: Exception) {
             throw CloudRestCallException("Failed to remove the application -  ${e.message ?: e.cause?.message}.", e)
+        }
+    }
+
+    fun fetchSecrets(
+        token: String,
+        tenants: List<Tenant>,
+    ): Secrets {
+        try {
+            val ncApp = findApplication(tenants)
+            if (ncApp == null) {
+                throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
+            }
+
+            val secretsUrl = "${ncBaseUrl}${ncApp.id}/secrets"
+            val httpGet = HttpGet(secretsUrl)
+            httpGet.setHeader("Accept", "application/json")
+            httpGet.setHeader("Authorization", "Bearer $token")
+
+            val client = HttpClients.createDefault()
+            client.use { httpClient ->
+                httpClient.execute(httpGet).use { response ->
+                    val status = response.statusLine.statusCode
+                    val responseText = response.entity?.let { EntityUtils.toString(it) } ?: ""
+
+                    if (status !in 200..299) {
+                        throw CloudRestCallException("Failed to fetch secrets with status $status: $responseText")
+                    }
+
+                    val objectMapper = ObjectMapper().registerKotlinModule()
+                    return objectMapper.readValue(responseText, Secrets::class.java)
+                }
+            }
+        } catch (e: Exception) {
+            throw CloudRestCallException("Failed to fetch application secrets - ${e.message ?: e.cause?.message}.", e)
         }
     }
 
