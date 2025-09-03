@@ -10,15 +10,15 @@ import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudConfig
 import com.noumenadigital.npl.cli.service.CloudAuthManager
-import com.noumenadigital.npl.cli.service.CloudDeployService
+import com.noumenadigital.npl.cli.service.CloudService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import java.io.File
 
 class CloudDeployFrontendCommand(
     val sourcesManager: SourcesManager = SourcesManager("."),
-    val cloudDeployService: CloudDeployService =
-        CloudDeployService(
+    val cloudService: CloudService =
+        CloudService(
             CloudAuthManager(),
             NoumenaCloudClient(NoumenaCloudConfig()),
         ),
@@ -97,7 +97,7 @@ class CloudDeployFrontendCommand(
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
-            CloudDeployService(
+            CloudService(
                 CloudAuthManager(noumenaCloudAuthClient),
                 NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
             )
@@ -107,7 +107,7 @@ class CloudDeployFrontendCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             val archive = sourcesManager.getArchivedSources()
-            cloudDeployService.deployFrontend(archive)
+            cloudService.deployFrontend(archive)
             output.success("Frontend successfully deployed to NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {

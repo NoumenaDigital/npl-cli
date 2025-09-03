@@ -1,8 +1,9 @@
 package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
+import com.noumenadigital.npl.cli.model.Secrets
 
-class CloudDeployService(
+class CloudService(
     val cloudAuthManager: CloudAuthManager,
     val noumenaCloudClient: NoumenaCloudClient,
 ) {
@@ -22,6 +23,12 @@ class CloudDeployService(
         val token = getAccessToken()
         val tenants = noumenaCloudClient.fetchTenants(token)
         noumenaCloudClient.clearApplication(token, tenants)
+    }
+
+    fun getAppSecrets(): Secrets {
+        val token = getAccessToken()
+        val tenants = noumenaCloudClient.fetchTenants(token)
+        return noumenaCloudClient.fetchSecrets(token, tenants)
     }
 
     private fun getAccessToken(): String {

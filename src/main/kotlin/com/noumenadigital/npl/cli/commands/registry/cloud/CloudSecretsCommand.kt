@@ -1,5 +1,7 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
@@ -13,15 +15,15 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudService
 import com.noumenadigital.npl.cli.service.ColorWriter
 
-class CloudClearNplCommand(
+class CloudSecretsCommand(
     private val cloudService: CloudService =
         CloudService(
             CloudAuthManager(),
             NoumenaCloudClient(NoumenaCloudConfig()),
         ),
 ) : CommandExecutor {
-    override val commandName: String = "cloud clear"
-    override val description: String = "Delete NPL sources and clears protocols from the database from the NOUMENA Cloud Application"
+    override val commandName: String = "cloud secrets"
+    override val description: String = "Retrieve application secrets from NOUMENA Cloud"
 
     override val parameters: List<NamedParameter> =
         listOf(
@@ -77,21 +79,23 @@ class CloudClearNplCommand(
         val url = parsedArgs.getValue("url")
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
-        val cloudDeployService =
+        val cloudService =
             CloudService(
                 CloudAuthManager(noumenaCloudAuthClient),
                 NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
             )
-        return CloudClearNplCommand(cloudService = cloudDeployService)
+        return CloudSecretsCommand(cloudService = cloudService)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            cloudService.clearApp()
-            output.success("NPL sources successfully cleared from NOUMENA Cloud app.")
+            val secrets = cloudService.getAppSecrets()
+            val objectMapper = ObjectMapper().registerKotlinModule()
+            val jsonOutput = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(secrets)
+            output.info(jsonOutput)
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
-            throw CloudCommandException(ex.message, ex, "cloud clear")
+            throw CloudCommandException(ex.message, ex, "cloud secrets")
         }
     }
 }
