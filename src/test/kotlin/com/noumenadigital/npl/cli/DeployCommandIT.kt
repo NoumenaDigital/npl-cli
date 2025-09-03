@@ -152,9 +152,9 @@ class DeployCommandIT :
             withConfigDir(tempDir) {
                 val commands =
                     if (withClear) {
-                        listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath, "--clear")
+                        listOf("deploy", "--target", "test-target", "--source-dir", testDirPath, "--clear")
                     } else {
-                        listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath)
+                        listOf("deploy", "--target", "test-target", "--source-dir", testDirPath)
                     }
 
                 runCommand(commands = commands) {
@@ -296,7 +296,7 @@ class DeployCommandIT :
                     var exitCode = -1
 
                     withConfigDir(tempDir) {
-                        runCommand(commands = listOf("deploy", "--sourceDir", testDirPath)) {
+                        runCommand(commands = listOf("deploy", "--source-dir", testDirPath)) {
                             process.waitFor(60, TimeUnit.SECONDS)
                             output = this.output
                             exitCode = process.exitValue()
@@ -333,7 +333,7 @@ class DeployCommandIT :
                     var exitCode = -1
 
                     withConfigDir(tempDir) {
-                        runCommand(commands = listOf("deploy", "--sourceDir", ".")) {
+                        runCommand(commands = listOf("deploy", "--source-dir", ".")) {
                             process.waitFor(60, TimeUnit.SECONDS)
                             output = this.output
                             exitCode = process.exitValue()
@@ -482,7 +482,7 @@ class DeployCommandIT :
                     var exitCode = -1
 
                     withConfigDir(tempDir) {
-                        runCommand(commands = listOf("deploy", "--sourceDir", testDirPath)) {
+                        runCommand(commands = listOf("deploy", "--source-dir", testDirPath)) {
                             process.waitFor(60, TimeUnit.SECONDS)
                             output = this.output
                             exitCode = process.exitValue()
@@ -582,7 +582,7 @@ class DeployCommandIT :
                     var exitCode = -1
 
                     withConfigDir(tempDir) {
-                        runCommand(commands = listOf("deploy", "--target", "test-target", "--sourceDir", testDirPath)) {
+                        runCommand(commands = listOf("deploy", "--target", "test-target", "--source-dir", testDirPath)) {
                             process.waitFor(60, TimeUnit.SECONDS)
                             output = this.output
                             exitCode = process.exitValue()
@@ -616,7 +616,7 @@ class DeployCommandIT :
 
                     withConfigDir(tempDir) {
                         runCommand(
-                            commands = listOf("deploy", "--sourceDir", testDirPath),
+                            commands = listOf("deploy", "--source-dir", testDirPath),
                         ) {
                             process.waitFor(5, TimeUnit.SECONDS)
 
@@ -640,7 +640,7 @@ class DeployCommandIT :
                     process.waitFor(5, TimeUnit.SECONDS)
 
                     val expectedOutput =
-                        "Missing required parameter: --sourceDir <directory>\n${DeployCommand.USAGE_STRING}"
+                        "Missing required parameter: --source-dir <directory>\n${DeployCommand.USAGE_STRING}"
 
                     output.normalize() shouldBe expectedOutput.normalize()
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
@@ -651,7 +651,7 @@ class DeployCommandIT :
                 val testDirPath = getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
 
                 runCommand(
-                    commands = listOf("deploy", "--target", "nonexistent-target", "--sourceDir", testDirPath),
+                    commands = listOf("deploy", "--target", "nonexistent-target", "--source-dir", testDirPath),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
@@ -666,7 +666,7 @@ class DeployCommandIT :
                 val nonExistentDir = "/non/existent/directory"
 
                 runCommand(
-                    commands = listOf("deploy", "--target", "test-target", "--sourceDir", nonExistentDir),
+                    commands = listOf("deploy", "--target", "test-target", "--source-dir", nonExistentDir),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
@@ -680,7 +680,7 @@ class DeployCommandIT :
                 tempFile.deleteOnExit()
 
                 runCommand(
-                    commands = listOf("deploy", "--target", "test-target", "--sourceDir", tempFile.absolutePath),
+                    commands = listOf("deploy", "--target", "test-target", "--source-dir", tempFile.absolutePath),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 

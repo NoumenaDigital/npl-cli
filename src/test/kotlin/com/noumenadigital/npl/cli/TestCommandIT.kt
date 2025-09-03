@@ -33,7 +33,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", "--sourceDir", testDirPath),
+                        commands = listOf("test", "--source-dir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -57,7 +57,7 @@ class TestCommandIT :
                     val relativePath = File(".").canonicalFile.toPath().relativize(testPath)
 
                     runCommand(
-                        commands = listOf("test", "--sourceDir", relativePath.pathString, "--coverage"),
+                        commands = listOf("test", "--source-dir", relativePath.pathString, "--coverage"),
                     ) {
                         process.waitFor()
 
@@ -115,7 +115,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", "--sourceDir", testDirPath, "--coverage"),
+                        commands = listOf("test", "--source-dir", testDirPath, "--coverage"),
                     ) {
                         process.waitFor()
 
@@ -171,7 +171,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "test_failure")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", "--sourceDir", testDirPath),
+                        commands = listOf("test", "--source-dir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -193,7 +193,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("failure", "test_assertion_failed")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", "--sourceDir", testDirPath),
+                        commands = listOf("test", "--source-dir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -213,7 +213,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("failure", "test_failed")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", "--sourceDir", testDirPath),
+                        commands = listOf("test", "--source-dir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -237,7 +237,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("success", "empty_tests_folder")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", "--sourceDir", testDirPath),
+                        commands = listOf("test", "--source-dir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -254,7 +254,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("failure", "single_file")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", "--sourceDir", testDirPath),
+                        commands = listOf("test", "--source-dir", testDirPath),
                     ) {
                         process.waitFor()
 
@@ -276,7 +276,7 @@ class TestCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("warnings", "compilation")).toAbsolutePath().toString()
                     runCommand(
-                        commands = listOf("test", "--sourceDir", testDirPath),
+                        commands = listOf("test", "--source-dir", testDirPath),
                     ) {
                         process.waitFor()
 

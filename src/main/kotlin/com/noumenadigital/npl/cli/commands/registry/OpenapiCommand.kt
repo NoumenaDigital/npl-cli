@@ -38,7 +38,7 @@ data class OpenapiCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -56,7 +56,7 @@ data class OpenapiCommand(
                 isRequiredForMcp = false,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -78,9 +78,9 @@ data class OpenapiCommand(
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
-        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
+        val srcDir = parsedArgs.getValue("source-dir") ?: CURRENT_DIRECTORY
         val rules = parsedArgs.getValue("rules")
-        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
+        val outputDir = parsedArgs.getValue("output-dir") ?: CURRENT_DIRECTORY
         return OpenapiCommand(srcDir, rules, outputDir)
     }
 

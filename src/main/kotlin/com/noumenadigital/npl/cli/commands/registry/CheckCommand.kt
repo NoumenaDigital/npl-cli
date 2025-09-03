@@ -20,7 +20,7 @@ data class CheckCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -37,7 +37,7 @@ data class CheckCommand(
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
-        val srcDir = parsedArgs.getValue("sourceDir") ?: "."
+        val srcDir = parsedArgs.getValue("source-dir") ?: "."
         return CheckCommand(srcDir = srcDir)
     }
 

@@ -50,7 +50,7 @@ class PumlCommandIT :
 
         test("Puml command: Happy path") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
-                runCommand(commands = listOf("puml", "--sourceDir", absolutePath)) {
+                runCommand(commands = listOf("puml", "--source-dir", absolutePath)) {
                     process.waitFor()
 
                     val pumlDir = workingDirectory.resolve("puml")
@@ -79,7 +79,7 @@ class PumlCommandIT :
         test("Puml command: relative path") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
                 val dir = Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files")
-                runCommand(commands = listOf("puml", "--sourceDir", dir.pathString)) {
+                runCommand(commands = listOf("puml", "--source-dir", dir.pathString)) {
                     process.waitFor()
 
                     val pumlDir = workingDirectory.resolve("puml")
@@ -107,14 +107,14 @@ class PumlCommandIT :
 
         test("Puml command: overwrite existing files") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
-                runCommand(commands = listOf("puml", "--sourceDir", absolutePath)) {
+                runCommand(commands = listOf("puml", "--source-dir", absolutePath)) {
                     process.waitFor()
 
                     workingDirectory.resolve("puml")
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
 
-                runCommand(commands = listOf("puml", "--sourceDir", absolutePath)) {
+                runCommand(commands = listOf("puml", "--source-dir", absolutePath)) {
                     process.waitFor()
 
                     workingDirectory.resolve("puml")
@@ -124,7 +124,7 @@ class PumlCommandIT :
         }
 
         test("Puml command: invalid path") {
-            runCommand(commands = listOf("puml", "--sourceDir", "non-existing-path")) {
+            runCommand(commands = listOf("puml", "--source-dir", "non-existing-path")) {
                 process.waitFor()
                 val expectedOutput = "Source directory does not exist or is not a directory: non-existing-path"
 
@@ -134,7 +134,7 @@ class PumlCommandIT :
 
         test("Puml command: directory pointing to a file") {
             val file = Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files", "test_iou.npl")
-            runCommand(commands = listOf("puml", "--sourceDir", file.pathString)) {
+            runCommand(commands = listOf("puml", "--source-dir", file.pathString)) {
                 process.waitFor()
                 val expectedOutput = "Source directory does not exist or is not a directory: ${file.pathString}".normalize()
 

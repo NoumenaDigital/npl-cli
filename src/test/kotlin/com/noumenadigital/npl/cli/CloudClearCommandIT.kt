@@ -225,7 +225,7 @@ class CloudClearCommandIT :
                                 "tenantslug",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -250,7 +250,7 @@ class CloudClearCommandIT :
                             listOf(
                                 "cloud",
                                 "clear",
-                                "--clientId",
+                                "--client-id",
                                 "wrong",
                                 "--app",
                                 "appslug",
@@ -258,7 +258,7 @@ class CloudClearCommandIT :
                                 "tenantslug",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -287,7 +287,7 @@ class CloudClearCommandIT :
                                 "non-existing",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -316,7 +316,7 @@ class CloudClearCommandIT :
                                 "default_tenant",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -346,7 +346,7 @@ class CloudClearCommandIT :
                                 "default_tenant",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {

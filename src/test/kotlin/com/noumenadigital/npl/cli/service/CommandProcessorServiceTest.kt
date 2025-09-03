@@ -36,26 +36,26 @@ class CommandProcessorServiceTest :
                     version    Display the current version of the NPL CLI
                     help       Display the description for npl-cli commands
                     init       Initializes a new project
-                                 --projectDir <projectDir>  Directory where project files will be stored. Created if it doesn’t exist
+                                 --project-dir <project-dir>  Directory where project files will be stored. Created if it doesn’t exist
                                  --bare  Installs an empty project structure (defaults to false)
-                                 --templateUrl <templateUrl>  URL of a repository containing a ZIP archive of the project template. Overrides the default template
+                                 --template-url <template-url>  URL of a repository containing a ZIP archive of the project template. Overrides the default template
                     check      Validate the correctness of NPL sources
-                                 --sourceDir <directory>  Directory containing NPL source files (defaults to current directory)
+                                 --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
                     test       Run the NPL tests
-                                 --sourceDir <directory>  Source directory containing NPL tests to run. Must be a parent directory of all required sources (both production and test). (defaults to current directory)
+                                 --source-dir <directory>  Source directory containing NPL tests to run. Must be a parent directory of all required sources (both production and test). (defaults to current directory)
                                  --coverage  Report test coverage details (printed to console as well as coverage.xml)
-                                 --outputDir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
+                                 --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     openapi    Generate the openapi specifications of NPL api
-                                 --sourceDir <directory>  Directory containing NPL source files (defaults to current directory)
+                                 --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
                                  --rules <rules descriptor path>  Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system
-                                 --outputDir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
+                                 --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     puml       Generate a puml diagram from source in the given directory
-                                 --sourceDir <directory>  Directory containing NPL source files (defaults to current directory)
-                                 --outputDir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
+                                 --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
+                                 --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
                                  --target <name>  Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.
-                                 --sourceDir <directory> (required)  Directory containing NPL sources
-                                 --configFile <path>  Path to deploy.yml configuration file
+                                 --source-dir <directory> (required)  Directory containing NPL sources
+                                 --config-file <path>  Path to deploy.yml configuration file
                                  --clear  Clear application contents before deployment
                     cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
                     mcp        Start an MCP server exposing NPL CLI functionality over stdio

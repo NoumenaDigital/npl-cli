@@ -23,7 +23,7 @@ data class PumlCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -32,7 +32,7 @@ data class PumlCommand(
                 isRequiredForMcp = true,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -89,8 +89,8 @@ data class PumlCommand(
             throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
         }
 
-        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
-        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
+        val srcDir = parsedArgs.getValue("source-dir") ?: CURRENT_DIRECTORY
+        val outputDir = parsedArgs.getValue("output-dir") ?: CURRENT_DIRECTORY
         return PumlCommand(srcDir = srcDir, outputDir = outputDir)
     }
 

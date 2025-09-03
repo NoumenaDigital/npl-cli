@@ -31,7 +31,7 @@ data class TestCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description =
                     "Source directory containing NPL tests to run." +
                         " Must be a parent directory of all required sources (both production and test).",
@@ -47,7 +47,7 @@ data class TestCommand(
                 isRequired = false,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -68,7 +68,7 @@ data class TestCommand(
                 return ExitCode.USAGE_ERROR
             }
 
-            val sourcePath = parsedArgs.getValue("sourceDir") ?: "."
+            val sourcePath = parsedArgs.getValue("source-dir") ?: "."
             val sourceDir = File(sourcePath)
             if (!sourceDir.isDirectory || !sourceDir.exists()) {
                 output.error(
@@ -78,7 +78,7 @@ data class TestCommand(
             }
 
             val showCoverage = parsedArgs.hasFlag("coverage")
-            val outputDir = parsedArgs.getValue("outputDir") ?: "."
+            val outputDir = parsedArgs.getValue("output-dir") ?: "."
             val coverageAnalyzer: CoverageAnalyzer = coverageAnalyzer(showCoverage, sourceDir, outputDir)
             val testHarness = TestHarness(SourcesManager(sourceDir.absolutePath), coverageAnalyzer)
 

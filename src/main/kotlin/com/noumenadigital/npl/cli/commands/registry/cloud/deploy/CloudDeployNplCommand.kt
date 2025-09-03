@@ -20,7 +20,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.isRegularFile
 import kotlin.streams.asSequence
-import kotlin.use
 
 class CloudDeployNplCommand(
     val sourcesManager: SourcesManager = SourcesManager("."),
@@ -63,21 +62,21 @@ class CloudDeployNplCommand(
                 valuePlaceholder = "<url>",
             ),
             NamedParameter(
-                name = "clientId",
+                name = "client-id",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
-                name = "clientSecret",
+                name = "client-secret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "authUrl",
+                name = "auth-url",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -97,9 +96,9 @@ class CloudDeployNplCommand(
                 commandName = "cloud deploy",
             )
         }
-        val clientId = parsedArgs.getValue("clientId")
-        val clientSecret = parsedArgs.getValue("clientSecret")
-        val authUrl = parsedArgs.getValue("authUrl")
+        val clientId = parsedArgs.getValue("client-id")
+        val clientSecret = parsedArgs.getValue("client-secret")
+        val authUrl = parsedArgs.getValue("auth-url")
         val url = parsedArgs.getValue("url")
         val sourcesManager = SourcesManager(migrationFile.parent.toString())
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)

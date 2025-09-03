@@ -28,7 +28,7 @@ class DeployCommand(
                 valuePlaceholder = "<name>",
             ),
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL sources",
                 isRequired = true,
                 valuePlaceholder = "<directory>",
@@ -36,7 +36,7 @@ class DeployCommand(
                 isRequiredForMcp = true,
             ),
             NamedParameter(
-                name = "configFile",
+                name = "config-file",
                 description = "Path to deploy.yml configuration file",
                 isRequired = false,
                 valuePlaceholder = "<path>",
@@ -65,11 +65,11 @@ class DeployCommand(
 
         val clearFlag = parsedArgs.hasFlag("clear")
         val targetValue = parsedArgs.getValue("target")
-        val sourceDirValue = parsedArgs.getValue("sourceDir")
-        val configFileValue = parsedArgs.getValue("configFile")
+        val sourceDirValue = parsedArgs.getValue("source-dir")
+        val configFileValue = parsedArgs.getValue("config-file")
 
         if (sourceDirValue == null) {
-            output.error("Missing required parameter: --sourceDir <directory>")
+            output.error("Missing required parameter: --source-dir <directory>")
             displayUsage(output)
             return ExitCode.GENERAL_ERROR
         }
@@ -184,12 +184,12 @@ class DeployCommand(
     companion object {
         val USAGE_STRING =
             """
-            Usage: deploy --sourceDir <directory> [--target <name>] [--configFile <path>] [--clear]
+            Usage: deploy --source-dir <directory> [--target <name>] [--config-file <path>] [--clear]
 
             Deploys NPL sources to a Noumena Engine instance.
 
             Arguments:
-              --sourceDir <directory>   Directory containing NPL sources (required).
+              --source-dir <directory>   Directory containing NPL sources (required).
                                  IMPORTANT: The directory must contain a valid NPL source structure, including
                                  migrations. E.g.:
                                   main
@@ -203,11 +203,11 @@ class DeployCommand(
                                 If --target is omitted, the 'defaultTarget' from deploy.yml is used if set.
 
             Options:
-              --configFile <path> Path to deploy.yml configuration file.
+              --config-file <path> Path to deploy.yml configuration file.
                                   If not specified, looks for .npl/deploy.yml in current directory or home directory.
               --clear             Clear application contents before deployment.
 
-            Configuration for --target is read from .npl/deploy.yml (current dir or home dir) unless --configFile is specified.
+            Configuration for --target is read from .npl/deploy.yml (current dir or home dir) unless --config-file is specified.
             """.trimIndent()
     }
 }

@@ -228,7 +228,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -254,7 +254,7 @@ class CloudDeployNplCommandIT :
                                 "cloud",
                                 "deploy",
                                 "npl",
-                                "--clientId",
+                                "--client-id",
                                 "wrong",
                                 "--app",
                                 "appslug",
@@ -264,7 +264,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -296,7 +296,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -329,7 +329,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -361,7 +361,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -393,7 +393,7 @@ class CloudDeployNplCommandIT :
                                 "other-migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {

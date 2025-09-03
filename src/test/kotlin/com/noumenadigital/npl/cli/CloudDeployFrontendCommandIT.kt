@@ -264,7 +264,7 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -290,7 +290,7 @@ class CloudDeployFrontendCommandIT :
                                 "cloud",
                                 "deploy",
                                 "frontend",
-                                "--clientId",
+                                "--client-id",
                                 "wrong",
                                 "--app",
                                 "appslug",
@@ -300,7 +300,7 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -332,7 +332,7 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -365,7 +365,7 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -397,7 +397,7 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -429,7 +429,7 @@ class CloudDeployFrontendCommandIT :
                                 "other-build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
