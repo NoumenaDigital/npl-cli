@@ -158,7 +158,7 @@ class DeployCommand(
             }
 
             is DeployResult.DeploymentFailed -> {
-                output.error("Error deploying NPL sources: ${deployResult.exception.message ?: "Unknown deployment failure"}")
+                output.error("Error deploying NPL sources: ${deployResult.exception.message ?: "Unknown deployment failure"}. In case of Authorization exception, check the target Engine is running and the credentials used in the deploy.yml configuration file.")
                 ExitCode.GENERAL_ERROR
             }
 
