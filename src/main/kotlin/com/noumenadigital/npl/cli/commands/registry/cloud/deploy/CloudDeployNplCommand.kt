@@ -23,8 +23,8 @@ import kotlin.streams.asSequence
 import kotlin.use
 
 class CloudDeployNplCommand(
-    val sourcesManager: SourcesManager = SourcesManager("."),
-    val cloudDeployService: CloudDeployService =
+    private val sourcesManager: SourcesManager = SourcesManager("."),
+    private val cloudDeployService: CloudDeployService =
         CloudDeployService(
             CloudAuthManager(),
             NoumenaCloudClient(NoumenaCloudConfig()),
@@ -134,7 +134,7 @@ class CloudDeployNplCommand(
         }
     }
 
-    fun findSingleFile(
+    private fun findSingleFile(
         fileName: String,
         searchDir: String = ".",
     ): File {
