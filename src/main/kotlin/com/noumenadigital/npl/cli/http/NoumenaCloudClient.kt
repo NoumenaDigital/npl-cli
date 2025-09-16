@@ -69,8 +69,9 @@ open class NoumenaCloudClient(
         tenants: List<Tenant>,
     ) {
         try {
-            val ncApp = findApplication(tenants)
-                ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
+            val ncApp =
+                findApplication(tenants)
+                    ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
             val deployUrl = "$ncBaseUrl/${ncApp.id}/deploy"
             val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
 
@@ -109,8 +110,9 @@ open class NoumenaCloudClient(
         tenants: List<Tenant>,
     ) {
         try {
-            val ncApp = findApplication(tenants)
-                ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
+            val ncApp =
+                findApplication(tenants)
+                    ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant slug ${config.tenantSlug}")
             val clearUrl = "$ncBaseUrl/${ncApp.id}/clear"
             val httpDelete = HttpDelete(clearUrl)
             httpDelete.setHeader("Accept", "application/json")
@@ -134,8 +136,9 @@ open class NoumenaCloudClient(
         tenants: List<Tenant>,
     ) {
         try {
-            val ncApp = findApplication(tenants)
-                ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant ${config.tenantSlug}")
+            val ncApp =
+                findApplication(tenants)
+                    ?: throw CloudRestCallException("Application slug ${config.appSlug} doesn't exist for tenant ${config.tenantSlug}")
             val deployUrl = "$ncBaseUrl/${ncApp.id}/uploadwebsite"
             val boundary = "----NoumenaBoundary" + UUID.randomUUID().toString().replace("-", "")
 

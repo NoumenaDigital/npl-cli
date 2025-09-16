@@ -24,8 +24,8 @@ class CloudServiceAccountDeployNplCommandIT :
 
                 mockOidc.dispatcher =
                     object : Dispatcher() {
-                        override fun dispatch(request: RecordedRequest): MockResponse {
-                            return when (request.path) {
+                        override fun dispatch(request: RecordedRequest): MockResponse =
+                            when (request.path) {
                                 "/realms/paas/protocol/openid-connect/token" -> {
                                     val body = request.body.readUtf8()
                                     if (body.contains("client_id=wrong") || body.contains("client_secret=wrong")) {
@@ -52,13 +52,12 @@ class CloudServiceAccountDeployNplCommandIT :
 
                                 else -> MockResponse().setResponseCode(404)
                             }
-                        }
                     }
 
                 mockNC.dispatcher =
                     object : Dispatcher() {
-                        override fun dispatch(request: RecordedRequest): MockResponse {
-                            return when (request.path) {
+                        override fun dispatch(request: RecordedRequest): MockResponse =
+                            when (request.path) {
                                 "/api/v1/tenants" -> {
                                     MockResponse()
                                         .setResponseCode(200)
@@ -98,7 +97,6 @@ class CloudServiceAccountDeployNplCommandIT :
 
                                 else -> MockResponse().setResponseCode(404)
                             }
-                        }
                     }
             }
 
@@ -125,25 +123,26 @@ class CloudServiceAccountDeployNplCommandIT :
                 withTestContext {
                     runCommand(
                         commands =
-                        listOf(
-                            "cloud",
-                            "deploy",
-                            "npl",
-                            "--app",
-                            "appslug",
-                            "--tenant",
-                            "tenantslug",
-                            "--migration",
-                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                            "--url",
-                            mockNC.url("/").toString(),
-                            "--authUrl",
-                            mockOidc.url("/realms/paas/").toString(),
-                        ),
-                        env = mapOf(
-                            "NPL_SA_CLIENT_ID" to "svc-id",
-                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
-                        ),
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "npl",
+                                "--app",
+                                "appslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--migration",
+                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                        env =
+                            mapOf(
+                                "NPL_SA_CLIENT_ID" to "svc-id",
+                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                            ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
@@ -165,25 +164,26 @@ class CloudServiceAccountDeployNplCommandIT :
                 withTestContext {
                     runCommand(
                         commands =
-                        listOf(
-                            "cloud",
-                            "deploy",
-                            "npl",
-                            "--app",
-                            "appslug",
-                            "--tenant",
-                            "tenantslug",
-                            "--migration",
-                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                            "--url",
-                            mockNC.url("/").toString(),
-                            "--authUrl",
-                            mockOidc.url("/realms/paas/").toString(),
-                        ),
-                        env = mapOf(
-                            "NPL_SA_CLIENT_ID" to "wrong",
-                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
-                        ),
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "npl",
+                                "--app",
+                                "appslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--migration",
+                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                        env =
+                            mapOf(
+                                "NPL_SA_CLIENT_ID" to "wrong",
+                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                            ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
@@ -202,25 +202,26 @@ class CloudServiceAccountDeployNplCommandIT :
                 withTestContext {
                     runCommand(
                         commands =
-                        listOf(
-                            "cloud",
-                            "deploy",
-                            "npl",
-                            "--app",
-                            "appslug",
-                            "--tenant",
-                            "tenantslug",
-                            "--migration",
-                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                            "--url",
-                            "non-url",
-                            "--authUrl",
-                            mockOidc.url("/realms/paas/").toString(),
-                        ),
-                        env = mapOf(
-                            "NPL_SA_CLIENT_ID" to "svc-id",
-                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
-                        ),
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "npl",
+                                "--app",
+                                "appslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--migration",
+                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--url",
+                                "non-url",
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                        env =
+                            mapOf(
+                                "NPL_SA_CLIENT_ID" to "svc-id",
+                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                            ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
@@ -240,25 +241,26 @@ class CloudServiceAccountDeployNplCommandIT :
                 withTestContext {
                     runCommand(
                         commands =
-                        listOf(
-                            "cloud",
-                            "deploy",
-                            "npl",
-                            "--app",
-                            "notappslug",
-                            "--tenant",
-                            "tenantslug",
-                            "--migration",
-                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                            "--url",
-                            mockNC.url("/").toString(),
-                            "--authUrl",
-                            mockOidc.url("/realms/paas/").toString(),
-                        ),
-                        env = mapOf(
-                            "NPL_SA_CLIENT_ID" to "svc-id",
-                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
-                        ),
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "npl",
+                                "--app",
+                                "notappslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--migration",
+                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                        env =
+                            mapOf(
+                                "NPL_SA_CLIENT_ID" to "svc-id",
+                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                            ),
                     ) {
                         process.waitFor()
                         val expectedOutput =
@@ -278,25 +280,26 @@ class CloudServiceAccountDeployNplCommandIT :
                 withTestContext {
                     runCommand(
                         commands =
-                        listOf(
-                            "cloud",
-                            "deploy",
-                            "npl",
-                            "--app",
-                            "appslug",
-                            "--tenant",
-                            "tenantslug",
-                            "--migration",
-                            "other-migration.yml",
-                            "--url",
-                            mockNC.url("/").toString(),
-                            "--authUrl",
-                            mockOidc.url("/realms/paas/").toString(),
-                        ),
-                        env = mapOf(
-                            "NPL_SA_CLIENT_ID" to "svc-id",
-                            "NPL_SA_CLIENT_SECRET" to "svc-secret",
-                        ),
+                            listOf(
+                                "cloud",
+                                "deploy",
+                                "npl",
+                                "--app",
+                                "appslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--migration",
+                                "other-migration.yml",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--authUrl",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                        env =
+                            mapOf(
+                                "NPL_SA_CLIENT_ID" to "svc-id",
+                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                            ),
                     ) {
                         process.waitFor()
                         val expectedOutput =

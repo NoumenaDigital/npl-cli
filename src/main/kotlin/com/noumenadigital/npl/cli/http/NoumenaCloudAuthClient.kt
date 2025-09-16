@@ -138,7 +138,10 @@ open class NoumenaCloudAuthClient(
         }
     }
 
-    open fun getAccessTokenByClientCredentials(serviceClientId: String, serviceClientSecret: String): TokenResponse {
+    open fun getAccessTokenByClientCredentials(
+        serviceClientId: String,
+        serviceClientSecret: String,
+    ): TokenResponse {
         try {
             val httpPost = HttpPost("$keycloakUrl/token")
             httpPost.setHeader("Content-Type", contentType)

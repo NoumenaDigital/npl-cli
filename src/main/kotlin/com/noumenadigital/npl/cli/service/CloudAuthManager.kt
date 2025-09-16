@@ -65,7 +65,10 @@ class CloudAuthManager(
         return updatedToken
     }
 
-    fun getServiceAccountAccessToken(clientId: String, clientSecret: String): String {
+    fun getServiceAccountAccessToken(
+        clientId: String,
+        clientSecret: String,
+    ): String {
         val token = noumenaCloudAuthClient.getAccessTokenByClientCredentials(clientId, clientSecret)
         val accessToken = token.accessToken
         if (accessToken.isNullOrBlank()) {
