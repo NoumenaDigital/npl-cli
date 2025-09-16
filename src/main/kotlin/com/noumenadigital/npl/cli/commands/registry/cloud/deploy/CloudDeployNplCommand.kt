@@ -114,9 +114,8 @@ class CloudDeployNplCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            // Read service account credentials first from env, then from system properties (used in tests direct mode)
-            val saClientId = System.getenv("NPL_SA_CLIENT_ID") ?: System.getProperty("NPL_SA_CLIENT_ID")
-            val saClientSecret = System.getenv("NPL_SA_CLIENT_SECRET") ?: System.getProperty("NPL_SA_CLIENT_SECRET")
+            val saClientId = System.getenv("NPL_SA_CLIENT_ID")
+            val saClientSecret = System.getenv("NPL_SA_CLIENT_SECRET")
             val archive = sourcesManager.getArchivedSources()
 
             if (!saClientId.isNullOrBlank() && !saClientSecret.isNullOrBlank()) {
