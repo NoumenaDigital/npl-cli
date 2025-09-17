@@ -143,8 +143,8 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SA_CLIENT_ID" to "svc-id",
-                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
                         process.waitFor()
@@ -184,8 +184,8 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SA_CLIENT_ID" to "wrong",
-                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "wrong",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
                         process.waitFor()
@@ -222,8 +222,8 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SA_CLIENT_ID" to "svc-id",
-                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
                         process.waitFor()
@@ -261,8 +261,8 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SA_CLIENT_ID" to "svc-id",
-                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
                         process.waitFor()
@@ -300,8 +300,8 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SA_CLIENT_ID" to "svc-id",
-                                "NPL_SA_CLIENT_SECRET" to "svc-secret",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
                         process.waitFor()

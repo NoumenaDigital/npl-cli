@@ -106,8 +106,8 @@ class CloudDeployFrontendCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            val saClientId = System.getenv("NPL_SA_CLIENT_ID") ?: System.getProperty("NPL_SA_CLIENT_ID")
-            val saClientSecret = System.getenv("NPL_SA_CLIENT_SECRET") ?: System.getProperty("NPL_SA_CLIENT_SECRET")
+            val saClientId = System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_ID")
+            val saClientSecret = System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
             val archive = sourcesManager.getArchivedSources()
 
             if (!saClientId.isNullOrBlank() && !saClientSecret.isNullOrBlank()) {
