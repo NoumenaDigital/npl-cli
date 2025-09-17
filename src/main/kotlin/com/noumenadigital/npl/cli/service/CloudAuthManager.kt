@@ -69,10 +69,11 @@ class CloudAuthManager(
         clientId: String,
         clientSecret: String,
     ): String {
-        val token = noumenaCloudAuthClient.getAccessTokenByClientCredentials(
-            serviceClientId = clientId,
-            serviceClientSecret = clientSecret
-        )
+        val token =
+            noumenaCloudAuthClient.getAccessTokenByClientCredentials(
+                serviceClientId = clientId,
+                serviceClientSecret = clientSecret,
+            )
         val accessToken = token.accessToken
         if (accessToken.isNullOrBlank()) {
             throw CloudCommandException("Access token is not available for the provided service account credentials.")

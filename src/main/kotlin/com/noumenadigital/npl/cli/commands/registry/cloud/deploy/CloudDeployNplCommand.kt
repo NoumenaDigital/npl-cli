@@ -115,7 +115,8 @@ class CloudDeployNplCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             val saClientId = cloudDeployService.noumenaCloudClient.config.tenantSlug
-            val saClientSecret = System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET") ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
+            val saClientSecret =
+                System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET") ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
             val archive = sourcesManager.getArchivedSources()
 
             if (!saClientSecret.isNullOrBlank()) {
