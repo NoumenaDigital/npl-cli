@@ -3,7 +3,6 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.engine.test.logging.info
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -28,7 +27,7 @@ class CloudServiceAccountDeployNplCommandIT :
                             when (request.path) {
                                 "/realms/paas/protocol/openid-connect/token" -> {
                                     val body = request.body.readUtf8()
-                                    if (body.contains("client_id=wrong") || body.contains("client_secret=wrong")) {
+                                    if (body.contains("client_secret=wrong")) {
                                         MockResponse()
                                             .setResponseCode(401)
                                             .setBody("Client Error.")
@@ -119,7 +118,6 @@ class CloudServiceAccountDeployNplCommandIT :
 
         context("success") {
             test("cloud deploy npl via service account success") {
-                info { "test mode: " + System.getenv("TEST_MODE") }
                 withTestContext {
                     runCommand(
                         commands =
@@ -140,7 +138,6 @@ class CloudServiceAccountDeployNplCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
                                 "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
@@ -160,7 +157,7 @@ class CloudServiceAccountDeployNplCommandIT :
         }
 
         context("error") {
-            test("cloud deploy npl via service account failed wrong clientId") {
+            test("cloud deploy npl via service account failed wrong clientSecret") {
                 withTestContext {
                     runCommand(
                         commands =
@@ -181,8 +178,7 @@ class CloudServiceAccountDeployNplCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "wrong",
-                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "wrong",
                             ),
                     ) {
                         process.waitFor()
@@ -219,7 +215,6 @@ class CloudServiceAccountDeployNplCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
                                 "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
@@ -258,7 +253,6 @@ class CloudServiceAccountDeployNplCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
                                 "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
@@ -297,7 +291,6 @@ class CloudServiceAccountDeployNplCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
                                 "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {

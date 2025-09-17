@@ -27,7 +27,7 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             when (request.path) {
                                 "/realms/paas/protocol/openid-connect/token" -> {
                                     val body = request.body.readUtf8()
-                                    if (body.contains("client_id=wrong") || body.contains("client_secret=wrong")) {
+                                    if (body.contains("client_secret=wrong")) {
                                         MockResponse()
                                             .setResponseCode(401)
                                             .setBody("Client Error.")
@@ -143,7 +143,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
                                 "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
@@ -163,7 +162,7 @@ class CloudServiceAccountDeployFrontendCommandIT :
         }
 
         context("error") {
-            test("cloud deploy frontend via service account failed wrong clientId") {
+            test("cloud deploy frontend via service account failed wrong clientSecret") {
                 withTestContext {
                     runCommand(
                         commands =
@@ -184,8 +183,7 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "wrong",
-                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
+                                "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "wrong",
                             ),
                     ) {
                         process.waitFor()
@@ -222,7 +220,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
                                 "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
@@ -261,7 +258,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
                                 "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {
@@ -300,7 +296,6 @@ class CloudServiceAccountDeployFrontendCommandIT :
                             ),
                         env =
                             mapOf(
-                                "NPL_SERVICE_ACCOUNT_CLIENT_ID" to "svc-id",
                                 "NPL_SERVICE_ACCOUNT_CLIENT_SECRET" to "svc-secret",
                             ),
                     ) {

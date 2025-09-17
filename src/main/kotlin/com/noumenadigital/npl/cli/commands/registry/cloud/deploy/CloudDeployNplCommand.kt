@@ -114,11 +114,11 @@ class CloudDeployNplCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            val saClientId = System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_ID")
-            val saClientSecret = System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
+            val saClientId = cloudDeployService.noumenaCloudClient.config.tenantSlug
+            val saClientSecret = System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET") ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
             val archive = sourcesManager.getArchivedSources()
 
-            if (!saClientId.isNullOrBlank() && !saClientSecret.isNullOrBlank()) {
+            if (!saClientSecret.isNullOrBlank()) {
                 output.info("Preparing to deploy NPL application to NOUMENA Cloud using service account...")
                 val accessToken = cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
                 output.success("Successfully authenticated with service account credentials")
