@@ -75,6 +75,11 @@ object CommandArgumentParser {
 
         fun getValue(name: String): String? = values[name]
 
+        fun getValueOrElse(
+            name: String,
+            defaultValue: String?,
+        ): String? = values[name] ?: defaultValue
+
         fun getRequiredValue(name: String): String = values[name] ?: throw RequiredParameterMissing(name)
     }
 }
