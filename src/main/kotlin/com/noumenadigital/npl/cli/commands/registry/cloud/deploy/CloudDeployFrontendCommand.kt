@@ -75,7 +75,6 @@ class CloudDeployFrontendCommand(
                 isHidden = true,
                 valuePlaceholder = "<authUrl>",
             ),
-            Env,
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
