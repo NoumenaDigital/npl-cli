@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.EnvironmentVariable
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -16,8 +17,8 @@ import com.noumenadigital.npl.cli.service.SourcesManager
 import java.io.File
 
 class CloudDeployFrontendCommand(
-    val sourcesManager: SourcesManager = SourcesManager("."),
-    val cloudDeployService: CloudDeployService =
+    private val sourcesManager: SourcesManager = SourcesManager("."),
+    private val cloudDeployService: CloudDeployService =
         CloudDeployService(
             CloudAuthManager(),
             NoumenaCloudClient(NoumenaCloudConfig()),
@@ -74,6 +75,15 @@ class CloudDeployFrontendCommand(
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<authUrl>",
+            ),
+        )
+
+    override val envVariables: List<EnvironmentVariable> =
+        listOf(
+            EnvironmentVariable(
+                name = "NPL_SERVICE_ACCOUNT_CLIENT_SECRET",
+                description = "Client secret for the service account to use for authentication",
+                isRequired = false,
             ),
         )
 
