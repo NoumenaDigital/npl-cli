@@ -137,4 +137,34 @@ open class NoumenaCloudAuthClient(
             throw CloudRestCallException(ex.message ?: ex.cause?.message ?: "Unknown error.", ex)
         }
     }
+
+    open fun getAccessTokenByClientCredentials(
+        serviceClientId: String,
+        serviceClientSecret: String,
+    ): TokenResponse {
+        try {
+            val httpPost = HttpPost("$keycloakUrl/token")
+            httpPost.setHeader("Content-Type", contentType)
+            httpPost.entity =
+                UrlEncodedFormEntity(
+                    listOf(
+                        BasicNameValuePair("client_id", serviceClientId),
+                        BasicNameValuePair("client_secret", serviceClientSecret),
+                        BasicNameValuePair("grant_type", "client_credentials"),
+                    ),
+                )
+
+            client.execute(httpPost).use { response ->
+                val status = response.statusLine.statusCode
+                val entity = response.entity ?: throw CloudRestCallException("Empty response entity.")
+                val json = EntityUtils.toString(entity)
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Cannot get access token using client credentials $status - $json")
+                }
+                return objectMapper.readValue(json)
+            }
+        } catch (ex: Exception) {
+            throw CloudRestCallException(ex.message ?: ex.cause?.message ?: "Unknown error.", ex)
+        }
+    }
 }

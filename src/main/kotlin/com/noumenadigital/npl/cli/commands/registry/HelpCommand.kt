@@ -43,6 +43,14 @@ open class HelpCommand : CommandExecutor {
                         }
                     output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
                 }
+
+            if (executor.envVariables.isNotEmpty()) {
+                val envIndent = " ".repeat(commandPadding + 2)
+                executor.envVariables.forEach { envVar ->
+                    val requiredMark = if (envVar.isRequired) " (required)" else ""
+                    output.info("$envIndent${envVar.name}  ${envVar.type}$requiredMark: ${envVar.description}")
+                }
+            }
         }
     }
 }
