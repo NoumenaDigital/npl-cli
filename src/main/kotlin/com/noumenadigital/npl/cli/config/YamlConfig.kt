@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,13 +22,13 @@ data class YamlConfig(
     )
 
     data class Cloud(
-        val tenant: String? = null,
         val app: String? = null,
-        val url: String? = null,
         val authUrl: String? = null,
-        val target: String? = null,
         val clear: Boolean = false,
         val deploymentUrl: String? = null,
+        val target: String? = null,
+        val tenant: String? = null,
+        val url: String? = null,
     )
 
     data class Local(
@@ -53,7 +51,7 @@ data class YamlConfig(
 }
 
 object YAMLConfigParser {
-    private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
+    private val mapper = ObjectMapper(YAMLFactory())
 
     fun parse(): YamlConfig? {
         val configFile = File("npl.yml")
