@@ -103,7 +103,7 @@ The NPL CLI supports the use of service accounts for authentication and authoriz
 Cloud. Service accounts are special accounts that belong to your application or a virtual machine (VM), instead of to an
 individual end user. They are used for machine-to-machine communication.
 
-To create a secret key for a service account, login to your NOUMENA Cloud account, navigate to the "Settings" page of
+To create a secret key for a service account, log in to your NOUMENA Cloud account, navigate to the "Settings" page of
 _your tenant_. You will find the "Service Accounts" section where you can generate a secret key. Note that this option
 is only available to the tenant's owner(s).
 
