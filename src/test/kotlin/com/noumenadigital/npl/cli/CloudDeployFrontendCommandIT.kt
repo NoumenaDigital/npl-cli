@@ -8,6 +8,7 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import org.intellij.lang.annotations.Language
 import java.io.File
 
 class CloudDeployFrontendCommandIT :
@@ -442,6 +443,94 @@ class CloudDeployFrontendCommandIT :
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                     }
+                }
+            }
+        }
+
+        context("Yaml Config") {
+            fun happyPath(
+                @Language("yaml") yamlConfig: String?,
+                params: List<String>,
+            ) {
+                yamlConfig?.let { TestUtils.createYamlConfig(it) }
+
+                runCommand(
+                    commands =
+                        listOf(
+                            "cloud",
+                            "deploy",
+                            "frontend",
+                            *params.toTypedArray(),
+                        ),
+                ) {
+                    process.waitFor()
+                    val expectedOutput =
+                        """
+                        Frontend successfully deployed to NOUMENA Cloud.
+                        """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+
+            test("command line arguments only") {
+                withTestContext {
+                    happyPath(
+                        yamlConfig = null,
+                        params =
+                            listOf(
+                                "--app",
+                                "appslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--frontend",
+                                "src/test/resources/frontend-sources/deploy-success/build",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--auth-url",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                    )
+                }
+            }
+
+            test("yaml config only") {
+                withTestContext {
+                    happyPath(
+                        yamlConfig = """
+                          cloud:
+                            app: appslug
+                            tenant: tenantslug
+                            frontend: src/test/resources/frontend-sources/deploy-success/build
+                            url: ${mockNC.url("/")}
+                            authUrl: ${mockOidc.url("/realms/paas/")}
+                        """,
+                        params = emptyList(),
+                    )
+                }
+            }
+
+            test("Both command line arguments and yaml config") {
+                withTestContext {
+                    happyPath(
+                        yamlConfig =
+                            """
+                            cloud:
+                              app: appslug
+                              tenant: tenantslug
+                              frontend: src/test/resources/frontend-sources/deploy-success/build
+                            """.trimIndent(),
+                        params =
+                            listOf(
+                                "--tenant",
+                                "tenantslug",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--auth-url",
+                                mockOidc.url("/realms/paas/").toString(),
+                            ),
+                    )
                 }
             }
         }

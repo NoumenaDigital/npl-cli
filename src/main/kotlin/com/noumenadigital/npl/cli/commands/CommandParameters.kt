@@ -1,9 +1,12 @@
 package com.noumenadigital.npl.cli.commands
 
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser.ParsedArguments
+import com.noumenadigital.npl.cli.config.YAMLConfigParser
 import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 
 data class NamedParameter(
     val name: String,
+    val yamlPropertyName: String = name,
     val description: String,
     val defaultValue: String? = null,
     val isRequired: Boolean = false,
@@ -81,5 +84,26 @@ object CommandArgumentParser {
         ): String? = values[name] ?: defaultValue
 
         fun getRequiredValue(name: String): String = values[name] ?: throw RequiredParameterMissing(name)
+    }
+}
+
+object ArgumentParser {
+    fun parse(
+        params: List<String>,
+        namedParameters: List<NamedParameter>,
+    ): ParsedArguments {
+        val yamlConfig = YAMLConfigParser.parseValues()
+        val parsed = CommandArgumentParser.parse(params, namedParameters)
+
+        val merged = mutableMapOf<String, String>()
+        namedParameters.forEach { param ->
+            val clValue = parsed.getValue(param.name)
+            val yamlValue = yamlConfig?.getValue(param.yamlPropertyName)
+
+            val value = clValue ?: yamlValue
+
+            value?.let { merged[param.name] = it }
+        }
+        return ParsedArguments(merged, parsed.unexpectedArgs)
     }
 }

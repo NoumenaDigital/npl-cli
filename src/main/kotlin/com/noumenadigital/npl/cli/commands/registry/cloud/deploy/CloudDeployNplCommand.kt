@@ -1,7 +1,7 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -37,18 +37,21 @@ class CloudDeployNplCommand(
         listOf(
             NamedParameter(
                 name = "app",
+                yamlPropertyName = "cloud.app",
                 description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
             ),
             NamedParameter(
                 name = "tenant",
+                yamlPropertyName = "cloud.tenant",
                 description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
                 name = "migration",
+                yamlPropertyName = "cloud.migration",
                 description = "Path to migration.yml",
                 isRequired = false,
                 valuePlaceholder = "<migration>",
@@ -56,6 +59,7 @@ class CloudDeployNplCommand(
             ),
             NamedParameter(
                 name = "url",
+                yamlPropertyName = "cloud.url",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
@@ -63,6 +67,7 @@ class CloudDeployNplCommand(
             ),
             NamedParameter(
                 name = "client-id",
+                yamlPropertyName = "cloud.clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
@@ -70,6 +75,7 @@ class CloudDeployNplCommand(
             ),
             NamedParameter(
                 name = "client-secret",
+                yamlPropertyName = "cloud.clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
@@ -77,6 +83,7 @@ class CloudDeployNplCommand(
             ),
             NamedParameter(
                 name = "auth-url",
+                yamlPropertyName = "cloud.authUrl",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -85,7 +92,7 @@ class CloudDeployNplCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
+        val parsedArgs = ArgumentParser.parse(params, parameters)
         val app = parsedArgs.getRequiredValue("app")
         val tenant = parsedArgs.getRequiredValue("tenant")
         val migration = parsedArgs.getValue("migration") ?: findSingleFile(migrationFileName).toString()

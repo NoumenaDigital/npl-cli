@@ -12,6 +12,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
+import org.intellij.lang.annotations.Language
 import java.io.File
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -54,6 +55,15 @@ object TestUtils {
 
     // Determines how to run the tests based on the test.mode system property
     private fun getTestMode(): String = System.getenv().getOrDefault("TEST_MODE", "direct")
+
+    fun createYamlConfig(
+        @Language("yaml") yaml: String,
+    ): File =
+        File("npl.yml").apply {
+            createNewFile()
+            writeText(yaml)
+            deleteOnExit()
+        }
 
     fun getTestResourcesPath(subPath: List<String> = emptyList()): Path {
         // Use the standard resources directory location

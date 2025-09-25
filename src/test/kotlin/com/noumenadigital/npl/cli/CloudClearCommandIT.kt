@@ -362,6 +362,37 @@ class CloudClearCommandIT :
                 }
             }
         }
+
+        context("Yaml config") {
+            withTestContext {
+                TestUtils.createYamlConfig(
+                    """
+                    cloud:
+                      app: appslug
+                      tenant: tenantslug
+                      url: ${mockNC.url("/")}
+                      authUrl: "http://localhost:${mockOidc.port}/realms/paas/"
+                    """.trimIndent(),
+                )
+
+                runCommand(
+                    commands =
+                        listOf(
+                            "cloud",
+                            "clear",
+                        ),
+                ) {
+                    process.waitFor()
+                    val expectedOutput =
+                        """
+                        NPL sources successfully cleared from NOUMENA Cloud app.
+                        """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+        }
     }) {
     companion object {
         private const val APP_ID_OK = "1a978a70-1709-40c1-82d7-30114edfc46b"

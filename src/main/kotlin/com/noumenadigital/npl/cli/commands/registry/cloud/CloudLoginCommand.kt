@@ -1,7 +1,7 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -21,6 +21,7 @@ class CloudLoginCommand(
         listOf(
             NamedParameter(
                 name = "client-id",
+                yamlPropertyName = "cloud.clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
@@ -28,6 +29,7 @@ class CloudLoginCommand(
             ),
             NamedParameter(
                 name = "client-secret",
+                yamlPropertyName = "cloud.clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
@@ -35,6 +37,7 @@ class CloudLoginCommand(
             ),
             NamedParameter(
                 name = "url",
+                yamlPropertyName = "cloud.url",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -43,7 +46,7 @@ class CloudLoginCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
+        val parsedArgs = ArgumentParser.parse(params, parameters)
         val clientId = parsedArgs.getValue("client-id")
         val clientSecret = parsedArgs.getValue("client-secret")
         val url = parsedArgs.getValue("url")

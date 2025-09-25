@@ -6,6 +6,7 @@ import com.noumenadigital.npl.cli.TestUtils.runCommand
 import com.noumenadigital.npl.cli.commands.registry.TestCommand.Companion.COVERAGE_FILE
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import org.intellij.lang.annotations.Language
 import java.io.File
 import kotlin.io.path.pathString
 
@@ -290,6 +291,108 @@ class TestCommandIT :
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
                     }
+                }
+            }
+
+            context("Yaml config") {
+                fun happyPath(
+                    @Language("yaml") yamlConfig: String?,
+                    params: List<String>,
+                    testWithCoverage: Boolean = false,
+                ) {
+                    coverageFile.exists() shouldBe false
+
+                    val testPath = getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath()
+
+                    yamlConfig?.let { TestUtils.createYamlConfig(it) }
+
+                    runCommand(
+                        commands = listOf("test", *params.toTypedArray()),
+                    ) {
+                        process.waitFor()
+
+                        val expectedOutput =
+                            """
+                        '$testPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
+                        Line coverage summary
+                        --------------------------------------
+                        src/main/npl/objects/iou/iou.npl   XXX%
+                        src/test/npl/objects/test_iou.npl XXX%
+                        --------------------------------------
+                        Overall                            XXX%
+
+
+                        NPL test completed successfully in XXX ms.
+                        """.normalize()
+
+                        coverageFile.exists() shouldBe testWithCoverage
+                        if (testWithCoverage) {
+                            coverageFile.readText().normalize() shouldBe
+                                """
+                                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                                <coverage version="1">
+                                    <file path="$testPath/src/main/npl/objects/iou/iou.npl">
+                                        <lineToCover covered="true" lineNumber="8"/>
+                                        <lineToCover covered="true" lineNumber="12"/>
+                                        <lineToCover covered="true" lineNumber="18"/>
+                                        <lineToCover covered="true" lineNumber="20"/>
+                                        <lineToCover covered="true" lineNumber="24"/>
+                                        <lineToCover covered="true" lineNumber="25"/>
+                                        <lineToCover covered="true" lineNumber="27"/>
+                                        <lineToCover covered="true" lineNumber="29"/>
+                                        <lineToCover covered="true" lineNumber="31"/>
+                                        <lineToCover covered="false" lineNumber="38"/>
+                                        <lineToCover covered="true" lineNumber="43"/>
+                                    </file>
+                                    <file path="$testPath/src/test/npl/objects/test_iou.npl">
+                                        <lineToCover covered="true" lineNumber="10"/>
+                                        <lineToCover covered="true" lineNumber="12"/>
+                                        <lineToCover covered="true" lineNumber="17"/>
+                                        <lineToCover covered="true" lineNumber="18"/>
+                                        <lineToCover covered="true" lineNumber="20"/>
+                                    </file>
+                                </coverage>
+
+                                """.trimIndent().normalize()
+
+                            output.normalize() shouldBe expectedOutput
+                        }
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
+
+                test("Yaml config happy path - coverage") {
+                    val testDirPath =
+                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+
+                    happyPath(
+                        params = emptyList(),
+                        testWithCoverage = true,
+                        yamlConfig =
+                            """
+                            local:
+                              sourceDir: "$testDirPath"
+                              config: "src/test/resources/test-config.yaml"
+                              coverage: "true"
+                            """.trimIndent(),
+                    )
+                }
+
+                test("Yaml config happy path - no coverage - explicit") {
+                    val testDirPath =
+                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+
+                    happyPath(
+                        params = emptyList(),
+                        testWithCoverage = false,
+                        yamlConfig =
+                            """
+                            local:
+                              sourceDir: "$testDirPath"
+                              config: "src/test/resources/test-config.yaml"
+                              testCoverage: "false"
+                            """.trimIndent(),
+                    )
                 }
             }
         },

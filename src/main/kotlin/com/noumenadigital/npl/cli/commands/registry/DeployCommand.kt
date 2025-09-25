@@ -1,7 +1,7 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.config.DeployConfig
 import com.noumenadigital.npl.cli.config.EngineTargetConfig
@@ -23,12 +23,14 @@ class DeployCommand(
         listOf(
             NamedParameter(
                 name = "target",
+                yamlPropertyName = "local.target",
                 description = "Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.",
                 isRequired = false,
                 valuePlaceholder = "<name>",
             ),
             NamedParameter(
                 name = "source-dir",
+                yamlPropertyName = "local.sourceDir",
                 description = "Directory containing NPL sources",
                 isRequired = true,
                 valuePlaceholder = "<directory>",
@@ -37,6 +39,7 @@ class DeployCommand(
             ),
             NamedParameter(
                 name = "config-file",
+                yamlPropertyName = "local.configFile",
                 description = "Path to deploy.yml configuration file",
                 isRequired = false,
                 valuePlaceholder = "<path>",
@@ -45,6 +48,7 @@ class DeployCommand(
             ),
             NamedParameter(
                 name = "clear",
+                yamlPropertyName = "local.clear",
                 description = "Clear application contents before deployment",
                 isRequired = false,
             ),
@@ -54,8 +58,7 @@ class DeployCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         // Parse arguments using the simpler parameter-based parser
-        val parser = CommandArgumentParser
-        val parsedArgs = parser.parse(args, parameters)
+        val parsedArgs = ArgumentParser.parse(args, parameters)
 
         if (parsedArgs.unexpectedArgs.isNotEmpty()) {
             output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
