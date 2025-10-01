@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.io.File
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,7 +16,10 @@ data class YamlConfig(
     val local: Local = Local(),
     val structure: Structure = Structure(),
 ) {
-    val schemaVersion: String = schemaUrl.substringAfterLast("/").removeSuffix(".json") // TODO Modify to support any line
+    val schemaVersion: String =
+        schemaUrl
+            .substringAfterLast("/")
+            .removeSuffix(".json") // TODO Modify to support any line
 
     data class Runtime(
         val version: String? = null,
@@ -51,7 +55,7 @@ data class YamlConfig(
 }
 
 object YAMLConfigParser {
-    private val mapper = ObjectMapper(YAMLFactory())
+    private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
 
     fun parse(): YamlConfig? {
         val configFile = File("npl.yml")
