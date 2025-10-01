@@ -8,6 +8,7 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import org.intellij.lang.annotations.Language
 import java.io.File
 
 class CloudDeployNplCommandIT :
@@ -228,7 +229,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -254,7 +255,7 @@ class CloudDeployNplCommandIT :
                                 "cloud",
                                 "deploy",
                                 "npl",
-                                "--clientId",
+                                "--client-id",
                                 "wrong",
                                 "--app",
                                 "appslug",
@@ -264,7 +265,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -296,7 +297,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -329,7 +330,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -361,7 +362,7 @@ class CloudDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -393,7 +394,7 @@ class CloudDeployNplCommandIT :
                                 "other-migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -406,6 +407,98 @@ class CloudDeployNplCommandIT :
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                     }
+                }
+            }
+        }
+        context("yaml config") {
+            fun happyPath(
+                @Language("yaml") yamlConfig: String?,
+                params: List<String>,
+            ) {
+                yamlConfig?.let { TestUtils.createYamlConfig(it) }
+
+                runCommand(
+                    commands =
+                        listOf(
+                            "cloud",
+                            "deploy",
+                            "npl",
+                            *params.toTypedArray(),
+                        ),
+                ) {
+                    process.waitFor()
+                    val expectedOutput =
+                        """
+                            NPL Application successfully deployed to NOUMENA Cloud.
+                            """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+
+            test("command line params only") {
+                withTestContext {
+                    val params =
+                        listOf(
+                            "--app",
+                            "appslug",
+                            "--tenant",
+                            "tenantslug",
+                            "--migration",
+                            "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                            "--url",
+                            mockNC.url("/").toString(),
+                            "--auth-url",
+                            mockOidc.url("/realms/paas/").toString(),
+                        )
+
+                    happyPath(
+                        params = params,
+                        yamlConfig = null,
+                    )
+                }
+            }
+
+            test("Yaml config only") {
+                withTestContext {
+                    happyPath(
+                        params = emptyList(),
+                        yamlConfig =
+                            """
+                            cloud:
+                                app: appslug
+                                tenant: tenantslug
+                                url: ${mockNC.url("/")}
+                                authUrl: ${mockOidc.url("/realms/paas/")}
+                            structure:
+                                migration: src/test/resources/npl-sources/deploy-success/main/migration.yml
+                            """.trimIndent(),
+                    )
+                }
+            }
+
+            test("Both command line params and Yaml config") {
+                withTestContext {
+                    happyPath(
+                        params =
+                            listOf(
+                                "--app",
+                                "appslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--migration",
+                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                            ),
+                        yamlConfig =
+                            """
+                            cloud:
+                                url: ${mockNC.url("/")}
+                                authUrl: ${mockOidc.url("/realms/paas/")}
+                            structure:
+                                migration: ignored/because/of/command-line-params
+                            """.trimIndent(),
+                    )
                 }
             }
         }

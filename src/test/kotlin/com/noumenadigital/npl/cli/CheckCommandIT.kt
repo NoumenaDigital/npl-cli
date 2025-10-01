@@ -15,7 +15,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "single_file")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -38,7 +38,7 @@ class CheckCommandIT :
                             File(".").canonicalFile.toPath().relativize(it)
                         }.toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -58,7 +58,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "multiple_files")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -78,7 +78,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "multiple_packages")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -98,7 +98,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -118,7 +118,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "versioned_dirs")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -139,7 +139,7 @@ class CheckCommandIT :
             test("single file") {
                 val testDirPath =
                     getTestResourcesPath(listOf("failure", "single_file")).toAbsolutePath().toString()
-                runCommand(listOf("check", "--sourceDir", testDirPath)) {
+                runCommand(listOf("check", "--source-dir", testDirPath)) {
                     process.waitFor()
 
                     val expectedOutput =
@@ -160,7 +160,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("failure", "multiple_files")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -180,7 +180,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("failure", "multiple_packages")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -202,7 +202,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "test_failure")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -222,7 +222,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("failure", "versioned_dir_errors")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -248,7 +248,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("warnings", "compilation")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -271,7 +271,7 @@ class CheckCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("warnings", "no_sources")).toAbsolutePath().toString()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", testDirPath),
+                    commands = listOf("check", "--source-dir", testDirPath),
                 ) {
                     process.waitFor()
 
@@ -290,7 +290,7 @@ class CheckCommandIT :
             test("directory does not exist") {
                 val nonExistentPath = getTestResourcesPath(listOf("non_existent_directory")).toAbsolutePath()
                 runCommand(
-                    commands = listOf("check", "--sourceDir", nonExistentPath.toString()),
+                    commands = listOf("check", "--source-dir", nonExistentPath.toString()),
                 ) {
                     process.waitFor()
 
@@ -310,7 +310,7 @@ class CheckCommandIT :
                 tempFile.deleteOnExit()
 
                 runCommand(
-                    commands = listOf("check", "--sourceDir", tempFile.absolutePath),
+                    commands = listOf("check", "--source-dir", tempFile.absolutePath),
                 ) {
                     process.waitFor()
 
@@ -322,6 +322,33 @@ class CheckCommandIT :
                     output.normalize() shouldBe expectedOutput
                     process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                 }
+            }
+        }
+
+        context("Yaml config happy path") {
+            val testDirPath =
+                getTestResourcesPath(listOf("success", "single_file")).toAbsolutePath().toString()
+
+            TestUtils.createYamlConfig(
+                """
+                structure:
+                  sourceDir: $testDirPath
+                """.trimIndent(),
+            )
+            runCommand(
+                commands = listOf("check"),
+            ) {
+                process.waitFor()
+
+                val expectedOutput =
+                    """
+                    Completed compilation for 1 file in XXX ms
+
+                    NPL check completed successfully.
+                    """.normalize()
+
+                output.normalize() shouldBe expectedOutput
+                process.exitValue() shouldBe ExitCode.SUCCESS.code
             }
         }
     })

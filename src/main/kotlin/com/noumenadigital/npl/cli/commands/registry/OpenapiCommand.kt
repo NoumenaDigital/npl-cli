@@ -1,7 +1,8 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
+import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -38,7 +39,8 @@ data class OpenapiCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
+                yamlPropertyName = "local.sourceDir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -56,7 +58,7 @@ data class OpenapiCommand(
                 isRequiredForMcp = false,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -67,21 +69,22 @@ data class OpenapiCommand(
         )
 
     companion object {
-        private const val CURRENT_DIRECTORY = "."
+        private val CURRENT_DIRECTORY = File(".")
         private const val DEFAULT_OPENAPI_URI = "http://localhost:12000"
     }
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = parseParams(params)
+        val config = parseParams(params)
 
-        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-        }
+//        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+//            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+//        }
 
-        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
-        val rules = parsedArgs.getValue("rules")
-        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
-        return OpenapiCommand(srcDir, rules, outputDir)
+        return OpenapiCommand(
+            config.sourceDir.absolutePath,
+            config.rulesFile?.absolutePath,
+            config.outputDir.absolutePath,
+        )
     }
 
     override fun execute(output: ColorWriter): ExitCode {
@@ -179,7 +182,14 @@ data class OpenapiCommand(
         }
     }
 
-    private fun parseParams(args: List<String>) = CommandArgumentParser.parse(args, parameters)
+    private fun parseParams(args: List<String>) =
+        ArgumentParser.parse(args, parameters) { settings ->
+            OpenapiConfig(
+                sourceDir = settings.structure.nplSourceDir ?: CURRENT_DIRECTORY,
+                rulesFile = settings.structure.rulesFile,
+                outputDir = settings.structure.outputDir ?: CURRENT_DIRECTORY,
+            )
+        }
 
     private fun String.removePrefix(): String = removePrefix("/")
 
@@ -196,3 +206,9 @@ data class OpenapiCommand(
         }
     }
 }
+
+data class OpenapiConfig(
+    val sourceDir: File,
+    val rulesFile: File?,
+    val outputDir: File,
+) : CommandConfig

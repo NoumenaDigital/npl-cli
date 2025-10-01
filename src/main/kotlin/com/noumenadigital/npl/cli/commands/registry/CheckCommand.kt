@@ -1,7 +1,8 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
+import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -20,7 +21,8 @@ data class CheckCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
+                yamlPropertyName = "local.sourceDir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -31,14 +33,17 @@ data class CheckCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
+        val config =
+            ArgumentParser.parse(params, parameters) { settings ->
+                CheckConfig(sourceDir = settings.structure.nplSourceDir ?: File("."))
+            }
 
-        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-        }
+//        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+//            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+//        }
 
-        val srcDir = parsedArgs.getValue("sourceDir") ?: "."
-        return CheckCommand(srcDir = srcDir)
+        val srcDir = config.sourceDir
+        return CheckCommand(srcDir = srcDir.absolutePath)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
@@ -82,3 +87,7 @@ data class CheckCommand(
         }
     }
 }
+
+data class CheckConfig(
+    val sourceDir: File = File("."),
+) : CommandConfig

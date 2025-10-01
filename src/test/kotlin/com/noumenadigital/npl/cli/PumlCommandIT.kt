@@ -4,11 +4,14 @@ import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
+import io.kotest.assertions.shouldFail
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
+import org.intellij.lang.annotations.Language
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.pathString
 
 class PumlCommandIT :
@@ -50,7 +53,7 @@ class PumlCommandIT :
 
         test("Puml command: Happy path") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
-                runCommand(commands = listOf("puml", "--sourceDir", absolutePath)) {
+                runCommand(commands = listOf("puml", "--source-dir", absolutePath)) {
                     process.waitFor()
 
                     val pumlDir = workingDirectory.resolve("puml")
@@ -79,7 +82,7 @@ class PumlCommandIT :
         test("Puml command: relative path") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
                 val dir = Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files")
-                runCommand(commands = listOf("puml", "--sourceDir", dir.pathString)) {
+                runCommand(commands = listOf("puml", "--source-dir", dir.pathString)) {
                     process.waitFor()
 
                     val pumlDir = workingDirectory.resolve("puml")
@@ -107,14 +110,14 @@ class PumlCommandIT :
 
         test("Puml command: overwrite existing files") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
-                runCommand(commands = listOf("puml", "--sourceDir", absolutePath)) {
+                runCommand(commands = listOf("puml", "--source-dir", absolutePath)) {
                     process.waitFor()
 
                     workingDirectory.resolve("puml")
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
 
-                runCommand(commands = listOf("puml", "--sourceDir", absolutePath)) {
+                runCommand(commands = listOf("puml", "--source-dir", absolutePath)) {
                     process.waitFor()
 
                     workingDirectory.resolve("puml")
@@ -124,7 +127,7 @@ class PumlCommandIT :
         }
 
         test("Puml command: invalid path") {
-            runCommand(commands = listOf("puml", "--sourceDir", "non-existing-path")) {
+            runCommand(commands = listOf("puml", "--source-dir", "non-existing-path")) {
                 process.waitFor()
                 val expectedOutput = "Source directory does not exist or is not a directory: non-existing-path"
 
@@ -134,11 +137,91 @@ class PumlCommandIT :
 
         test("Puml command: directory pointing to a file") {
             val file = Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files", "test_iou.npl")
-            runCommand(commands = listOf("puml", "--sourceDir", file.pathString)) {
+            runCommand(commands = listOf("puml", "--source-dir", file.pathString)) {
                 process.waitFor()
                 val expectedOutput = "Source directory does not exist or is not a directory: ${file.pathString}".normalize()
 
                 output.normalize() shouldBe expectedOutput
+            }
+        }
+
+        context("Yaml config") {
+            val file =
+                Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files")
+
+            fun happyPath(
+                @Language("yaml") yamlConfig: String?,
+                params: List<String>,
+            ) {
+                if (yamlConfig != null) TestUtils.createYamlConfig(yamlConfig)
+
+                withPumlTestContext(testDir = listOf("success", "multiple_files")) {
+                    runCommand(commands = listOf("puml", *params.toTypedArray())) {
+                        process.waitFor()
+
+                        val pumlDir = workingDirectory.resolve("puml")
+                        val expectedOutput =
+                            """
+                                Completed compilation for 5 files in XXX ms
+
+                                Writing Puml files to ${pumlDir.relativeOrAbsolute()}
+
+                                Puml diagram generated successfully.
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        with(workingDirectory.resolve("puml")) {
+                            exists() shouldBe true
+                            listAllFilesNames() shouldContainAll listOf("settle.puml", "iou.puml", "includes.puml")
+                            findFile("settle.puml") { file -> file.validateContents(SETTLE_PUML_CONTENTS) }
+                            findFile("iou.puml") { file -> file.validateContents(IOU_PUML_CONTENTS) }
+                            findFile("includes.puml") { file -> file.validateContents(INCLUDES_PUML_CONTENTS) }
+                        }
+                    }
+                }
+            }
+
+            test("Use property only from yaml config") {
+                happyPath(
+                    yamlConfig =
+                        """
+                        structure:
+                          sourceDir: ${file.absolutePathString()}
+                        """.trimIndent(),
+                    params = emptyList(),
+                )
+            }
+
+            test("Use property only from command line") {
+                happyPath(
+                    yamlConfig = null,
+                    params = listOf("--source-dir", file.pathString),
+                )
+            }
+
+            test("Override property from yaml config with command line argument") {
+                happyPath(
+                    yamlConfig =
+                        """
+                        local:
+                          sourceDir: /invalid/path
+                        """.trimIndent(),
+                    params = listOf("--source-dir", file.pathString),
+                )
+            }
+
+            test("Should fail if command line argument is invalid") {
+                shouldFail {
+                    happyPath(
+                        yamlConfig =
+                            """
+                            local:
+                              sourceDir: ${file.pathString}
+                            """.trimIndent(),
+                        params = listOf("--source-dir", "/invalid/path"),
+                    )
+                }
             }
         }
     }) {

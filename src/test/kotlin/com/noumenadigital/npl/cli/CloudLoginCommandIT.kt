@@ -143,6 +143,40 @@ class CloudLoginCommandIT :
                 }
             }
         }
+
+        context("yaml config") {
+            test("cloud login") {
+                val refreshTokenToVerify = "success-refresh-token"
+
+                withTestContext(refreshTokenToVerify) {
+                    TestUtils.createYamlConfig(
+                        """
+                        cloud:
+                            url: ${mockOidc.url("/realms/paas/")}
+                        """.trimIndent(),
+                    )
+
+                    runCommand(
+                        commands = listOf("cloud", "login"),
+                        env =
+                            mapOf(
+                                NPL_CLI_BROWSER_DISABLED to "true",
+                            ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
+                            Please open the following URL in your browser: verification-uri-complete
+                            Successfully logged in to NOUMENA Cloud.
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        readTempFile().refreshToken shouldBe refreshTokenToVerify
+                    }
+                }
+            }
+        }
     }) {
     companion object {
         private const val NPL_CLI_BROWSER_DISABLED = "NPL_CLI_BROWSER_DISABLED"

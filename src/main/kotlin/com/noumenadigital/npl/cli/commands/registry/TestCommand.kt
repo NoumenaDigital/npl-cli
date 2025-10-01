@@ -1,7 +1,8 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
+import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -31,7 +32,8 @@ data class TestCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
+                yamlPropertyName = "local.sourceDir",
                 description =
                     "Source directory containing NPL tests to run." +
                         " Must be a parent directory of all required sources (both production and test).",
@@ -43,11 +45,13 @@ data class TestCommand(
             ),
             NamedParameter(
                 name = "coverage",
+                yamlPropertyName = "local.coverage",
                 description = "Report test coverage details (printed to console as well as coverage.xml)",
                 isRequired = false,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
+                yamlPropertyName = "local.outputDir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -61,26 +65,30 @@ data class TestCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            val parsedArgs = CommandArgumentParser.parse(params, parameters)
+            val config =
+                ArgumentParser.parse(params, parameters) { settings ->
+                    TestConfig(
+                        sourceDir = settings.structure.nplSourceDir ?: File("."),
+                        withCoverage = settings.structure.testCoverage,
+                        outputDir = settings.structure.outputDir ?: File("."),
+                    )
+                }
 
-            if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-                output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-                return ExitCode.USAGE_ERROR
-            }
+//            if (parsedArgs.unexpectedArgs.isNotEmpty()) {
+//                output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
+//                return ExitCode.USAGE_ERROR
+//            }
 
-            val sourcePath = parsedArgs.getValue("sourceDir") ?: "."
-            val sourceDir = File(sourcePath)
-            if (!sourceDir.isDirectory || !sourceDir.exists()) {
+            if (!config.sourceDir.isDirectory || !config.sourceDir.exists()) {
                 output.error(
-                    "Given source directory is either not a directory or does not exist. ${sourceDir.relativeOrAbsolute()}",
+                    "Given source directory is either not a directory or does not exist. ${config.sourceDir.relativeOrAbsolute()}",
                 )
                 return ExitCode.GENERAL_ERROR
             }
 
-            val showCoverage = parsedArgs.hasFlag("coverage")
-            val outputDir = parsedArgs.getValue("outputDir") ?: "."
-            val coverageAnalyzer: CoverageAnalyzer = coverageAnalyzer(showCoverage, sourceDir, outputDir)
-            val testHarness = TestHarness(SourcesManager(sourceDir.absolutePath), coverageAnalyzer)
+            val showCoverage = config.withCoverage
+            val coverageAnalyzer = coverageAnalyzer(showCoverage, config.sourceDir, config.outputDir.canonicalPath)
+            val testHarness = TestHarness(SourcesManager(config.sourceDir.absolutePath), coverageAnalyzer)
 
             val start = System.nanoTime()
             val testResults = testHarness.runTest()
@@ -219,3 +227,9 @@ data class TestCommand(
 
     private fun formatSuccess(success: Boolean) = if (success) "PASS" else "FAIL"
 }
+
+data class TestConfig(
+    val sourceDir: File,
+    val withCoverage: Boolean = false,
+    val outputDir: File,
+) : CommandConfig

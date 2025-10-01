@@ -24,9 +24,9 @@ class InitCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "projectDir",
+                name = "project-dir",
                 description = "Directory where project files will be stored. Created if it doesn’t exist",
-                valuePlaceholder = "<projectDir>",
+                valuePlaceholder = "<project-dir>",
             ),
             NamedParameter(
                 name = "bare",
@@ -35,10 +35,10 @@ class InitCommand(
                 isRequired = false,
             ),
             NamedParameter(
-                name = "templateUrl",
+                name = "template-url",
                 description = "URL of a repository containing a ZIP archive of the project template. Overrides the default template",
                 isRequired = false,
-                valuePlaceholder = "<templateUrl>",
+                valuePlaceholder = "<template-url>",
             ),
         )
 
@@ -56,12 +56,12 @@ class InitCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        if (parsedArgs.getValue("templateUrl") != null && parsedArgs.hasFlag("bare")) {
-            output.displayError("Cannot use --bare and --templateUrl together.")
+        if (parsedArgs.getValue("template-url") != null && parsedArgs.hasFlag("bare")) {
+            output.displayError("Cannot use --bare and --template-url together.")
             return ExitCode.USAGE_ERROR
         }
 
-        val projectPath = parsedArgs.getValue("projectDir")
+        val projectPath = parsedArgs.getValue("project-dir")
         val projectDir =
             projectPath?.let {
                 File(it).apply {
@@ -79,7 +79,7 @@ class InitCommand(
         val archiveFile = projectDir.resolve("project${UUID.randomUUID()}.zip")
 
         try {
-            val templateUrl = parsedArgs.getValue("templateUrl") ?: repoClient.getDefaultUrl(parsedArgs)
+            val templateUrl = parsedArgs.getValue("template-url") ?: repoClient.getDefaultUrl(parsedArgs)
             repoClient.downloadTemplateArchive(templateUrl, archiveFile)
             output.info("Successfully downloaded project files")
         } catch (e: Exception) {

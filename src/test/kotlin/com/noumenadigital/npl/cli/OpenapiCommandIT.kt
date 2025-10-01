@@ -60,7 +60,7 @@ class OpenapiCommandIT :
             test("no protocols found") {
                 withOpenapiTestContext(testDir = listOf("success", "single_file")) {
                     runCommand(
-                        commands = listOf("openapi", "--sourceDir", absolutePath),
+                        commands = listOf("openapi", "--source-dir", absolutePath),
                     ) {
                         process.waitFor()
                         val expectedOutput =
@@ -80,7 +80,7 @@ class OpenapiCommandIT :
             test("multiple files") {
                 withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
                     runCommand(
-                        commands = listOf("openapi", "--sourceDir", absolutePath),
+                        commands = listOf("openapi", "--source-dir", absolutePath),
                     ) {
                         process.waitFor()
 
@@ -104,7 +104,7 @@ class OpenapiCommandIT :
             test("multiple files - relative path") {
                 withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
                     runCommand(
-                        commands = listOf("openapi", "--sourceDir", relativePath),
+                        commands = listOf("openapi", "--source-dir", relativePath),
                     ) {
                         process.waitFor()
 
@@ -128,7 +128,7 @@ class OpenapiCommandIT :
             test("can generate openapi specs for multiple files successfully") {
                 withOpenapiTestContext(testDir = listOf("deploy-success")) {
                     runCommand(
-                        commands = listOf("openapi", "--sourceDir", absolutePath),
+                        commands = listOf("openapi", "--source-dir", absolutePath),
                     ) {
                         process.waitFor()
 
@@ -154,7 +154,7 @@ class OpenapiCommandIT :
             test("multiple packages") {
                 withOpenapiTestContext(testDir = listOf("success", "multiple_packages")) {
                     runCommand(
-                        commands = listOf("openapi", "--sourceDir", absolutePath),
+                        commands = listOf("openapi", "--source-dir", absolutePath),
                     ) {
                         process.waitFor()
 
@@ -178,7 +178,7 @@ class OpenapiCommandIT :
             test("test failure") {
                 withOpenapiTestContext(testDir = listOf("success", "test_failure")) {
                     runCommand(
-                        commands = listOf("openapi", "--sourceDir", absolutePath),
+                        commands = listOf("openapi", "--source-dir", absolutePath),
                     ) {
                         process.waitFor()
 
@@ -200,7 +200,7 @@ class OpenapiCommandIT :
                 test("multiple packages") {
                     withOpenapiTestContext(testDir = listOf("failure", "multiple_packages")) {
                         runCommand(
-                            commands = listOf("openapi", "--sourceDir", absolutePath),
+                            commands = listOf("openapi", "--source-dir", absolutePath),
                         ) {
                             process.waitFor()
 
@@ -225,7 +225,7 @@ class OpenapiCommandIT :
                 test("warnings during compilation") {
                     withOpenapiTestContext(testDir = listOf("warnings", "compilation")) {
                         runCommand(
-                            commands = listOf("openapi", "--sourceDir", absolutePath),
+                            commands = listOf("openapi", "--source-dir", absolutePath),
                         ) {
                             process.waitFor()
 
@@ -255,7 +255,7 @@ class OpenapiCommandIT :
                 test("no NPL sources") {
                     withOpenapiTestContext(testDir = listOf("warnings", "no_sources")) {
                         runCommand(
-                            commands = listOf("openapi", "--sourceDir", absolutePath),
+                            commands = listOf("openapi", "--source-dir", absolutePath),
                         ) {
                             process.waitFor()
 
@@ -282,7 +282,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         rulesDescPath.absolutePathString(),
@@ -315,7 +315,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         rulesDescPath.absolutePathString(),
@@ -349,7 +349,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         relativePath.pathString,
@@ -384,7 +384,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         rulesDescPath.absolutePathString(),
@@ -414,7 +414,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         rulesDescPath.absolutePathString(),
@@ -444,7 +444,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         rulesDescPath.absolutePathString(),
@@ -469,7 +469,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         rulesDescPath.absolutePathString(),
@@ -494,7 +494,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         rulesDescPath.absolutePathString(),
@@ -519,7 +519,7 @@ class OpenapiCommandIT :
                                 commands =
                                     listOf(
                                         "openapi",
-                                        "--sourceDir",
+                                        "--source-dir",
                                         absolutePath,
                                         "--rules",
                                         rulesDescPath.absolutePathString(),
@@ -534,6 +534,38 @@ class OpenapiCommandIT :
                                 process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
                             }
                         }
+                    }
+                }
+            }
+        }
+        context("Yaml config") {
+            test("yaml config happy path") {
+                withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
+                    TestUtils.createYamlConfig(
+                        """
+                        structure:
+                          sourceDir: $absolutePath
+                        """.trimIndent(),
+                    )
+
+                    runCommand(
+                        commands = listOf("openapi"),
+                    ) {
+                        process.waitFor()
+
+                        val expectedOutput =
+                            """
+                        Completed compilation for 5 files in XXX ms
+
+                        Generating openapi for objects/iou
+                        Generating openapi for processes
+                        NPL openapi completed successfully.
+                        """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        validateOpenapiSpec("objects.iou-openapi.yml").messages.size shouldBe 0
+                        validateOpenapiSpec("processes-openapi.yml").messages.size shouldBe 0
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
                     }
                 }
             }

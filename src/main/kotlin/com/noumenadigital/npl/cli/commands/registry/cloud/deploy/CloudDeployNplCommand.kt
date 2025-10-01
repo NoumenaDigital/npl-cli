@@ -1,12 +1,14 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
+import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.EnvironmentVariable
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
+import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
@@ -21,7 +23,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.isRegularFile
 import kotlin.streams.asSequence
-import kotlin.use
 
 class CloudDeployNplCommand(
     private val sourcesManager: SourcesManager = SourcesManager("."),
@@ -39,18 +40,21 @@ class CloudDeployNplCommand(
         listOf(
             NamedParameter(
                 name = "app",
+                yamlPropertyName = "cloud.app",
                 description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
             ),
             NamedParameter(
                 name = "tenant",
+                yamlPropertyName = "cloud.tenant",
                 description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
                 name = "migration",
+                yamlPropertyName = "cloud.migration",
                 description = "Path to migration.yml",
                 isRequired = false,
                 valuePlaceholder = "<migration>",
@@ -58,27 +62,31 @@ class CloudDeployNplCommand(
             ),
             NamedParameter(
                 name = "url",
+                yamlPropertyName = "cloud.url",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
             ),
             NamedParameter(
-                name = "clientId",
+                name = "client-id",
+                yamlPropertyName = "cloud.clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
-                name = "clientSecret",
+                name = "client-secret",
+                yamlPropertyName = "cloud.clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "authUrl",
+                name = "auth-url",
+                yamlPropertyName = "cloud.authUrl",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -96,28 +104,31 @@ class CloudDeployNplCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val app = parsedArgs.getRequiredValue("app")
-        val tenant = parsedArgs.getRequiredValue("tenant")
-        val migration = parsedArgs.getValue("migration") ?: findSingleFile(migrationFileName).toString()
-        val migrationFile = File(migration)
-        if (!migrationFile.exists()) {
+        val config =
+            ArgumentParser.parse(params, parameters) { settings ->
+                CloudDeployNplConfig(
+                    app = settings.cloud.app ?: throw RequiredParameterMissing("app"),
+                    tenant = settings.cloud.tenant ?: throw RequiredParameterMissing("tenant"),
+                    migration = settings.structure.migrationDescriptorFile ?: findSingleFile(migrationFileName),
+                    url = settings.cloud.url,
+                    clientId = settings.local.clientId,
+                    clientSecret = settings.local.clientSecret,
+                    authUrl = settings.cloud.authUrl,
+                )
+            }
+        if (!config.migration.exists()) {
             throw CloudCommandException(
-                message = "Migration file does not exist - $migration",
+                message = "Migration file does not exist - ${config.migration}",
                 commandName = "cloud deploy",
             )
         }
-        val clientId = parsedArgs.getValue("clientId")
-        val clientSecret = parsedArgs.getValue("clientSecret")
-        val authUrl = parsedArgs.getValue("authUrl")
-        val url = parsedArgs.getValue("url")
-        val sourcesManager = SourcesManager(migrationFile.parent.toString())
-        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
+        val sourcesManager = SourcesManager(config.migration.parent.toString())
+        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(config.clientId, config.clientSecret, config.authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
+                NoumenaCloudClient(NoumenaCloudConfig.get(config.app, config.tenant, config.url)),
             )
         return CloudDeployNplCommand(sourcesManager, cloudDeployService)
     }
@@ -145,7 +156,7 @@ class CloudDeployNplCommand(
         }
     }
 
-    private fun findSingleFile(
+    fun findSingleFile(
         fileName: String,
         searchDir: String = ".",
     ): File {
@@ -173,3 +184,13 @@ class CloudDeployNplCommand(
         }
     }
 }
+
+data class CloudDeployNplConfig(
+    val app: String,
+    val tenant: String,
+    val migration: File,
+    val url: String? = null,
+    val clientId: String? = null,
+    val clientSecret: String? = null,
+    val authUrl: String? = null,
+) : CommandConfig

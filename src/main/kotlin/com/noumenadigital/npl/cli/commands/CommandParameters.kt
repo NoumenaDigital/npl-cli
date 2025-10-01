@@ -1,9 +1,14 @@
 package com.noumenadigital.npl.cli.commands
 
-import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
+import com.noumenadigital.npl.cli.commands.AppSettings.Other
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser.ParsedArguments
+import com.noumenadigital.npl.cli.config.YAMLConfigParser
+import com.noumenadigital.npl.cli.config.YamlConfig
+import java.io.File
 
 data class NamedParameter(
     val name: String,
+    val yamlPropertyName: String = name,
     val description: String,
     val defaultValue: String? = null,
     val isRequired: Boolean = false,
@@ -75,6 +80,72 @@ object CommandArgumentParser {
 
         fun getValue(name: String): String? = values[name]
 
-        fun getRequiredValue(name: String): String = values[name] ?: throw RequiredParameterMissing(name)
+        fun getValueOrElse(
+            name: String,
+            defaultValue: String?,
+        ): String? = values[name] ?: defaultValue
+    }
+}
+
+object ArgumentParser {
+    inline fun <reified T> parse(
+        params: List<String>,
+        namedParameters: List<NamedParameter>,
+        genConfig: (settings: AppSettings) -> T,
+    ): T {
+        val yamlConfig = YAMLConfigParser.parse()
+        val parsed = CommandArgumentParser.parse(params, namedParameters)
+
+        return genConfig(toAppSettings(parsed, yamlConfig))
+    }
+
+    fun toAppSettings(
+        parsedArgs: ParsedArguments,
+        yamlConfig: YamlConfig?,
+    ): AppSettings {
+        fun String.toFile(): File = File(this)
+
+        fun Boolean.orElse(default: Boolean?): Boolean = (takeIf { it } ?: default) == true
+
+        return AppSettings(
+            local =
+                AppSettings.Local(
+                    clientId = parsedArgs.getValueOrElse("client-id", yamlConfig?.local?.clientId),
+                    clientSecret = parsedArgs.getValueOrElse("client-secret", yamlConfig?.local?.clientSecret),
+                    managementUrl = parsedArgs.getValueOrElse("management-url", yamlConfig?.local?.managementUrl),
+                    password = parsedArgs.getValueOrElse("password", yamlConfig?.local?.password),
+                    username = parsedArgs.getValueOrElse("username", yamlConfig?.local?.username),
+                ),
+            cloud =
+                AppSettings.Cloud(
+                    app = parsedArgs.getValueOrElse("app", yamlConfig?.cloud?.app),
+                    authUrl = parsedArgs.getValueOrElse("auth-url", yamlConfig?.cloud?.authUrl),
+                    clear = parsedArgs.hasFlag("clear").orElse(yamlConfig?.cloud?.clear),
+                    deploymentUrl = parsedArgs.getValueOrElse("deployment-url", yamlConfig?.cloud?.deploymentUrl),
+                    target = parsedArgs.getValueOrElse("target", yamlConfig?.cloud?.target),
+                    tenant = parsedArgs.getValueOrElse("tenant", yamlConfig?.cloud?.tenant),
+                    url = parsedArgs.getValueOrElse("url", yamlConfig?.cloud?.url),
+                ),
+            structure =
+                AppSettings.Structure(
+                    frontEnd = parsedArgs.getValueOrElse("frontend", yamlConfig?.structure?.frontend)?.toFile(),
+                    migrationDescriptorFile =
+                        parsedArgs
+                            .getValueOrElse("migration", yamlConfig?.structure?.migration)
+                            ?.toFile(),
+                    nplSourceDir = parsedArgs.getValueOrElse("source-dir", yamlConfig?.structure?.sourceDir)?.toFile(),
+                    outputDir = parsedArgs.getValueOrElse("output-dir", yamlConfig?.structure?.outputDir)?.toFile(),
+                    rulesFile = parsedArgs.getValueOrElse("rules", yamlConfig?.structure?.rules)?.toFile(),
+                    testCoverage = parsedArgs.hasFlag("coverage").orElse(yamlConfig?.structure?.coverage),
+                    testSourceDir =
+                        parsedArgs.getValueOrElse("test-source-dir", yamlConfig?.structure?.testSourceDir)?.toFile(),
+                ),
+            other =
+                Other(
+                    projectDir = parsedArgs.getValue("project-dir")?.toFile(),
+                    templateUrl = parsedArgs.getValue("template-url"),
+                    minimal = parsedArgs.hasFlag("bare"),
+                ),
+        )
     }
 }

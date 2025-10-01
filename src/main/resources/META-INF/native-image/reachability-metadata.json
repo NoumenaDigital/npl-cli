@@ -262,6 +262,58 @@
       ]
     },
     {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "com.noumenadigital.npl.cli.config.YamlConfig$Runtime",
+            "com.noumenadigital.npl.cli.config.YamlConfig$Cloud",
+            "com.noumenadigital.npl.cli.config.YamlConfig$Local",
+            "com.noumenadigital.npl.cli.config.YamlConfig$Structure",
+            "int",
+            "kotlin.jvm.internal.DefaultConstructorMarker"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig$Cloud",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig$Local",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig$Runtime",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig$Structure",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.noumenadigital.npl.cli.model.Application",
       "allDeclaredFields": true,
       "methods": [

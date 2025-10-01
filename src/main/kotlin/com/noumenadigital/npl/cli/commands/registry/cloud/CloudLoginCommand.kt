@@ -1,7 +1,8 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
+import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -20,14 +21,16 @@ class CloudLoginCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "clientId",
+                name = "client-id",
+                yamlPropertyName = "cloud.clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
-                name = "clientSecret",
+                name = "client-secret",
+                yamlPropertyName = "cloud.clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
@@ -35,6 +38,7 @@ class CloudLoginCommand(
             ),
             NamedParameter(
                 name = "url",
+                yamlPropertyName = "cloud.url",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -43,16 +47,21 @@ class CloudLoginCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val clientId = parsedArgs.getValue("clientId")
-        val clientSecret = parsedArgs.getValue("clientSecret")
-        val url = parsedArgs.getValue("url")
+        val config =
+            ArgumentParser.parse(params, parameters) { settings ->
+                CloudLoginConfig(
+                    clientId = settings.local.clientId,
+                    clientSecret = settings.local.clientSecret,
+                    url = settings.cloud.url,
+                )
+            }
+
         val noumenaCloudAuthClient =
             NoumenaCloudAuthClient(
                 NoumenaCloudAuthConfig.get(
-                    clientId = clientId,
-                    clientSecret = clientSecret,
-                    url = url,
+                    clientId = config.clientId,
+                    clientSecret = config.clientSecret,
+                    url = config.url,
                 ),
             )
         val authManager = CloudAuthManager(noumenaCloudAuthClient)
@@ -69,3 +78,9 @@ class CloudLoginCommand(
         }
     }
 }
+
+data class CloudLoginConfig(
+    val clientId: String? = null,
+    val clientSecret: String? = null,
+    val url: String? = null,
+) : CommandConfig

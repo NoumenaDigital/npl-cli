@@ -3,8 +3,9 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.ExitCode.GENERAL_ERROR
 import com.noumenadigital.npl.cli.ExitCode.SUCCESS
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
+import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.config.CommandConfig
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
@@ -23,7 +24,8 @@ data class PumlCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
+                yamlPropertyName = "local.sourceDir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -32,7 +34,8 @@ data class PumlCommand(
                 isRequiredForMcp = true,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
+                yamlPropertyName = "local.outputDir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -83,18 +86,19 @@ data class PumlCommand(
     }
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
+        val config =
+            ArgumentParser.parse(params, parameters) { settings ->
+                PumlConfig(
+                    sourceDir = settings.structure.nplSourceDir ?: File("."),
+                    outputDir = settings.structure.outputDir ?: File("."),
+                )
+            }
 
-        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-        }
-
-        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
-        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
-        return PumlCommand(srcDir = srcDir, outputDir = outputDir)
-    }
-
-    companion object {
-        private const val CURRENT_DIRECTORY = "."
+        return PumlCommand(config.sourceDir.absolutePath, config.outputDir.absolutePath)
     }
 }
+
+data class PumlConfig(
+    val sourceDir: File = File("."),
+    val outputDir: File = File("."),
+) : CommandConfig
