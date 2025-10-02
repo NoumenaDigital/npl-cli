@@ -18,8 +18,8 @@ import com.noumenadigital.npl.cli.service.SourcesManager
 import java.io.File
 
 class CloudDeployFrontendCommand(
-    val sourcesManager: SourcesManager = SourcesManager("."),
-    val cloudDeployService: CloudDeployService =
+    private val sourcesManager: SourcesManager = SourcesManager("."),
+    private val cloudDeployService: CloudDeployService =
         CloudDeployService(
             CloudAuthManager(),
             NoumenaCloudClient(NoumenaCloudConfig()),

@@ -146,7 +146,7 @@ class DeployCommand(
     companion object {
         val USAGE_STRING =
             """
-            Usage: deploy --source-dir <directory> [--target <name>] [--config-file <path>] [--clear]
+            Usage: deploy --source-dir <directory> [--clear]
 
             Deploys NPL sources to a Noumena Engine instance.
 
@@ -159,14 +159,10 @@ class DeployCommand(
                                   └── migration.yml
                                   └── npl.yml
 
-            Target Specification (one required):
-              --target <name>     Named target from deploy.yml to deploy to.
-                                If --target is omitted, the 'defaultTarget' from deploy.yml is used if set.
-
             Options:
               --clear             Clear application contents before deployment.
 
-            Configuration for --target is read from .npl/deploy.yml (current dir).
+            Configuration is read from npl.yml (current dir).
             """.trimIndent()
     }
 }

@@ -149,7 +149,7 @@ class CloudDeployNplCommand(
         }
     }
 
-    fun findSingleFile(
+    private fun findSingleFile(
         fileName: String,
         searchDir: String = ".",
     ): File {
