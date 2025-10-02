@@ -100,7 +100,7 @@ object TestUtils {
             when (testMode) {
                 "binary" -> runWithBinary(commands, env)
                 "jar" -> runWithJar(commands, env)
-                else -> runDirect(commands)
+                else -> runDirect(commands, env)
             }
 
         testContext.apply(test)
@@ -181,7 +181,12 @@ object TestUtils {
         )
     }
 
-    private fun runDirect(commands: List<String>): TestContext {
+    private fun runDirect(
+        commands: List<String>,
+        env: Map<String, String>,
+    ): TestContext {
+        env.forEach { (k, v) -> System.setProperty(k, v) }
+
         val stringWriter = ColorWriter(StringWriter(), false)
 
         val exitCode = CommandProcessor().process(commands, stringWriter)

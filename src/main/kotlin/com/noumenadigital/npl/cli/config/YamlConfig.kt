@@ -16,10 +16,12 @@ data class YamlConfig(
     val local: Local = Local(),
     val structure: Structure = Structure(),
 ) {
-    val schemaVersion: String =
-        schemaUrl
-            .substringAfterLast("/")
-            .removeSuffix(".json") // TODO Modify to support any line
+    val schemaVersion: Int =
+        Regex("v(\\d+)$")
+            .find(schemaUrl)
+            ?.groupValues
+            ?.get(1)
+            ?.toInt() ?: 1
 
     data class Runtime(
         val version: String? = null,

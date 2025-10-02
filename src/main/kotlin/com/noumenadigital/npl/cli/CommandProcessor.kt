@@ -1,6 +1,7 @@
 package com.noumenadigital.npl.cli
 
 import com.noumenadigital.npl.cli.commands.registry.CommandsParser
+import com.noumenadigital.npl.cli.exception.ArgumentParsingException
 import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -31,6 +32,11 @@ class CommandProcessor(
                     }
 
                     is CommandParsingException -> {
+                        output.error(ex.buildOutputMessage())
+                        return ExitCode.USAGE_ERROR
+                    }
+
+                    is ArgumentParsingException -> {
                         output.error(ex.buildOutputMessage())
                         return ExitCode.USAGE_ERROR
                     }

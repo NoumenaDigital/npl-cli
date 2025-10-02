@@ -32,21 +32,18 @@ class CloudDeployFrontendCommand(
         listOf(
             NamedParameter(
                 name = "app",
-                yamlPropertyName = "cloud.app",
                 description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
             ),
             NamedParameter(
                 name = "tenant",
-                yamlPropertyName = "cloud.tenant",
                 description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
                 name = "frontend",
-                yamlPropertyName = "cloud.frontend",
                 description = "Path to the frontend source directory containing the index.html file",
                 isRequired = true,
                 valuePlaceholder = "<frontend>",
@@ -54,7 +51,6 @@ class CloudDeployFrontendCommand(
             ),
             NamedParameter(
                 name = "url",
-                yamlPropertyName = "cloud.url",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
@@ -62,7 +58,6 @@ class CloudDeployFrontendCommand(
             ),
             NamedParameter(
                 name = "client-id",
-                yamlPropertyName = "cloud.clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
@@ -70,7 +65,6 @@ class CloudDeployFrontendCommand(
             ),
             NamedParameter(
                 name = "client-secret",
-                yamlPropertyName = "cloud.clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
@@ -78,7 +72,6 @@ class CloudDeployFrontendCommand(
             ),
             NamedParameter(
                 name = "auth-url",
-                yamlPropertyName = "cloud.authUrl",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,

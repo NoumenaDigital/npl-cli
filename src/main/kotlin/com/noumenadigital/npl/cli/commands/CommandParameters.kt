@@ -4,11 +4,11 @@ import com.noumenadigital.npl.cli.commands.AppSettings.Other
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser.ParsedArguments
 import com.noumenadigital.npl.cli.config.YAMLConfigParser
 import com.noumenadigital.npl.cli.config.YamlConfig
+import com.noumenadigital.npl.cli.exception.ArgumentParsingException
 import java.io.File
 
 data class NamedParameter(
     val name: String,
-    val yamlPropertyName: String = name,
     val description: String,
     val defaultValue: String? = null,
     val isRequired: Boolean = false,
@@ -95,6 +95,10 @@ object ArgumentParser {
     ): T {
         val yamlConfig = YAMLConfigParser.parse()
         val parsed = CommandArgumentParser.parse(params, namedParameters)
+
+        if (parsed.unexpectedArgs.isNotEmpty()) {
+            throw ArgumentParsingException("Unexpected arguments: ${parsed.unexpectedArgs.joinToString(" ")}")
+        }
 
         return genConfig(toAppSettings(parsed, yamlConfig))
     }

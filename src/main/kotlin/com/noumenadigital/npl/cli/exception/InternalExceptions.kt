@@ -2,6 +2,10 @@ package com.noumenadigital.npl.cli.exception
 
 sealed class InternalException : RuntimeException()
 
+class ArgumentParsingException(
+    override val message: String,
+) : InternalException()
+
 class CommandParsingException(
     val commands: List<String> = emptyList(),
 ) : InternalException()

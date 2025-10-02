@@ -30,7 +30,6 @@ class CommandParametersTest :
 
         context("CommandArgumentParser") {
             val parser = CommandArgumentParser
-//            val argParser = ArgumentParser
             val namedParamWithValue =
                 NamedParameter(name = "file", description = "File path", valuePlaceholder = "<path>")
             val namedFlag = NamedParameter(name = "verbose", description = "Enable verbose mode")
@@ -45,15 +44,6 @@ class CommandParametersTest :
                 result.hasFlag("verbose").shouldBeFalse()
                 result.unexpectedArgs shouldBe listOf("other")
             }
-
-//            test("should parse named parameter with value with ArgumentParser") {
-//                val args = listOf("--file", "my/path.txt", "other")
-//                val result = parser.parse(args, parameters)
-//
-//                result.getValue("file") shouldBe "my/path.txt"
-//                result.hasFlag("verbose").shouldBeFalse()
-//                result.unexpectedArgs shouldBe listOf("other")
-//            }
 
             test("should parse named flag") {
                 val args = listOf("--verbose", "other", "--file", "path")

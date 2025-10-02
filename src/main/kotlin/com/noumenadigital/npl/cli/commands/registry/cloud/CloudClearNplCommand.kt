@@ -29,21 +29,18 @@ class CloudClearNplCommand(
         listOf(
             NamedParameter(
                 name = "app",
-                yamlPropertyName = "cloud.app",
                 description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
             ),
             NamedParameter(
                 name = "tenant",
-                yamlPropertyName = "cloud.tenant",
                 description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
             ),
             NamedParameter(
                 name = "url",
-                yamlPropertyName = "cloud.url",
                 description = "NOUMENA Cloud deployment URL",
                 isRequired = false,
                 isHidden = true,
@@ -51,7 +48,6 @@ class CloudClearNplCommand(
             ),
             NamedParameter(
                 name = "client-id",
-                yamlPropertyName = "cloud.clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
@@ -59,7 +55,6 @@ class CloudClearNplCommand(
             ),
             NamedParameter(
                 name = "client-secret",
-                yamlPropertyName = "cloud.clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
@@ -67,7 +62,6 @@ class CloudClearNplCommand(
             ),
             NamedParameter(
                 name = "auth-url",
-                yamlPropertyName = "cloud.authUrl",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,

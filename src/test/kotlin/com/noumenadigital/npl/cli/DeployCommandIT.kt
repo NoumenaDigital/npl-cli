@@ -1,14 +1,9 @@
 package com.noumenadigital.npl.cli
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import com.noumenadigital.npl.cli.commands.registry.DeployCommand
-import com.noumenadigital.npl.cli.config.DeployConfig
-import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -74,49 +69,6 @@ class DeployCommandIT :
         fun cleanupMockServers() {
             mockOidc.shutdown()
             mockEngine.shutdown()
-        }
-
-        fun createConfigFile(
-            tempDir: File,
-            engineManagementUrl: String,
-            oidcAuthUrl: String,
-            schemaVersion: String = "v1",
-            defaultTarget: String? = null,
-        ): File {
-            val configDir = File(tempDir, ".npl")
-            configDir.mkdirs()
-
-            val configFile = File(configDir, "deploy.yml")
-
-            val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
-
-            val deployConfig =
-                DeployConfig(
-                    schemaVersion = schemaVersion,
-                    targets =
-                        mapOf(
-                            "test-target" to
-                                EngineTargetConfig(
-                                    engineManagementUrl = engineManagementUrl,
-                                    authUrl = "${oidcAuthUrl}realms/noumena",
-                                    username = "user1",
-                                    password = "password1",
-                                    clientId = "nm-platform-service-client",
-                                    clientSecret = "87ff12ca-cf29-4719-bda8-c92faa78e3c4",
-                                ),
-                            "other-target" to
-                                EngineTargetConfig(
-                                    engineManagementUrl = engineManagementUrl,
-                                    authUrl = "${oidcAuthUrl}realms/noumena",
-                                    username = "user2",
-                                    password = "password2",
-                                ),
-                        ),
-                    defaultTarget = defaultTarget,
-                )
-
-            mapper.writeValue(configFile, deployConfig)
-            return configFile
         }
 
         fun executeDeployCommand(): Pair<String, Int> {
@@ -490,7 +442,7 @@ class DeployCommandIT :
                 exitCode shouldBe ExitCode.GENERAL_ERROR.code
             }
 
-            xtest("error when defaultTarget is invalid") {
+            test("error when defaultTarget is invalid") {
                 val engineUrl = mockEngine.url("/").toString()
                 val oidcUrl = mockOidc.url("/").toString()
                 val testDirPath =
@@ -615,28 +567,8 @@ class DeployCommandIT :
 
         context("command validation errors") {
             test("missing target parameter") {
-                val engineUrl = mockEngine.url("/").toString()
-                val oidcUrl = mockOidc.url("/").toString()
-
                 val testDirPath =
                     getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
-
-                TestUtils.createYamlConfig(
-                    """
-                    cloud:
-                      authUrl: ${oidcUrl}realms/noumena
-
-                    local:
-                      clientId: nm-platform-service-client
-                      clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
-                      managementUrl: $engineUrl
-                      username: user1
-                      password: password1
-
-                    structure:
-                      sourceDir: $testDirPath
-                    """.trimIndent(),
-                )
 
                 runCommand(
                     commands = listOf("deploy", "--source-dir", testDirPath),
@@ -652,7 +584,7 @@ class DeployCommandIT :
                 }
             }
 
-            xtest("missing directory parameter") {
+            test("missing directory parameter") {
                 runCommand(
                     commands = listOf("deploy", "--target", "test-target"),
                 ) {

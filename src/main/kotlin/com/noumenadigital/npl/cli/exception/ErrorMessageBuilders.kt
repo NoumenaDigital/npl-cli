@@ -58,6 +58,8 @@ fun DeployConfigException.buildOutputMessage(): String {
 
 fun ClientSetupException.buildOutputMessage(): String = "Client setup error: ${this.message}"
 
+fun ArgumentParsingException.buildOutputMessage(): String = this.message
+
 fun AuthorizationFailedException.buildOutputMessage(): String = this.message
 
 fun CloudCommandException.buildOutputMessage(): String = "Command ${this.commandName} failed: ${this.message}"

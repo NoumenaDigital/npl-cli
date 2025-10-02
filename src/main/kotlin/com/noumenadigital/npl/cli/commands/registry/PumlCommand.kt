@@ -25,7 +25,6 @@ data class PumlCommand(
         listOf(
             NamedParameter(
                 name = "source-dir",
-                yamlPropertyName = "local.sourceDir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -35,7 +34,6 @@ data class PumlCommand(
             ),
             NamedParameter(
                 name = "output-dir",
-                yamlPropertyName = "local.outputDir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -93,10 +91,6 @@ data class PumlCommand(
                     outputDir = settings.structure.outputDir ?: File("."),
                 )
             }
-
-//        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-//            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-//        }
 
         return PumlCommand(config.sourceDir.absolutePath, config.outputDir.absolutePath)
     }

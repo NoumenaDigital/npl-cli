@@ -22,7 +22,6 @@ class CloudLoginCommand(
         listOf(
             NamedParameter(
                 name = "client-id",
-                yamlPropertyName = "cloud.clientId",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
@@ -30,7 +29,6 @@ class CloudLoginCommand(
             ),
             NamedParameter(
                 name = "client-secret",
-                yamlPropertyName = "cloud.clientSecret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
@@ -38,7 +36,6 @@ class CloudLoginCommand(
             ),
             NamedParameter(
                 name = "url",
-                yamlPropertyName = "cloud.url",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,

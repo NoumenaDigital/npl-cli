@@ -22,7 +22,6 @@ data class CheckCommand(
         listOf(
             NamedParameter(
                 name = "source-dir",
-                yamlPropertyName = "local.sourceDir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -37,10 +36,6 @@ data class CheckCommand(
             ArgumentParser.parse(params, parameters) { settings ->
                 CheckConfig(sourceDir = settings.structure.nplSourceDir ?: File("."))
             }
-
-//        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-//            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-//        }
 
         val srcDir = config.sourceDir
         return CheckCommand(srcDir = srcDir.absolutePath)

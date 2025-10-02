@@ -33,7 +33,6 @@ data class TestCommand(
         listOf(
             NamedParameter(
                 name = "source-dir",
-                yamlPropertyName = "local.sourceDir",
                 description =
                     "Source directory containing NPL tests to run." +
                         " Must be a parent directory of all required sources (both production and test).",
@@ -45,13 +44,11 @@ data class TestCommand(
             ),
             NamedParameter(
                 name = "coverage",
-                yamlPropertyName = "local.coverage",
                 description = "Report test coverage details (printed to console as well as coverage.xml)",
                 isRequired = false,
             ),
             NamedParameter(
                 name = "output-dir",
-                yamlPropertyName = "local.outputDir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -73,11 +70,6 @@ data class TestCommand(
                         outputDir = settings.structure.outputDir ?: File("."),
                     )
                 }
-
-//            if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-//                output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-//                return ExitCode.USAGE_ERROR
-//            }
 
             if (!config.sourceDir.isDirectory || !config.sourceDir.exists()) {
                 output.error(

@@ -40,7 +40,6 @@ data class OpenapiCommand(
         listOf(
             NamedParameter(
                 name = "source-dir",
-                yamlPropertyName = "local.sourceDir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -75,10 +74,6 @@ data class OpenapiCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val config = parseParams(params)
-
-//        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-//            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-//        }
 
         return OpenapiCommand(
             config.sourceDir.absolutePath,

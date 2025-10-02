@@ -30,7 +30,6 @@ class DeployCommand(
             ),
             NamedParameter(
                 name = "source-dir",
-                yamlPropertyName = "local.sourceDir",
                 description = "Directory containing NPL sources",
                 isRequired = true,
                 valuePlaceholder = "<directory>",
@@ -39,7 +38,6 @@ class DeployCommand(
             ),
             NamedParameter(
                 name = "clear",
-                yamlPropertyName = "local.clear",
                 description = "Clear application contents before deployment",
                 isRequired = false,
             ),
@@ -62,12 +60,6 @@ class DeployCommand(
                     engineManagementUrl = settings.local.managementUrl ?: MGMT_URL_DEFAULT,
                 )
             }
-
-//        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-//            output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-//            displayUsage(output)
-//            return ExitCode.GENERAL_ERROR
-//        }
 
         if (config.sourceDir == null) {
             output.error("Missing required parameter: --source-dir <directory>")
