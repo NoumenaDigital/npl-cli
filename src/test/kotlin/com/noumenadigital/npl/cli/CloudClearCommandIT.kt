@@ -365,7 +365,7 @@ class CloudClearCommandIT :
 
         context("Yaml config") {
             withTestContext {
-                TestUtils.createYamlConfig(
+                TestUtils.withYamlConfig(
                     """
                     cloud:
                       app: appslug
@@ -373,23 +373,24 @@ class CloudClearCommandIT :
                       url: ${mockNC.url("/")}
                       authUrl: "http://localhost:${mockOidc.port}/realms/paas/"
                     """.trimIndent(),
-                )
-
-                runCommand(
-                    commands =
-                        listOf(
-                            "cloud",
-                            "clear",
-                        ),
                 ) {
-                    process.waitFor()
-                    val expectedOutput =
-                        """
+
+                    runCommand(
+                        commands =
+                            listOf(
+                                "cloud",
+                                "clear",
+                            ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
                         NPL sources successfully cleared from NOUMENA Cloud app.
                         """.normalize()
 
-                    output.normalize() shouldBe expectedOutput
-                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
                 }
             }
         }

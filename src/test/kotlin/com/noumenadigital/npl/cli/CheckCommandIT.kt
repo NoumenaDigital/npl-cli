@@ -329,26 +329,27 @@ class CheckCommandIT :
             val testDirPath =
                 getTestResourcesPath(listOf("success", "single_file")).toAbsolutePath().toString()
 
-            TestUtils.createYamlConfig(
+            TestUtils.withYamlConfig(
                 """
                 structure:
                   sourceDir: $testDirPath
                 """.trimIndent(),
-            )
-            runCommand(
-                commands = listOf("check"),
             ) {
-                process.waitFor()
+                runCommand(
+                    commands = listOf("check"),
+                ) {
+                    process.waitFor()
 
-                val expectedOutput =
-                    """
+                    val expectedOutput =
+                        """
                     Completed compilation for 1 file in XXX ms
 
                     NPL check completed successfully.
                     """.normalize()
 
-                output.normalize() shouldBe expectedOutput
-                process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
             }
         }
     })

@@ -8,12 +8,10 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.intellij.lang.annotations.Language
 import java.io.File
 
 class CloudDeployNplCommandIT :
     FunSpec({
-
         class TestContext {
             var mockOidc: MockWebServer = MockWebServer()
             var mockNC: MockWebServer = MockWebServer()
@@ -411,12 +409,7 @@ class CloudDeployNplCommandIT :
             }
         }
         context("yaml config") {
-            fun happyPath(
-                @Language("yaml") yamlConfig: String?,
-                params: List<String>,
-            ) {
-                yamlConfig?.let { TestUtils.createYamlConfig(it) }
-
+            fun happyPath(params: List<String>) {
                 runCommand(
                     commands =
                         listOf(
@@ -453,52 +446,51 @@ class CloudDeployNplCommandIT :
                             mockOidc.url("/realms/paas/").toString(),
                         )
 
-                    happyPath(
-                        params = params,
-                        yamlConfig = null,
-                    )
+                    happyPath(params = params)
                 }
             }
 
             test("Yaml config only") {
                 withTestContext {
-                    happyPath(
-                        params = emptyList(),
-                        yamlConfig =
-                            """
-                            cloud:
-                                app: appslug
-                                tenant: tenantslug
-                                url: ${mockNC.url("/")}
-                                authUrl: ${mockOidc.url("/realms/paas/")}
-                            structure:
-                                migration: src/test/resources/npl-sources/deploy-success/main/migration.yml
-                            """.trimIndent(),
-                    )
+                    TestUtils.withYamlConfig(
+                        """
+                        cloud:
+                            app: appslug
+                            tenant: tenantslug
+                            url: ${mockNC.url("/")}
+                            authUrl: ${mockOidc.url("/realms/paas/")}
+                        structure:
+                            migration: src/test/resources/npl-sources/deploy-success/main/migration.yml
+                        """.trimIndent(),
+                    ) {
+                        happyPath(params = emptyList())
+                    }
                 }
             }
 
             test("Both command line params and Yaml config") {
                 withTestContext {
-                    happyPath(
-                        params =
-                            listOf(
-                                "--app",
-                                "appslug",
-                                "--tenant",
-                                "tenantslug",
-                                "--migration",
-                                "src/test/resources/npl-sources/deploy-success/main/migration.yml",
-                            ),
-                        yamlConfig =
-                            """
-                            cloud:
-                                url: ${mockNC.url("/")}
-                                authUrl: ${mockOidc.url("/realms/paas/")}
-                            structure:
-                                migration: ignored/because/of/command-line-params
-                            """.trimIndent(),
-                    )
+                    TestUtils.withYamlConfig(
+                        """
+                        cloud:
+                            url: ${mockNC.url("/")}
+                            authUrl: ${mockOidc.url("/realms/paas/")}
+                        structure:
+                            migration: ignored/because/of/command-line-params
+                        """.trimIndent(),
+                    ) {
+                        happyPath(
+                            params =
+                                listOf(
+                                    "--app",
+                                    "appslug",
+                                    "--tenant",
+                                    "tenantslug",
+                                    "--migration",
+                                    "src/test/resources/npl-sources/deploy-success/main/migration.yml",
+                                ),
+                        )
+                    }
                 }
             }
         }

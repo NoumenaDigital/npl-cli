@@ -56,13 +56,15 @@ object TestUtils {
     // Determines how to run the tests based on the test.mode system property
     private fun getTestMode(): String = System.getenv().getOrDefault("TEST_MODE", "direct")
 
-    fun createYamlConfig(
+    fun withYamlConfig(
         @Language("yaml") yaml: String,
+        test: () -> Unit,
     ): File =
         File("npl.yml").apply {
             createNewFile()
             writeText(yaml)
-            deleteOnExit()
+            test()
+            delete()
         }
 
     fun getTestResourcesPath(subPath: List<String> = emptyList()): Path {

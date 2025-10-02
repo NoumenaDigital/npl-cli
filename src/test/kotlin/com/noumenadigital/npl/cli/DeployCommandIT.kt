@@ -106,7 +106,7 @@ class DeployCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
-                TestUtils.createYamlConfig(
+                TestUtils.withYamlConfig(
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
@@ -122,15 +122,16 @@ class DeployCommandIT :
                     structure:
                       sourceDir: $testDirPath
                     """.trimIndent(),
-                )
+                ) {
 
-                val (output, exitCode) = executeDeployCommand()
+                    val (output, exitCode) = executeDeployCommand()
 
-                output.normalize() shouldBe
-                    """
-                    Successfully deployed NPL sources and migrations to $engineUrl.
-                    """.trimIndent()
-                exitCode shouldBe ExitCode.SUCCESS.code
+                    output.normalize() shouldBe
+                        """
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
+                }
             }
 
             test("simple deploy - relative path") {
@@ -147,7 +148,7 @@ class DeployCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("deploy-success", "main")).toFile().relativeOrAbsolute().toString()
 
-                TestUtils.createYamlConfig(
+                TestUtils.withYamlConfig(
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
@@ -163,15 +164,15 @@ class DeployCommandIT :
                     structure:
                       sourceDir: $testDirPath
                     """.trimIndent(),
-                )
+                ) {
+                    val (output, exitCode) = executeDeployCommand()
 
-                val (output, exitCode) = executeDeployCommand()
-
-                output.normalize() shouldBe
-                    """
-                    Successfully deployed NPL sources and migrations to $engineUrl.
-                    """.trimIndent()
-                exitCode shouldBe ExitCode.SUCCESS.code
+                    output.normalize() shouldBe
+                        """
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
+                }
             }
 
             test("deploy with clear flag") {
@@ -195,7 +196,7 @@ class DeployCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
-                TestUtils.createYamlConfig(
+                TestUtils.withYamlConfig(
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
@@ -212,16 +213,16 @@ class DeployCommandIT :
                     structure:
                       sourceDir: $testDirPath
                     """.trimIndent(),
-                )
+                ) {
+                    val (output, exitCode) = executeDeployCommand()
 
-                val (output, exitCode) = executeDeployCommand()
-
-                output.normalize() shouldBe
-                    """
-                    Application contents cleared for $engineUrl
-                    Successfully deployed NPL sources and migrations to $engineUrl.
-                    """.trimIndent()
-                exitCode shouldBe ExitCode.SUCCESS.code
+                    output.normalize() shouldBe
+                        """
+                        Application contents cleared for $engineUrl
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
+                }
             }
 
             test("override parameter from yaml config with command line") {
@@ -238,7 +239,7 @@ class DeployCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
-                TestUtils.createYamlConfig(
+                TestUtils.withYamlConfig(
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
@@ -252,22 +253,23 @@ class DeployCommandIT :
                     structure:
                       sourceDir: $testDirPath
                     """.trimIndent(),
-                )
+                ) {
 
-                var output = ""
-                var exitCode = -1
+                    var output = ""
+                    var exitCode = -1
 
-                runCommand(commands = listOf("deploy", "--target", "other-target")) {
-                    process.waitFor(60, TimeUnit.SECONDS)
-                    output = this.output
-                    exitCode = process.exitValue()
+                    runCommand(commands = listOf("deploy", "--target", "other-target")) {
+                        process.waitFor(60, TimeUnit.SECONDS)
+                        output = this.output
+                        exitCode = process.exitValue()
+                    }
+
+                    output.normalize() shouldBe
+                        """
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
                 }
-
-                output.normalize() shouldBe
-                    """
-                    Successfully deployed NPL sources and migrations to $engineUrl.
-                    """.trimIndent()
-                exitCode shouldBe ExitCode.SUCCESS.code
             }
 
             test("deploy using default target and . path") {
@@ -284,7 +286,7 @@ class DeployCommandIT :
                 var output = ""
                 var exitCode = -1
 
-                TestUtils.createYamlConfig(
+                TestUtils.withYamlConfig(
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
@@ -298,19 +300,19 @@ class DeployCommandIT :
                     structure:
                       sourceDir: .
                     """.trimIndent(),
-                )
+                ) {
+                    runCommand(commands = listOf("deploy")) {
+                        process.waitFor(60, TimeUnit.SECONDS)
+                        output = this.output
+                        exitCode = process.exitValue()
+                    }
 
-                runCommand(commands = listOf("deploy")) {
-                    process.waitFor(60, TimeUnit.SECONDS)
-                    output = this.output
-                    exitCode = process.exitValue()
+                    output.normalize() shouldBe
+                        """
+                        Successfully deployed NPL sources and migrations to $engineUrl.
+                        """.trimIndent()
+                    exitCode shouldBe ExitCode.SUCCESS.code
                 }
-
-                output.normalize() shouldBe
-                    """
-                    Successfully deployed NPL sources and migrations to $engineUrl.
-                    """.trimIndent()
-                exitCode shouldBe ExitCode.SUCCESS.code
             }
         }
 
@@ -349,7 +351,7 @@ class DeployCommandIT :
                 val testDirPath =
                     getTestResourcesPath(listOf("deploy-failure", "main")).toAbsolutePath().toString()
 
-                TestUtils.createYamlConfig(
+                TestUtils.withYamlConfig(
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
@@ -366,21 +368,22 @@ class DeployCommandIT :
                     structure:
                       sourceDir: $testDirPath
                     """.trimIndent(),
-                )
+                ) {
 
-                val (output, exitCode) = executeDeployCommand()
+                    val (output, exitCode) = executeDeployCommand()
 
-                output.normalize() shouldBe
-                    """
-                    Application contents cleared for $engineUrl
-                    Error deploying NPL sources: '1' source errors encountered:
-                    class SourceErrorDetail {
-                        code: 0001
-                        description: /npl-1.0/objects/iou/iou.npl: (1, 9) E0001: Syntax error: missing {<EOF>, ';'} at 'NPL'
-                    }
-                    """.trimIndent()
+                    output.normalize() shouldBe
+                        """
+                        Application contents cleared for $engineUrl
+                        Error deploying NPL sources: '1' source errors encountered:
+                        class SourceErrorDetail {
+                            code: 0001
+                            description: /npl-1.0/objects/iou/iou.npl: (1, 9) E0001: Syntax error: missing {<EOF>, ';'} at 'NPL'
+                        }
+                        """.trimIndent()
 
-                exitCode shouldBe ExitCode.GENERAL_ERROR.code
+                    exitCode shouldBe ExitCode.GENERAL_ERROR.code
+                }
             }
 
             test("when deploying without required migration file") {
@@ -413,7 +416,7 @@ class DeployCommandIT :
                         .toAbsolutePath()
                         .toString()
 
-                TestUtils.createYamlConfig(
+                TestUtils.withYamlConfig(
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
@@ -430,16 +433,16 @@ class DeployCommandIT :
                     structure:
                       sourceDir: $testDirPath
                     """.trimIndent(),
-                )
+                ) {
+                    val (output, exitCode) = executeDeployCommand()
+                    output.normalize() shouldBe
+                        """
+                        Application contents cleared for $engineUrl
+                        Error deploying NPL sources: Unknown exception: 'Could not locate `migration.yml` in zip:file:/tmp/npl-deployment-${mockEngine.hostName}.zip'
+                        """.trimIndent()
 
-                val (output, exitCode) = executeDeployCommand()
-                output.normalize() shouldBe
-                    """
-                    Application contents cleared for $engineUrl
-                    Error deploying NPL sources: Unknown exception: 'Could not locate `migration.yml` in zip:file:/tmp/npl-deployment-${mockEngine.hostName}.zip'
-                    """.trimIndent()
-
-                exitCode shouldBe ExitCode.GENERAL_ERROR.code
+                    exitCode shouldBe ExitCode.GENERAL_ERROR.code
+                }
             }
         }
 
@@ -489,7 +492,7 @@ class DeployCommandIT :
                     val testDirPath =
                         getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
 
-                    TestUtils.createYamlConfig(
+                    TestUtils.withYamlConfig(
                         """
                         cloud:
                           authUrl: ${oidcUrl}realms/noumena
@@ -505,17 +508,18 @@ class DeployCommandIT :
                         structure:
                           sourceDir: $testDirPath
                         """.trimIndent(),
-                    )
+                    ) {
 
-                    val (output, exitCode) = executeDeployCommand()
+                        val (output, exitCode) = executeDeployCommand()
 
-                    val expectedOutput =
-                        """
-                        Authorization exception: Invalid client credentials
-                        """.trimIndent()
+                        val expectedOutput =
+                            """
+                            Authorization exception: Invalid client credentials
+                            """.trimIndent()
 
-                    output.normalize() shouldBe expectedOutput
-                    exitCode shouldBe ExitCode.CONFIG_ERROR.code
+                        output.normalize() shouldBe expectedOutput
+                        exitCode shouldBe ExitCode.CONFIG_ERROR.code
+                    }
                 } finally {
                     tempDir.deleteRecursively()
                     setupMockServers() // Re-setup default dispatchers

@@ -8,7 +8,6 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.intellij.lang.annotations.Language
 import java.io.File
 
 class CloudDeployFrontendCommandIT :
@@ -448,12 +447,7 @@ class CloudDeployFrontendCommandIT :
         }
 
         context("Yaml Config") {
-            fun happyPath(
-                @Language("yaml") yamlConfig: String?,
-                params: List<String>,
-            ) {
-                yamlConfig?.let { TestUtils.createYamlConfig(it) }
-
+            fun happyPath(params: List<String>) {
                 runCommand(
                     commands =
                         listOf(
@@ -477,7 +471,6 @@ class CloudDeployFrontendCommandIT :
             test("command line arguments only") {
                 withTestContext {
                     happyPath(
-                        yamlConfig = null,
                         params =
                             listOf(
                                 "--app",
@@ -497,8 +490,8 @@ class CloudDeployFrontendCommandIT :
 
             test("yaml config only") {
                 withTestContext {
-                    happyPath(
-                        yamlConfig = """
+                    TestUtils.withYamlConfig(
+                        """
                           cloud:
                             app: appslug
                             tenant: tenantslug
@@ -507,32 +500,35 @@ class CloudDeployFrontendCommandIT :
                           structure:
                             frontend: src/test/resources/frontend-sources/deploy-success/build
                         """,
-                        params = emptyList(),
-                    )
+                    ) {
+                        happyPath(params = emptyList())
+                    }
                 }
             }
 
             test("Both command line arguments and yaml config") {
                 withTestContext {
-                    happyPath(
-                        yamlConfig =
-                            """
-                            cloud:
+                    TestUtils.withYamlConfig(
+                        """
+                          cloud:
                               app: appslug
                               tenant: tenantslug
-                            structure:
+                          structure:
                               frontend: src/test/resources/frontend-sources/deploy-success/build
-                            """.trimIndent(),
-                        params =
-                            listOf(
-                                "--tenant",
-                                "tenantslug",
-                                "--url",
-                                mockNC.url("/").toString(),
-                                "--auth-url",
-                                mockOidc.url("/realms/paas/").toString(),
-                            ),
-                    )
+                        """,
+                    ) {
+                        happyPath(
+                            params =
+                                listOf(
+                                    "--tenant",
+                                    "tenantslug",
+                                    "--url",
+                                    mockNC.url("/").toString(),
+                                    "--auth-url",
+                                    mockOidc.url("/realms/paas/").toString(),
+                                ),
+                        )
+                    }
                 }
             }
         }

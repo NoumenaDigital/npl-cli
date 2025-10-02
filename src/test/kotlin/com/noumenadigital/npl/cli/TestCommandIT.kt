@@ -304,15 +304,14 @@ class TestCommandIT :
 
                     val testPath = getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath()
 
-                    TestUtils.createYamlConfig(yamlConfig)
+                    TestUtils.withYamlConfig(yamlConfig) {
+                        runCommand(
+                            commands = listOf("test", *params.toTypedArray()),
+                        ) {
+                            process.waitFor()
 
-                    runCommand(
-                        commands = listOf("test", *params.toTypedArray()),
-                    ) {
-                        process.waitFor()
-
-                        val expectedOutput =
-                            """
+                            val expectedOutput =
+                                """
                         '$testPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
                         Line coverage summary
                         --------------------------------------
@@ -325,39 +324,40 @@ class TestCommandIT :
                         NPL test completed successfully in XXX ms.
                         """.normalize()
 
-                        coverageFile.exists() shouldBe testWithCoverage
-                        if (testWithCoverage) {
-                            coverageFile.readText().normalize() shouldBe
-                                """
-                                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-                                <coverage version="1">
-                                    <file path="$testPath/src/main/npl/objects/iou/iou.npl">
-                                        <lineToCover covered="true" lineNumber="8"/>
-                                        <lineToCover covered="true" lineNumber="12"/>
-                                        <lineToCover covered="true" lineNumber="18"/>
-                                        <lineToCover covered="true" lineNumber="20"/>
-                                        <lineToCover covered="true" lineNumber="24"/>
-                                        <lineToCover covered="true" lineNumber="25"/>
-                                        <lineToCover covered="true" lineNumber="27"/>
-                                        <lineToCover covered="true" lineNumber="29"/>
-                                        <lineToCover covered="true" lineNumber="31"/>
-                                        <lineToCover covered="false" lineNumber="38"/>
-                                        <lineToCover covered="true" lineNumber="43"/>
-                                    </file>
-                                    <file path="$testPath/src/test/npl/objects/test_iou.npl">
-                                        <lineToCover covered="true" lineNumber="10"/>
-                                        <lineToCover covered="true" lineNumber="12"/>
-                                        <lineToCover covered="true" lineNumber="17"/>
-                                        <lineToCover covered="true" lineNumber="18"/>
-                                        <lineToCover covered="true" lineNumber="20"/>
-                                    </file>
-                                </coverage>
+                            coverageFile.exists() shouldBe testWithCoverage
+                            if (testWithCoverage) {
+                                coverageFile.readText().normalize() shouldBe
+                                    """
+                                    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                                    <coverage version="1">
+                                        <file path="$testPath/src/main/npl/objects/iou/iou.npl">
+                                            <lineToCover covered="true" lineNumber="8"/>
+                                            <lineToCover covered="true" lineNumber="12"/>
+                                            <lineToCover covered="true" lineNumber="18"/>
+                                            <lineToCover covered="true" lineNumber="20"/>
+                                            <lineToCover covered="true" lineNumber="24"/>
+                                            <lineToCover covered="true" lineNumber="25"/>
+                                            <lineToCover covered="true" lineNumber="27"/>
+                                            <lineToCover covered="true" lineNumber="29"/>
+                                            <lineToCover covered="true" lineNumber="31"/>
+                                            <lineToCover covered="false" lineNumber="38"/>
+                                            <lineToCover covered="true" lineNumber="43"/>
+                                        </file>
+                                        <file path="$testPath/src/test/npl/objects/test_iou.npl">
+                                            <lineToCover covered="true" lineNumber="10"/>
+                                            <lineToCover covered="true" lineNumber="12"/>
+                                            <lineToCover covered="true" lineNumber="17"/>
+                                            <lineToCover covered="true" lineNumber="18"/>
+                                            <lineToCover covered="true" lineNumber="20"/>
+                                        </file>
+                                    </coverage>
 
-                                """.trimIndent().normalize()
+                                    """.trimIndent().normalize()
 
-                            output.normalize() shouldBe expectedOutput
+                                output.normalize() shouldBe expectedOutput
+                            }
+                            process.exitValue() shouldBe ExitCode.SUCCESS.code
                         }
-                        process.exitValue() shouldBe ExitCode.SUCCESS.code
                     }
                 }
 

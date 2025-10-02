@@ -8,7 +8,6 @@ import io.kotest.assertions.shouldFail
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
-import org.intellij.lang.annotations.Language
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
@@ -149,12 +148,7 @@ class PumlCommandIT :
             val file =
                 Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files")
 
-            fun happyPath(
-                @Language("yaml") yamlConfig: String?,
-                params: List<String>,
-            ) {
-                if (yamlConfig != null) TestUtils.createYamlConfig(yamlConfig)
-
+            fun happyPath(params: List<String>) {
                 withPumlTestContext(testDir = listOf("success", "multiple_files")) {
                     runCommand(commands = listOf("puml", *params.toTypedArray())) {
                         process.waitFor()
@@ -183,44 +177,41 @@ class PumlCommandIT :
             }
 
             test("Use property only from yaml config") {
-                happyPath(
-                    yamlConfig =
-                        """
-                        structure:
-                          sourceDir: ${file.absolutePathString()}
-                        """.trimIndent(),
-                    params = emptyList(),
-                )
+                TestUtils.withYamlConfig(
+                    """
+                    structure:
+                      sourceDir: ${file.absolutePathString()}
+                    """.trimIndent(),
+                ) {
+                    happyPath(params = emptyList())
+                }
             }
 
             test("Use property only from command line") {
-                happyPath(
-                    yamlConfig = null,
-                    params = listOf("--source-dir", file.pathString),
-                )
+                happyPath(params = listOf("--source-dir", file.pathString))
             }
 
             test("Override property from yaml config with command line argument") {
-                happyPath(
-                    yamlConfig =
-                        """
-                        local:
-                          sourceDir: /invalid/path
-                        """.trimIndent(),
-                    params = listOf("--source-dir", file.pathString),
-                )
+                TestUtils.withYamlConfig(
+                    """
+                    local:
+                      sourceDir: /invalid/path
+                    """.trimIndent(),
+                ) {
+                    happyPath(params = listOf("--source-dir", file.pathString))
+                }
             }
 
             test("Should fail if command line argument is invalid") {
                 shouldFail {
-                    happyPath(
-                        yamlConfig =
-                            """
-                            local:
-                              sourceDir: ${file.pathString}
-                            """.trimIndent(),
-                        params = listOf("--source-dir", "/invalid/path"),
-                    )
+                    TestUtils.withYamlConfig(
+                        """
+                        local:
+                          sourceDir: ${file.pathString}
+                        """.trimIndent(),
+                    ) {
+                        happyPath(params = emptyList())
+                    }
                 }
             }
         }

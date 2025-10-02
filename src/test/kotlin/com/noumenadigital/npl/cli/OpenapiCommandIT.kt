@@ -541,31 +541,29 @@ class OpenapiCommandIT :
         context("Yaml config") {
             test("yaml config happy path") {
                 withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
-                    TestUtils.createYamlConfig(
+                    TestUtils.withYamlConfig(
                         """
                         structure:
                           sourceDir: $absolutePath
                         """.trimIndent(),
-                    )
-
-                    runCommand(
-                        commands = listOf("openapi"),
                     ) {
-                        process.waitFor()
+                        runCommand(commands = listOf("openapi")) {
+                            process.waitFor()
 
-                        val expectedOutput =
-                            """
-                        Completed compilation for 5 files in XXX ms
+                            val expectedOutput =
+                                """
+                            Completed compilation for 5 files in XXX ms
 
-                        Generating openapi for objects/iou
-                        Generating openapi for processes
-                        NPL openapi completed successfully.
-                        """.normalize()
+                            Generating openapi for objects/iou
+                            Generating openapi for processes
+                            NPL openapi completed successfully.
+                            """.normalize()
 
-                        output.normalize() shouldBe expectedOutput
-                        validateOpenapiSpec("objects.iou-openapi.yml").messages.size shouldBe 0
-                        validateOpenapiSpec("processes-openapi.yml").messages.size shouldBe 0
-                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                            output.normalize() shouldBe expectedOutput
+                            validateOpenapiSpec("objects.iou-openapi.yml").messages.size shouldBe 0
+                            validateOpenapiSpec("processes-openapi.yml").messages.size shouldBe 0
+                            process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        }
                     }
                 }
             }
