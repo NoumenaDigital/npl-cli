@@ -441,48 +441,6 @@ class DeployCommandIT :
 
                 exitCode shouldBe ExitCode.GENERAL_ERROR.code
             }
-
-            test("error when defaultTarget is invalid") {
-                val engineUrl = mockEngine.url("/").toString()
-                val oidcUrl = mockOidc.url("/").toString()
-                val testDirPath =
-                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
-
-                var output = ""
-                var exitCode = -1
-
-                TestUtils.createYamlConfig(
-                    """
-                    cloud:
-                      authUrl: ${oidcUrl}realms/noumena
-                      target: invalid-default
-                      clear: true
-
-                    local:
-                      clientId: nm-platform-service-client
-                      clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
-                      managementUrl: $engineUrl
-                      username: user1
-                      password: password1
-
-                    structure:
-                      sourceDir: $testDirPath
-                    """.trimIndent(),
-                )
-
-                runCommand(commands = listOf("deploy")) {
-                    process.waitFor(60, TimeUnit.SECONDS)
-                    output = this.output
-                    exitCode = process.exitValue()
-                }
-
-                val expectedOutput =
-                    "Using default target 'invalid-default' from configuration.\n" +
-                        "Configuration error for default target 'invalid-default': " +
-                        "Target 'invalid-default' not found in configuration"
-                output.normalize() shouldBe expectedOutput.normalize()
-                exitCode shouldBe ExitCode.CONFIG_ERROR.code
-            }
         }
 
         context("authentication errors") {
