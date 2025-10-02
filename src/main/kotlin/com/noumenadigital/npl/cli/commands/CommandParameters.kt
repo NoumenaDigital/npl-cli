@@ -126,7 +126,6 @@ object ArgumentParser {
                     authUrl = parsedArgs.getValueOrElse("auth-url", yamlConfig?.cloud?.authUrl),
                     clear = parsedArgs.hasFlag("clear").orElse(yamlConfig?.cloud?.clear),
                     deploymentUrl = parsedArgs.getValueOrElse("deployment-url", yamlConfig?.cloud?.deploymentUrl),
-                    target = parsedArgs.getValueOrElse("target", yamlConfig?.cloud?.target),
                     tenant = parsedArgs.getValueOrElse("tenant", yamlConfig?.cloud?.tenant),
                     url = parsedArgs.getValueOrElse("url", yamlConfig?.cloud?.url),
                 ),

@@ -110,7 +110,6 @@ class DeployCommandIT :
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
-                      target: test-target
 
                     local:
                       clientId: nm-platform-service-client
@@ -152,7 +151,6 @@ class DeployCommandIT :
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
-                      target: test-target
 
                     local:
                       clientId: nm-platform-service-client
@@ -200,7 +198,6 @@ class DeployCommandIT :
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
-                      target: test-target
                       clear: true
 
                     local:
@@ -243,7 +240,6 @@ class DeployCommandIT :
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
-                      target: test-target
 
                     local:
                       managementUrl: ${mockEngine.url("/")}
@@ -251,14 +247,14 @@ class DeployCommandIT :
                       password: password2
 
                     structure:
-                      sourceDir: $testDirPath
+                      sourceDir: /non-existent/path
                     """.trimIndent(),
                 ) {
 
                     var output = ""
                     var exitCode = -1
 
-                    runCommand(commands = listOf("deploy", "--target", "other-target")) {
+                    runCommand(commands = listOf("deploy", "--source-dir", testDirPath)) {
                         process.waitFor(60, TimeUnit.SECONDS)
                         output = this.output
                         exitCode = process.exitValue()
@@ -290,7 +286,6 @@ class DeployCommandIT :
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
-                      target: other-target
 
                     local:
                       managementUrl: ${mockEngine.url("/")}
@@ -355,7 +350,6 @@ class DeployCommandIT :
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
-                      target: test-target
                       clear: true
 
                     local:
@@ -420,7 +414,6 @@ class DeployCommandIT :
                     """
                     cloud:
                       authUrl: ${oidcUrl}realms/noumena
-                      target: test-target
                       clear: true
 
                     local:
@@ -496,7 +489,6 @@ class DeployCommandIT :
                         """
                         cloud:
                           authUrl: ${oidcUrl}realms/noumena
-                          target: invalid-default
 
                         local:
                           clientId: nm-platform-service-client
@@ -528,27 +520,9 @@ class DeployCommandIT :
         }
 
         context("command validation errors") {
-            test("missing target parameter") {
-                val testDirPath =
-                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
-
-                runCommand(
-                    commands = listOf("deploy", "--source-dir", testDirPath),
-                ) {
-                    process.waitFor(5, TimeUnit.SECONDS)
-
-                    val expectedOutput =
-                        "Missing required parameter: --target <name> or set defaultTarget in npl.yml\n" +
-                            DeployCommand.USAGE_STRING
-
-                    output.normalize() shouldBe expectedOutput.normalize()
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
-                }
-            }
-
             test("missing directory parameter") {
                 runCommand(
-                    commands = listOf("deploy", "--target", "test-target"),
+                    commands = listOf("deploy"),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
@@ -564,7 +538,7 @@ class DeployCommandIT :
                 val nonExistentDir = "/non/existent/directory"
 
                 runCommand(
-                    commands = listOf("deploy", "--target", "test-target", "--source-dir", nonExistentDir),
+                    commands = listOf("deploy", "--source-dir", nonExistentDir),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 
@@ -578,7 +552,7 @@ class DeployCommandIT :
                 tempFile.deleteOnExit()
 
                 runCommand(
-                    commands = listOf("deploy", "--target", "test-target", "--source-dir", tempFile.absolutePath),
+                    commands = listOf("deploy", "--source-dir", tempFile.absolutePath),
                 ) {
                     process.waitFor(5, TimeUnit.SECONDS)
 

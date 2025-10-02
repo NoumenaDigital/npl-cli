@@ -32,7 +32,6 @@ data class YamlConfig(
         val authUrl: String? = null,
         val clear: Boolean = false,
         val deploymentUrl: String? = null,
-        val target: String? = null,
         val tenant: String? = null,
         val url: String? = null,
     )

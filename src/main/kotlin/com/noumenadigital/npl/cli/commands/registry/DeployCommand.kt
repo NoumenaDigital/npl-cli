@@ -23,12 +23,6 @@ class DeployCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "target",
-                description = "Named target from npl.yml to deploy to. Required unless defaultTarget is set in config.",
-                isRequired = false,
-                valuePlaceholder = "<name>",
-            ),
-            NamedParameter(
                 name = "source-dir",
                 description = "Directory containing NPL sources",
                 isRequired = true,
@@ -49,7 +43,6 @@ class DeployCommand(
         val config =
             ArgumentParser.parse(args, parameters) { settings ->
                 CloudDeployConfig(
-                    target = settings.cloud.target,
                     username = settings.local.username,
                     password = settings.local.password,
                     sourceDir = settings.structure.nplSourceDir,
@@ -77,19 +70,13 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        if (config.target == null) {
-            output.error("Missing required parameter: --target <name> or set defaultTarget in npl.yml")
-            displayUsage(output)
-            return ExitCode.GENERAL_ERROR
-        }
-
         if (config.username == null) {
-            output.error("Configuration error '${config.username}': username is required for engine target")
+            output.error("Configuration error '${config.username}': username is required.")
             return ExitCode.CONFIG_ERROR
         }
 
         if (config.password == null) {
-            output.error("Configuration error '${config.password}': password is required for engine target")
+            output.error("Configuration error '${config.password}': password is required.")
             return ExitCode.CONFIG_ERROR
         }
 
@@ -175,7 +162,6 @@ data class CloudDeployConfig(
     val engineManagementUrl: String = MGMT_URL_DEFAULT,
     val password: String? = null,
     val sourceDir: File? = null,
-    val target: String? = null,
     val username: String? = null,
 ) : CommandConfig {
     companion object {

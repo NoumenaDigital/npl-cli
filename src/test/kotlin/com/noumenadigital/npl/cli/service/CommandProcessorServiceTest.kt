@@ -53,7 +53,6 @@ class CommandProcessorServiceTest :
                                  --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
                                  --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
-                                 --target <name>  Named target from npl.yml to deploy to. Required unless defaultTarget is set in config.
                                  --source-dir <directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
                     cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
