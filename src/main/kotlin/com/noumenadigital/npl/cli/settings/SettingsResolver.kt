@@ -146,7 +146,23 @@ object SettingsResolver {
     fun parseArgs(
         args: List<String>,
         parameters: List<NamedParameter>,
-    ): ParsedArguments = CommandArgumentParser.parse(args, parameters)
+    ): ParsedArguments {
+        val parsed = CommandArgumentParser.parse(args, parameters)
+        val allowedDeprecated =
+            setOf(
+                "authUrl",
+                "clientId",
+                "clientSecret",
+                "managementUrl",
+                "frontEnd",
+                "sourceDir",
+                "outputDir",
+                "testSourceDir",
+                "projectDir",
+                "templateUrl",
+            )
+        return parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = allowedDeprecated)
+    }
 
     fun parseArgsOrThrow(
         args: List<String>,

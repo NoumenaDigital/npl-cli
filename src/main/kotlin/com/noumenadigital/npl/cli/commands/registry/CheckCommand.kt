@@ -68,6 +68,8 @@ data class CheckCommand(
         } catch (e: CommandExecutionException) {
             output.error(e.message)
             return ExitCode.GENERAL_ERROR
+        } catch (e: RequiredParameterMissing) {
+            throw e
         } catch (e: Exception) {
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
         }

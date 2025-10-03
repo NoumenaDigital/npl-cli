@@ -34,15 +34,14 @@ data class TestCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "source-dir",
+                name = "test-source-dir",
                 description =
                     "Source directory containing NPL tests to run." +
                         " Must be a parent directory of all required sources (both production and test).",
-                defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
-                isRequiredForMcp = true,
+                isRequiredForMcp = false,
             ),
             NamedParameter(
                 name = "coverage",
@@ -67,18 +66,18 @@ data class TestCommand(
             val settings = settings ?: DefaultSettingsProvider(params, parameters)
             val structureSettings = settings.structure
 
-            if (structureSettings.nplSourceDir == null) {
+            if (structureSettings.testSourceDir == null) {
                 throw RequiredParameterMissing(
-                    parameterName = "source-dir",
-                    yamlExample = "structure:\n  sourceDir: <directory>",
+                    parameterName = "test-source-dir",
+                    yamlExample = "structure:\n  testSourceDir: <directory>",
                 )
             }
-            if (!structureSettings.nplSourceDir.isDirectory) {
-                output.error("Given NPL source directory is not a directory: ${structureSettings.nplSourceDir.relativeOrAbsolute()}")
+            if (!structureSettings.testSourceDir.isDirectory) {
+                output.error("Given NPL source directory is not a directory: ${structureSettings.testSourceDir.relativeOrAbsolute()}")
                 return ExitCode.GENERAL_ERROR
             }
-            if (!structureSettings.nplSourceDir.exists()) {
-                output.error("Given NPL source directory does not exist: ${structureSettings.nplSourceDir.relativeOrAbsolute()}")
+            if (!structureSettings.testSourceDir.exists()) {
+                output.error("Given NPL source directory does not exist: ${structureSettings.testSourceDir.relativeOrAbsolute()}")
                 return ExitCode.GENERAL_ERROR
             }
 
@@ -86,10 +85,10 @@ data class TestCommand(
             val coverageAnalyzer =
                 coverageAnalyzer(
                     showCoverage = showCoverage,
-                    sourceDir = structureSettings.nplSourceDir,
+                    sourceDir = structureSettings.testSourceDir,
                     outputDir = structureSettings.outputDir?.canonicalPath ?: ".",
                 )
-            val testHarness = TestHarness(SourcesManager(structureSettings.nplSourceDir.absolutePath), coverageAnalyzer)
+            val testHarness = TestHarness(SourcesManager(structureSettings.testSourceDir.absolutePath), coverageAnalyzer)
 
             val start = System.nanoTime()
             val testResults = testHarness.runTest()
@@ -115,6 +114,8 @@ data class TestCommand(
         } catch (e: CommandExecutionException) {
             output.error(e.message)
             return ExitCode.GENERAL_ERROR
+        } catch (e: RequiredParameterMissing) {
+            throw e
         } catch (e: Exception) {
             throw CommandExecutionException("Failed to run NPL test: ${e.message}", e)
         }
