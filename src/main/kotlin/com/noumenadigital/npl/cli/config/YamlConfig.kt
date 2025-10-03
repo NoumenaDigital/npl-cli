@@ -32,11 +32,13 @@ data class YamlConfig(
     )
 
     data class Local(
+        val managementUrl: String? = null,
+        val authUrl: String? = null,
         val clientId: String? = null,
         val clientSecret: String? = null,
-        val managementUrl: String? = null,
         val username: String? = null,
         val password: String? = null,
+        val clear: Boolean = false,
     )
 
     data class Structure(

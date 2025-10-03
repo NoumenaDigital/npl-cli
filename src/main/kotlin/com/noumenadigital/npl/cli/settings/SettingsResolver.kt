@@ -33,11 +33,14 @@ object SettingsResolver {
         yamlConfig: YamlConfig?,
     ): LocalSettings =
         LocalSettings(
-            clientId = parsedArgs.getValueOrElse("client-id", yamlConfig?.local?.clientId),
-            clientSecret = parsedArgs.getValueOrElse("client-secret", yamlConfig?.local?.clientSecret),
-            managementUrl = parsedArgs.getValueOrElse("management-url", yamlConfig?.local?.managementUrl),
+            managementUrl =
+                parsedArgs.getValueOrElse("management-url", yamlConfig?.local?.managementUrl) ?: "http://localhost:12400/realms/noumena",
+            authUrl = parsedArgs.getValueOrElse("auth-url", yamlConfig?.local?.authUrl) ?: "http://localhost:11000",
             password = parsedArgs.getValueOrElse("password", yamlConfig?.local?.password),
             username = parsedArgs.getValueOrElse("username", yamlConfig?.local?.username),
+            clientId = parsedArgs.getValueOrElse("client-id", yamlConfig?.local?.clientId),
+            clientSecret = parsedArgs.getValueOrElse("client-secret", yamlConfig?.local?.clientSecret),
+            clear = parsedArgs.hasFlag("clear").orElse(yamlConfig?.local?.clear),
         )
 
     fun resolveStructure(
