@@ -166,11 +166,12 @@ object SettingsResolver {
                 "projectDir",
                 "templateUrl",
             )
-        val filtered = parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = allowedDeprecated)
-        if (filtered.unexpectedArgs.isNotEmpty()) {
-            throw ArgumentParsingException("Unexpected arguments: ${filtered.unexpectedArgs.joinToString(separator = " ")}")
+        val filteredUnexpected = parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = allowedDeprecated).unexpectedArgs
+        if (filteredUnexpected.isNotEmpty()) {
+            throw ArgumentParsingException("Unexpected arguments: ${filteredUnexpected.joinToString(separator = " ")}")
         }
-        return filtered
+        // Return the original parsed so deprecated tokens remain available to accessors
+        return parsed
     }
 
     fun loadYamlConfig(): YamlConfig? = YAMLConfigParser.parse()
