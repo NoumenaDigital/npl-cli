@@ -30,6 +30,7 @@ data class ClientSetupException(
 
 class RequiredParameterMissing(
     val parameterName: String,
+    val yamlExample: String? = null,
 ) : InternalException()
 
 data class AuthorizationFailedException(

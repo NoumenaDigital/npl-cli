@@ -83,8 +83,16 @@ class CloudClearNplCommand(
                 CloudAuthManager(noumenaCloudAuthClient),
                 NoumenaCloudClient(
                     NoumenaCloudConfig.get(
-                        appSlug = cloudSettings.app ?: throw RequiredParameterMissing("app"),
-                        tenantSlug = cloudSettings.tenant ?: throw RequiredParameterMissing("tenant"),
+                        appSlug =
+                            cloudSettings.app ?: throw RequiredParameterMissing(
+                                parameterName = "app",
+                                yamlExample = "cloud:\n  app: <app>",
+                            ),
+                        tenantSlug =
+                            cloudSettings.tenant ?: throw RequiredParameterMissing(
+                                parameterName = "tenant",
+                                yamlExample = "cloud:\n  tenant: <tenant>",
+                            ),
                         url = cloudSettings.url,
                     ),
                 ),

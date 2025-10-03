@@ -83,7 +83,10 @@ class CloudDeployFrontendCommand(
         val structureSettings = settings.structure
 
         if (structureSettings.frontEnd == null) {
-            throw RequiredParameterMissing("frontend")
+            throw RequiredParameterMissing(
+                parameterName = "frontend",
+                yamlExample = "structure:\n  frontend: <directory>",
+            )
         }
         if (!structureSettings.frontEnd.exists() || !structureSettings.frontEnd.isDirectory) {
             throw CloudCommandException(
@@ -105,8 +108,16 @@ class CloudDeployFrontendCommand(
                 CloudAuthManager(noumenaCloudAuthClient),
                 NoumenaCloudClient(
                     NoumenaCloudConfig.get(
-                        appSlug = cloudSettings.app ?: throw RequiredParameterMissing("app"),
-                        tenantSlug = cloudSettings.tenant ?: throw RequiredParameterMissing("tenant"),
+                        appSlug =
+                            cloudSettings.app ?: throw RequiredParameterMissing(
+                                parameterName = "app",
+                                yamlExample = "cloud:\n  app: <app>",
+                            ),
+                        tenantSlug =
+                            cloudSettings.tenant ?: throw RequiredParameterMissing(
+                                parameterName = "tenant",
+                                yamlExample = "cloud:\n  tenant: <tenant>",
+                            ),
                         url = cloudSettings.url,
                     ),
                 ),

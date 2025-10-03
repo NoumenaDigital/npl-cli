@@ -45,4 +45,8 @@ fun AuthorizationFailedException.buildOutputMessage(): String = this.message
 
 fun CloudCommandException.buildOutputMessage(): String = "Command ${this.commandName} failed: ${this.message}"
 
-fun RequiredParameterMissing.buildOutputMessage(): String = "Command parsing failed: required parameter ${this.parameterName} is missing"
+fun RequiredParameterMissing.buildOutputMessage(): String =
+    "Missing required parameter: ${this.parameterName}\n" +
+        "Either pass it as a command line argument in the following form:\n\n" +
+        "\t--${this.parameterName} <value>\n\n" +
+        "or define it in npl.yml, e.g.:\n\n${this.yamlExample}"

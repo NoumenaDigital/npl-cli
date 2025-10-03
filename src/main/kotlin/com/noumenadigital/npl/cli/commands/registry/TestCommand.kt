@@ -68,7 +68,10 @@ data class TestCommand(
             val structureSettings = settings.structure
 
             if (structureSettings.nplSourceDir == null) {
-                throw RequiredParameterMissing("source-dir")
+                throw RequiredParameterMissing(
+                    parameterName = "source-dir",
+                    yamlExample = "structure:\n  sourceDir: <directory>",
+                )
             }
             if (!structureSettings.nplSourceDir.isDirectory) {
                 output.error("Given NPL source directory is not a directory: ${structureSettings.nplSourceDir.relativeOrAbsolute()}")
