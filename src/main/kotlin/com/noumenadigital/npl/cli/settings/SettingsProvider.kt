@@ -6,7 +6,6 @@ interface SettingsProvider {
     val cloud: CloudSettings
     val local: LocalSettings
     val structure: StructureSettings
-    val other: OtherSettings
 }
 
 class DefaultSettingsProvider(
@@ -19,5 +18,4 @@ class DefaultSettingsProvider(
     override val cloud: CloudSettings by lazy { SettingsResolver.resolveCloud(parsed, yaml) }
     override val local: LocalSettings by lazy { SettingsResolver.resolveLocal(parsed, yaml) }
     override val structure: StructureSettings by lazy { SettingsResolver.resolveStructure(parsed, yaml) }
-    override val other: OtherSettings by lazy { SettingsResolver.resolveOther(parsed) }
 }

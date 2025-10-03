@@ -13,6 +13,51 @@ object SettingsResolver {
 
     private fun Boolean.orElse(default: Boolean?): Boolean = (takeIf { it } ?: default) == true
 
+    // Hardcoded deprecated CLI parameter name replacements (without leading dashes)
+    // Example: --projectDir -> --project-dir
+    private val defaultDeprecatedNames: Map<String, String> =
+        mapOf(
+            // Common across commands
+            "sourceDir" to "source-dir",
+            "outputDir" to "output-dir",
+            // init
+            "projectDir" to "project-dir",
+            "templateUrl" to "template-url",
+            // structure
+            "testSourceDir" to "test-source-dir",
+            "frontEnd" to "frontend",
+            // cloud/local auth
+            "clientId" to "client-id",
+            "clientSecret" to "client-secret",
+            "authUrl" to "auth-url",
+            "managementUrl" to "management-url",
+        )
+
+    private fun normalizeDeprecatedArgs(
+        args: List<String>,
+        deprecatedNames: Map<String, String>,
+    ): Pair<List<String>, List<String>> {
+        if (args.isEmpty() || deprecatedNames.isEmpty()) return Pair(args, emptyList())
+
+        val warnings = mutableListOf<String>()
+        val normalized =
+            args.map { token ->
+                if (token.startsWith("--")) {
+                    val name = token.removePrefix("--")
+                    val replacement = deprecatedNames[name]
+                    if (replacement != null) {
+                        warnings.add("Parameter '--$name' is deprecated; use '--$replacement' instead.")
+                        "--$replacement"
+                    } else {
+                        token
+                    }
+                } else {
+                    token
+                }
+            }
+        return Pair(normalized, warnings)
+    }
+
     fun resolveCloud(
         parsedArgs: ParsedArguments,
         yamlConfig: YamlConfig?,
@@ -59,24 +104,23 @@ object SettingsResolver {
             testSourceDir = parsedArgs.getValueOrElse("test-source-dir", yamlConfig?.structure?.testSourceDir)?.toFile(),
         )
 
-    fun resolveOther(parsedArgs: ParsedArguments): OtherSettings =
-        OtherSettings(
-            projectDir = parsedArgs.getValue("project-dir")?.toFile(),
-            templateUrl = parsedArgs.getValue("template-url"),
-            minimal = parsedArgs.hasFlag("bare"),
-        )
-
     // Convenience helpers to reduce duplication in commands
     fun parseArgs(
         args: List<String>,
         parameters: List<NamedParameter>,
-    ): ParsedArguments = CommandArgumentParser.parse(args, parameters)
+        deprecatedNames: Map<String, String> = defaultDeprecatedNames,
+    ): ParsedArguments {
+        val (normalized, warnings) = normalizeDeprecatedArgs(args, deprecatedNames)
+        val parsed = CommandArgumentParser.parse(normalized, parameters)
+        return parsed.withWarnings(warnings)
+    }
 
     fun parseArgsOrThrow(
         args: List<String>,
         parameters: List<NamedParameter>,
+        deprecatedNames: Map<String, String> = defaultDeprecatedNames,
     ): ParsedArguments {
-        val parsed = parseArgs(args, parameters)
+        val parsed = parseArgs(args, parameters, deprecatedNames)
         if (parsed.unexpectedArgs.isNotEmpty()) {
             throw ArgumentParsingException("Unexpected arguments: ${parsed.unexpectedArgs.joinToString(" ")}")
         }
@@ -95,8 +139,9 @@ object SettingsResolver {
     fun resolveInitFrom(
         args: List<String>,
         parameters: List<NamedParameter>,
+        deprecatedNames: Map<String, String> = defaultDeprecatedNames,
     ): InitSettings {
-        val parsed = parseArgs(args, parameters)
+        val parsed = parseArgs(args, parameters, deprecatedNames)
         return resolveInit(parsed)
     }
 }
