@@ -21,7 +21,6 @@ object SettingsResolver {
             app = parsedArgs.getValueOrElse("app", yamlConfig?.cloud?.app),
             authUrl = parsedArgs.getValueOrElse("auth-url", yamlConfig?.cloud?.authUrl),
             clear = parsedArgs.hasFlag("clear").orElse(yamlConfig?.cloud?.clear),
-            deploymentUrl = parsedArgs.getValueOrElse("deployment-url", yamlConfig?.cloud?.deploymentUrl),
             tenant = parsedArgs.getValueOrElse("tenant", yamlConfig?.cloud?.tenant),
             url = parsedArgs.getValueOrElse("url", yamlConfig?.cloud?.url),
             clientId = parsedArgs.getValueOrElse("client-id", yamlConfig?.cloud?.clientId),

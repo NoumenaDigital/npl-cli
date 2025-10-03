@@ -21,11 +21,10 @@ data class YamlConfig(
     )
 
     data class Cloud(
+        val tenant: String? = null,
         val app: String? = null,
         val authUrl: String? = null,
         val clear: Boolean = false,
-        val deploymentUrl: String? = null,
-        val tenant: String? = null,
         val url: String? = null,
         val clientId: String? = null,
         val clientSecret: String? = null,
