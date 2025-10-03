@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
@@ -15,6 +14,7 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 import java.io.File
 
 class CloudDeployFrontendCommand(
@@ -80,18 +80,20 @@ class CloudDeployFrontendCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
+        val settings = DefaultSettingsProvider(params, parameters)
+        val cloud = settings.cloud
+        val local = settings.local
+        val structure = settings.structure
         val config =
-            ArgumentParser.parse(params, parameters) { settings ->
-                CloudDeployFrontendConfig(
-                    app = settings.cloud.app ?: throw RequiredParameterMissing("app"),
-                    tenant = settings.cloud.tenant ?: throw RequiredParameterMissing("tenant"),
-                    frontend = settings.structure.frontEnd ?: throw RequiredParameterMissing("frontend"),
-                    url = settings.cloud.url,
-                    clientId = settings.local.clientId,
-                    clientSecret = settings.local.clientSecret,
-                    authUrl = settings.cloud.authUrl,
-                )
-            }
+            CloudDeployFrontendConfig(
+                app = cloud.app ?: throw RequiredParameterMissing("app"),
+                tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
+                frontend = structure.frontEnd ?: throw RequiredParameterMissing("frontend"),
+                url = cloud.url,
+                clientId = local.clientId,
+                clientSecret = local.clientSecret,
+                authUrl = cloud.authUrl,
+            )
 
         if (!config.frontend.exists() || !config.frontend.isDirectory) {
             throw CloudCommandException(
@@ -120,7 +122,8 @@ class CloudDeployFrontendCommand(
 
             if (!saClientSecret.isNullOrBlank()) {
                 output.info("Preparing to deploy frontend to NOUMENA Cloud using service account...")
-                val accessToken = cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
+                val accessToken =
+                    cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
                 output.success("Successfully authenticated with service account credentials")
                 cloudDeployService.deployFrontendWithToken(archive, accessToken)
             } else {

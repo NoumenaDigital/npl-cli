@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CloudDeployConfig.Companion.AUTH_URL_DEFAULT
@@ -10,12 +9,15 @@ import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.DeployResult
 import com.noumenadigital.npl.cli.service.DeployService
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
+import com.noumenadigital.npl.cli.settings.SettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 
 class DeployCommand(
     private val args: List<String> = emptyList(),
     private val deployService: DeployService = DeployService(),
+    private val settings: SettingsProvider? = null,
 ) : CommandExecutor {
     override val commandName: String = "deploy"
     override val description: String = "Deploy NPL sources to a Noumena Engine instance"
@@ -37,46 +39,52 @@ class DeployCommand(
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor = DeployCommand(params)
+    override fun createInstance(params: List<String>): CommandExecutor =
+        DeployCommand(params, deployService, DefaultSettingsProvider(params, parameters))
 
     override fun execute(output: ColorWriter): ExitCode {
+        val settings = settings ?: DefaultSettingsProvider(args, parameters)
+        val cloud = settings.cloud
+        val local = settings.local
+        val structure = settings.structure
         val config =
-            ArgumentParser.parse(args, parameters) { settings ->
-                CloudDeployConfig(
-                    username = settings.local.username,
-                    password = settings.local.password,
-                    sourceDir = settings.structure.nplSourceDir,
-                    clear = settings.cloud.clear,
-                    authUrl = settings.cloud.authUrl ?: AUTH_URL_DEFAULT,
-                    clientId = settings.local.clientId,
-                    clientSecret = settings.local.clientSecret,
-                    engineManagementUrl = settings.local.managementUrl ?: MGMT_URL_DEFAULT,
-                )
-            }
+            CloudDeployConfig(
+                username = local.username,
+                password = local.password,
+                sourceDir = structure.nplSourceDir,
+                clear = cloud.clear,
+                authUrl = cloud.authUrl ?: AUTH_URL_DEFAULT,
+                clientId = local.clientId,
+                clientSecret = local.clientSecret,
+                engineManagementUrl = local.managementUrl ?: MGMT_URL_DEFAULT,
+            )
 
-        if (config.sourceDir == null) {
+        val sourceDir = config.sourceDir
+        if (sourceDir == null) {
             output.error("Missing required parameter: --source-dir <directory>")
             displayUsage(output)
             return ExitCode.GENERAL_ERROR
         }
 
-        if (!config.sourceDir.exists()) {
-            output.error("Source directory does not exist: ${config.sourceDir.relativeOrAbsolute()}")
+        if (!sourceDir.exists()) {
+            output.error("Source directory does not exist: ${sourceDir.relativeOrAbsolute()}")
             return ExitCode.GENERAL_ERROR
         }
 
-        if (!config.sourceDir.isDirectory) {
-            output.error("Source path is not a directory: ${config.sourceDir.relativeOrAbsolute()}")
+        if (!sourceDir.isDirectory) {
+            output.error("Source path is not a directory: ${sourceDir.relativeOrAbsolute()}")
             return ExitCode.GENERAL_ERROR
         }
 
-        if (config.username == null) {
-            output.error("Configuration error '${config.username}': username is required.")
+        val username = config.username
+        if (username == null) {
+            output.error("Configuration error '$username': username is required.")
             return ExitCode.CONFIG_ERROR
         }
 
-        if (config.password == null) {
-            output.error("Configuration error '${config.password}': password is required.")
+        val password = config.password
+        if (password == null) {
+            output.error("Configuration error '$password': password is required.")
             return ExitCode.CONFIG_ERROR
         }
 
@@ -84,8 +92,8 @@ class DeployCommand(
             EngineTargetConfig(
                 engineManagementUrl = config.engineManagementUrl,
                 authUrl = config.authUrl,
-                username = config.username,
-                password = config.password,
+                username = username,
+                password = password,
                 clientId = config.clientId,
                 clientSecret = config.clientSecret,
             )
@@ -108,7 +116,7 @@ class DeployCommand(
             }
         }
 
-        return when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, config.sourceDir.absolutePath)) {
+        return when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, sourceDir.absolutePath)) {
             is DeployResult.Success -> {
                 output.success("Successfully deployed NPL sources and migrations to ${targetConfig.engineManagementUrl}.")
                 ExitCode.SUCCESS

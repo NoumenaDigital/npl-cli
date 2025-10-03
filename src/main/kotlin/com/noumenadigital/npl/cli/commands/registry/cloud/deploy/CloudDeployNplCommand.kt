@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.EnvironmentVariable
 import com.noumenadigital.npl.cli.commands.NamedParameter
@@ -17,6 +16,7 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -97,18 +97,20 @@ class CloudDeployNplCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
+        val settings = DefaultSettingsProvider(params, parameters)
+        val cloud = settings.cloud
+        val local = settings.local
+        val structure = settings.structure
         val config =
-            ArgumentParser.parse(params, parameters) { settings ->
-                CloudDeployNplConfig(
-                    app = settings.cloud.app ?: throw RequiredParameterMissing("app"),
-                    tenant = settings.cloud.tenant ?: throw RequiredParameterMissing("tenant"),
-                    migration = settings.structure.migrationDescriptorFile ?: findSingleFile(migrationFileName),
-                    url = settings.cloud.url,
-                    clientId = settings.local.clientId,
-                    clientSecret = settings.local.clientSecret,
-                    authUrl = settings.cloud.authUrl,
-                )
-            }
+            CloudDeployNplConfig(
+                app = cloud.app ?: throw RequiredParameterMissing("app"),
+                tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
+                migration = structure.migrationDescriptorFile ?: findSingleFile(migrationFileName),
+                url = cloud.url,
+                clientId = local.clientId,
+                clientSecret = local.clientSecret,
+                authUrl = cloud.authUrl,
+            )
         if (!config.migration.exists()) {
             throw CloudCommandException(
                 message = "Migration file does not exist - ${config.migration}",
@@ -130,12 +132,14 @@ class CloudDeployNplCommand(
         try {
             val saClientId = cloudDeployService.noumenaCloudClient.config.tenantSlug
             val saClientSecret =
-                System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET") ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
+                System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
+                    ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
             val archive = sourcesManager.getArchivedSources()
 
             if (!saClientSecret.isNullOrBlank()) {
                 output.info("Preparing to deploy NPL application to NOUMENA Cloud using service account...")
-                val accessToken = cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
+                val accessToken =
+                    cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
                 output.success("Successfully authenticated with service account credentials")
                 cloudDeployService.deployNplApplicationWithToken(archive, accessToken)
             } else {

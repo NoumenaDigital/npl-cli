@@ -16,13 +16,6 @@ data class YamlConfig(
     val local: Local = Local(),
     val structure: Structure = Structure(),
 ) {
-    val schemaVersion: Int =
-        Regex("v(\\d+)$")
-            .find(schemaUrl)
-            ?.groupValues
-            ?.get(1)
-            ?.toInt() ?: 1
-
     data class Runtime(
         val version: String? = null,
     )
@@ -75,5 +68,3 @@ object YAMLConfigParser {
         return config
     }
 }
-
-interface CommandConfig

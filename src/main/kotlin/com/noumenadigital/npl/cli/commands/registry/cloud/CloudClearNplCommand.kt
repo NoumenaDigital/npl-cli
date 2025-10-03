@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
@@ -14,6 +13,7 @@ import com.noumenadigital.npl.cli.http.NoumenaCloudConfig
 import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 
 class CloudClearNplCommand(
     val cloudDeployService: CloudDeployService =
@@ -70,17 +70,18 @@ class CloudClearNplCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
+        val settings = DefaultSettingsProvider(params, parameters)
+        val cloud = settings.cloud
+        val local = settings.local
         val config =
-            ArgumentParser.parse(params, parameters) { settings ->
-                CloudClearNplConfig(
-                    app = settings.cloud.app ?: throw RequiredParameterMissing("app"),
-                    tenant = settings.cloud.tenant ?: throw RequiredParameterMissing("tenant"),
-                    url = settings.cloud.url,
-                    clientId = settings.local.clientId,
-                    clientSecret = settings.local.clientSecret,
-                    authUrl = settings.cloud.authUrl,
-                )
-            }
+            CloudClearNplConfig(
+                app = cloud.app ?: throw RequiredParameterMissing("app"),
+                tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
+                url = cloud.url,
+                clientId = local.clientId,
+                clientSecret = local.clientSecret,
+                authUrl = cloud.authUrl,
+            )
 
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(config.clientId, config.clientSecret, config.authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)

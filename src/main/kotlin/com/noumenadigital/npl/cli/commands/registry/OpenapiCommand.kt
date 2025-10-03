@@ -1,13 +1,14 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
+import com.noumenadigital.npl.cli.settings.SettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.ProtocolProto
@@ -32,6 +33,7 @@ data class OpenapiCommand(
     private val ruleDescriptorPath: String? = null,
     private val outputDir: String = ".",
     private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir)),
+    private val settings: SettingsProvider? = null,
 ) : CommandExecutor {
     override val commandName: String = "openapi"
     override val description: String = "Generate the openapi specifications of NPL api"
@@ -74,11 +76,13 @@ data class OpenapiCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val config = parseParams(params)
-
+        val settings = DefaultSettingsProvider(params, parameters)
         return OpenapiCommand(
             config.sourceDir.absolutePath,
             config.rulesFile?.absolutePath,
             config.outputDir.absolutePath,
+            CompilerService(SourcesManager(config.sourceDir.absolutePath)),
+            settings,
         )
     }
 
@@ -168,23 +172,23 @@ data class OpenapiCommand(
         val protosMap = allProtos.filterIsInstance<ProtocolProto>().associateBy { it.protoId.toString().untagged() }
 
         rules.ruleSet.forEach { rule ->
-            val proto = protosMap[rule.untaggedPrototypeId.toString()]
+            val proto =
+                protosMap[rule.untaggedPrototypeId.toString()]
+                    ?: error("No matching prototype found matching [" + rule.untaggedPrototypeId + "]")
 
-            if (proto == null) {
-                error("No matching prototype found matching [" + rule.untaggedPrototypeId + "]")
-            }
             PartyAssignmentRulesValidator.validateParties(rule, proto.actualType.parties)
         }
     }
 
-    private fun parseParams(args: List<String>) =
-        ArgumentParser.parse(args, parameters) { settings ->
-            OpenapiConfig(
-                sourceDir = settings.structure.nplSourceDir ?: CURRENT_DIRECTORY,
-                rulesFile = settings.structure.rulesFile,
-                outputDir = settings.structure.outputDir ?: CURRENT_DIRECTORY,
-            )
-        }
+    private fun parseParams(args: List<String>): OpenapiConfig {
+        val settings = DefaultSettingsProvider(args, parameters)
+        val structure = settings.structure
+        return OpenapiConfig(
+            sourceDir = structure.nplSourceDir ?: CURRENT_DIRECTORY,
+            rulesFile = structure.rulesFile,
+            outputDir = structure.outputDir ?: CURRENT_DIRECTORY,
+        )
+    }
 
     private fun String.removePrefix(): String = removePrefix("/")
 

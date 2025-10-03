@@ -1,12 +1,12 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.NO_SAMPLES
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
 import com.noumenadigital.npl.cli.service.ColorWriter
+import com.noumenadigital.npl.cli.settings.SettingsResolver
 import com.noumenadigital.npl.cli.util.ZipExtractor
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
@@ -45,7 +45,8 @@ class InitCommand(
     override fun execute(output: ColorWriter): ExitCode {
         fun ColorWriter.displayError(message: String) = error("npl init: $message")
 
-        val parsedArgs = CommandArgumentParser.parse(args, parameters)
+        val init = SettingsResolver.resolveInitFrom(args, parameters)
+        val parsedArgs = SettingsResolver.parseArgs(args, parameters)
 
         if (parsedArgs.unexpectedArgs.isNotEmpty()) {
             if (parsedArgs.unexpectedArgs.contains("name")) {
@@ -56,15 +57,14 @@ class InitCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        if (parsedArgs.getValue("template-url") != null && parsedArgs.hasFlag("bare")) {
+        if (init.templateUrl != null && init.bare) {
             output.displayError("Cannot use --bare and --template-url together.")
             return ExitCode.USAGE_ERROR
         }
 
-        val projectPath = parsedArgs.getValue("project-dir")
         val projectDir =
-            projectPath?.let {
-                File(it).apply {
+            init.projectDir?.let {
+                it.apply {
                     if (exists()) {
                         output.displayError("Directory ${relativeOrAbsolute()} already exists.")
                         return ExitCode.GENERAL_ERROR
@@ -79,7 +79,7 @@ class InitCommand(
         val archiveFile = projectDir.resolve("project${UUID.randomUUID()}.zip")
 
         try {
-            val templateUrl = parsedArgs.getValue("template-url") ?: repoClient.getDefaultUrl(parsedArgs)
+            val templateUrl = init.templateUrl ?: repoClient.getDefaultUrl(init.bare)
             repoClient.downloadTemplateArchive(templateUrl, archiveFile)
             output.info("Successfully downloaded project files")
         } catch (e: Exception) {
@@ -109,8 +109,8 @@ class InitCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor = InitCommand(params)
 
-    private fun NoumenaGitRepoClient.getDefaultUrl(parsedArgs: CommandArgumentParser.ParsedArguments): String =
-        if (parsedArgs.hasFlag("bare")) {
+    private fun NoumenaGitRepoClient.getDefaultUrl(isBare: Boolean): String =
+        if (isBare) {
             getBranchUrl(NO_SAMPLES)
         } else {
             getBranchUrl(SAMPLES)

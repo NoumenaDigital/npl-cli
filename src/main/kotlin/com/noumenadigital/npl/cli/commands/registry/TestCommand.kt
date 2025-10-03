@@ -1,13 +1,14 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.service.TestHarness
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
+import com.noumenadigital.npl.cli.settings.SettingsProvider
 import com.noumenadigital.npl.cli.util.normalizeWindowsPath
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import com.noumenadigital.npl.testing.coverage.CoverageAnalyzer
@@ -20,6 +21,7 @@ import java.time.Duration
 
 data class TestCommand(
     private val params: List<String> = emptyList(),
+    private val settings: SettingsProvider? = null,
 ) : CommandExecutor {
     companion object {
         const val MIN_PADDING = 25
@@ -58,18 +60,18 @@ data class TestCommand(
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor = TestCommand(params)
+    override fun createInstance(params: List<String>): CommandExecutor = TestCommand(params, DefaultSettingsProvider(params, parameters))
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
+            val settings = settings ?: DefaultSettingsProvider(params, parameters)
+            val structure = settings.structure
             val config =
-                ArgumentParser.parse(params, parameters) { settings ->
-                    TestConfig(
-                        sourceDir = settings.structure.nplSourceDir ?: File("."),
-                        withCoverage = settings.structure.testCoverage,
-                        outputDir = settings.structure.outputDir ?: File("."),
-                    )
-                }
+                TestConfig(
+                    sourceDir = structure.nplSourceDir ?: File("."),
+                    withCoverage = structure.testCoverage,
+                    outputDir = structure.outputDir ?: File("."),
+                )
 
             if (!config.sourceDir.isDirectory || !config.sourceDir.exists()) {
                 output.error(

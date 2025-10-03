@@ -1,13 +1,13 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 
@@ -32,10 +32,9 @@ data class CheckCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val config =
-            ArgumentParser.parse(params, parameters) { settings ->
-                CheckConfig(sourceDir = settings.structure.nplSourceDir ?: File("."))
-            }
+        val settings = DefaultSettingsProvider(params, parameters)
+        val structure = settings.structure
+        val config = CheckConfig(sourceDir = structure.nplSourceDir ?: File("."))
 
         val srcDir = config.sourceDir
         return CheckCommand(srcDir = srcDir.absolutePath)

@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.ArgumentParser
 import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
@@ -10,7 +9,7 @@ import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.ColorWriter
-import kotlinx.coroutines.runBlocking
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 
 class CloudLoginCommand(
     private val authManager: CloudAuthManager = CloudAuthManager(),
@@ -44,14 +43,15 @@ class CloudLoginCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
+        val settings = DefaultSettingsProvider(params, parameters)
+        val local = settings.local
+        val cloud = settings.cloud
         val config =
-            ArgumentParser.parse(params, parameters) { settings ->
-                CloudLoginConfig(
-                    clientId = settings.local.clientId,
-                    clientSecret = settings.local.clientSecret,
-                    url = settings.cloud.url,
-                )
-            }
+            CloudLoginConfig(
+                clientId = local.clientId,
+                clientSecret = local.clientSecret,
+                url = cloud.url,
+            )
 
         val noumenaCloudAuthClient =
             NoumenaCloudAuthClient(
@@ -67,7 +67,7 @@ class CloudLoginCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            runBlocking { authManager.login(output) }
+            authManager.loginBlocking(output)
             output.success("Successfully logged in to NOUMENA Cloud.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
