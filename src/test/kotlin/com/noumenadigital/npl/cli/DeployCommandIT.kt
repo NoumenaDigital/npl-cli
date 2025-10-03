@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.TestUtils.toYamlSafePath
 import com.noumenadigital.npl.cli.commands.registry.DeployCommand
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import io.kotest.core.spec.style.FunSpec
@@ -104,7 +105,7 @@ class DeployCommandIT :
                 val engineUrl = mockEngine.url("/").toString()
                 val oidcUrl = mockOidc.url("/").toString()
                 val testDirPath =
-                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString().toYamlSafePath()
 
                 TestUtils.withYamlConfig(
                     """
@@ -188,7 +189,7 @@ class DeployCommandIT :
                 val oidcUrl = mockOidc.url("").toString()
 
                 val testDirPath =
-                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString().toYamlSafePath()
 
                 TestUtils.withYamlConfig(
                     """
@@ -334,7 +335,7 @@ class DeployCommandIT :
                 val oidcUrl = mockOidc.url("").toString()
 
                 val testDirPath =
-                    getTestResourcesPath(listOf("deploy-failure", "main")).toAbsolutePath().toString()
+                    getTestResourcesPath(listOf("deploy-failure", "main")).toAbsolutePath().toString().toYamlSafePath()
 
                 TestUtils.withYamlConfig(
                     """
@@ -397,6 +398,7 @@ class DeployCommandIT :
                     getTestResourcesPath(listOf("success", "both_sources", "src", "main"))
                         .toAbsolutePath()
                         .toString()
+                        .toYamlSafePath()
 
                 TestUtils.withYamlConfig(
                     """
@@ -469,7 +471,7 @@ class DeployCommandIT :
                 try {
                     // Config file uses standard credentials, but the mock server forces failure
                     val testDirPath =
-                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString()
+                        getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString().toYamlSafePath()
 
                     TestUtils.withYamlConfig(
                         """

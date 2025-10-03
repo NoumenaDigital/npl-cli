@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli
 import com.noumenadigital.npl.cli.TestUtils.getTestResourcesPath
 import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
+import com.noumenadigital.npl.cli.TestUtils.toYamlSafePath
 import com.noumenadigital.npl.cli.commands.registry.TestCommand.Companion.COVERAGE_FILE
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -363,7 +364,7 @@ class TestCommandIT :
 
                 test("Yaml config happy path - coverage") {
                     val testDirPath =
-                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString().toYamlSafePath()
 
                     happyPath(
                         params = emptyList(),
@@ -379,7 +380,7 @@ class TestCommandIT :
 
                 test("Yaml config happy path - no coverage - implicit") {
                     val testDirPath =
-                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString().toYamlSafePath()
 
                     happyPath(
                         params = emptyList(),
@@ -394,7 +395,7 @@ class TestCommandIT :
 
                 test("Yaml config happy path - no coverage - explicit") {
                     val testDirPath =
-                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+                        getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString().toYamlSafePath()
 
                     happyPath(
                         params = emptyList(),

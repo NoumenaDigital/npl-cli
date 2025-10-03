@@ -79,6 +79,8 @@ object TestUtils {
             .normalize()
     }
 
+    fun String.toYamlSafePath(): String = replace('\\', '/')
+
     fun String.normalize(withPadding: Boolean = true): String =
         replace("\r\n", "\n")
             // Normalize path separators to forward slashes
