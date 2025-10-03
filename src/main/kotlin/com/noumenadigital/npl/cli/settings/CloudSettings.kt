@@ -7,4 +7,6 @@ data class CloudSettings(
     val deploymentUrl: String? = null,
     val tenant: String? = null,
     val url: String? = null,
+    val clientId: String? = null,
+    val clientSecret: String? = null,
 )

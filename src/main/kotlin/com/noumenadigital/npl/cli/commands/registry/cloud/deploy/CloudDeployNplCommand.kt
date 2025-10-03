@@ -99,7 +99,6 @@ class CloudDeployNplCommand(
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
         val cloud = settings.cloud
-        val local = settings.local
         val structure = settings.structure
         val config =
             CloudDeployNplConfig(
@@ -107,8 +106,8 @@ class CloudDeployNplCommand(
                 tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
                 migration = structure.migrationDescriptorFile ?: findSingleFile(migrationFileName),
                 url = cloud.url,
-                clientId = local.clientId,
-                clientSecret = local.clientSecret,
+                clientId = cloud.clientId,
+                clientSecret = cloud.clientSecret,
                 authUrl = cloud.authUrl,
             )
         if (!config.migration.exists()) {

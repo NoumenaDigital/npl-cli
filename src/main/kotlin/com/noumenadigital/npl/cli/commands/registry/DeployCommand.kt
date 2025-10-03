@@ -54,8 +54,8 @@ class DeployCommand(
                 sourceDir = structure.nplSourceDir,
                 clear = cloud.clear,
                 authUrl = cloud.authUrl ?: AUTH_URL_DEFAULT,
-                clientId = local.clientId,
-                clientSecret = local.clientSecret,
+                clientId = cloud.clientId,
+                clientSecret = cloud.clientSecret,
                 engineManagementUrl = local.managementUrl ?: MGMT_URL_DEFAULT,
             )
 

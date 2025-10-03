@@ -72,14 +72,13 @@ class CloudClearNplCommand(
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
         val cloud = settings.cloud
-        val local = settings.local
         val config =
             CloudClearNplConfig(
                 app = cloud.app ?: throw RequiredParameterMissing("app"),
                 tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
                 url = cloud.url,
-                clientId = local.clientId,
-                clientSecret = local.clientSecret,
+                clientId = cloud.clientId,
+                clientSecret = cloud.clientSecret,
                 authUrl = cloud.authUrl,
             )
 

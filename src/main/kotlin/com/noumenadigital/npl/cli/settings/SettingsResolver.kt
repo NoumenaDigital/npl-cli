@@ -24,6 +24,8 @@ object SettingsResolver {
             deploymentUrl = parsedArgs.getValueOrElse("deployment-url", yamlConfig?.cloud?.deploymentUrl),
             tenant = parsedArgs.getValueOrElse("tenant", yamlConfig?.cloud?.tenant),
             url = parsedArgs.getValueOrElse("url", yamlConfig?.cloud?.url),
+            clientId = parsedArgs.getValueOrElse("client-id", yamlConfig?.cloud?.clientId),
+            clientSecret = parsedArgs.getValueOrElse("client-secret", yamlConfig?.cloud?.clientSecret),
         )
 
     fun resolveLocal(

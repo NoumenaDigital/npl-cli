@@ -44,12 +44,11 @@ class CloudLoginCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
-        val local = settings.local
         val cloud = settings.cloud
         val config =
             CloudLoginConfig(
-                clientId = local.clientId,
-                clientSecret = local.clientSecret,
+                clientId = cloud.clientId,
+                clientSecret = cloud.clientSecret,
                 url = cloud.url,
             )
 

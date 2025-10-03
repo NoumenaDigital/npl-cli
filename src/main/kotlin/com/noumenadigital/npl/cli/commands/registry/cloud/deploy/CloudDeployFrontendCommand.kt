@@ -82,7 +82,6 @@ class CloudDeployFrontendCommand(
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
         val cloud = settings.cloud
-        val local = settings.local
         val structure = settings.structure
         val config =
             CloudDeployFrontendConfig(
@@ -90,8 +89,8 @@ class CloudDeployFrontendCommand(
                 tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
                 frontend = structure.frontEnd ?: throw RequiredParameterMissing("frontend"),
                 url = cloud.url,
-                clientId = local.clientId,
-                clientSecret = local.clientSecret,
+                clientId = cloud.clientId,
+                clientSecret = cloud.clientSecret,
                 authUrl = cloud.authUrl,
             )
 

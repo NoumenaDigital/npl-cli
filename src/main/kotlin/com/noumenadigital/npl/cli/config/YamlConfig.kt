@@ -9,7 +9,7 @@ import java.io.File
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class YamlConfig(
-    @JsonProperty("\$schema")
+    @param:JsonProperty("\$schema")
     val schemaUrl: String = "https://noumenadigital/npl-cli/main/src/main/resources/npl-cli-config-schema.json",
     val runtime: Runtime = Runtime(),
     val cloud: Cloud = Cloud(),
@@ -27,6 +27,8 @@ data class YamlConfig(
         val deploymentUrl: String? = null,
         val tenant: String? = null,
         val url: String? = null,
+        val clientId: String? = null,
+        val clientSecret: String? = null,
     )
 
     data class Local(
