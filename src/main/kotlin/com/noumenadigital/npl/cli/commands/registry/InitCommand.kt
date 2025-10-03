@@ -76,7 +76,10 @@ class InitCommand(
                 }
             } ?: File(".")
 
-        val archiveFile = projectDir.resolve("project${UUID.randomUUID()}.zip")
+        val archiveFile =
+            projectDir.resolve("project${UUID.randomUUID()}.zip").also {
+                it.deleteOnExit()
+            }
 
         try {
             val templateUrl = init.templateUrl ?: repoClient.getDefaultUrl(init.bare)
