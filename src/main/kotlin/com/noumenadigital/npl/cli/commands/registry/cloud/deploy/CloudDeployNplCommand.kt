@@ -93,14 +93,20 @@ class CloudDeployNplCommand(
         val settings = DefaultSettingsProvider(params, parameters)
         val cloudSettings: CloudSettings = settings.cloud
         val structureSettings: StructureSettings = settings.structure
-        if (structureSettings.migrationDescriptorFile?.exists() == false) {
+        val migrationFile =
+            structureSettings.migrationDescriptorFile
+                ?: throw RequiredParameterMissing(
+                    parameterName = "migration",
+                    yamlExample = "structure:\n  migration: <path>",
+                )
+        if (!migrationFile.exists()) {
             throw CloudCommandException(
-                message = "Migration file does not exist - ${structureSettings.migrationDescriptorFile}",
-                commandName = "cloud deploy",
+                message = "Migration file does not exist - $migrationFile",
+                commandName = "cloud deploy npl",
             )
         }
 
-        val sourcesManager = SourcesManager(structureSettings.migrationDescriptorFile?.parent.toString())
+        val sourcesManager = SourcesManager(migrationFile.parent)
         val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(cloudSettings.clientId, cloudSettings.clientSecret, cloudSettings.authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
