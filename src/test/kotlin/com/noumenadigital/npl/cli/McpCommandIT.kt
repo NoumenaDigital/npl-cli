@@ -88,7 +88,7 @@ class McpCommandIT :
                             toolName = "check",
                             arguments =
                                 buildJsonObject {
-                                    put("sourceDir", testDirPath)
+                                    put("source-dir", testDirPath)
                                 },
                         )
 
@@ -123,7 +123,7 @@ class McpCommandIT :
                             toolName = "test",
                             arguments =
                                 buildJsonObject {
-                                    put("sourceDir", testDirPath)
+                                    put("test-source-dir", testDirPath)
                                     put("coverage", false)
                                 },
                         )

@@ -1,7 +1,5 @@
 package com.noumenadigital.npl.cli.commands
 
-import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
-
 data class NamedParameter(
     val name: String,
     val description: String,
@@ -19,6 +17,27 @@ data class NamedParameter(
     val takesValue: Boolean = valuePlaceholder != null
 
     val cliName: String = "--$name"
+}
+
+object DeprecationNotifier {
+    private val sink: ThreadLocal<((String) -> Unit)?> = ThreadLocal()
+
+    fun setSink(handler: ((String) -> Unit)?) {
+        if (handler == null) {
+            sink.remove()
+        } else {
+            sink.set(handler)
+        }
+    }
+
+    fun warn(message: String) {
+        val handler = sink.get()
+        if (handler != null) {
+            handler(message)
+        } else {
+            System.err.println(message)
+        }
+    }
 }
 
 /**
@@ -75,6 +94,62 @@ object CommandArgumentParser {
 
         fun getValue(name: String): String? = values[name]
 
-        fun getRequiredValue(name: String): String = values[name] ?: throw RequiredParameterMissing(name)
+        fun getValueOrElse(
+            name: String,
+            defaultValue: String?,
+        ): String? = values[name] ?: defaultValue
+
+        fun getValueOrElse(
+            name: String,
+            deprecatedNames: List<String>,
+            defaultValue: String?,
+        ): String? {
+            val canonical = values[name]
+            if (canonical != null) return canonical
+
+            if (deprecatedNames.isEmpty()) return defaultValue
+
+            // Look for deprecated alias occurrences in unexpected args, reconstructing value pairs if present
+            val tokens = unexpectedArgs
+            for (i in tokens.indices) {
+                val token = tokens[i]
+                if (!token.startsWith("--")) continue
+                val withoutDashes = token.removePrefix("--")
+                if (withoutDashes in deprecatedNames) {
+                    val value =
+                        if (i + 1 < tokens.size && !tokens[i + 1].startsWith("--")) {
+                            tokens[i + 1]
+                        } else {
+                            ""
+                        }
+                    DeprecationNotifier.warn("Parameter '--$withoutDashes' is deprecated; use '--$name' instead.")
+                    return value
+                }
+            }
+
+            return defaultValue
+        }
+
+        fun withoutDeprecatedUnexpectedNames(deprecatedNames: Set<String>): ParsedArguments {
+            if (deprecatedNames.isEmpty() || unexpectedArgs.isEmpty()) return this
+            val tokens = unexpectedArgs
+            val filtered = mutableListOf<String>()
+            var i = 0
+            while (i < tokens.size) {
+                val t = tokens[i]
+                if (t.startsWith(prefix = "--") && t.removePrefix(prefix = "--") in deprecatedNames) {
+                    i +=
+                        if (i + 1 < tokens.size && !tokens[i + 1].startsWith(prefix = "--")) {
+                            2
+                        } else {
+                            1
+                        }
+                    continue
+                }
+                filtered.add(t)
+                i += 1
+            }
+            return ParsedArguments(values, filtered)
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.Commands
+import com.noumenadigital.npl.cli.commands.DeprecationNotifier
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -110,6 +111,35 @@ class CommandParametersTest :
                 result.hasFlag("file").shouldBeFalse()
                 result.getValue("file").shouldBeNull()
                 result.hasFlag("verbose").shouldBeFalse()
+            }
+        }
+
+        context("Deprecated parameter names") {
+            test("should return value from deprecated name and emit warning via notifier sink") {
+                val parser = CommandArgumentParser
+                val parameters = listOf(NamedParameter(name = "auth-url", description = "Auth URL", valuePlaceholder = "<url>"))
+                val args = listOf("--authUrl", "http://old")
+
+                val captured = mutableListOf<String>()
+                DeprecationNotifier.setSink { msg -> captured.add(msg) }
+                val result = parser.parse(args, parameters)
+                val value = result.getValueOrElse(name = "auth-url", deprecatedNames = listOf("authUrl"), defaultValue = null)
+                DeprecationNotifier.setSink(null)
+
+                value shouldBe "http://old"
+                captured.size shouldBe 1
+                captured.first() shouldBe "Parameter '--authUrl' is deprecated; use '--auth-url' instead."
+            }
+
+            test("should ignore deprecated token in unexpected when throwing") {
+                val parser = CommandArgumentParser
+                val parameters = emptyList<NamedParameter>()
+                val args = listOf("--projectDir", "proj")
+
+                val result = parser.parse(args, parameters)
+                // Without resolver's filtering this remains unexpected; here we only assert accessor behavior
+                val v = result.getValueOrElse(name = "project-dir", deprecatedNames = listOf("projectDir"), defaultValue = null)
+                v shouldBe "proj"
             }
         }
 

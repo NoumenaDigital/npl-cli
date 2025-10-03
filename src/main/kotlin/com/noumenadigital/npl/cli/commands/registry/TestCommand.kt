@@ -1,12 +1,13 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.service.TestHarness
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
+import com.noumenadigital.npl.cli.settings.SettingsProvider
 import com.noumenadigital.npl.cli.util.normalizeWindowsPath
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import com.noumenadigital.npl.testing.coverage.CoverageAnalyzer
@@ -19,6 +20,7 @@ import java.time.Duration
 
 data class TestCommand(
     private val params: List<String> = emptyList(),
+    private val settings: SettingsProvider? = null,
 ) : CommandExecutor {
     companion object {
         const val MIN_PADDING = 25
@@ -31,11 +33,10 @@ data class TestCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "test-source-dir",
                 description =
                     "Source directory containing NPL tests to run." +
                         " Must be a parent directory of all required sources (both production and test).",
-                defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
@@ -47,7 +48,7 @@ data class TestCommand(
                 isRequired = false,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -57,30 +58,32 @@ data class TestCommand(
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor = TestCommand(params)
+    override fun createInstance(params: List<String>): CommandExecutor = TestCommand(params, DefaultSettingsProvider(params, parameters))
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            val parsedArgs = CommandArgumentParser.parse(params, parameters)
+            val settings = settings ?: DefaultSettingsProvider(params, parameters)
+            val structureSettings = settings.structure
 
-            if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-                output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-                return ExitCode.USAGE_ERROR
+            val testSourceDir = structureSettings.testSourceDir ?: File(".")
+
+            if (!testSourceDir.isDirectory) {
+                output.error("Given NPL source directory is not a directory: ${testSourceDir.relativeOrAbsolute()}")
+                return ExitCode.GENERAL_ERROR
             }
-
-            val sourcePath = parsedArgs.getValue("sourceDir") ?: "."
-            val sourceDir = File(sourcePath)
-            if (!sourceDir.isDirectory || !sourceDir.exists()) {
-                output.error(
-                    "Given source directory is either not a directory or does not exist. ${sourceDir.relativeOrAbsolute()}",
-                )
+            if (!testSourceDir.exists()) {
+                output.error("Given NPL source directory does not exist: ${testSourceDir.relativeOrAbsolute()}")
                 return ExitCode.GENERAL_ERROR
             }
 
-            val showCoverage = parsedArgs.hasFlag("coverage")
-            val outputDir = parsedArgs.getValue("outputDir") ?: "."
-            val coverageAnalyzer: CoverageAnalyzer = coverageAnalyzer(showCoverage, sourceDir, outputDir)
-            val testHarness = TestHarness(SourcesManager(sourceDir.absolutePath), coverageAnalyzer)
+            val showCoverage = structureSettings.testCoverage
+            val coverageAnalyzer =
+                coverageAnalyzer(
+                    showCoverage = showCoverage,
+                    sourceDir = testSourceDir,
+                    outputDir = structureSettings.outputDir?.canonicalPath ?: ".",
+                )
+            val testHarness = TestHarness(SourcesManager(testSourceDir.absolutePath), coverageAnalyzer)
 
             val start = System.nanoTime()
             val testResults = testHarness.runTest()

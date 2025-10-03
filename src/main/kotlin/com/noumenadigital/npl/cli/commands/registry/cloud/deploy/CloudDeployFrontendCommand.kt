@@ -1,11 +1,10 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
-import com.noumenadigital.npl.cli.commands.EnvironmentVariable
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
+import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
@@ -14,7 +13,7 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
-import java.io.File
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 
 class CloudDeployFrontendCommand(
     private val sourcesManager: SourcesManager = SourcesManager("."),
@@ -56,21 +55,21 @@ class CloudDeployFrontendCommand(
                 valuePlaceholder = "<url>",
             ),
             NamedParameter(
-                name = "clientId",
+                name = "client-id",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
-                name = "clientSecret",
+                name = "client-secret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "authUrl",
+                name = "auth-url",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
@@ -78,38 +77,50 @@ class CloudDeployFrontendCommand(
             ),
         )
 
-    override val envVariables: List<EnvironmentVariable> =
-        listOf(
-            EnvironmentVariable(
-                name = "NPL_SERVICE_ACCOUNT_CLIENT_SECRET",
-                description = "Client secret for the service account to use for authentication",
-                isRequired = false,
-            ),
-        )
-
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val app = parsedArgs.getRequiredValue("app")
-        val tenant = parsedArgs.getRequiredValue("tenant")
-        val buildDir = parsedArgs.getRequiredValue("frontend")
-        val buildDirFile = File(buildDir)
-        if (!buildDirFile.exists() || !buildDirFile.isDirectory) {
+        val settings = DefaultSettingsProvider(params, parameters)
+        val cloudSettings = settings.cloud
+        val structureSettings = settings.structure
+
+        if (structureSettings.frontEnd == null) {
+            throw RequiredParameterMissing(
+                parameterName = "frontend",
+                yamlExample = "structure:\n  frontend: <directory>",
+            )
+        }
+        if (!structureSettings.frontEnd.exists() || !structureSettings.frontEnd.isDirectory) {
             throw CloudCommandException(
-                message = "Build directory does not exist or is not a directory - $buildDir",
+                message = "Build directory does not exist or is not a directory - ${structureSettings.frontEnd}",
                 commandName = "cloud deploy frontend",
             )
         }
-        val clientId = parsedArgs.getValue("clientId")
-        val clientSecret = parsedArgs.getValue("clientSecret")
-        val authUrl = parsedArgs.getValue("authUrl")
-        val url = parsedArgs.getValue("url")
-        val sourcesManager = SourcesManager(buildDirFile.toString())
-        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
+        val sourcesManager = SourcesManager(structureSettings.frontEnd.absolutePath)
+        val noumenaCloudAuthConfig =
+            NoumenaCloudAuthConfig.get(
+                clientId = cloudSettings.clientId,
+                clientSecret = cloudSettings.clientSecret,
+                url = cloudSettings.authUrl,
+            )
+
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
+                NoumenaCloudClient(
+                    NoumenaCloudConfig.get(
+                        appSlug =
+                            cloudSettings.app ?: throw RequiredParameterMissing(
+                                parameterName = "app",
+                                yamlExample = "cloud:\n  app: <app>",
+                            ),
+                        tenantSlug =
+                            cloudSettings.tenant ?: throw RequiredParameterMissing(
+                                parameterName = "tenant",
+                                yamlExample = "cloud:\n  tenant: <tenant>",
+                            ),
+                        url = cloudSettings.url,
+                    ),
+                ),
             )
         return CloudDeployFrontendCommand(sourcesManager, cloudDeployService)
     }
@@ -124,7 +135,8 @@ class CloudDeployFrontendCommand(
 
             if (!saClientSecret.isNullOrBlank()) {
                 output.info("Preparing to deploy frontend to NOUMENA Cloud using service account...")
-                val accessToken = cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
+                val accessToken =
+                    cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
                 output.success("Successfully authenticated with service account credentials")
                 cloudDeployService.deployFrontendWithToken(archive, accessToken)
             } else {

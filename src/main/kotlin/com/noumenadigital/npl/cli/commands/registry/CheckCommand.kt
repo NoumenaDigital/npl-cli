@@ -1,12 +1,12 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 
@@ -20,7 +20,7 @@ data class CheckCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -31,13 +31,11 @@ data class CheckCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
+        val settings = DefaultSettingsProvider(params, parameters)
+        val structure = settings.structure
 
-        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-        }
+        val srcDir = structure.nplSourceDir?.absolutePath ?: "."
 
-        val srcDir = parsedArgs.getValue("sourceDir") ?: "."
         return CheckCommand(srcDir = srcDir)
     }
 
