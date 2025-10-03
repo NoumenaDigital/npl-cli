@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli
 
+import com.noumenadigital.npl.cli.commands.DeprecationNotifier
 import com.noumenadigital.npl.cli.commands.registry.CommandsParser
 import com.noumenadigital.npl.cli.exception.ArgumentParsingException
 import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
@@ -23,6 +24,7 @@ class CommandProcessor(
     ): ExitCode {
         output.use { out ->
             try {
+                DeprecationNotifier.setSink(out::warning)
                 return commandsParser.parse(inputArgs).execute(out)
             } catch (ex: InternalException) {
                 when (ex) {
@@ -78,6 +80,8 @@ class CommandProcessor(
                     ex.message?.contains("file", ignoreCase = true) == true -> ExitCode.NO_INPUT
                     else -> ExitCode.INTERNAL_ERROR
                 }
+            } finally {
+                DeprecationNotifier.setSink(null)
             }
         }
     }

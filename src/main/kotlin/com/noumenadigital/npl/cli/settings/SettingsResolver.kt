@@ -13,63 +13,45 @@ object SettingsResolver {
 
     private fun Boolean.orElse(default: Boolean?): Boolean = (takeIf { it } ?: default) == true
 
-    // Hardcoded deprecated CLI parameter name replacements (without leading dashes)
-    // Example: --projectDir -> --project-dir
-    private val defaultDeprecatedNames: Map<String, String> =
-        mapOf(
-            // Common across commands
-            "sourceDir" to "source-dir",
-            "outputDir" to "output-dir",
-            // init
-            "projectDir" to "project-dir",
-            "templateUrl" to "template-url",
-            // structure
-            "testSourceDir" to "test-source-dir",
-            "frontEnd" to "frontend",
-            // cloud/local auth
-            "clientId" to "client-id",
-            "clientSecret" to "client-secret",
-            "authUrl" to "auth-url",
-            "managementUrl" to "management-url",
-        )
-
-    private fun normalizeDeprecatedArgs(
-        args: List<String>,
-        deprecatedNames: Map<String, String>,
-    ): Pair<List<String>, List<String>> {
-        if (args.isEmpty() || deprecatedNames.isEmpty()) return Pair(args, emptyList())
-
-        val warnings = mutableListOf<String>()
-        val normalized =
-            args.map { token ->
-                if (token.startsWith("--")) {
-                    val name = token.removePrefix("--")
-                    val replacement = deprecatedNames[name]
-                    if (replacement != null) {
-                        warnings.add("Parameter '--$name' is deprecated; use '--$replacement' instead.")
-                        "--$replacement"
-                    } else {
-                        token
-                    }
-                } else {
-                    token
-                }
-            }
-        return Pair(normalized, warnings)
-    }
-
     fun resolveCloud(
         parsedArgs: ParsedArguments,
         yamlConfig: YamlConfig?,
     ): CloudSettings =
         CloudSettings(
-            app = parsedArgs.getValueOrElse("app", yamlConfig?.cloud?.app),
-            authUrl = parsedArgs.getValueOrElse("auth-url", yamlConfig?.cloud?.authUrl),
-            clear = parsedArgs.hasFlag("clear").orElse(yamlConfig?.cloud?.clear),
-            tenant = parsedArgs.getValueOrElse("tenant", yamlConfig?.cloud?.tenant),
-            url = parsedArgs.getValueOrElse("url", yamlConfig?.cloud?.url),
-            clientId = parsedArgs.getValueOrElse("client-id", yamlConfig?.cloud?.clientId),
-            clientSecret = parsedArgs.getValueOrElse("client-secret", yamlConfig?.cloud?.clientSecret),
+            app =
+                parsedArgs.getValueOrElse(
+                    name = "app",
+                    defaultValue = yamlConfig?.cloud?.app,
+                ),
+            authUrl =
+                parsedArgs.getValueOrElse(
+                    name = "auth-url",
+                    deprecatedNames = listOf("authUrl"),
+                    defaultValue = yamlConfig?.cloud?.authUrl,
+                ),
+            clear = parsedArgs.hasFlag(name = "clear").orElse(yamlConfig?.cloud?.clear),
+            tenant =
+                parsedArgs.getValueOrElse(
+                    name = "tenant",
+                    defaultValue = yamlConfig?.cloud?.tenant,
+                ),
+            url =
+                parsedArgs.getValueOrElse(
+                    name = "url",
+                    defaultValue = yamlConfig?.cloud?.url,
+                ),
+            clientId =
+                parsedArgs.getValueOrElse(
+                    name = "client-id",
+                    deprecatedNames = listOf("clientId"),
+                    defaultValue = yamlConfig?.cloud?.clientId,
+                ),
+            clientSecret =
+                parsedArgs.getValueOrElse(
+                    name = "client-secret",
+                    deprecatedNames = listOf("clientSecret"),
+                    defaultValue = yamlConfig?.cloud?.clientSecret,
+                ),
         )
 
     fun resolveLocal(
@@ -78,13 +60,40 @@ object SettingsResolver {
     ): LocalSettings =
         LocalSettings(
             managementUrl =
-                parsedArgs.getValueOrElse("management-url", yamlConfig?.local?.managementUrl) ?: "http://localhost:12400/realms/noumena",
-            authUrl = parsedArgs.getValueOrElse("auth-url", yamlConfig?.local?.authUrl) ?: "http://localhost:11000",
-            password = parsedArgs.getValueOrElse("password", yamlConfig?.local?.password),
-            username = parsedArgs.getValueOrElse("username", yamlConfig?.local?.username),
-            clientId = parsedArgs.getValueOrElse("client-id", yamlConfig?.local?.clientId),
-            clientSecret = parsedArgs.getValueOrElse("client-secret", yamlConfig?.local?.clientSecret),
-            clear = parsedArgs.hasFlag("clear").orElse(yamlConfig?.local?.clear),
+                parsedArgs.getValueOrElse(
+                    name = "management-url",
+                    deprecatedNames = listOf("managementUrl"),
+                    defaultValue = yamlConfig?.local?.managementUrl,
+                ) ?: "http://localhost:12400/realms/noumena",
+            authUrl =
+                parsedArgs.getValueOrElse(
+                    name = "auth-url",
+                    deprecatedNames = listOf("authUrl"),
+                    defaultValue = yamlConfig?.local?.authUrl,
+                ) ?: "http://localhost:11000",
+            password =
+                parsedArgs.getValueOrElse(
+                    name = "password",
+                    defaultValue = yamlConfig?.local?.password,
+                ),
+            username =
+                parsedArgs.getValueOrElse(
+                    name = "username",
+                    defaultValue = yamlConfig?.local?.username,
+                ),
+            clientId =
+                parsedArgs.getValueOrElse(
+                    name = "client-id",
+                    deprecatedNames = listOf("clientId"),
+                    defaultValue = yamlConfig?.local?.clientId,
+                ),
+            clientSecret =
+                parsedArgs.getValueOrElse(
+                    name = "client-secret",
+                    deprecatedNames = listOf("clientSecret"),
+                    defaultValue = yamlConfig?.local?.clientSecret,
+                ),
+            clear = parsedArgs.hasFlag(name = "clear").orElse(yamlConfig?.local?.clear),
         )
 
     fun resolveStructure(
@@ -92,56 +101,103 @@ object SettingsResolver {
         yamlConfig: YamlConfig?,
     ): StructureSettings =
         StructureSettings(
-            frontEnd = parsedArgs.getValueOrElse("frontend", yamlConfig?.structure?.frontend)?.toFile(),
+            frontEnd =
+                parsedArgs
+                    .getValueOrElse(
+                        name = "frontend",
+                        deprecatedNames = listOf("frontEnd"),
+                        defaultValue = yamlConfig?.structure?.frontend,
+                    )?.toFile(),
             migrationDescriptorFile =
                 parsedArgs
-                    .getValueOrElse("migration", yamlConfig?.structure?.migration)
+                    .getValueOrElse(name = "migration", defaultValue = yamlConfig?.structure?.migration)
                     ?.toFile(),
-            nplSourceDir = parsedArgs.getValueOrElse("source-dir", yamlConfig?.structure?.sourceDir)?.toFile(),
-            outputDir = parsedArgs.getValueOrElse("output-dir", yamlConfig?.structure?.outputDir)?.toFile(),
-            rulesFile = parsedArgs.getValueOrElse("rules", yamlConfig?.structure?.rules)?.toFile(),
+            nplSourceDir =
+                parsedArgs
+                    .getValueOrElse(
+                        name = "source-dir",
+                        deprecatedNames = listOf("sourceDir"),
+                        defaultValue = yamlConfig?.structure?.sourceDir,
+                    )?.toFile(),
+            outputDir =
+                parsedArgs
+                    .getValueOrElse(
+                        name = "output-dir",
+                        deprecatedNames = listOf("outputDir"),
+                        defaultValue = yamlConfig?.structure?.outputDir,
+                    )?.toFile(),
+            rulesFile =
+                parsedArgs
+                    .getValueOrElse(
+                        name = "rules",
+                        defaultValue = yamlConfig?.structure?.rules,
+                    )?.toFile(),
             testCoverage = parsedArgs.hasFlag("coverage").orElse(yamlConfig?.structure?.coverage),
-            testSourceDir = parsedArgs.getValueOrElse("test-source-dir", yamlConfig?.structure?.testSourceDir)?.toFile(),
+            testSourceDir =
+                parsedArgs
+                    .getValueOrElse(
+                        name = "test-source-dir",
+                        deprecatedNames = listOf("testSourceDir"),
+                        defaultValue = yamlConfig?.structure?.testSourceDir,
+                    )?.toFile(),
         )
 
     // Convenience helpers to reduce duplication in commands
     fun parseArgs(
         args: List<String>,
         parameters: List<NamedParameter>,
-        deprecatedNames: Map<String, String> = defaultDeprecatedNames,
-    ): ParsedArguments {
-        val (normalized, warnings) = normalizeDeprecatedArgs(args, deprecatedNames)
-        val parsed = CommandArgumentParser.parse(normalized, parameters)
-        return parsed.withWarnings(warnings)
-    }
+    ): ParsedArguments = CommandArgumentParser.parse(args, parameters)
 
     fun parseArgsOrThrow(
         args: List<String>,
         parameters: List<NamedParameter>,
-        deprecatedNames: Map<String, String> = defaultDeprecatedNames,
     ): ParsedArguments {
-        val parsed = parseArgs(args, parameters, deprecatedNames)
-        if (parsed.unexpectedArgs.isNotEmpty()) {
-            throw ArgumentParsingException("Unexpected arguments: ${parsed.unexpectedArgs.joinToString(" ")}")
+        val parsed = parseArgs(args, parameters)
+        val allowedDeprecated =
+            setOf(
+                "authUrl",
+                "clientId",
+                "clientSecret",
+                "managementUrl",
+                "frontEnd",
+                "sourceDir",
+                "outputDir",
+                "testSourceDir",
+                "projectDir",
+                "templateUrl",
+            )
+        val filtered = parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = allowedDeprecated)
+        if (filtered.unexpectedArgs.isNotEmpty()) {
+            throw ArgumentParsingException("Unexpected arguments: ${filtered.unexpectedArgs.joinToString(separator = " ")}")
         }
-        return parsed
+        return filtered
     }
 
     fun loadYamlConfig(): YamlConfig? = YAMLConfigParser.parse()
 
     fun resolveInit(parsedArgs: ParsedArguments): InitSettings =
         InitSettings(
-            projectDir = parsedArgs.getValue("project-dir")?.let { File(it) },
-            bare = parsedArgs.hasFlag("bare"),
-            templateUrl = parsedArgs.getValue("template-url"),
+            projectDir =
+                parsedArgs
+                    .getValueOrElse(
+                        name = "project-dir",
+                        deprecatedNames = listOf("projectDir"),
+                        defaultValue = null,
+                    )?.let { File(it) },
+            bare = parsedArgs.hasFlag(name = "bare"),
+            templateUrl =
+                parsedArgs.getValueOrElse(
+                    name = "template-url",
+                    deprecatedNames = listOf("templateUrl"),
+                    defaultValue = null,
+                ),
         )
 
     fun resolveInitFrom(
         args: List<String>,
         parameters: List<NamedParameter>,
-        deprecatedNames: Map<String, String> = defaultDeprecatedNames,
     ): InitSettings {
-        val parsed = parseArgs(args, parameters, deprecatedNames)
+        val parsed = parseArgs(args, parameters)
         return resolveInit(parsed)
     }
 }
