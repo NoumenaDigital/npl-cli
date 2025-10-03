@@ -3,7 +3,6 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
-import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
@@ -35,13 +34,9 @@ data class CheckCommand(
         val settings = DefaultSettingsProvider(params, parameters)
         val structure = settings.structure
 
-        val srcDir =
-            structure.nplSourceDir ?: throw RequiredParameterMissing(
-                parameterName = "source-dir",
-                yamlExample = "structure:\n  sourceDir: <directory>",
-            )
+        val srcDir = structure.nplSourceDir?.absolutePath ?: "."
 
-        return CheckCommand(srcDir = srcDir.absolutePath)
+        return CheckCommand(srcDir = srcDir)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
@@ -68,8 +63,6 @@ data class CheckCommand(
         } catch (e: CommandExecutionException) {
             output.error(e.message)
             return ExitCode.GENERAL_ERROR
-        } catch (e: RequiredParameterMissing) {
-            throw e
         } catch (e: Exception) {
             throw CommandExecutionException("Failed to run NPL check: ${e.message}", e)
         }
