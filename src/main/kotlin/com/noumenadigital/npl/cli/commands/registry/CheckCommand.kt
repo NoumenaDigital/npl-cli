@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -34,9 +33,9 @@ data class CheckCommand(
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
         val structure = settings.structure
-        val config = CheckConfig(sourceDir = structure.nplSourceDir ?: File("."))
 
-        val srcDir = config.sourceDir
+        val srcDir = structure.nplSourceDir ?: throw CommandExecutionException("Source directory is not specified.")
+
         return CheckCommand(srcDir = srcDir.absolutePath)
     }
 
@@ -81,7 +80,3 @@ data class CheckCommand(
         }
     }
 }
-
-data class CheckConfig(
-    val sourceDir: File = File("."),
-) : CommandConfig

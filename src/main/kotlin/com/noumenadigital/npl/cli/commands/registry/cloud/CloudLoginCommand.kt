@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -9,6 +8,7 @@ import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.ColorWriter
+import com.noumenadigital.npl.cli.settings.CloudSettings
 import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 
 class CloudLoginCommand(
@@ -44,20 +44,13 @@ class CloudLoginCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
-        val cloud = settings.cloud
-        val config =
-            CloudLoginConfig(
-                clientId = cloud.clientId,
-                clientSecret = cloud.clientSecret,
-                url = cloud.url,
-            )
-
+        val cloud: CloudSettings = settings.cloud
         val noumenaCloudAuthClient =
             NoumenaCloudAuthClient(
                 NoumenaCloudAuthConfig.get(
-                    clientId = config.clientId,
-                    clientSecret = config.clientSecret,
-                    url = config.url,
+                    clientId = cloud.clientId,
+                    clientSecret = cloud.clientSecret,
+                    url = cloud.url,
                 ),
             )
         val authManager = CloudAuthManager(noumenaCloudAuthClient)
@@ -74,9 +67,3 @@ class CloudLoginCommand(
         }
     }
 }
-
-data class CloudLoginConfig(
-    val clientId: String? = null,
-    val clientSecret: String? = null,
-    val url: String? = null,
-) : CommandConfig

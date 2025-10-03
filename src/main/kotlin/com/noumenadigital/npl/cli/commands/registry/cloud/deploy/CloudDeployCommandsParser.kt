@@ -10,6 +10,6 @@ object CloudDeployCommandsParser {
 
         val arguments = if (command.size > 1) command.drop(1) else emptyList()
 
-        return CloudDeployCommands.Companion.commandFromString(commandName, arguments)
+        return CloudDeployCommands.commandFromString(commandName, arguments)
     }
 }

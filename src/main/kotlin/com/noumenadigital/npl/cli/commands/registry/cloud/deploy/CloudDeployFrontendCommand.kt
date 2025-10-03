@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -15,7 +14,6 @@ import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
-import java.io.File
 
 class CloudDeployFrontendCommand(
     private val sourcesManager: SourcesManager = SourcesManager("."),
@@ -81,32 +79,37 @@ class CloudDeployFrontendCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
-        val cloud = settings.cloud
-        val structure = settings.structure
-        val config =
-            CloudDeployFrontendConfig(
-                app = cloud.app ?: throw RequiredParameterMissing("app"),
-                tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
-                frontend = structure.frontEnd ?: throw RequiredParameterMissing("frontend"),
-                url = cloud.url,
-                clientId = cloud.clientId,
-                clientSecret = cloud.clientSecret,
-                authUrl = cloud.authUrl,
-            )
+        val cloudSettings = settings.cloud
+        val structureSettings = settings.structure
 
-        if (!config.frontend.exists() || !config.frontend.isDirectory) {
+        if (structureSettings.frontEnd == null) {
+            throw RequiredParameterMissing("frontend")
+        }
+        if (!structureSettings.frontEnd.exists() || !structureSettings.frontEnd.isDirectory) {
             throw CloudCommandException(
-                message = "Build directory does not exist or is not a directory - ${config.frontend}",
+                message = "Build directory does not exist or is not a directory - ${structureSettings.frontEnd}",
                 commandName = "cloud deploy frontend",
             )
         }
-        val sourcesManager = SourcesManager(config.frontend.absolutePath)
-        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(config.clientId, config.clientSecret, config.authUrl)
+        val sourcesManager = SourcesManager(structureSettings.frontEnd.absolutePath)
+        val noumenaCloudAuthConfig =
+            NoumenaCloudAuthConfig.get(
+                clientId = cloudSettings.clientId,
+                clientSecret = cloudSettings.clientSecret,
+                url = cloudSettings.authUrl,
+            )
+
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(config.app, config.tenant, config.url)),
+                NoumenaCloudClient(
+                    NoumenaCloudConfig.get(
+                        appSlug = cloudSettings.app ?: throw RequiredParameterMissing("app"),
+                        tenantSlug = cloudSettings.tenant ?: throw RequiredParameterMissing("tenant"),
+                        url = cloudSettings.url,
+                    ),
+                ),
             )
         return CloudDeployFrontendCommand(sourcesManager, cloudDeployService)
     }
@@ -136,13 +139,3 @@ class CloudDeployFrontendCommand(
         }
     }
 }
-
-data class CloudDeployFrontendConfig(
-    val app: String,
-    val tenant: String,
-    val frontend: File,
-    val url: String? = null,
-    val clientId: String? = null,
-    val clientSecret: String? = null,
-    val authUrl: String? = null,
-) : CommandConfig

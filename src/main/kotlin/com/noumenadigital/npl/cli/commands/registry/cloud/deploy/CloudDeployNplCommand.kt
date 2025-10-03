@@ -1,12 +1,10 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.EnvironmentVariable
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
-import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
@@ -16,13 +14,9 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.settings.CloudSettings
 import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.isRegularFile
-import kotlin.streams.asSequence
+import com.noumenadigital.npl.cli.settings.StructureSettings
 
 class CloudDeployNplCommand(
     private val sourcesManager: SourcesManager = SourcesManager("."),
@@ -34,7 +28,6 @@ class CloudDeployNplCommand(
 ) : CommandExecutor {
     override val commandName: String = "cloud deploy npl"
     override val description: String = "Deploy NPL sources to a NOUMENA Cloud Application"
-    private val migrationFileName = "migration.yml"
 
     override val parameters: List<NamedParameter> =
         listOf(
@@ -98,31 +91,29 @@ class CloudDeployNplCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
-        val cloud = settings.cloud
-        val structure = settings.structure
-        val config =
-            CloudDeployNplConfig(
-                app = cloud.app ?: throw RequiredParameterMissing("app"),
-                tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
-                migration = structure.migrationDescriptorFile ?: findSingleFile(migrationFileName),
-                url = cloud.url,
-                clientId = cloud.clientId,
-                clientSecret = cloud.clientSecret,
-                authUrl = cloud.authUrl,
-            )
-        if (!config.migration.exists()) {
+        val cloudSettings: CloudSettings = settings.cloud
+        val structureSettings: StructureSettings = settings.structure
+        if (structureSettings.migrationDescriptorFile?.exists() == false) {
             throw CloudCommandException(
-                message = "Migration file does not exist - ${config.migration}",
+                message = "Migration file does not exist - ${structureSettings.migrationDescriptorFile}",
                 commandName = "cloud deploy",
             )
         }
-        val sourcesManager = SourcesManager(config.migration.parent.toString())
-        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(config.clientId, config.clientSecret, config.authUrl)
+
+        val sourcesManager = SourcesManager(structureSettings.migrationDescriptorFile?.parent.toString())
+        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(cloudSettings.clientId, cloudSettings.clientSecret, cloudSettings.authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(config.app, config.tenant, config.url)),
+                NoumenaCloudClient(
+                    config =
+                        NoumenaCloudConfig.get(
+                            appSlug = cloudSettings.app ?: throw RequiredParameterMissing("app"),
+                            tenantSlug = cloudSettings.tenant ?: throw RequiredParameterMissing("tenant"),
+                            url = cloudSettings.url,
+                        ),
+                ),
             )
         return CloudDeployNplCommand(sourcesManager, cloudDeployService)
     }
@@ -151,42 +142,4 @@ class CloudDeployNplCommand(
             throw CloudCommandException(ex.message, ex, "cloud deploy npl")
         }
     }
-
-    private fun findSingleFile(
-        fileName: String,
-        searchDir: String = ".",
-    ): File {
-        val srcDir = Paths.get(searchDir).toFile()
-
-        if (!srcDir.exists() || !srcDir.isDirectory) {
-            throw CommandExecutionException("Source path '$srcDir' does not exist or is not a directory.")
-        }
-        val matchedFiles =
-            Files.walk(Paths.get(srcDir.toURI())).use { paths ->
-                paths
-                    .asSequence()
-                    .filter { it.isRegularFile() && it.fileName.toString() == fileName }
-                    .map(Path::toFile)
-                    .toList()
-            }
-
-        return when {
-            matchedFiles.isEmpty() -> throw CommandExecutionException("No '$fileName' file found in $srcDir")
-            matchedFiles.size > 1 -> throw CommandExecutionException(
-                "Multiple '$fileName' files found:\n${matchedFiles.joinToString("\n")}",
-            )
-
-            else -> matchedFiles.first()
-        }
-    }
 }
-
-data class CloudDeployNplConfig(
-    val app: String,
-    val tenant: String,
-    val migration: File,
-    val url: String? = null,
-    val clientId: String? = null,
-    val clientSecret: String? = null,
-    val authUrl: String? = null,
-) : CommandConfig

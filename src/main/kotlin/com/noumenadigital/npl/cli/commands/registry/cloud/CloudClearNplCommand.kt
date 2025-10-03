@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
@@ -70,24 +69,25 @@ class CloudClearNplCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val settings = DefaultSettingsProvider(params, parameters)
-        val cloud = settings.cloud
-        val config =
-            CloudClearNplConfig(
-                app = cloud.app ?: throw RequiredParameterMissing("app"),
-                tenant = cloud.tenant ?: throw RequiredParameterMissing("tenant"),
-                url = cloud.url,
-                clientId = cloud.clientId,
-                clientSecret = cloud.clientSecret,
-                authUrl = cloud.authUrl,
-            )
+        val cloudSettings = DefaultSettingsProvider(params, parameters).cloud
 
-        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(config.clientId, config.clientSecret, config.authUrl)
+        val noumenaCloudAuthConfig =
+            NoumenaCloudAuthConfig.get(
+                clientId = cloudSettings.clientId,
+                clientSecret = cloudSettings.clientSecret,
+                url = cloudSettings.authUrl,
+            )
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(config.app, config.tenant, config.url)),
+                NoumenaCloudClient(
+                    NoumenaCloudConfig.get(
+                        appSlug = cloudSettings.app ?: throw RequiredParameterMissing("app"),
+                        tenantSlug = cloudSettings.tenant ?: throw RequiredParameterMissing("tenant"),
+                        url = cloudSettings.url,
+                    ),
+                ),
             )
         return CloudClearNplCommand(cloudDeployService = cloudDeployService)
     }
@@ -102,12 +102,3 @@ class CloudClearNplCommand(
         }
     }
 }
-
-data class CloudClearNplConfig(
-    val app: String,
-    val tenant: String,
-    val url: String? = null,
-    val clientId: String? = null,
-    val clientSecret: String? = null,
-    val authUrl: String? = null,
-) : CommandConfig

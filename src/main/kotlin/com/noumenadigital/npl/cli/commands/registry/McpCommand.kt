@@ -42,8 +42,7 @@ object McpCommand : CommandExecutor {
         try {
             val loggerFactory = LoggerFactory.getILoggerFactory()
             if (loggerFactory is LoggerContext) {
-                val context = loggerFactory
-                val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
+                val rootLogger = loggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
                 val appenders = rootLogger.iteratorForAppenders()
                 while (appenders.hasNext()) {
                     val appender = appenders.next()

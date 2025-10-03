@@ -39,10 +39,10 @@ class DeployCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         val settings = settings ?: DefaultSettingsProvider(args, parameters)
-        val local = settings.local
-        val structure = settings.structure
+        val localSettings = settings.local
+        val structureSettings = settings.structure
 
-        val sourceDir = structure.nplSourceDir
+        val sourceDir = structureSettings.nplSourceDir
         if (sourceDir == null) {
             output.error("Missing required parameter: --source-dir <directory>")
             displayUsage(output)
@@ -59,22 +59,22 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        val username = local.username
+        val username = localSettings.username
         if (username == null) {
             output.error("Configuration error '$username': username is required.")
             return ExitCode.CONFIG_ERROR
         }
 
-        val password = local.password
+        val password = localSettings.password
         if (password == null) {
             output.error("Configuration error '$password': password is required.")
             return ExitCode.CONFIG_ERROR
         }
 
-        if (local.clear) {
-            when (val clearResult = deployService.clearApplication(local)) {
+        if (localSettings.clear) {
+            when (val clearResult = deployService.clearApplication(localSettings)) {
                 is DeployResult.ClearSuccess -> {
-                    output.info("Application contents cleared for ${local.managementUrl}")
+                    output.info("Application contents cleared for ${localSettings.managementUrl}")
                 }
 
                 is DeployResult.ClearFailed -> {
@@ -89,9 +89,9 @@ class DeployCommand(
             }
         }
 
-        return when (val deployResult = deployService.deploySourcesAndMigrations(local, sourceDir.absolutePath)) {
+        return when (val deployResult = deployService.deploySourcesAndMigrations(localSettings, sourceDir.absolutePath)) {
             is DeployResult.Success -> {
-                output.success("Successfully deployed NPL sources and migrations to ${local.managementUrl}.")
+                output.success("Successfully deployed NPL sources and migrations to ${localSettings.managementUrl}.")
                 ExitCode.SUCCESS
             }
 
@@ -125,7 +125,6 @@ class DeployCommand(
                                   main
                                   ├── npl-1.0
                                   └── migration.yml
-                                  └── npl.yml
 
             Options:
               --clear             Clear application contents before deployment.

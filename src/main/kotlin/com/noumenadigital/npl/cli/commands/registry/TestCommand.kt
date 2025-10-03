@@ -1,9 +1,9 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
+import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.service.TestHarness
@@ -65,24 +65,28 @@ data class TestCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             val settings = settings ?: DefaultSettingsProvider(params, parameters)
-            val structure = settings.structure
-            val config =
-                TestConfig(
-                    sourceDir = structure.nplSourceDir ?: File("."),
-                    withCoverage = structure.testCoverage,
-                    outputDir = structure.outputDir ?: File("."),
-                )
+            val structureSettings = settings.structure
 
-            if (!config.sourceDir.isDirectory || !config.sourceDir.exists()) {
-                output.error(
-                    "Given source directory is either not a directory or does not exist. ${config.sourceDir.relativeOrAbsolute()}",
-                )
+            if (structureSettings.nplSourceDir == null) {
+                throw RequiredParameterMissing("source-dir")
+            }
+            if (!structureSettings.nplSourceDir.isDirectory) {
+                output.error("Given NPL source directory is not a directory: ${structureSettings.nplSourceDir.relativeOrAbsolute()}")
+                return ExitCode.GENERAL_ERROR
+            }
+            if (!structureSettings.nplSourceDir.exists()) {
+                output.error("Given NPL source directory does not exist: ${structureSettings.nplSourceDir.relativeOrAbsolute()}")
                 return ExitCode.GENERAL_ERROR
             }
 
-            val showCoverage = config.withCoverage
-            val coverageAnalyzer = coverageAnalyzer(showCoverage, config.sourceDir, config.outputDir.canonicalPath)
-            val testHarness = TestHarness(SourcesManager(config.sourceDir.absolutePath), coverageAnalyzer)
+            val showCoverage = structureSettings.testCoverage
+            val coverageAnalyzer =
+                coverageAnalyzer(
+                    showCoverage = showCoverage,
+                    sourceDir = structureSettings.nplSourceDir,
+                    outputDir = structureSettings.outputDir?.canonicalPath ?: ".",
+                )
+            val testHarness = TestHarness(SourcesManager(structureSettings.nplSourceDir.absolutePath), coverageAnalyzer)
 
             val start = System.nanoTime()
             val testResults = testHarness.runTest()
@@ -221,9 +225,3 @@ data class TestCommand(
 
     private fun formatSuccess(success: Boolean) = if (success) "PASS" else "FAIL"
 }
-
-data class TestConfig(
-    val sourceDir: File,
-    val withCoverage: Boolean = false,
-    val outputDir: File,
-) : CommandConfig

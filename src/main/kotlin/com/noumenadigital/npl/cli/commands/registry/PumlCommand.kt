@@ -3,7 +3,6 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.ExitCode.GENERAL_ERROR
 import com.noumenadigital.npl.cli.ExitCode.SUCCESS
-import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -55,11 +54,9 @@ data class PumlCommand(
             }
 
             val outputDirFile = File(outputDir).resolve("puml")
-            val protosMap = CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
-
-            if (protosMap == null) {
-                throw CommandExecutionException("No user defined types found, check sources and try again.")
-            }
+            val protosMap =
+                CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
+                    ?: throw CommandExecutionException("No user defined types found, check sources and try again.")
 
             val pumlFiles =
                 com.noumenadigital.pumlgen.NplPumlObjectGenerator
@@ -88,18 +85,11 @@ data class PumlCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor {
         val settings = DefaultSettingsProvider(params, parameters)
-        val structure = settings.structure
-        val config =
-            PumlConfig(
-                sourceDir = structure.nplSourceDir ?: File("."),
-                outputDir = structure.outputDir ?: File("."),
-            )
-
-        return PumlCommand(config.sourceDir.absolutePath, config.outputDir.absolutePath, settings)
+        val structureSettings = settings.structure
+        return PumlCommand(
+            srcDir = structureSettings.nplSourceDir?.absolutePath ?: srcDir,
+            outputDir = structureSettings.outputDir?.absolutePath ?: outputDir,
+            settings = settings,
+        )
     }
 }
-
-data class PumlConfig(
-    val sourceDir: File = File("."),
-    val outputDir: File = File("."),
-) : CommandConfig

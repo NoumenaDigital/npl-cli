@@ -22,8 +22,7 @@ open class HelpCommand : CommandExecutor {
         entries.forEach { command ->
             val name = command.commandName.padEnd(commandPadding)
             output.info("$name${command.description}")
-            val executor = command
-            executor.parameters
+            command.parameters
                 .filter { !it.isHidden }
                 .forEach { param ->
                     val paramIndent = " ".repeat(commandPadding + 2)
@@ -44,9 +43,9 @@ open class HelpCommand : CommandExecutor {
                     output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
                 }
 
-            if (executor.envVariables.isNotEmpty()) {
+            if (command.envVariables.isNotEmpty()) {
                 val envIndent = " ".repeat(commandPadding + 2)
-                executor.envVariables.forEach { envVar ->
+                command.envVariables.forEach { envVar ->
                     val requiredMark = if (envVar.isRequired) " (required)" else ""
                     output.info("$envIndent${envVar.name}  ${envVar.type}$requiredMark: ${envVar.description}")
                 }
