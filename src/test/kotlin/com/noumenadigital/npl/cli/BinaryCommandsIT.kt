@@ -53,7 +53,7 @@ class BinaryCommandsIT :
                     check      Validate the correctness of NPL sources
                                  --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
                     test       Run the NPL tests
-                                 --source-dir <directory>  Source directory containing NPL tests to run. Must be a parent directory of all required sources (both production and test). (defaults to current directory)
+                                 --test-source-dir <directory>  Source directory containing NPL tests to run. Must be a parent directory of all required sources (both production and test).
                                  --coverage  Report test coverage details (printed to console as well as coverage.xml)
                                  --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     openapi    Generate the openapi specifications of NPL api

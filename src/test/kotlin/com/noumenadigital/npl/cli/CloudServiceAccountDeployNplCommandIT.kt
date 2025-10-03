@@ -297,7 +297,7 @@ class CloudServiceAccountDeployNplCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Migration file does not exist - other-migration.yml
+                            Command cloud deploy npl failed: Migration file does not exist - other-migration.yml
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput
