@@ -14,6 +14,10 @@ import java.io.File
 class TestHarnessTest :
     FunSpec({
 
+        afterTest {
+            File(COVERAGE_FILE).takeIf { it.exists() }?.delete()
+        }
+
         data class TestContext(
             val tempDir: File = tempdir(),
             val withCoverage: Boolean,
