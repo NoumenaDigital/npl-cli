@@ -63,8 +63,11 @@ object TestUtils {
         File("npl.yml").apply {
             createNewFile()
             writeText(yaml)
-            test()
-            delete()
+            try {
+                test()
+            } finally {
+                delete()
+            }
         }
 
     fun getTestResourcesPath(subPath: List<String> = emptyList()): Path {
