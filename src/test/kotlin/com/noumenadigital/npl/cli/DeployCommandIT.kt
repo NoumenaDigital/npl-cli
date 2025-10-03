@@ -108,10 +108,8 @@ class DeployCommandIT :
 
                 TestUtils.withYamlConfig(
                     """
-                    cloud:
-                      authUrl: ${oidcUrl}realms/noumena
-
                     local:
+                      authUrl: ${oidcUrl}realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: ${mockEngine.url("/")}
@@ -145,14 +143,12 @@ class DeployCommandIT :
                 val oidcUrl = mockOidc.url("/").toString()
 
                 val testDirPath =
-                    getTestResourcesPath(listOf("deploy-success", "main")).toFile().relativeOrAbsolute().toString()
+                    getTestResourcesPath(listOf("deploy-success", "main")).toFile().relativeOrAbsolute()
 
                 TestUtils.withYamlConfig(
                     """
-                    cloud:
-                      authUrl: ${oidcUrl}realms/noumena
-
                     local:
+                      authUrl: ${oidcUrl}realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: ${mockEngine.url("/")}
@@ -196,16 +192,14 @@ class DeployCommandIT :
 
                 TestUtils.withYamlConfig(
                     """
-                    cloud:
-                      authUrl: ${oidcUrl}realms/noumena
-                      clear: true
-
                     local:
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: ${mockEngine.url("/")}
                       username: user1
                       password: password1
+                      authUrl: ${oidcUrl}realms/noumena
+                      clear: true
 
                     structure:
                       sourceDir: $testDirPath
@@ -238,10 +232,8 @@ class DeployCommandIT :
 
                 TestUtils.withYamlConfig(
                     """
-                    cloud:
-                      authUrl: ${oidcUrl}realms/noumena
-
                     local:
+                      authUrl: ${oidcUrl}realms/noumena
                       managementUrl: ${mockEngine.url("/")}
                       username: user2
                       password: password2
@@ -284,10 +276,8 @@ class DeployCommandIT :
 
                 TestUtils.withYamlConfig(
                     """
-                    cloud:
-                      authUrl: ${oidcUrl}realms/noumena
-
                     local:
+                      authUrl: ${oidcUrl}realms/noumena
                       managementUrl: ${mockEngine.url("/")}
                       username: user2
                       password: password2
@@ -348,11 +338,9 @@ class DeployCommandIT :
 
                 TestUtils.withYamlConfig(
                     """
-                    cloud:
+                    local:
                       authUrl: ${oidcUrl}realms/noumena
                       clear: true
-
-                    local:
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: ${mockEngine.url("/")}
@@ -412,11 +400,9 @@ class DeployCommandIT :
 
                 TestUtils.withYamlConfig(
                     """
-                    cloud:
+                    local:
                       authUrl: ${oidcUrl}realms/noumena
                       clear: true
-
-                    local:
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: ${mockEngine.url("/")}
@@ -487,10 +473,8 @@ class DeployCommandIT :
 
                     TestUtils.withYamlConfig(
                         """
-                        cloud:
-                          authUrl: ${oidcUrl}realms/noumena
-
                         local:
+                          authUrl: ${oidcUrl}realms/noumena
                           clientId: nm-platform-service-client
                           clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                           managementUrl: $engineUrl

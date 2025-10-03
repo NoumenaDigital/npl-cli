@@ -234,9 +234,6 @@
       "type": "com.noumenadigital.npl.cli.config.DeployConfig$Companion"
     },
     {
-      "type": "com.noumenadigital.npl.cli.config.DeploymentTargetConfig"
-    },
-    {
       "type": "com.noumenadigital.npl.cli.config.EngineTargetConfig",
       "allDeclaredFields": true,
       "allDeclaredMethods": true,

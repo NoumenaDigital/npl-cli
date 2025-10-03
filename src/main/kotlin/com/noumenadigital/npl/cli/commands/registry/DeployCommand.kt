@@ -1,18 +1,13 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandConfig
 import com.noumenadigital.npl.cli.commands.NamedParameter
-import com.noumenadigital.npl.cli.commands.registry.CloudDeployConfig.Companion.AUTH_URL_DEFAULT
-import com.noumenadigital.npl.cli.commands.registry.CloudDeployConfig.Companion.MGMT_URL_DEFAULT
-import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.DeployResult
 import com.noumenadigital.npl.cli.service.DeployService
 import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 import com.noumenadigital.npl.cli.settings.SettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
-import java.io.File
 
 class DeployCommand(
     private val args: List<String> = emptyList(),
@@ -44,22 +39,10 @@ class DeployCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         val settings = settings ?: DefaultSettingsProvider(args, parameters)
-        val cloud = settings.cloud
         val local = settings.local
         val structure = settings.structure
-        val config =
-            CloudDeployConfig(
-                username = local.username,
-                password = local.password,
-                sourceDir = structure.nplSourceDir,
-                clear = cloud.clear,
-                authUrl = cloud.authUrl ?: AUTH_URL_DEFAULT,
-                clientId = cloud.clientId,
-                clientSecret = cloud.clientSecret,
-                engineManagementUrl = local.managementUrl ?: MGMT_URL_DEFAULT,
-            )
 
-        val sourceDir = config.sourceDir
+        val sourceDir = structure.nplSourceDir
         if (sourceDir == null) {
             output.error("Missing required parameter: --source-dir <directory>")
             displayUsage(output)
@@ -76,32 +59,22 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        val username = config.username
+        val username = local.username
         if (username == null) {
             output.error("Configuration error '$username': username is required.")
             return ExitCode.CONFIG_ERROR
         }
 
-        val password = config.password
+        val password = local.password
         if (password == null) {
             output.error("Configuration error '$password': password is required.")
             return ExitCode.CONFIG_ERROR
         }
 
-        val targetConfig =
-            EngineTargetConfig(
-                engineManagementUrl = config.engineManagementUrl,
-                authUrl = config.authUrl,
-                username = username,
-                password = password,
-                clientId = config.clientId,
-                clientSecret = config.clientSecret,
-            )
-
-        if (config.clear) {
-            when (val clearResult = deployService.clearApplication(targetConfig)) {
+        if (local.clear) {
+            when (val clearResult = deployService.clearApplication(local)) {
                 is DeployResult.ClearSuccess -> {
-                    output.info("Application contents cleared for ${config.engineManagementUrl}")
+                    output.info("Application contents cleared for ${local.managementUrl}")
                 }
 
                 is DeployResult.ClearFailed -> {
@@ -116,9 +89,9 @@ class DeployCommand(
             }
         }
 
-        return when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, sourceDir.absolutePath)) {
+        return when (val deployResult = deployService.deploySourcesAndMigrations(local, sourceDir.absolutePath)) {
             is DeployResult.Success -> {
-                output.success("Successfully deployed NPL sources and migrations to ${targetConfig.engineManagementUrl}.")
+                output.success("Successfully deployed NPL sources and migrations to ${local.managementUrl}.")
                 ExitCode.SUCCESS
             }
 
@@ -159,21 +132,5 @@ class DeployCommand(
 
             Configuration is read from npl.yml (current dir).
             """.trimIndent()
-    }
-}
-
-data class CloudDeployConfig(
-    val authUrl: String = AUTH_URL_DEFAULT,
-    val clear: Boolean = false,
-    val clientId: String? = null,
-    val clientSecret: String? = null,
-    val engineManagementUrl: String = MGMT_URL_DEFAULT,
-    val password: String? = null,
-    val sourceDir: File? = null,
-    val username: String? = null,
-) : CommandConfig {
-    companion object {
-        const val AUTH_URL_DEFAULT: String = "http://localhost:11000"
-        const val MGMT_URL_DEFAULT: String = "http://localhost:12400/realms/noumena"
     }
 }

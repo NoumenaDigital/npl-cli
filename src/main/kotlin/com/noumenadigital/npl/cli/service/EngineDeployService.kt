@@ -1,8 +1,8 @@
 package com.noumenadigital.npl.cli.service
 
-import com.noumenadigital.npl.cli.config.EngineTargetConfig
 import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
+import com.noumenadigital.npl.cli.settings.LocalSettings
 import com.noumenadigital.platform.client.auth.AuthConfiguration
 import com.noumenadigital.platform.client.auth.AuthorizationFailedAuthTokenException
 import com.noumenadigital.platform.client.auth.TokenAuthorizationProvider
@@ -29,21 +29,21 @@ private data class ClientContext(
 )
 
 class DeployService {
-    fun clearApplication(targetConfig: EngineTargetConfig): DeployResult =
+    fun clearApplication(localSettings: LocalSettings): DeployResult =
         try {
-            val context = setupClientContextInternal(targetConfig)
+            val context = setupClientContextInternal(localSettings)
             context.managementClient.clearApplicationContents(context.authProvider)
             DeployResult.ClearSuccess
         } catch (e: Exception) {
-            DeployResult.ClearFailed(wrapException(targetConfig, e))
+            DeployResult.ClearFailed(wrapException(localSettings, e))
         }
 
     fun deploySourcesAndMigrations(
-        targetConfig: EngineTargetConfig,
+        localSettings: LocalSettings,
         srcDir: String,
     ): DeployResult =
         try {
-            val context = setupClientContextInternal(targetConfig)
+            val context = setupClientContextInternal(localSettings)
             context.managementClient.deploySourcesWithMigrations(
                 sourceDirectory = srcDir,
                 authorizationProvider = context.authProvider,
@@ -51,24 +51,24 @@ class DeployService {
             DeployResult.Success
         } catch (e: AuthorizationFailedAuthTokenException) {
             throw AuthorizationFailedException(
-                message = e.message ?: "Authorization failed for ${targetConfig.engineManagementUrl}",
+                message = e.message ?: "Authorization failed for $localSettings",
                 cause = e,
             )
         } catch (e: Exception) {
-            DeployResult.DeploymentFailed(wrapException(targetConfig, e))
+            DeployResult.DeploymentFailed(wrapException(localSettings, e))
         }
 
-    private fun setupClientContextInternal(targetConfig: EngineTargetConfig): ClientContext {
+    private fun setupClientContextInternal(localSettings: LocalSettings): ClientContext {
         try {
-            val userConfig = UserConfiguration(targetConfig.username, targetConfig.password)
+            val userConfig = UserConfiguration(localSettings.username!!, localSettings.password!!)
             val authConfig =
                 AuthConfiguration(
-                    clientId = targetConfig.clientId ?: "",
-                    clientSecret = targetConfig.clientSecret ?: "",
-                    authUrl = targetConfig.authUrl,
+                    clientId = localSettings.clientId ?: "",
+                    clientSecret = localSettings.clientSecret ?: "",
+                    authUrl = localSettings.authUrl,
                 )
             val authProvider = TokenAuthorizationProvider(userConfig, authConfig)
-            val managementClient = ManagementHttpClient(targetConfig.engineManagementUrl)
+            val managementClient = ManagementHttpClient(localSettings.managementUrl)
 
             return ClientContext(managementClient, authProvider)
         } catch (e: Exception) {
@@ -77,13 +77,13 @@ class DeployService {
     }
 
     private fun wrapException(
-        targetConfig: EngineTargetConfig,
+        targetConfig: LocalSettings,
         e: Exception,
     ): Exception =
         when (e) {
             is AuthorizationFailedAuthTokenException ->
                 AuthorizationFailedException(
-                    message = e.message ?: "Authorization failed for ${targetConfig.engineManagementUrl}",
+                    message = e.message ?: "Authorization failed for ${targetConfig.managementUrl}",
                     cause = e,
                 )
             is ClientSetupException -> e
