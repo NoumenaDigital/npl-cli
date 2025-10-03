@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.DeployResult
 import com.noumenadigital.npl.cli.service.DeployService
@@ -59,17 +60,19 @@ class DeployCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        val username = localSettings.username
-        if (username == null) {
-            output.error("Configuration error '$username': username is required.")
-            return ExitCode.CONFIG_ERROR
-        }
+        val username =
+            localSettings.username
+                ?: throw RequiredParameterMissing(
+                    parameterName = "username",
+                    yamlExample = "local:\n  username: <username>",
+                )
 
-        val password = localSettings.password
-        if (password == null) {
-            output.error("Configuration error '$password': password is required.")
-            return ExitCode.CONFIG_ERROR
-        }
+        val password =
+            localSettings.password
+                ?: throw RequiredParameterMissing(
+                    parameterName = "password",
+                    yamlExample = "local:\n  password: <password>",
+                )
 
         if (localSettings.clear) {
             when (val clearResult = deployService.clearApplication(localSettings)) {
