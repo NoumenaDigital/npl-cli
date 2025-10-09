@@ -9,6 +9,20 @@ import com.noumenadigital.npl.cli.exception.ArgumentParsingException
 import java.io.File
 
 object SettingsResolver {
+    private val DEPRECATED_CLI_PARAMS =
+        setOf(
+            "authUrl",
+            "clientId",
+            "clientSecret",
+            "managementUrl",
+            "frontEnd",
+            "sourceDir",
+            "outputDir",
+            "testSourceDir",
+            "projectDir",
+            "templateUrl",
+        )
+
     private fun String.toFile(): File = File(this)
 
     private fun Boolean.orElse(default: Boolean?): Boolean = (takeIf { it } ?: default) == true
@@ -142,51 +156,23 @@ object SettingsResolver {
                     )?.toFile(),
         )
 
-    // Convenience helpers to reduce duplication in commands
     fun parseArgs(
         args: List<String>,
         parameters: List<NamedParameter>,
     ): ParsedArguments {
         val parsed = CommandArgumentParser.parse(args, parameters)
-        val allowedDeprecated =
-            setOf(
-                "authUrl",
-                "clientId",
-                "clientSecret",
-                "managementUrl",
-                "frontEnd",
-                "sourceDir",
-                "outputDir",
-                "testSourceDir",
-                "projectDir",
-                "templateUrl",
-            )
-        return parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = allowedDeprecated)
+        return parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = DEPRECATED_CLI_PARAMS)
     }
 
     fun parseArgsOrThrow(
         args: List<String>,
         parameters: List<NamedParameter>,
     ): ParsedArguments {
-        val parsed = parseArgs(args, parameters)
-        val allowedDeprecated =
-            setOf(
-                "authUrl",
-                "clientId",
-                "clientSecret",
-                "managementUrl",
-                "frontEnd",
-                "sourceDir",
-                "outputDir",
-                "testSourceDir",
-                "projectDir",
-                "templateUrl",
-            )
-        val filteredUnexpected = parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = allowedDeprecated).unexpectedArgs
+        val parsed = CommandArgumentParser.parse(args, parameters)
+        val filteredUnexpected = parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = DEPRECATED_CLI_PARAMS).unexpectedArgs
         if (filteredUnexpected.isNotEmpty()) {
             throw ArgumentParsingException("Unexpected arguments: ${filteredUnexpected.joinToString(separator = " ")}")
         }
-        // Return the original parsed so deprecated tokens remain available to accessors
         return parsed
     }
 

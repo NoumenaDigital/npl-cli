@@ -115,7 +115,7 @@ class CommandParametersTest :
         }
 
         context("Deprecated parameter names") {
-            test("should return value from deprecated name and emit warning via notifier sink") {
+            test("should emit warning when filtering deprecated parameters") {
                 val parser = CommandArgumentParser
                 val parameters = listOf(NamedParameter(name = "auth-url", description = "Auth URL", valuePlaceholder = "<url>"))
                 val args = listOf("--authUrl", "http://old")
@@ -123,21 +123,20 @@ class CommandParametersTest :
                 val captured = mutableListOf<String>()
                 DeprecationNotifier.setSink { msg -> captured.add(msg) }
                 val result = parser.parse(args, parameters)
-                val value = result.getValueOrElse(name = "auth-url", deprecatedNames = listOf("authUrl"), defaultValue = null)
+                val filtered = result.withoutDeprecatedUnexpectedNames(setOf("authUrl"))
                 DeprecationNotifier.setSink(null)
 
-                value shouldBe "http://old"
+                filtered.unexpectedArgs.shouldBeEmpty()
                 captured.size shouldBe 1
                 captured.first() shouldBe "Parameter '--authUrl' is deprecated; use '--auth-url' instead."
             }
 
-            test("should ignore deprecated token in unexpected when throwing") {
+            test("should access value from deprecated parameter in unexpected args") {
                 val parser = CommandArgumentParser
                 val parameters = emptyList<NamedParameter>()
                 val args = listOf("--projectDir", "proj")
 
                 val result = parser.parse(args, parameters)
-                // Without resolver's filtering this remains unexpected; here we only assert accessor behavior
                 val v = result.getValueOrElse(name = "project-dir", deprecatedNames = listOf("projectDir"), defaultValue = null)
                 v shouldBe "proj"
             }

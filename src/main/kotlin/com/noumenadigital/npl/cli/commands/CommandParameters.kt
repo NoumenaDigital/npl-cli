@@ -109,7 +109,6 @@ object CommandArgumentParser {
 
             if (deprecatedNames.isEmpty()) return defaultValue
 
-            // Look for deprecated alias occurrences in unexpected args, reconstructing value pairs if present
             val tokens = unexpectedArgs
             for (i in tokens.indices) {
                 val token = tokens[i]
@@ -122,7 +121,6 @@ object CommandArgumentParser {
                         } else {
                             ""
                         }
-                    DeprecationNotifier.warn("Parameter '--$withoutDashes' is deprecated; use '--$name' instead.")
                     return value
                 }
             }
@@ -137,14 +135,19 @@ object CommandArgumentParser {
             var i = 0
             while (i < tokens.size) {
                 val t = tokens[i]
-                if (t.startsWith(prefix = "--") && t.removePrefix(prefix = "--") in deprecatedNames) {
-                    i +=
-                        if (i + 1 < tokens.size && !tokens[i + 1].startsWith(prefix = "--")) {
-                            2
-                        } else {
-                            1
-                        }
-                    continue
+                if (t.startsWith(prefix = "--")) {
+                    val paramName = t.removePrefix(prefix = "--")
+                    if (paramName in deprecatedNames) {
+                        val kebabCase = paramName.replace(Regex("([a-z])([A-Z])"), "$1-$2").lowercase()
+                        DeprecationNotifier.warn("Parameter '--$paramName' is deprecated; use '--$kebabCase' instead.")
+                        i +=
+                            if (i + 1 < tokens.size && !tokens[i + 1].startsWith(prefix = "--")) {
+                                2
+                            } else {
+                                1
+                            }
+                        continue
+                    }
                 }
                 filtered.add(t)
                 i += 1
