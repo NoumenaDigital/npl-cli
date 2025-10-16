@@ -1325,6 +1325,10 @@
       "allDeclaredFields": true
     },
     {
+      "type": "io.swagger.v3.oas.models.media.MapSchema",
+      "allDeclaredFields": true
+    },
+    {
       "type": "io.swagger.v3.oas.models.media.MediaType",
       "allDeclaredFields": true,
       "methods": [

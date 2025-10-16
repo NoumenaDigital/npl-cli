@@ -58,7 +58,7 @@ class PumlCommandIT :
                     val pumlDir = workingDirectory.resolve("puml")
                     val expectedOutput =
                         """
-                    Completed compilation for 5 files in XXX ms
+                    Completed compilation for 6 files in XXX ms
 
                     Writing Puml files to ${pumlDir.relativeOrAbsolute()}
 
@@ -69,7 +69,7 @@ class PumlCommandIT :
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                     with(workingDirectory.resolve("puml")) {
                         exists() shouldBe true
-                        listAllFilesNames() shouldContainAll listOf("settle.puml", "iou.puml", "includes.puml")
+                        listAllFilesNames() shouldContainAll listOf("settle.puml", "iou.puml", "balance.puml", "includes.puml")
                         findFile("settle.puml") { file -> file.validateContents(SETTLE_PUML_CONTENTS) }
                         findFile("iou.puml") { file -> file.validateContents(IOU_PUML_CONTENTS) }
                         findFile("includes.puml") { file -> file.validateContents(INCLUDES_PUML_CONTENTS) }
@@ -87,7 +87,7 @@ class PumlCommandIT :
                     val pumlDir = workingDirectory.resolve("puml")
                     val expectedOutput =
                         """
-                        Completed compilation for 5 files in XXX ms
+                        Completed compilation for 6 files in XXX ms
 
                         Writing Puml files to ${pumlDir.relativeOrAbsolute()}
 
@@ -262,6 +262,7 @@ class PumlCommandIT :
             hide empty members
             !include objects/iou/iou.puml
             !include objects/iou/marketPrice.puml
+            !include processes/balance.puml
             !include processes/settle.puml
             @enduml
             """.trimIndent()
