@@ -3,9 +3,10 @@ package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.EnvironmentVariable
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
-import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
+import com.noumenadigital.npl.cli.exception.CommandValidationException
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
@@ -14,18 +15,9 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
-import com.noumenadigital.npl.cli.settings.CloudSettings
-import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
-import com.noumenadigital.npl.cli.settings.StructureSettings
+import java.io.File
 
-class CloudDeployNplCommand(
-    private val sourcesManager: SourcesManager = SourcesManager("."),
-    private val cloudDeployService: CloudDeployService =
-        CloudDeployService(
-            CloudAuthManager(),
-            NoumenaCloudClient(NoumenaCloudConfig()),
-        ),
-) : CommandExecutor {
+object CloudDeployNplCommandDescriptor : CommandDescriptor {
     override val commandName: String = "cloud deploy npl"
     override val description: String = "Deploy NPL sources to a NOUMENA Cloud Application"
 
@@ -36,47 +28,54 @@ class CloudDeployNplCommand(
                 description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
+                configFilePath = "/cloud/app",
             ),
             NamedParameter(
                 name = "tenant",
                 description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
+                configFilePath = "/cloud/tenant",
             ),
             NamedParameter(
                 name = "migration",
                 description = "Path to migration.yml",
-                isRequired = false,
+                isRequired = true,
                 valuePlaceholder = "<migration>",
                 takesPath = true,
+                configFilePath = "/structure/migration",
             ),
             NamedParameter(
                 name = "url",
                 description = "NOUMENA Cloud deployment URL",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<url>",
+                configFilePath = "/cloud/url",
             ),
             NamedParameter(
                 name = "client-id",
                 description = "OAuth2 Client ID",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
+                configFilePath = "/cloud/clientId",
             ),
             NamedParameter(
                 name = "client-secret",
                 description = "OAuth2 Client Secret",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
+                configFilePath = "/cloud/clientSecret",
             ),
             NamedParameter(
                 name = "auth-url",
                 description = "NOUMENA Cloud Auth URL",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<auth-url>",
+                configFilePath = "/cloud/authUrl",
             ),
         )
 
@@ -89,48 +88,60 @@ class CloudDeployNplCommand(
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val settings = DefaultSettingsProvider(params, parameters)
-        val cloudSettings: CloudSettings = settings.cloud
-        val structureSettings: StructureSettings = settings.structure
-        val migrationFile =
-            structureSettings.migrationDescriptorFile
-                ?: throw RequiredParameterMissing(
-                    parameterName = "migration",
-                    yamlExample = "structure:\n  migration: <path>",
-                )
-        if (!migrationFile.exists()) {
-            throw CloudCommandException(
-                message = "Migration file does not exist - $migrationFile",
-                commandName = "cloud deploy npl",
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedApp = parsedArguments["app"] as String
+        val parsedTenant = parsedArguments["tenant"] as String
+        val parsedMigration = parsedArguments["migration"] as? String ?: "."
+        val parsedUrl = parsedArguments["url"] as String
+        val parsedClientId = parsedArguments["client-id"] as String
+        val parsedClientSecret = parsedArguments["client-secret"] as String
+        val parsedAuthUrl = parsedArguments["auth-url"] as String
+        return CloudDeployNplCommand(
+            app = parsedApp,
+            tenant = parsedTenant,
+            migration = parsedMigration,
+            url = parsedUrl,
+            clientId = parsedClientId,
+            clientSecret = parsedClientSecret,
+            authUrl = parsedAuthUrl,
+        )
+    }
+}
+
+class CloudDeployNplCommand(
+    private val app: String,
+    private val tenant: String,
+    private val migration: String,
+    private val url: String,
+    private val clientId: String,
+    private val clientSecret: String,
+    private val authUrl: String,
+) : CommandExecutor {
+    init {
+        val file = File(migration)
+        if (!file.exists()) {
+            throw CommandValidationException(
+                message = "Command cloud deploy npl failed: Migration file does not exist - $file",
             )
         }
-
-        val sourcesManager = SourcesManager(migrationFile.parentFile?.absolutePath ?: ".")
-        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(cloudSettings.clientId, cloudSettings.clientSecret, cloudSettings.authUrl)
-        val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
-        val cloudDeployService =
-            CloudDeployService(
-                CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(
-                    config =
-                        NoumenaCloudConfig.get(
-                            appSlug =
-                                cloudSettings.app ?: throw RequiredParameterMissing(
-                                    parameterName = "app",
-                                    yamlExample = "cloud:\n  app: <app>",
-                                ),
-                            tenantSlug =
-                                cloudSettings.tenant ?: throw RequiredParameterMissing(
-                                    parameterName = "tenant",
-                                    yamlExample = "cloud:\n  tenant: <tenant>",
-                                ),
-                            url = cloudSettings.url,
-                        ),
-                ),
-            )
-        return CloudDeployNplCommand(sourcesManager, cloudDeployService)
     }
+
+    val sourcesManager = SourcesManager(migration)
+    val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
+    val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
+    val cloudDeployService =
+        CloudDeployService(
+            CloudAuthManager(noumenaCloudAuthClient),
+            NoumenaCloudClient(
+                config =
+                    NoumenaCloudConfig.get(
+                        appSlug = app,
+                        tenantSlug =
+                        tenant,
+                        url = url,
+                    ),
+            ),
+        )
 
     override fun execute(output: ColorWriter): ExitCode {
         try {

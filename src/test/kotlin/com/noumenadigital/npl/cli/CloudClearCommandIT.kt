@@ -191,13 +191,22 @@ class CloudClearCommandIT :
         }
 
         fun withTestContext(test: TestContext.() -> Unit) {
-            val context =
-                TestContext()
+            val context = TestContext()
             try {
                 System.setProperty("NPL_CLI_BROWSER_DISABLED", "true")
                 context.setupMockServers()
                 runCommand(
-                    commands = listOf("cloud", "login", "--url", context.mockOidc.url("/realms/paas/").toString()),
+                    commands =
+                        listOf(
+                            "cloud",
+                            "login",
+                            "--url",
+                            context.mockOidc.url("/realms/paas/").toString(),
+                            "--client-id",
+                            "client-id-ok",
+                            "--client-secret",
+                            "client-secret-ok",
+                        ),
                     env = mapOf("NPL_CLI_BROWSER_DISABLED" to "true"),
                 ) {
                     process.waitFor()
@@ -227,6 +236,10 @@ class CloudClearCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "client-id-ok",
+                                "--client-secret",
+                                "client-secret-ok",
                             ),
                     ) {
                         process.waitFor()
@@ -252,6 +265,8 @@ class CloudClearCommandIT :
                                 "clear",
                                 "--client-id",
                                 "wrong",
+                                "--client-secret",
+                                "good",
                                 "--app",
                                 "appslug",
                                 "--tenant",
@@ -289,6 +304,10 @@ class CloudClearCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -318,6 +337,10 @@ class CloudClearCommandIT :
                                 "non-url",
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -348,6 +371,10 @@ class CloudClearCommandIT :
                                 "non-url",
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -372,6 +399,8 @@ class CloudClearCommandIT :
                       tenant: tenantslug
                       url: ${mockNC.url("/")}
                       authUrl: "http://localhost:${mockOidc.port}/realms/paas/"
+                      clientId: paas
+                      clientSecret: paas
                     """.trimIndent(),
                 ) {
 

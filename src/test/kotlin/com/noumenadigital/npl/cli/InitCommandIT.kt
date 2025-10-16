@@ -244,11 +244,11 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    npl init: Unknown arguments found: --unexpected
+                    Unexpected arguments: --unexpected
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
                 }
             }
         }

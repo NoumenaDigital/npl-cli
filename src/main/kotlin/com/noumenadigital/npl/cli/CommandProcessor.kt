@@ -9,6 +9,7 @@ import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 import com.noumenadigital.npl.cli.exception.CommandParsingException
+import com.noumenadigital.npl.cli.exception.CommandValidationException
 import com.noumenadigital.npl.cli.exception.DeployConfigException
 import com.noumenadigital.npl.cli.exception.InternalException
 import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
@@ -41,6 +42,11 @@ class CommandProcessor(
                     is ArgumentParsingException -> {
                         output.error(ex.buildOutputMessage())
                         return ExitCode.USAGE_ERROR
+                    }
+
+                    is CommandValidationException -> {
+                        output.error(ex.buildOutputMessage(inputArgs))
+                        return ExitCode.GENERAL_ERROR
                     }
 
                     is CommandExecutionException -> {

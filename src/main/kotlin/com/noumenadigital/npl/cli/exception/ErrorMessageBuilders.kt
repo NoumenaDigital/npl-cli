@@ -27,6 +27,8 @@ fun CommandNotFoundException.buildOutputMessage(): String {
 fun Exception.buildOutputMessage(inputArgs: List<String>): String =
     "Executing command: [${inputArgs.joinToString(" ")}] FAILED. Error: ${stackTraceToString().trim()}"
 
+fun CommandValidationException.buildOutputMessage(inputArgs: List<String>): String = this.message
+
 fun DeployConfigException.buildOutputMessage(): String {
     val errorLines =
         this.message
@@ -45,8 +47,27 @@ fun AuthorizationFailedException.buildOutputMessage(): String = this.message
 
 fun CloudCommandException.buildOutputMessage(): String = "Command ${this.commandName} failed: ${this.message}"
 
-fun RequiredParameterMissing.buildOutputMessage(): String =
-    "Missing required parameter: ${this.parameterName}\n" +
-        "Either pass it as a command line argument in the following form:\n\n" +
-        "\t--${this.parameterName} <value>\n\n" +
-        "or define it in npl.yml, e.g.:\n\n${this.yamlExample}"
+fun RequiredParameterMissing.buildOutputMessage(): String {
+    val params = parameterNames.joinToString(", ")
+
+    val yamlExamplesFormatted =
+        yamlExamples
+            .filterNotNull()
+            .joinToString("\n") { "  $it" }
+
+    val usagePart = usageInstruction?.let { "\nUsage:\n  $it\n" } ?: ""
+
+    return """
+        |Missing required parameter(s): $params
+        |
+        |You can provide them in one of the following ways:
+        |
+        |  • As command-line arguments:
+        |${parameterNames.joinToString("\n") { "      --$it <value>" }}
+        |
+        |  • In your npl.yml configuration file:
+        |
+        |$yamlExamplesFormatted
+        |$usagePart
+        """.trimMargin()
+}

@@ -2,60 +2,66 @@ package com.noumenadigital.npl.cli.commands.registry.cloud
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.ColorWriter
-import com.noumenadigital.npl.cli.settings.CloudSettings
-import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 
-class CloudLoginCommand(
-    private val authManager: CloudAuthManager = CloudAuthManager(),
-) : CommandExecutor {
+object CloudLoginCommandDescriptor : CommandDescriptor {
     override val commandName: String = "cloud login"
     override val description: String = "Handle the NPL CLI login to NOUMENA Сloud  "
-
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
                 name = "client-id",
                 description = "OAuth2 Client ID",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
+                configFilePath = "/cloud/clientId",
             ),
             NamedParameter(
                 name = "client-secret",
                 description = "OAuth2 Client Secret",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
+                configFilePath = "/cloud/clientSecret",
             ),
             NamedParameter(
                 name = "url",
                 description = "NOUMENA Cloud Auth URL",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<url>",
+                configFilePath = "/cloud/url",
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val settings = DefaultSettingsProvider(params, parameters)
-        val cloud: CloudSettings = settings.cloud
-        val noumenaCloudAuthClient =
-            NoumenaCloudAuthClient(
-                NoumenaCloudAuthConfig.get(
-                    clientId = cloud.clientId,
-                    clientSecret = cloud.clientSecret,
-                    url = cloud.url,
-                ),
-            )
-        val authManager = CloudAuthManager(noumenaCloudAuthClient)
-        return CloudLoginCommand(authManager)
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedClientId = parsedArguments["client-id"] as String
+        val parsedClientSecret = parsedArguments["client-secret"] as String
+        val parsedUrl = parsedArguments["url"] as String
+        return CloudLoginCommand(clientId = parsedClientId, clientSecret = parsedClientSecret, url = parsedUrl)
     }
+}
+
+class CloudLoginCommand(
+    private val clientId: String,
+    private val clientSecret: String,
+    private val url: String,
+) : CommandExecutor {
+    val noumenaCloudAuthConfig =
+        NoumenaCloudAuthConfig.get(
+            clientId = clientId,
+            clientSecret = clientSecret,
+            url = url,
+        )
+    val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
+    val authManager = CloudAuthManager(noumenaCloudAuthClient)
 
     override fun execute(output: ColorWriter): ExitCode {
         try {

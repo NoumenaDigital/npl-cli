@@ -233,7 +233,17 @@ class CloudDeployFrontendCommandIT :
                 System.setProperty("NPL_CLI_BROWSER_DISABLED", "true")
                 context.setupMockServers()
                 runCommand(
-                    commands = listOf("cloud", "login", "--url", context.mockOidc.url("/realms/paas/").toString()),
+                    commands =
+                        listOf(
+                            "cloud",
+                            "login",
+                            "--url",
+                            context.mockOidc.url("/realms/paas/").toString(),
+                            "--client-id",
+                            "paas",
+                            "--client-secret",
+                            "paas",
+                        ),
                     env = mapOf("NPL_CLI_BROWSER_DISABLED" to "true"),
                 ) {
                     process.waitFor()
@@ -266,6 +276,10 @@ class CloudDeployFrontendCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -292,6 +306,8 @@ class CloudDeployFrontendCommandIT :
                                 "frontend",
                                 "--client-id",
                                 "wrong",
+                                "--client-secret",
+                                "paas",
                                 "--app",
                                 "appslug",
                                 "--tenant",
@@ -334,6 +350,10 @@ class CloudDeployFrontendCommandIT :
                                 "non-url",
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -367,6 +387,10 @@ class CloudDeployFrontendCommandIT :
                                 "non-url",
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -399,6 +423,10 @@ class CloudDeployFrontendCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -431,6 +459,10 @@ class CloudDeployFrontendCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -483,6 +515,10 @@ class CloudDeployFrontendCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     )
                 }
@@ -497,6 +533,8 @@ class CloudDeployFrontendCommandIT :
                             tenant: tenantslug
                             url: ${mockNC.url("/")}
                             authUrl: ${mockOidc.url("/realms/paas/")}
+                            clientId: paas
+                            clientSecret: paas
                           structure:
                             frontend: src/test/resources/frontend-sources/deploy-success/build
                         """,
@@ -513,6 +551,8 @@ class CloudDeployFrontendCommandIT :
                           cloud:
                               app: appslug
                               tenant: tenantslug
+                              clientId: paas
+                              clientSecret: paas
                           structure:
                               frontend: src/test/resources/frontend-sources/deploy-success/build
                         """,

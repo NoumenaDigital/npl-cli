@@ -2,9 +2,9 @@ package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
-import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
@@ -13,16 +13,9 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
-import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
+import java.io.File
 
-class CloudDeployFrontendCommand(
-    private val sourcesManager: SourcesManager = SourcesManager("."),
-    private val cloudDeployService: CloudDeployService =
-        CloudDeployService(
-            CloudAuthManager(),
-            NoumenaCloudClient(NoumenaCloudConfig()),
-        ),
-) : CommandExecutor {
+object CloudDeployFrontendCommandDescriptor : CommandDescriptor {
     override val commandName: String = "cloud deploy frontend"
     override val description: String = "Deploy frontend sources to a NOUMENA Cloud Application"
 
@@ -33,97 +26,116 @@ class CloudDeployFrontendCommand(
                 description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
+                configFilePath = "/cloud/app",
             ),
             NamedParameter(
                 name = "tenant",
                 description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
+                configFilePath = "/cloud/tenant",
             ),
             NamedParameter(
                 name = "frontend",
                 description = "Path to the frontend source directory containing the index.html file",
-                isRequired = true,
+                isRequired = false,
                 valuePlaceholder = "<frontend>",
                 takesPath = true,
+                configFilePath = "/cloud/frontend",
             ),
             NamedParameter(
                 name = "url",
                 description = "NOUMENA Cloud deployment URL",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<url>",
+                configFilePath = "/cloud/url",
             ),
             NamedParameter(
                 name = "client-id",
                 description = "OAuth2 Client ID",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
+                configFilePath = "/cloud/clientId",
             ),
             NamedParameter(
                 name = "client-secret",
                 description = "OAuth2 Client Secret",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
+                configFilePath = "/cloud/clientSecret",
             ),
             NamedParameter(
                 name = "auth-url",
                 description = "NOUMENA Cloud Auth URL",
-                isRequired = false,
+                isRequired = true,
                 isHidden = true,
-                valuePlaceholder = "<authUrl>",
+                valuePlaceholder = "<auth-url>",
+                configFilePath = "/cloud/authUrl",
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val settings = DefaultSettingsProvider(params, parameters)
-        val cloudSettings = settings.cloud
-        val structureSettings = settings.structure
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedApp = parsedArguments["app"] as String
+        val parsedTenant = parsedArguments["tenant"] as String
+        val parsedFrontend = parsedArguments["frontend"] as? String ?: "."
+        val parsedUrl = parsedArguments["url"] as String
+        val parsedClientId = parsedArguments["client-id"] as String
+        val parsedClientSecret = parsedArguments["client-secret"] as String
+        val parsedAuthUrl = parsedArguments["auth-url"] as String
+        return CloudDeployFrontendCommand(
+            app = parsedApp,
+            tenant = parsedTenant,
+            frontend = parsedFrontend,
+            url = parsedUrl,
+            clientId = parsedClientId,
+            clientSecret = parsedClientSecret,
+            authUrl = parsedAuthUrl,
+        )
 
-        if (structureSettings.frontEnd == null) {
-            throw RequiredParameterMissing(
-                parameterName = "frontend",
-                yamlExample = "structure:\n  frontend: <directory>",
-            )
-        }
-        if (!structureSettings.frontEnd.exists() || !structureSettings.frontEnd.isDirectory) {
+        /*        if (structureSettings.frontEnd == null) {
+                    throw RequiredParameterMissing(
+                        parameterName = "frontend",
+                        yamlExample = "structure:\n  frontend: <directory>",
+                    )
+                }*/
+    }
+}
+
+class CloudDeployFrontendCommand(
+    private val app: String,
+    private val tenant: String,
+    private val frontend: String,
+    private val url: String,
+    private val clientId: String,
+    private val clientSecret: String,
+    private val authUrl: String,
+) : CommandExecutor {
+    init {
+        val frontendFile = File(frontend)
+        if (!frontendFile.exists() || !frontendFile.isDirectory) {
             throw CloudCommandException(
-                message = "Build directory does not exist or is not a directory - ${structureSettings.frontEnd}",
+                message = "Build directory does not exist or is not a directory - $frontend",
                 commandName = "cloud deploy frontend",
             )
         }
-        val sourcesManager = SourcesManager(structureSettings.frontEnd.absolutePath)
-        val noumenaCloudAuthConfig =
-            NoumenaCloudAuthConfig.get(
-                clientId = cloudSettings.clientId,
-                clientSecret = cloudSettings.clientSecret,
-                url = cloudSettings.authUrl,
-            )
-
-        val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
-        val cloudDeployService =
-            CloudDeployService(
-                CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(
-                    NoumenaCloudConfig.get(
-                        appSlug =
-                            cloudSettings.app ?: throw RequiredParameterMissing(
-                                parameterName = "app",
-                                yamlExample = "cloud:\n  app: <app>",
-                            ),
-                        tenantSlug =
-                            cloudSettings.tenant ?: throw RequiredParameterMissing(
-                                parameterName = "tenant",
-                                yamlExample = "cloud:\n  tenant: <tenant>",
-                            ),
-                        url = cloudSettings.url,
-                    ),
-                ),
-            )
-        return CloudDeployFrontendCommand(sourcesManager, cloudDeployService)
     }
+
+    val sourcesManager = SourcesManager(frontend)
+    val noumenaCloudAuthConfig =
+        NoumenaCloudAuthConfig.get(
+            clientId = clientId,
+            clientSecret = clientSecret,
+            url = authUrl,
+        )
+
+    val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
+    val cloudAuthManager = CloudAuthManager(noumenaCloudAuthClient)
+    val config = NoumenaCloudConfig.get(app, tenant, url)
+    val noumenaCloudClient = NoumenaCloudClient(config)
+    val cloudDeployService = CloudDeployService(cloudAuthManager, noumenaCloudClient)
 
     override fun execute(output: ColorWriter): ExitCode {
         try {

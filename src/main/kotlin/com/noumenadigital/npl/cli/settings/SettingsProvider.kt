@@ -1,21 +1,40 @@
 package com.noumenadigital.npl.cli.settings
 
-import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
+import com.noumenadigital.npl.cli.config.YAMLConfigParser
+import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 
-interface SettingsProvider {
-    val cloud: CloudSettings
-    val local: LocalSettings
-    val structure: StructureSettings
-}
+interface SettingsProvider
 
 class DefaultSettingsProvider(
     private val args: List<String>,
-    private val parameters: List<NamedParameter>,
+    private val commandDescriptor: CommandDescriptor,
 ) : SettingsProvider {
-    private val parsed by lazy { SettingsResolver.parseArgsOrThrow(args, parameters) }
-    private val yaml by lazy { SettingsResolver.loadYamlConfig() }
+    private val parsed by lazy { SettingsResolver.parseArgsOrThrow(args, commandDescriptor.parameters) }
 
-    override val cloud: CloudSettings by lazy { SettingsResolver.resolveCloud(parsed, yaml) }
-    override val local: LocalSettings by lazy { SettingsResolver.resolveLocal(parsed, yaml) }
-    override val structure: StructureSettings by lazy { SettingsResolver.resolveStructure(parsed, yaml) }
+    fun getParsedCommandArgumentsWithBasicValidation(): Map<String, Any> {
+        YAMLConfigParser.reload()
+        val configFileParsedValues =
+            commandDescriptor.parameters
+                .mapNotNull { parameter ->
+                    val value = YAMLConfigParser.getValue(parameter.configFilePath)
+                    value?.let { parameter.name to it }
+                }.toMap()
+
+        val resultArguments = configFileParsedValues + parsed.values
+
+        val missingRequired =
+            commandDescriptor.parameters
+                .filter { it.isRequired && it.name !in resultArguments.keys }
+
+        if (missingRequired.isNotEmpty()) {
+            throw RequiredParameterMissing(
+                usageInstruction = commandDescriptor.usageInstruction,
+                parameterNames = missingRequired.map { it.name },
+                yamlExamples = missingRequired.map { it.configFilePath },
+            )
+        }
+
+        return resultArguments
+    }
 }

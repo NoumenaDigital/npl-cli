@@ -9,6 +9,7 @@ data class NamedParameter(
     val valuePlaceholder: String? = null,
     val takesPath: Boolean = false,
     val isRequiredForMcp: Boolean = isRequired && !isHidden,
+    val configFilePath: String = "/$name",
 ) {
     init {
         require(!name.startsWith("--")) { "Named parameters should not start with '--' in definition" }
@@ -87,17 +88,12 @@ object CommandArgumentParser {
     }
 
     data class ParsedArguments(
-        private val values: Map<String, String>,
+        val values: Map<String, String>,
         val unexpectedArgs: List<String>,
     ) {
         fun hasFlag(name: String): Boolean = values.containsKey(name)
 
         fun getValue(name: String): String? = values[name]
-
-        fun getValueOrElse(
-            name: String,
-            defaultValue: String?,
-        ): String? = values[name] ?: defaultValue
 
         fun getValueOrElse(
             name: String,

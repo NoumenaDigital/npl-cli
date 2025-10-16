@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
-import com.noumenadigital.npl.cli.commands.Commands
 import com.noumenadigital.npl.cli.commands.DeprecationNotifier
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import io.kotest.assertions.throwables.shouldThrow
@@ -149,8 +148,7 @@ class CommandParametersTest :
 
                 val result = parser.parse(input)
 
-                result.commandName shouldBe Commands.commandFromString("help", emptyList()).commandName
-                result.description shouldBe Commands.commandFromString("help", emptyList()).description
+                result::class shouldBe HelpCommand::class
             }
 
             test("should execute help command when input list is empty") {
@@ -158,8 +156,7 @@ class CommandParametersTest :
                 val input = emptyList<String>()
 
                 val result = parser.parse(input)
-                result.commandName shouldBe Commands.commandFromString("help", emptyList()).commandName
-                result.description shouldBe Commands.commandFromString("help", emptyList()).description
+                result::class shouldBe HelpCommand::class
             }
         }
     })

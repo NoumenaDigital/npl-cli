@@ -8,18 +8,22 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
-import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
-import com.noumenadigital.npl.cli.settings.SettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 
-data class PumlCommand(
-    private val srcDir: String = ".",
-    private val outputDir: String = ".",
-    private val settings: SettingsProvider? = null,
-) : CommandExecutor {
+object PumlCommandDescriptor : CommandDescriptor {
     override val commandName: String = "puml"
     override val description: String = "Generate a puml diagram from source in the given directory"
+    override val supportsMcp: Boolean = true
+
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedSrcDir = parsedArguments["source-dir"] as? String ?: "."
+        val parsedOutputDir = parsedArguments["output-dir"] as? String ?: "."
+        return PumlCommand(
+            srcDir = parsedSrcDir,
+            outputDir = parsedOutputDir,
+        )
+    }
 
     override val parameters: List<NamedParameter> =
         listOf(
@@ -31,6 +35,7 @@ data class PumlCommand(
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = "/structure/sourceDir",
             ),
             NamedParameter(
                 name = "output-dir",
@@ -40,9 +45,15 @@ data class PumlCommand(
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = "/structure/outputDir",
             ),
         )
+}
 
+data class PumlCommand(
+    private val srcDir: String = ".",
+    private val outputDir: String = ".",
+) : CommandExecutor {
     override fun execute(output: ColorWriter): ExitCode {
         try {
             File(srcDir).let {
@@ -81,15 +92,5 @@ data class PumlCommand(
         } catch (e: Exception) {
             throw CommandExecutionException("Failed to run NPL puml: ${e.message}", e)
         }
-    }
-
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val settings = DefaultSettingsProvider(params, parameters)
-        val structureSettings = settings.structure
-        return PumlCommand(
-            srcDir = structureSettings.nplSourceDir?.absolutePath ?: srcDir,
-            outputDir = structureSettings.outputDir?.absolutePath ?: outputDir,
-            settings = settings,
-        )
     }
 }

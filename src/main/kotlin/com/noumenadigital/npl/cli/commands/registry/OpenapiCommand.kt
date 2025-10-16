@@ -6,8 +6,6 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
-import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
-import com.noumenadigital.npl.cli.settings.SettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.ProtocolProto
@@ -27,15 +25,21 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.notExists
 
-data class OpenapiCommand(
-    private val srcDir: String = ".",
-    private val ruleDescriptorPath: String? = null,
-    private val outputDir: String = ".",
-    private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir)),
-    private val settings: SettingsProvider? = null,
-) : CommandExecutor {
+object OpenapiCommandDescriptor : CommandDescriptor {
     override val commandName: String = "openapi"
     override val description: String = "Generate the openapi specifications of NPL api"
+    override val supportsMcp: Boolean = true
+
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedSrcDir = parsedArguments["source-dir"] as? String ?: "."
+        val parsedRules = parsedArguments["rules"] as? String
+        val parsedOutputDir = parsedArguments["output-dir"] as? String ?: "."
+        return OpenapiCommand(
+            srcDir = parsedSrcDir,
+            ruleDescriptorPath = parsedRules,
+            outputDir = parsedOutputDir,
+        )
+    }
 
     override val parameters: List<NamedParameter> =
         listOf(
@@ -47,6 +51,7 @@ data class OpenapiCommand(
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = "/structure/sourceDir",
             ),
             NamedParameter(
                 name = "rules",
@@ -56,6 +61,7 @@ data class OpenapiCommand(
                 valuePlaceholder = "<rules descriptor path>",
                 takesPath = true,
                 isRequiredForMcp = false,
+                configFilePath = "/structure/rules",
             ),
             NamedParameter(
                 name = "output-dir",
@@ -65,22 +71,20 @@ data class OpenapiCommand(
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = "/structure/outputDir",
             ),
         )
+}
+
+data class OpenapiCommand(
+    private val srcDir: String,
+    private val ruleDescriptorPath: String?,
+    private val outputDir: String,
+) : CommandExecutor {
+    private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir))
 
     companion object {
         private const val DEFAULT_OPENAPI_URI = "http://localhost:12000"
-    }
-
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val settings = DefaultSettingsProvider(params, parameters)
-        val structureSettings = settings.structure
-        return OpenapiCommand(
-            srcDir = structureSettings.nplSourceDir?.absolutePath ?: srcDir,
-            ruleDescriptorPath = structureSettings.rulesFile?.absolutePath,
-            compilerService = CompilerService(SourcesManager(structureSettings.nplSourceDir?.absolutePath ?: srcDir)),
-            outputDir = structureSettings.outputDir?.absolutePath ?: outputDir,
-        )
     }
 
     override fun execute(output: ColorWriter): ExitCode {

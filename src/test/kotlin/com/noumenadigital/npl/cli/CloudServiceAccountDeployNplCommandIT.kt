@@ -135,6 +135,10 @@ class CloudServiceAccountDeployNplCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -175,6 +179,10 @@ class CloudServiceAccountDeployNplCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -212,6 +220,10 @@ class CloudServiceAccountDeployNplCommandIT :
                                 "non-url",
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -250,6 +262,10 @@ class CloudServiceAccountDeployNplCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -288,6 +304,10 @@ class CloudServiceAccountDeployNplCommandIT :
                                 mockNC.url("/").toString(),
                                 "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(

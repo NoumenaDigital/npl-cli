@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.config
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -53,21 +54,37 @@ data class YamlConfig(
 
 object YAMLConfigParser {
     private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
+    private val configFile = File("npl.yml")
+    private var rootNode: JsonNode? = null
 
-    fun parse(): YamlConfig? {
-        val configFile = File("npl.yml")
-
-        val config: YamlConfig? =
-            if (configFile.exists()) {
-                try {
-                    mapper.readValue(configFile, YamlConfig::class.java)
-                } catch (_: Exception) {
-                    null
-                }
-            } else {
+    fun reload() {
+        rootNode =
+            try {
+                if (configFile.exists()) mapper.readTree(configFile) else null
+            } catch (_: Exception) {
                 null
             }
+    }
 
-        return config
+    fun parse(): YamlConfig? {
+        if (!configFile.exists()) return null
+        return try {
+            mapper.readValue(configFile, YamlConfig::class.java)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun getValue(path: String): Any? {
+        var node = rootNode ?: return null
+        node = node.at(path) ?: return null
+        return when {
+            node.isTextual -> node.asText()
+            node.isNumber -> node.numberValue()
+            node.isBoolean -> node.booleanValue()
+            node.isArray -> node.map { it.asText() }
+            node.isObject -> mapper.convertValue(node, Map::class.java)
+            else -> null
+        }
     }
 }

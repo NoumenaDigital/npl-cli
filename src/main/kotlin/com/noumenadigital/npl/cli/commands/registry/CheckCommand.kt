@@ -3,19 +3,22 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
+import com.noumenadigital.npl.cli.exception.CommandValidationException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
-import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 
-data class CheckCommand(
-    private val srcDir: String = ".",
-    private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir)),
-) : CommandExecutor {
+object CheckCommandDescriptor : CommandDescriptor {
     override val commandName: String = "check"
     override val description: String = "Validate the correctness of NPL sources"
+    override val supportsMcp: Boolean = true
+
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedSrcDir = parsedArguments["source-dir"] as? String ?: "."
+        return CheckCommand(srcDir = parsedSrcDir)
+    }
 
     override val parameters: List<NamedParameter> =
         listOf(
@@ -27,21 +30,23 @@ data class CheckCommand(
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = "/structure/sourceDir",
             ),
         )
+}
 
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val settings = DefaultSettingsProvider(params, parameters)
-        val structure = settings.structure
-
-        val srcDir = structure.nplSourceDir?.absolutePath ?: "."
-
-        return CheckCommand(srcDir = srcDir)
+data class CheckCommand(
+    private val srcDir: String,
+) : CommandExecutor {
+    init {
+        checkDirectory(srcDir)
     }
+
+    private val sourcesManager = SourcesManager(srcDir)
+    private val compilerService = CompilerService(sourcesManager)
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            checkDirectory(srcDir)
             val result = compilerService.compileAndReport(output = output)
 
             return when {
@@ -72,11 +77,11 @@ data class CheckCommand(
         val dir = File(directory)
 
         if (!dir.exists()) {
-            throw CommandExecutionException("Target directory does not exist: ${dir.relativeOrAbsolute()}")
+            throw CommandValidationException("Target directory does not exist: ${dir.relativeOrAbsolute()}")
         }
 
         if (!dir.isDirectory) {
-            throw CommandExecutionException("Target path is not a directory: ${dir.relativeOrAbsolute()}")
+            throw CommandValidationException("Target path is not a directory: ${dir.relativeOrAbsolute()}")
         }
     }
 }

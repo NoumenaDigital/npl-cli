@@ -9,7 +9,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import kotlin.io.path.isRegularFile
 
 class SourcesManager(
     private val srcPath: String,
