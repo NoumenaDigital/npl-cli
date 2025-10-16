@@ -25,6 +25,9 @@
       "type": "[Lcom.fasterxml.jackson.databind.ser.Serializers;"
     },
     {
+      "type": "[Lcom.noumenadigital.npl.cli.commands.CommandsRegistry;"
+    },
+    {
       "type": "[Ljava.lang.Object;"
     },
     {

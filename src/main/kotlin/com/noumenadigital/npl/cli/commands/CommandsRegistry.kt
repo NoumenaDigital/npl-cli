@@ -33,12 +33,14 @@ interface CommandsRegistry {
                     ?: throw CommandNotFoundException(normalizedCommand)
 
             val commandDescriptor = matchedCommand.getCommandDescriptor()
+            val parsedArguments: Map<String, Any>
             if (commandDescriptor.isParentCommand) {
-                return commandDescriptor.createCommandExecutorInstance(mapOf(SUB_COMMANDS_CONST to params))
+                parsedArguments = mapOf(SUB_COMMANDS_CONST to params)
+            } else {
+                val settingsProvider = DefaultSettingsProvider(params, commandDescriptor)
+                parsedArguments = settingsProvider.getParsedCommandArgumentsWithBasicValidation()
             }
 
-            val settingsProvider = DefaultSettingsProvider(params, commandDescriptor)
-            val parsedArguments = settingsProvider.getParsedCommandArgumentsWithBasicValidation()
             return commandDescriptor.createCommandExecutorInstance(parsedArguments)
         }
     }
