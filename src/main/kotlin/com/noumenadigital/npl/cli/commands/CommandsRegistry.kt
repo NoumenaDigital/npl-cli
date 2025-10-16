@@ -2,8 +2,8 @@ package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
+import com.noumenadigital.npl.cli.config.DefaultSettingsProvider
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
-import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 
 interface CommandsRegistry {
     val commandDescriptor: () -> CommandDescriptor

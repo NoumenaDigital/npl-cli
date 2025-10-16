@@ -6,8 +6,8 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CloudCommands
 import com.noumenadigital.npl.cli.commands.CloudDeployCommands
 import com.noumenadigital.npl.cli.commands.Commands
+import com.noumenadigital.npl.cli.config.DefaultSettingsProvider
 import com.noumenadigital.npl.cli.service.ColorWriter
-import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.Implementation

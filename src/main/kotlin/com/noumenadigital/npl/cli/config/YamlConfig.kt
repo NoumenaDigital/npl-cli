@@ -1,17 +1,12 @@
 package com.noumenadigital.npl.cli.config
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.io.File
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class YamlConfig(
-    @param:JsonProperty("\$schema")
-    val schemaUrl: String?,
     val runtime: Runtime = Runtime(),
     val cloud: Cloud = Cloud(),
     val local: Local = Local(),
@@ -64,15 +59,6 @@ object YAMLConfigParser {
             } catch (_: Exception) {
                 null
             }
-    }
-
-    fun parse(): YamlConfig? {
-        if (!configFile.exists()) return null
-        return try {
-            mapper.readValue(configFile, YamlConfig::class.java)
-        } catch (_: Exception) {
-            null
-        }
     }
 
     fun getValue(path: String): Any? {

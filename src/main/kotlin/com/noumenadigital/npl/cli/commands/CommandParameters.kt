@@ -1,5 +1,7 @@
 package com.noumenadigital.npl.cli.commands
 
+import com.noumenadigital.npl.cli.exception.ArgumentParsingException
+
 data class NamedParameter(
     val name: String,
     val description: String,
@@ -45,6 +47,32 @@ object DeprecationNotifier {
  * Simple command line argument parser supporting "--param value" format.
  */
 object CommandArgumentParser {
+    private val DEPRECATED_CLI_PARAMS =
+        setOf(
+            "authUrl",
+            "clientId",
+            "clientSecret",
+            "managementUrl",
+            "frontEnd",
+            "sourceDir",
+            "outputDir",
+            "testSourceDir",
+            "projectDir",
+            "templateUrl",
+        )
+
+    fun parseArgsOrThrow(
+        args: List<String>,
+        parameters: List<NamedParameter>,
+    ): ParsedArguments {
+        val parsed = CommandArgumentParser.parse(args, parameters)
+        val filteredUnexpected = parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = DEPRECATED_CLI_PARAMS).unexpectedArgs
+        if (filteredUnexpected.isNotEmpty()) {
+            throw ArgumentParsingException("Unexpected arguments: ${filteredUnexpected.joinToString(separator = " ")}")
+        }
+        return parsed
+    }
+
     fun parse(
         args: List<String>,
         parameters: List<NamedParameter>,

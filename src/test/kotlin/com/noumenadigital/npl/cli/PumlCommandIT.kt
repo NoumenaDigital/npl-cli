@@ -156,7 +156,7 @@ class PumlCommandIT :
                         val pumlDir = workingDirectory.resolve("puml")
                         val expectedOutput =
                             """
-                                Completed compilation for 5 files in XXX ms
+                                Completed compilation for 6 files in XXX ms
 
                                 Writing Puml files to ${pumlDir.relativeOrAbsolute()}
 

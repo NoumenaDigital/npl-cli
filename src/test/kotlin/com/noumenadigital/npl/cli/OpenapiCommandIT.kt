@@ -552,7 +552,7 @@ class OpenapiCommandIT :
 
                             val expectedOutput =
                                 """
-                            Completed compilation for 5 files in XXX ms
+                            Completed compilation for 6 files in XXX ms
 
                             Generating openapi for objects/iou
                             Generating openapi for processes

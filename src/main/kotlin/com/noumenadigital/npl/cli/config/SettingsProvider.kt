@@ -1,7 +1,7 @@
-package com.noumenadigital.npl.cli.settings
+package com.noumenadigital.npl.cli.config
 
+import com.noumenadigital.npl.cli.commands.CommandArgumentParser.parseArgsOrThrow
 import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
-import com.noumenadigital.npl.cli.config.YAMLConfigParser
 import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 
 interface SettingsProvider
@@ -10,7 +10,7 @@ class DefaultSettingsProvider(
     private val args: List<String>,
     private val commandDescriptor: CommandDescriptor,
 ) : SettingsProvider {
-    private val parsed by lazy { SettingsResolver.parseArgsOrThrow(args, commandDescriptor.parameters) }
+    private val parsed by lazy { parseArgsOrThrow(args, commandDescriptor.parameters) }
 
     fun getParsedCommandArgumentsWithBasicValidation(): Map<String, Any> {
         YAMLConfigParser.reload()
