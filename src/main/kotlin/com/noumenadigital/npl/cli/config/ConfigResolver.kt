@@ -4,12 +4,10 @@ import com.noumenadigital.npl.cli.commands.CommandArgumentParser.parseArgsOrThro
 import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 
-interface SettingsProvider
-
-class DefaultSettingsProvider(
+class ConfigResolver(
     private val args: List<String>,
     private val commandDescriptor: CommandDescriptor,
-) : SettingsProvider {
+) {
     private val parsed by lazy { parseArgsOrThrow(args, commandDescriptor.parameters) }
 
     fun getParsedCommandArgumentsWithBasicValidation(): Map<String, Any> {

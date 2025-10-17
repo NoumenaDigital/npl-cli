@@ -6,7 +6,7 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CloudCommands
 import com.noumenadigital.npl.cli.commands.CloudDeployCommands
 import com.noumenadigital.npl.cli.commands.Commands
-import com.noumenadigital.npl.cli.config.DefaultSettingsProvider
+import com.noumenadigital.npl.cli.config.ConfigResolver
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
@@ -160,7 +160,7 @@ object McpCommand : CommandExecutor {
             try {
                 val cmdArgs = buildCommandArgs(args, commandDescriptor)
                 logger.info("Built command args: $cmdArgs")
-                val default = DefaultSettingsProvider(cmdArgs, commandDescriptor)
+                val default = ConfigResolver(cmdArgs, commandDescriptor)
                 val parsedArguments = default.getParsedCommandArgumentsWithBasicValidation()
                 val commandInstance = commandDescriptor.createCommandExecutorInstance(parsedArguments)
                 val exitCode = commandInstance.execute(colorWriter)

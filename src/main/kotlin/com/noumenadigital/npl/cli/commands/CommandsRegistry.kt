@@ -2,7 +2,7 @@ package com.noumenadigital.npl.cli.commands
 
 import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
-import com.noumenadigital.npl.cli.config.DefaultSettingsProvider
+import com.noumenadigital.npl.cli.config.ConfigResolver
 import com.noumenadigital.npl.cli.exception.CommandNotFoundException
 
 interface CommandsRegistry {
@@ -37,7 +37,7 @@ interface CommandsRegistry {
             if (commandDescriptor.isParentCommand) {
                 parsedArguments = mapOf(SUB_COMMANDS_CONST to params)
             } else {
-                val settingsProvider = DefaultSettingsProvider(params, commandDescriptor)
+                val settingsProvider = ConfigResolver(params, commandDescriptor)
                 parsedArguments = settingsProvider.getParsedCommandArgumentsWithBasicValidation()
             }
 
