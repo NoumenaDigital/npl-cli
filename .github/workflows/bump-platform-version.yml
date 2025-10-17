@@ -11,7 +11,9 @@ on:
 
 env:
   CI_PIPELINE_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-  PLATFORM_VERSION_TAG_LINK: "https://github.com/NoumenaDigital/platform/releases/tag/${{ inputs.PLATFORM_VERSION }}"
+  # Resolve PLATFORM_VERSION: pull_request -> sample test; workflow_dispatch -> provided input or sample if blank.
+  PLATFORM_VERSION: ${{ github.event_name == 'pull_request' && '2025.0.0-test' || inputs.PLATFORM_VERSION || '2025.0.0-test' }}
+  PLATFORM_VERSION_TAG_LINK: "https://github.com/NoumenaDigital/platform/releases/tag/${{ github.event_name == 'pull_request' && '2025.0.0-test' || inputs.PLATFORM_VERSION || '2025.0.0-test' }}"
   SLACK_WEBHOOK: "${{ secrets.SLACK_URL }}"
   SLACK_USERNAME: "bumperBot"
   SLACK_ICON: "https://avatars.githubusercontent.com/u/56019787?s=50&v=4"
@@ -34,14 +36,17 @@ jobs:
           git config --global user.name "noumenadigital-bot"
           git config --global user.email "noumenadigital-bot@users.noreply.github.com"
 
+      - name: "Echo resolved platform version"
+        run: |
+          echo "Resolved PLATFORM_VERSION='${PLATFORM_VERSION}' (event: ${{ github.event_name }})"
+
       - name: "Update platform version in pom"
         run: |
-          PLATFORM_VERSION="${{ inputs.PLATFORM_VERSION }}"
           mvn -B versions:set -DnewVersion="${PLATFORM_VERSION}" -DgenerateBackupPoms=false
           mvn -B versions:set-property -Dproperty=platform.version -DnewVersion="${PLATFORM_VERSION}" -DgenerateBackupPoms=false
           git diff --name-only
         env:
-          PLATFORM_VERSION: "${{ inputs.PLATFORM_VERSION }}"
+          PLATFORM_VERSION: "${{ env.PLATFORM_VERSION }}"
 
       - uses: tibdex/github-app-token@v2.1.0
         id: generate-token-pr
@@ -54,9 +59,9 @@ jobs:
         id: cpr
         with:
           base: master
-          title: "chore: bump platform to ${{ inputs.PLATFORM_VERSION }}"
-          commit-message: "Updated platform version to ${{ inputs.PLATFORM_VERSION }}"
-          branch: "Bump-platform-${{ inputs.PLATFORM_VERSION }}"
+          title: "chore: bump platform to ${{ env.PLATFORM_VERSION }}"
+          commit-message: "Updated platform version to ${{ env.PLATFORM_VERSION }}"
+          branch: "Bump-platform-${{ env.PLATFORM_VERSION }}"
           delete-branch: true
           token: ${{ steps.generate-token-pr.outputs.token }}
 
@@ -79,19 +84,19 @@ jobs:
 #        uses: rtCamp/action-slack-notify@v2
 #        env:
 #          SLACK_TITLE: "Report Success"
-#          SLACK_MESSAGE: "NPL CLI: platform version bumped successfully to <${{ inputs.PLATFORM_VERSION }}> - #${{ steps.cpr.outputs.pull-request-number }}>."
+#          SLACK_MESSAGE: "NPL CLI: platform version bumped successfully to <${{ env.PLATFORM_VERSION }}> - #${{ steps.cpr.outputs.pull-request-number }}>."
 #          SLACK_COLOR: "660033"
 #
 #      - name: "Report failure"
 #        if: ${{ failure() }}
 #        uses: rtCamp/action-slack-notify@v2
 #        env:
-#          SLACK_MESSAGE: "The <${{ env.CI_PIPELINE_URL }}|npl-cli bump> failed for platform release <${{ env.PLATFORM_VERSION_TAG_LINK }}|${{ inputs.PLATFORM_VERSION }}>."
+#          SLACK_MESSAGE: "The <${{ env.CI_PIPELINE_URL }}|npl-cli bump> failed for platform release <${{ env.PLATFORM_VERSION_TAG_LINK }}|${{ env.PLATFORM_VERSION }}>."
 #          SLACK_COLOR: ${{ job.status }}
 #
 #      - name: "Report cancellation"
 #        if: ${{ cancelled() }}
 #        uses: rtCamp/action-slack-notify@v2
 #        env:
-#          SLACK_MESSAGE: "The <${{ env.CI_PIPELINE_URL }}|npl-cli bump> cancelled for platform release <${{ env.PLATFORM_VERSION_TAG_LINK }}|${{ inputs.PLATFORM_VERSION }}>."
+#          SLACK_MESSAGE: "The <${{ env.CI_PIPELINE_URL }}|npl-cli bump> cancelled for platform release <${{ env.PLATFORM_VERSION_TAG_LINK }}|${{ env.PLATFORM_VERSION }}>."
 #          SLACK_COLOR: ${{ job.status }}
