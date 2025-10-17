@@ -5,6 +5,7 @@ import com.noumenadigital.npl.cli.commands.EnvironmentVariable
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.exception.CommandValidationException
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
@@ -28,14 +29,14 @@ object CloudDeployNplCommandDescriptor : CommandDescriptor {
                 description = "NOUMENA Cloud Application slug",
                 isRequired = true,
                 valuePlaceholder = "<app>",
-                configFilePath = "/cloud/app",
+                configFilePath = YamlConfig.Cloud.app,
             ),
             NamedParameter(
                 name = "tenant",
                 description = "NOUMENA Cloud Tenant slug",
                 isRequired = true,
                 valuePlaceholder = "<tenant>",
-                configFilePath = "/cloud/tenant",
+                configFilePath = YamlConfig.Cloud.tenant,
             ),
             NamedParameter(
                 name = "migration",
@@ -43,7 +44,7 @@ object CloudDeployNplCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 valuePlaceholder = "<migration>",
                 takesPath = true,
-                configFilePath = "/structure/migration",
+                configFilePath = YamlConfig.Structure.migration,
             ),
             NamedParameter(
                 name = "url",
@@ -51,7 +52,7 @@ object CloudDeployNplCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<url>",
-                configFilePath = "/cloud/url",
+                configFilePath = YamlConfig.Cloud.url,
             ),
             NamedParameter(
                 name = "client-id",
@@ -59,7 +60,7 @@ object CloudDeployNplCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
-                configFilePath = "/cloud/clientId",
+                configFilePath = YamlConfig.Cloud.clientId,
             ),
             NamedParameter(
                 name = "client-secret",
@@ -67,7 +68,7 @@ object CloudDeployNplCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
-                configFilePath = "/cloud/clientSecret",
+                configFilePath = YamlConfig.Cloud.clientSecret,
             ),
             NamedParameter(
                 name = "auth-url",
@@ -75,7 +76,7 @@ object CloudDeployNplCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<auth-url>",
-                configFilePath = "/cloud/authUrl",
+                configFilePath = YamlConfig.Cloud.authUrl,
             ),
         )
 

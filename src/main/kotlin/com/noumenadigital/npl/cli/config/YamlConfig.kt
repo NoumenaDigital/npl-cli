@@ -4,47 +4,54 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.noumenadigital.npl.cli.config.YamlConfigField.Companion.yamlPath
 import java.io.File
 
-data class YamlConfig(
-    val runtime: Runtime = Runtime(),
-    val cloud: Cloud = Cloud(),
-    val local: Local = Local(),
-    val structure: Structure = Structure(),
+object YamlConfig {
+    object Cloud {
+        val tenant: YamlConfigField = yamlPath("/cloud/tenant")
+        val app: YamlConfigField = yamlPath("/cloud/app")
+        val authUrl: YamlConfigField = yamlPath("/cloud/authUrl")
+        val clear: YamlConfigField = yamlPath("/cloud/clear")
+        val url: YamlConfigField = yamlPath("/cloud/url")
+        val clientId: YamlConfigField = yamlPath("/cloud/clientId")
+        val clientSecret: YamlConfigField = yamlPath("/cloud/clientSecret")
+    }
+
+    object Local {
+        val managementUrl: YamlConfigField = yamlPath("/local/managementUrl")
+        val authUrl: YamlConfigField = yamlPath("/local/authUrl")
+        val clientId: YamlConfigField = yamlPath("/local/clientId")
+        val clientSecret: YamlConfigField = yamlPath("/local/clientSecret")
+        val username: YamlConfigField = yamlPath("/local/username")
+        val password: YamlConfigField = yamlPath("/local/password")
+        val clear: YamlConfigField = yamlPath("/local/clear")
+    }
+
+    object Structure {
+        val coverage: YamlConfigField = yamlPath("/structure/coverage")
+        val frontend: YamlConfigField = yamlPath("/structure/frontend")
+        val migration: YamlConfigField = yamlPath("/structure/migration")
+        val outputDir: YamlConfigField = yamlPath("/structure/outputDir")
+        val rules: YamlConfigField = yamlPath("/structure/rules")
+        val sourceDir: YamlConfigField = yamlPath("/structure/sourceDir")
+        val testSourceDir: YamlConfigField = yamlPath("/structure/testSourceDir")
+        val initProjectDir: YamlConfigField = yamlPath("/structure/initProjectDir")
+        val initBare: YamlConfigField = yamlPath("/structure/initBare")
+        val initTemplateUrl: YamlConfigField = yamlPath("/structure/initTemplateUrl")
+    }
+}
+
+class YamlConfigField private constructor(
+    private val fieldPath: String,
 ) {
-    data class Runtime(
-        val version: String? = null,
-    )
+    fun getValue(): String = fieldPath
 
-    data class Cloud(
-        val tenant: String? = null,
-        val app: String? = null,
-        val authUrl: String? = null,
-        val clear: Boolean = false,
-        val url: String? = null,
-        val clientId: String? = null,
-        val clientSecret: String? = null,
-    )
+    override fun toString(): String = fieldPath
 
-    data class Local(
-        val managementUrl: String? = null,
-        val authUrl: String? = null,
-        val clientId: String? = null,
-        val clientSecret: String? = null,
-        val username: String? = null,
-        val password: String? = null,
-        val clear: Boolean = false,
-    )
-
-    data class Structure(
-        val coverage: Boolean = false,
-        val frontend: String? = null,
-        val migration: String? = null,
-        val outputDir: String? = null,
-        val rules: String? = null,
-        val sourceDir: String? = null,
-        val testSourceDir: String? = null,
-    )
+    companion object {
+        fun yamlPath(fieldPath: String): YamlConfigField = YamlConfigField(fieldPath)
+    }
 }
 
 object YAMLConfigParser {

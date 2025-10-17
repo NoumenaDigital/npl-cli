@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.exception.CommandValidationException
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -30,7 +31,7 @@ object CheckCommandDescriptor : CommandDescriptor {
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
-                configFilePath = "/structure/sourceDir",
+                configFilePath = YamlConfig.Structure.sourceDir,
             ),
         )
 }

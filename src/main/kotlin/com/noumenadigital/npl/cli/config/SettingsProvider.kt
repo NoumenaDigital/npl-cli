@@ -17,7 +17,7 @@ class DefaultSettingsProvider(
         val configFileParsedValues =
             commandDescriptor.parameters
                 .mapNotNull { parameter ->
-                    val value = YAMLConfigParser.getValue(parameter.configFilePath)
+                    val value = YAMLConfigParser.getValue(parameter.configFilePath.toString())
                     value?.let { parameter.name to it }
                 }.toMap()
 
@@ -31,7 +31,7 @@ class DefaultSettingsProvider(
             throw RequiredParameterMissing(
                 usageInstruction = commandDescriptor.usageInstruction,
                 parameterNames = missingRequired.map { it.name },
-                yamlExamples = missingRequired.map { it.configFilePath },
+                yamlExamples = missingRequired.map { it.configFilePath.toString() },
             )
         }
 

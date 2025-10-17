@@ -4,6 +4,7 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.ExitCode.GENERAL_ERROR
 import com.noumenadigital.npl.cli.ExitCode.SUCCESS
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
@@ -35,7 +36,7 @@ object PumlCommandDescriptor : CommandDescriptor {
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
-                configFilePath = "/structure/sourceDir",
+                configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
                 name = "output-dir",
@@ -45,7 +46,7 @@ object PumlCommandDescriptor : CommandDescriptor {
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
-                configFilePath = "/structure/outputDir",
+                configFilePath = YamlConfig.Structure.outputDir,
             ),
         )
 }

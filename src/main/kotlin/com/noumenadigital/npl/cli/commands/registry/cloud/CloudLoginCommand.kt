@@ -4,6 +4,7 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.exception.CloudCommandException
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
@@ -21,7 +22,7 @@ object CloudLoginCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
-                configFilePath = "/cloud/clientId",
+                configFilePath = YamlConfig.Cloud.clientId,
             ),
             NamedParameter(
                 name = "client-secret",
@@ -29,7 +30,7 @@ object CloudLoginCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
-                configFilePath = "/cloud/clientSecret",
+                configFilePath = YamlConfig.Cloud.clientSecret,
             ),
             NamedParameter(
                 name = "url",
@@ -37,7 +38,7 @@ object CloudLoginCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<url>",
-                configFilePath = "/cloud/url",
+                configFilePath = YamlConfig.Cloud.url,
             ),
         )
 

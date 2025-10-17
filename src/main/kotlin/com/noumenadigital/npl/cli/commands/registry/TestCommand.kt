@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
@@ -43,13 +44,13 @@ object TestCommandDescriptor : CommandDescriptor {
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
-                configFilePath = "/structure/testSourceDir",
+                configFilePath = YamlConfig.Structure.testSourceDir,
             ),
             NamedParameter(
                 name = "coverage",
                 description = "Report test coverage details (printed to console as well as coverage.xml)",
                 isRequired = false,
-                configFilePath = "/structure/coverage",
+                configFilePath = YamlConfig.Structure.coverage,
             ),
             NamedParameter(
                 name = "output-dir",
@@ -59,7 +60,7 @@ object TestCommandDescriptor : CommandDescriptor {
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
                 isRequiredForMcp = false,
-                configFilePath = "/structure/outputDir",
+                configFilePath = YamlConfig.Structure.outputDir,
             ),
         )
 }

@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.NO_SAMPLES
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
@@ -30,21 +31,21 @@ object InitCommandDescriptor : CommandDescriptor {
                 description = "Directory where project files will be stored. Created if it doesn’t exist",
                 valuePlaceholder = "<project-dir>",
                 isRequired = false,
-                configFilePath = "/structure/initProjectDir",
+                configFilePath = YamlConfig.Structure.initProjectDir,
             ),
             NamedParameter(
                 name = "bare",
                 description = "Installs an empty project structure",
                 defaultValue = "false",
                 isRequired = false,
-                configFilePath = "/structure/initBare",
+                configFilePath = YamlConfig.Structure.initBare,
             ),
             NamedParameter(
                 name = "template-url",
                 description = "URL of a repository containing a ZIP archive of the project template. Overrides the default template",
                 isRequired = false,
                 valuePlaceholder = "<template-url>",
-                configFilePath = "/structure/initTemplateUrl",
+                configFilePath = YamlConfig.Structure.initTemplateUrl,
             ),
         )
 }

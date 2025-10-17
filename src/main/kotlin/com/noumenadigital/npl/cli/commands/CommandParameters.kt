@@ -1,5 +1,6 @@
 package com.noumenadigital.npl.cli.commands
 
+import com.noumenadigital.npl.cli.config.YamlConfigField
 import com.noumenadigital.npl.cli.exception.ArgumentParsingException
 
 data class NamedParameter(
@@ -11,7 +12,7 @@ data class NamedParameter(
     val valuePlaceholder: String? = null,
     val takesPath: Boolean = false,
     val isRequiredForMcp: Boolean = isRequired && !isHidden,
-    val configFilePath: String = "/$name",
+    val configFilePath: YamlConfigField?,
 ) {
     init {
         require(!name.startsWith("--")) { "Named parameters should not start with '--' in definition" }
@@ -23,29 +24,15 @@ data class NamedParameter(
 }
 
 object DeprecationNotifier {
-    private val sink: ThreadLocal<((String) -> Unit)?> = ThreadLocal()
+    private var sink: ((String) -> Unit)? = null
 
     fun setSink(handler: ((String) -> Unit)?) {
-        if (handler == null) {
-            sink.remove()
-        } else {
-            sink.set(handler)
-        }
+        sink = handler
     }
 
-    fun warn(message: String) {
-        val handler = sink.get()
-        if (handler != null) {
-            handler(message)
-        } else {
-            System.err.println(message)
-        }
-    }
+    fun warn(message: String) = sink?.invoke(message) ?: System.err.println(message)
 }
 
-/**
- * Simple command line argument parser supporting "--param value" format.
- */
 object CommandArgumentParser {
     private val DEPRECATED_CLI_PARAMS =
         setOf(
@@ -65,7 +52,7 @@ object CommandArgumentParser {
         args: List<String>,
         parameters: List<NamedParameter>,
     ): ParsedArguments {
-        val parsed = CommandArgumentParser.parse(args, parameters)
+        val parsed = parse(args, parameters)
         val filteredUnexpected = parsed.withoutDeprecatedUnexpectedNames(deprecatedNames = DEPRECATED_CLI_PARAMS).unexpectedArgs
         if (filteredUnexpected.isNotEmpty()) {
             throw ArgumentParsingException("Unexpected arguments: ${filteredUnexpected.joinToString(separator = " ")}")

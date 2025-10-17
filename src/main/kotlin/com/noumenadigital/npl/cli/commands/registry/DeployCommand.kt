@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.DeployResult
 import com.noumenadigital.npl.cli.service.DeployService
@@ -40,13 +41,13 @@ object DeployCommandDescriptor : CommandDescriptor {
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
-                configFilePath = "/structure/sourceDir",
+                configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
                 name = "clear",
                 description = "Clear application contents before deployment",
                 isRequired = false,
-                configFilePath = "/local/clear",
+                configFilePath = YamlConfig.Local.clear,
             ),
             NamedParameter(
                 name = "username",
@@ -54,7 +55,7 @@ object DeployCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 valuePlaceholder = "<username>",
                 isHidden = true,
-                configFilePath = "/local/username",
+                configFilePath = YamlConfig.Local.username,
             ),
             NamedParameter(
                 name = "password",
@@ -62,7 +63,7 @@ object DeployCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<password>",
-                configFilePath = "/local/password",
+                configFilePath = YamlConfig.Local.password,
             ),
             NamedParameter(
                 name = "management-url",
@@ -70,7 +71,7 @@ object DeployCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<url>",
-                configFilePath = "/local/managementUrl",
+                configFilePath = YamlConfig.Local.managementUrl,
             ),
             NamedParameter(
                 name = "client-id",
@@ -78,7 +79,7 @@ object DeployCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<client-id>",
-                configFilePath = "/local/clientId",
+                configFilePath = YamlConfig.Local.clientId,
             ),
             NamedParameter(
                 name = "client-secret",
@@ -86,7 +87,7 @@ object DeployCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<secret>",
-                configFilePath = "/local/clientSecret",
+                configFilePath = YamlConfig.Local.clientSecret,
             ),
             NamedParameter(
                 name = "auth-url",
@@ -94,7 +95,7 @@ object DeployCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 isHidden = true,
                 valuePlaceholder = "<url>",
-                configFilePath = "/local/authUrl",
+                configFilePath = YamlConfig.Local.authUrl,
             ),
         )
 
