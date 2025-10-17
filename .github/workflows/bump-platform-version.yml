@@ -36,14 +36,21 @@ jobs:
           git config --global user.name "noumenadigital-bot"
           git config --global user.email "noumenadigital-bot@users.noreply.github.com"
 
+      - name: "Set up Maven"
+        uses: actions/setup-java@v4
+        with:
+          distribution: "graalvm"
+          java-version: "24"
+          cache: "maven"
+
       - name: "Echo resolved platform version"
         run: |
           echo "Resolved PLATFORM_VERSION='${PLATFORM_VERSION}' (event: ${{ github.event_name }})"
 
       - name: "Update platform version in pom"
         run: |
-          mvn -B versions:set -DnewVersion="${PLATFORM_VERSION}" -DgenerateBackupPoms=false
-          mvn -B versions:set-property -Dproperty=platform.version -DnewVersion="${PLATFORM_VERSION}" -DgenerateBackupPoms=false
+          mvn -B versions:set -DnewVersion="${PLATFORM_VERSION}" -DgenerateBackupPoms=false -DskipTests
+          mvn -B versions:set-property -Dproperty=platform.version -DnewVersion="${PLATFORM_VERSION}" -DgenerateBackupPoms=false -DskipTests
           git diff --name-only
         env:
           PLATFORM_VERSION: "${{ env.PLATFORM_VERSION }}"
