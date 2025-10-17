@@ -1,0 +1,97 @@
+name: "Bump platform version"
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      PLATFORM_VERSION:
+        description: "Platform version to build the project with"
+        required: true
+
+env:
+  CI_PIPELINE_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  PLATFORM_VERSION_TAG_LINK: "https://github.com/NoumenaDigital/platform/releases/tag/${{ inputs.PLATFORM_VERSION }}"
+  SLACK_WEBHOOK: "${{ secrets.SLACK_URL }}"
+  SLACK_USERNAME: "bumperBot"
+  SLACK_ICON: "https://avatars.githubusercontent.com/u/56019787?s=50&v=4"
+  SLACK_CHANNEL: "#platform-status"
+  SLACK_TITLE: " "
+  SLACK_FOOTER: "npl-cli#bump-platform-version.yml"
+  MSG_MINIMAL: true
+
+jobs:
+  update_pom:
+    name: "Update pom with new platform version"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Set Git user"
+        run: |
+          git config --global user.name "noumenadigital-bot"
+          git config --global user.email "noumenadigital-bot@users.noreply.github.com"
+
+      - name: "Update platform version in pom"
+        run: |
+          PLATFORM_VERSION="${{ inputs.PLATFORM_VERSION }}"
+          mvn -B versions:set -DnewVersion="${PLATFORM_VERSION}" -DgenerateBackupPoms=false
+          mvn -B versions:set-property -Dproperty=platform.version -DnewVersion="${PLATFORM_VERSION}" -DgenerateBackupPoms=false
+          git diff --name-only
+        env:
+          PLATFORM_VERSION: "${{ inputs.PLATFORM_VERSION }}"
+
+      - uses: tibdex/github-app-token@v2.1.0
+        id: generate-token-pr
+        with:
+          app_id: ${{ secrets.GH_ND_TOKEN_PR_APP_ID }}
+          private_key: ${{ secrets.GH_ND_TOKEN_PR_APP_PRIVATE_KEY }}
+
+      - name: "Create pull request"
+        uses: peter-evans/create-pull-request@v6
+        id: cpr
+        with:
+          base: master
+          title: "chore: bump platform to ${{ inputs.PLATFORM_VERSION }}"
+          commit-message: "Updated platform version to ${{ inputs.PLATFORM_VERSION }}"
+          branch: "Bump-platform-${{ inputs.PLATFORM_VERSION }}"
+          delete-branch: true
+          token: ${{ steps.generate-token-pr.outputs.token }}
+
+      - name: "Enable auto-merge"
+        if: ${{ steps.cpr.outputs.pull-request-operation == 'created' }}
+        run: |
+          gh pr merge "${{ steps.cpr.outputs.pull-request-url }}" --auto --squash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: "Approve pull request"
+#        if: ${{ steps.cpr.outputs.pull-request-operation == 'created' }}
+#        uses: juliangruber/approve-pull-request-action@v2
+#        with:
+#          number: ${{ steps.cpr.outputs.pull-request-number }}
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#
+#      - name: "Report Success"
+#        if: ${{ steps.cpr.outputs.pull-request-operation == 'closed' }}
+#        uses: rtCamp/action-slack-notify@v2
+#        env:
+#          SLACK_TITLE: "Report Success"
+#          SLACK_MESSAGE: "NPL CLI: platform version bumped successfully to <${{ inputs.PLATFORM_VERSION }}> - #${{ steps.cpr.outputs.pull-request-number }}>."
+#          SLACK_COLOR: "660033"
+#
+#      - name: "Report failure"
+#        if: ${{ failure() }}
+#        uses: rtCamp/action-slack-notify@v2
+#        env:
+#          SLACK_MESSAGE: "The <${{ env.CI_PIPELINE_URL }}|npl-cli bump> failed for platform release <${{ env.PLATFORM_VERSION_TAG_LINK }}|${{ inputs.PLATFORM_VERSION }}>."
+#          SLACK_COLOR: ${{ job.status }}
+#
+#      - name: "Report cancellation"
+#        if: ${{ cancelled() }}
+#        uses: rtCamp/action-slack-notify@v2
+#        env:
+#          SLACK_MESSAGE: "The <${{ env.CI_PIPELINE_URL }}|npl-cli bump> cancelled for platform release <${{ env.PLATFORM_VERSION_TAG_LINK }}|${{ inputs.PLATFORM_VERSION }}>."
+#          SLACK_COLOR: ${{ job.status }}
