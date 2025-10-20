@@ -21,9 +21,6 @@ env:
   SLACK_TITLE: " "
   SLACK_FOOTER: "npl-cli#bump-platform-version.yml"
   MSG_MINIMAL: true
-  # Map required secrets into env for safer presence checks (avoids parser error on 'secrets' context in step-level if)
-  GH_ND_TOKEN_PR_APP_ID: ${{ secrets.GH_ND_TOKEN_PR_APP_ID }}
-  GH_ND_TOKEN_PR_APP_PRIVATE_KEY: ${{ secrets.GH_ND_TOKEN_PR_APP_PRIVATE_KEY }}
 
 jobs:
   update_pom:
@@ -57,14 +54,6 @@ jobs:
           git diff --name-only
         env:
           PLATFORM_VERSION: "${{ env.PLATFORM_VERSION }}"
-
-      - name: Check required secrets
-        if: ${{ env.GH_ND_TOKEN_PR_APP_ID == '' || env.GH_ND_TOKEN_PR_APP_PRIVATE_KEY == '' }}
-        run: |
-          echo "::error::Required secrets are missing or unavailable in this context."
-          echo "GH_ND_TOKEN_PR_APP_ID present? ${{ env.GH_ND_TOKEN_PR_APP_ID != '' }}"
-          echo "GH_ND_TOKEN_PR_APP_PRIVATE_KEY present? ${{ env.GH_ND_TOKEN_PR_APP_PRIVATE_KEY != '' }}"
-          exit 1
 
       - uses: tibdex/github-app-token@v2.1.0
         id: generate-token-pr
