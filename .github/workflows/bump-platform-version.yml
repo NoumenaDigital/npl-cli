@@ -21,6 +21,8 @@ env:
   SLACK_TITLE: " "
   SLACK_FOOTER: "npl-cli#bump-platform-version.yml"
   MSG_MINIMAL: true
+  GH_ND_TOKEN_PR_APP_ID: ${{ secrets.GH_ND_TOKEN_PR_APP_ID }}
+  GH_ND_TOKEN_PR_APP_PRIVATE_KEY: ${{ secrets.GH_ND_TOKEN_PR_APP_PRIVATE_KEY }}
 
 jobs:
   update_pom:
@@ -46,6 +48,16 @@ jobs:
       - name: "Echo resolved platform version"
         run: |
           echo "Resolved PLATFORM_VERSION='${PLATFORM_VERSION}' (event: ${{ github.event_name }})"
+
+      - name: Debug GitHub App secret lengths
+        run: |
+          echo "GH_ND_TOKEN_PR_APP_ID length: ${#GH_ND_TOKEN_PR_APP_ID}" || true
+          echo "GH_ND_TOKEN_PR_APP_PRIVATE_KEY length: ${#GH_ND_TOKEN_PR_APP_PRIVATE_KEY}" || true
+          if [ -z "${GH_ND_TOKEN_PR_APP_ID}" ] || [ -z "${GH_ND_TOKEN_PR_APP_PRIVATE_KEY}" ]; then
+            echo "One or both GitHub App secrets are empty (or unavailable in this context)."
+          else
+            echo "Both GitHub App secrets have non-zero length."
+          fi
 
       - name: "Update platform version in pom"
         run: |
@@ -78,6 +90,15 @@ jobs:
           gh pr merge "${{ steps.cpr.outputs.pull-request-url }}" --auto --squash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check required secrets (GitHub App optional)
+        if: ${{ env.GH_ND_TOKEN_PR_APP_ID == '' || env.GH_ND_TOKEN_PR_APP_PRIVATE_KEY == '' }}
+        run: |
+          echo "GitHub App secrets missing; proceeding with GITHUB_TOKEN fallback."
+          echo "GH_ND_TOKEN_PR_APP_ID present? ${{ env.GH_ND_TOKEN_PR_APP_ID != '' }}"
+          echo "GH_ND_TOKEN_PR_APP_PRIVATE_KEY present? ${{ env.GH_ND_TOKEN_PR_APP_PRIVATE_KEY != '' }}"
+          echo "GH_ND_TOKEN_PR_APP_ID length: ${#GH_ND_TOKEN_PR_APP_ID}" || true
+          echo "GH_ND_TOKEN_PR_APP_PRIVATE_KEY length: ${#GH_ND_TOKEN_PR_APP_PRIVATE_KEY}" || true
 
 #      - name: "Approve pull request"
 #        if: ${{ steps.cpr.outputs.pull-request-operation == 'created' }}
