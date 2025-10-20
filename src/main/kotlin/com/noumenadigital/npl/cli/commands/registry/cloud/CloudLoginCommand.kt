@@ -19,7 +19,7 @@ object CloudLoginCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "client-id",
                 description = "OAuth2 Client ID",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
                 configFilePath = YamlConfig.Cloud.clientId,
@@ -27,7 +27,7 @@ object CloudLoginCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "client-secret",
                 description = "OAuth2 Client Secret",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
                 configFilePath = YamlConfig.Cloud.clientSecret,
@@ -35,7 +35,7 @@ object CloudLoginCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "url",
                 description = "NOUMENA Cloud Auth URL",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
                 configFilePath = YamlConfig.Cloud.url,
@@ -43,9 +43,9 @@ object CloudLoginCommandDescriptor : CommandDescriptor {
         )
 
     override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
-        val parsedClientId = parsedArguments["client-id"] as String
-        val parsedClientSecret = parsedArguments["client-secret"] as String
-        val parsedUrl = parsedArguments["url"] as String
+        val parsedClientId = parsedArguments["client-id"] as? String ?: "paas"
+        val parsedClientSecret = parsedArguments["client-secret"] as? String ?: "paas"
+        val parsedUrl = parsedArguments["url"] as? String ?: "https://keycloak.noumena.cloud/realms/paas"
         return CloudLoginCommand(clientId = parsedClientId, clientSecret = parsedClientSecret, url = parsedUrl)
     }
 }

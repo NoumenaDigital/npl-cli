@@ -36,7 +36,7 @@ object CloudClearNplCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "url",
                 description = "NOUMENA Cloud deployment URL",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
                 configFilePath = YamlConfig.Cloud.url,
@@ -44,7 +44,7 @@ object CloudClearNplCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "client-id",
                 description = "OAuth2 Client ID",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<client-id>",
                 configFilePath = YamlConfig.Cloud.clientId,
@@ -52,7 +52,7 @@ object CloudClearNplCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "client-secret",
                 description = "OAuth2 Client Secret",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<client-secret>",
                 configFilePath = YamlConfig.Cloud.clientSecret,
@@ -60,7 +60,7 @@ object CloudClearNplCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "auth-url",
                 description = "NOUMENA Cloud Auth URL",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<auth-url>",
                 configFilePath = YamlConfig.Cloud.authUrl,
@@ -68,12 +68,12 @@ object CloudClearNplCommandDescriptor : CommandDescriptor {
         )
 
     override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedUrl = parsedArguments["url"] as? String ?: "https://portal.noumena.cloud"
         val parsedApp = parsedArguments["app"] as String
         val parsedTenant = parsedArguments["tenant"] as String
-        val parsedUrl = parsedArguments["url"] as String
-        val parsedClientId = parsedArguments["client-id"] as String
-        val parsedClientSecret = parsedArguments["client-secret"] as String
-        val parsedAuthUrl = parsedArguments["auth-url"] as String
+        val parsedClientId = parsedArguments["client-id"] as? String ?: "paas"
+        val parsedClientSecret = parsedArguments["client-secret"] as? String ?: "paas"
+        val parsedAuthUrl = parsedArguments["auth-url"] as? String ?: "https://keycloak.noumena.cloud/realms/paas"
         return CloudClearNplCommand(
             app = parsedApp,
             tenant = parsedTenant,

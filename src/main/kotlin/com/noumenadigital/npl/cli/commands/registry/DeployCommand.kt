@@ -68,7 +68,7 @@ object DeployCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "management-url",
                 description = "Url of the Noumena Engine management endpoint",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
                 configFilePath = YamlConfig.Local.managementUrl,
@@ -76,7 +76,7 @@ object DeployCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "client-id",
                 description = "Client ID for deployment to Noumena Engine instance",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<client-id>",
                 configFilePath = YamlConfig.Local.clientId,
@@ -84,7 +84,7 @@ object DeployCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "client-secret",
                 description = "Client secret for deployment to Noumena Engine instance",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<secret>",
                 configFilePath = YamlConfig.Local.clientSecret,
@@ -92,7 +92,7 @@ object DeployCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "auth-url",
                 description = "Authentication URL of the Noumena Engine instance",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
                 configFilePath = YamlConfig.Local.authUrl,
@@ -104,10 +104,10 @@ object DeployCommandDescriptor : CommandDescriptor {
         val parsedClear = !(parsedArguments["clear"] == null || parsedArguments["clear"] as? Boolean == false)
         val parsedUsername = parsedArguments["username"] as String
         val parsedPassword = parsedArguments["password"] as String
-        val parsedManagementUrl = parsedArguments["management-url"] as String
-        val parsedClientSecret = parsedArguments["client-secret"] as String
-        val parsedClientId = parsedArguments["client-id"] as String
-        val parsedAuthUrl = parsedArguments["auth-url"] as String
+        val parsedManagementUrl = parsedArguments["management-url"] as? String ?: "http://localhost:12400/realms/noumena"
+        val parsedClientSecret = parsedArguments["client-secret"] as? String ?: "paas"
+        val parsedClientId = parsedArguments["client-id"] as? String ?: "paas"
+        val parsedAuthUrl = parsedArguments["auth-url"] as? String ?: "http://localhost:11000"
         return DeployCommand(
             sourceDir = parsedSourceDir,
             clear = parsedClear,

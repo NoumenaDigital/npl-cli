@@ -47,7 +47,7 @@ object CloudDeployFrontendCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "url",
                 description = "NOUMENA Cloud deployment URL",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<url>",
                 configFilePath = YamlConfig.Cloud.url,
@@ -55,7 +55,7 @@ object CloudDeployFrontendCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "client-id",
                 description = "OAuth2 Client ID",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
                 configFilePath = YamlConfig.Cloud.clientId,
@@ -63,7 +63,7 @@ object CloudDeployFrontendCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "client-secret",
                 description = "OAuth2 Client Secret",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
                 configFilePath = YamlConfig.Cloud.clientSecret,
@@ -71,7 +71,7 @@ object CloudDeployFrontendCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "auth-url",
                 description = "NOUMENA Cloud Auth URL",
-                isRequired = true,
+                isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<auth-url>",
                 configFilePath = YamlConfig.Cloud.authUrl,
@@ -82,10 +82,10 @@ object CloudDeployFrontendCommandDescriptor : CommandDescriptor {
         val parsedApp = parsedArguments["app"] as String
         val parsedTenant = parsedArguments["tenant"] as String
         val parsedFrontend = parsedArguments["frontend"] as? String ?: "."
-        val parsedUrl = parsedArguments["url"] as String
-        val parsedClientId = parsedArguments["client-id"] as String
-        val parsedClientSecret = parsedArguments["client-secret"] as String
-        val parsedAuthUrl = parsedArguments["auth-url"] as String
+        val parsedUrl = parsedArguments["url"] as? String ?: "https://portal.noumena.cloud"
+        val parsedClientId = parsedArguments["client-id"] as? String ?: "paas"
+        val parsedClientSecret = parsedArguments["client-secret"] as? String ?: "paas"
+        val parsedAuthUrl = parsedArguments["auth-url"] as? String ?: "https://keycloak.noumena.cloud/realms/paas"
         return CloudDeployFrontendCommand(
             app = parsedApp,
             tenant = parsedTenant,
@@ -95,13 +95,6 @@ object CloudDeployFrontendCommandDescriptor : CommandDescriptor {
             clientSecret = parsedClientSecret,
             authUrl = parsedAuthUrl,
         )
-
-        /*        if (structureSettings.frontEnd == null) {
-                    throw RequiredParameterMissing(
-                        parameterName = "frontend",
-                        yamlExample = "structure:\n  frontend: <directory>",
-                    )
-                }*/
     }
 }
 
