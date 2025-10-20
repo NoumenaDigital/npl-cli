@@ -56,21 +56,29 @@ class YamlConfigField private constructor(
 
 object YAMLConfigParser {
     private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
-    private val configFile = File("npl.yml")
+    private val configFileYml = File("npl.yml")
+    private val configFileYaml = File("npl.yaml")
     private var rootNode: JsonNode? = null
 
-    fun reload() {
+    fun reload(): JsonNode? {
         rootNode =
             try {
-                if (configFile.exists()) mapper.readTree(configFile) else null
+                if (configFileYml.exists()) {
+                    mapper.readTree(configFileYml)
+                } else if (configFileYaml.exists()) {
+                    mapper.readTree(configFileYaml)
+                } else {
+                    null
+                }
             } catch (_: Exception) {
                 null
             }
+        return rootNode
     }
 
     fun getValue(path: String): Any? {
-        var node = rootNode ?: return null
-        node = node.at(path) ?: return null
+        var node = rootNode ?: reload()
+        node = node?.at(path) ?: return null
         return when {
             node.isTextual -> node.asText()
             node.isNumber -> node.numberValue()
