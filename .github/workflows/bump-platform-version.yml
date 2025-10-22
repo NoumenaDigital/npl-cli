@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       PLATFORM_VERSION:
-        description: "Platform version to build the project with"
+        description: "Platform version to bump to"
         required: true
 
 env:
