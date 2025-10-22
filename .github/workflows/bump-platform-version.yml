@@ -1,8 +1,5 @@
 name: "Bump platform version"
 on:
-  pull_request:
-    branches:
-      - master
   workflow_dispatch:
     inputs:
       PLATFORM_VERSION:
