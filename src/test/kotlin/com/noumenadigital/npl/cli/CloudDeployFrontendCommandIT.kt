@@ -233,7 +233,17 @@ class CloudDeployFrontendCommandIT :
                 System.setProperty("NPL_CLI_BROWSER_DISABLED", "true")
                 context.setupMockServers()
                 runCommand(
-                    commands = listOf("cloud", "login", "--url", context.mockOidc.url("/realms/paas/").toString()),
+                    commands =
+                        listOf(
+                            "cloud",
+                            "login",
+                            "--url",
+                            context.mockOidc.url("/realms/paas/").toString(),
+                            "--client-id",
+                            "paas",
+                            "--client-secret",
+                            "paas",
+                        ),
                     env = mapOf("NPL_CLI_BROWSER_DISABLED" to "true"),
                 ) {
                     process.waitFor()
@@ -264,8 +274,12 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -290,8 +304,10 @@ class CloudDeployFrontendCommandIT :
                                 "cloud",
                                 "deploy",
                                 "frontend",
-                                "--clientId",
+                                "--client-id",
                                 "wrong",
+                                "--client-secret",
+                                "paas",
                                 "--app",
                                 "appslug",
                                 "--tenant",
@@ -300,7 +316,7 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -332,8 +348,12 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -365,8 +385,12 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -397,8 +421,12 @@ class CloudDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -429,8 +457,12 @@ class CloudDeployFrontendCommandIT :
                                 "other-build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -441,6 +473,101 @@ class CloudDeployFrontendCommandIT :
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    }
+                }
+            }
+        }
+
+        context("Yaml Config") {
+            fun happyPath(params: List<String>) {
+                runCommand(
+                    commands =
+                        listOf(
+                            "cloud",
+                            "deploy",
+                            "frontend",
+                            *params.toTypedArray(),
+                        ),
+                ) {
+                    process.waitFor()
+                    val expectedOutput =
+                        """
+                        Frontend successfully deployed to NOUMENA Cloud.
+                        """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+
+            test("command line arguments only") {
+                withTestContext {
+                    happyPath(
+                        params =
+                            listOf(
+                                "--app",
+                                "appslug",
+                                "--tenant",
+                                "tenantslug",
+                                "--frontend",
+                                "src/test/resources/frontend-sources/deploy-success/build",
+                                "--url",
+                                mockNC.url("/").toString(),
+                                "--auth-url",
+                                mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
+                            ),
+                    )
+                }
+            }
+
+            test("yaml config only") {
+                withTestContext {
+                    TestUtils.withYamlConfig(
+                        """
+                          cloud:
+                            app: appslug
+                            tenant: tenantslug
+                            url: ${mockNC.url("/")}
+                            authUrl: ${mockOidc.url("/realms/paas/")}
+                            clientId: paas
+                            clientSecret: paas
+                          structure:
+                            frontend: src/test/resources/frontend-sources/deploy-success/build
+                        """,
+                    ) {
+                        happyPath(params = emptyList())
+                    }
+                }
+            }
+
+            test("Both command line arguments and yaml config") {
+                withTestContext {
+                    TestUtils.withYamlConfig(
+                        """
+                          cloud:
+                              app: appslug
+                              tenant: tenantslug
+                              clientId: paas
+                              clientSecret: paas
+                          structure:
+                              frontend: src/test/resources/frontend-sources/deploy-success/build
+                        """,
+                    ) {
+                        happyPath(
+                            params =
+                                listOf(
+                                    "--tenant",
+                                    "tenantslug",
+                                    "--url",
+                                    mockNC.url("/").toString(),
+                                    "--auth-url",
+                                    mockOidc.url("/realms/paas/").toString(),
+                                ),
+                        )
                     }
                 }
             }

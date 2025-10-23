@@ -1,31 +1,14 @@
 package com.noumenadigital.npl.cli.commands
 
-import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
-import com.noumenadigital.npl.cli.commands.registry.cloud.deploy.CloudDeployFrontendCommand
-import com.noumenadigital.npl.cli.commands.registry.cloud.deploy.CloudDeployHelpCommand
-import com.noumenadigital.npl.cli.commands.registry.cloud.deploy.CloudDeployNplCommand
-import com.noumenadigital.npl.cli.exception.CommandNotFoundException
+import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.cloud.deploy.CloudDeployFrontendCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.cloud.deploy.CloudDeployHelpCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.cloud.deploy.CloudDeployNplCommandDescriptor
 
 enum class CloudDeployCommands(
-    override val commandExecutorFactory: () -> CommandExecutor,
+    override val commandDescriptor: () -> CommandDescriptor,
 ) : CommandsRegistry {
-    CLOUD_DEPLOY_HELP({ CloudDeployHelpCommand }),
-    CLOUD_DEPLOY_NPL({ CloudDeployNplCommand() }),
-    CLOUD_DEPLOY_FRONTEND({ CloudDeployFrontendCommand() }),
-    ;
-
-    companion object {
-        fun commandFromString(
-            command: String,
-            params: List<String> = emptyList(),
-        ): CommandExecutor {
-            val normalizedCommand = "cloud deploy ${command.lowercase()}"
-            val matchedCommand =
-                CloudDeployCommands.entries.find { it.commandName.equals(normalizedCommand, ignoreCase = true) }
-                    ?: throw CommandNotFoundException(normalizedCommand)
-
-            val baseExecutor = matchedCommand.getBaseExecutor()
-            return baseExecutor.createInstance(params)
-        }
-    }
+    CLOUD_DEPLOY_HELP({ CloudDeployHelpCommandDescriptor }),
+    CLOUD_DEPLOY_NPL({ CloudDeployNplCommandDescriptor }),
+    CLOUD_DEPLOY_FRONTEND({ CloudDeployFrontendCommandDescriptor }),
 }

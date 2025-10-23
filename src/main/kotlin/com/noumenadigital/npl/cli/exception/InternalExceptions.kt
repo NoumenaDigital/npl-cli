@@ -2,6 +2,10 @@ package com.noumenadigital.npl.cli.exception
 
 sealed class InternalException : RuntimeException()
 
+class ArgumentParsingException(
+    override val message: String,
+) : InternalException()
+
 class CommandParsingException(
     val commands: List<String> = emptyList(),
 ) : InternalException()
@@ -15,6 +19,10 @@ class CommandExecutionException(
     override val cause: Throwable? = null,
 ) : InternalException()
 
+class CommandValidationException(
+    override val message: String,
+) : InternalException()
+
 data class DeployConfigException(
     override val message: String,
 ) : InternalException()
@@ -25,7 +33,9 @@ data class ClientSetupException(
 ) : InternalException()
 
 class RequiredParameterMissing(
-    val parameterName: String,
+    val usageInstruction: String? = null,
+    val parameterNames: List<String>,
+    val yamlExamples: List<String?> = emptyList(),
 ) : InternalException()
 
 data class AuthorizationFailedException(

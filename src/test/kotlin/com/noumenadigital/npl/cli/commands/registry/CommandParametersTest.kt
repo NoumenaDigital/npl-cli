@@ -1,7 +1,7 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.commands.CommandArgumentParser
-import com.noumenadigital.npl.cli.commands.Commands
+import com.noumenadigital.npl.cli.commands.DeprecationNotifier
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -17,22 +17,27 @@ class CommandParametersTest :
         context("CommandParameter validation") {
             test("NamedParameter should not allow '--' prefix") {
                 shouldThrow<IllegalArgumentException> {
-                    NamedParameter(name = "--param", description = "desc")
+                    NamedParameter(name = "--param", description = "desc", configFilePath = null)
                 }
-                NamedParameter(name = "param", description = "desc") // Should not throw
+                NamedParameter(name = "param", description = "desc", configFilePath = null) // Should not throw
             }
 
             test("NamedParameter takesValue should be true only if valuePlaceholder is not null") {
-                NamedParameter(name = "param", description = "desc").takesValue.shouldBeFalse()
-                NamedParameter(name = "param", description = "desc", valuePlaceholder = "<val>").takesValue.shouldBeTrue()
+                NamedParameter(name = "param", description = "desc", configFilePath = null).takesValue.shouldBeFalse()
+                NamedParameter(
+                    name = "param",
+                    description = "desc",
+                    valuePlaceholder = "<val>",
+                    configFilePath = null,
+                ).takesValue.shouldBeTrue()
             }
         }
 
         context("CommandArgumentParser") {
             val parser = CommandArgumentParser
             val namedParamWithValue =
-                NamedParameter(name = "file", description = "File path", valuePlaceholder = "<path>")
-            val namedFlag = NamedParameter(name = "verbose", description = "Enable verbose mode")
+                NamedParameter(name = "file", description = "File path", valuePlaceholder = "<path>", configFilePath = null)
+            val namedFlag = NamedParameter(name = "verbose", description = "Enable verbose mode", configFilePath = null)
 
             val parameters = listOf(namedParamWithValue, namedFlag)
 
@@ -113,6 +118,35 @@ class CommandParametersTest :
             }
         }
 
+        context("Deprecated parameter names") {
+            test("should emit warning when filtering deprecated parameters") {
+                val parser = CommandArgumentParser
+                val parameters =
+                    listOf(NamedParameter(name = "auth-url", description = "Auth URL", valuePlaceholder = "<url>", configFilePath = null))
+                val args = listOf("--authUrl", "http://old")
+
+                val captured = mutableListOf<String>()
+                DeprecationNotifier.setSink { msg -> captured.add(msg) }
+                val result = parser.parse(args, parameters)
+                val filtered = result.withoutDeprecatedUnexpectedNames(setOf("authUrl"))
+                DeprecationNotifier.setSink(null)
+
+                filtered.unexpectedArgs.shouldBeEmpty()
+                captured.size shouldBe 1
+                captured.first() shouldBe "Parameter '--authUrl' is deprecated; use '--auth-url' instead."
+            }
+
+            test("should access value from deprecated parameter in unexpected args") {
+                val parser = CommandArgumentParser
+                val parameters = emptyList<NamedParameter>()
+                val args = listOf("--projectDir", "proj")
+
+                val result = parser.parse(args, parameters)
+                val v = result.getValueOrElse(name = "project-dir", deprecatedNames = listOf("projectDir"), defaultValue = null)
+                v shouldBe "proj"
+            }
+        }
+
         context("CommandsParser") {
             test("should parse a list of valid command strings into Command objects") {
                 val parser = CommandsParser
@@ -120,8 +154,7 @@ class CommandParametersTest :
 
                 val result = parser.parse(input)
 
-                result.commandName shouldBe Commands.commandFromString("help", emptyList()).commandName
-                result.description shouldBe Commands.commandFromString("help", emptyList()).description
+                result::class shouldBe HelpCommand::class
             }
 
             test("should execute help command when input list is empty") {
@@ -129,8 +162,7 @@ class CommandParametersTest :
                 val input = emptyList<String>()
 
                 val result = parser.parse(input)
-                result.commandName shouldBe Commands.commandFromString("help", emptyList()).commandName
-                result.description shouldBe Commands.commandFromString("help", emptyList()).description
+                result::class shouldBe HelpCommand::class
             }
         }
     })

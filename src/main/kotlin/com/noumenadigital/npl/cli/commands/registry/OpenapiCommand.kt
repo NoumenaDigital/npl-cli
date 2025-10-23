@@ -1,8 +1,8 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
@@ -26,25 +26,33 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.notExists
 
-data class OpenapiCommand(
-    private val srcDir: String = ".",
-    private val ruleDescriptorPath: String? = null,
-    private val outputDir: String = ".",
-    private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir)),
-) : CommandExecutor {
+object OpenapiCommandDescriptor : CommandDescriptor {
     override val commandName: String = "openapi"
     override val description: String = "Generate the openapi specifications of NPL api"
+    override val supportsMcp: Boolean = true
+
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedSrcDir = parsedArguments["source-dir"] as? String ?: "."
+        val parsedRules = parsedArguments["rules"] as? String
+        val parsedOutputDir = parsedArguments["output-dir"] as? String ?: "."
+        return OpenapiCommand(
+            srcDir = parsedSrcDir,
+            ruleDescriptorPath = parsedRules,
+            outputDir = parsedOutputDir,
+        )
+    }
 
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
                 name = "rules",
@@ -54,34 +62,30 @@ data class OpenapiCommand(
                 valuePlaceholder = "<rules descriptor path>",
                 takesPath = true,
                 isRequiredForMcp = false,
+                configFilePath = YamlConfig.Structure.rules,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.outputDir,
             ),
         )
+}
+
+data class OpenapiCommand(
+    private val srcDir: String,
+    private val ruleDescriptorPath: String?,
+    private val outputDir: String,
+) : CommandExecutor {
+    private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir))
 
     companion object {
-        private const val CURRENT_DIRECTORY = "."
         private const val DEFAULT_OPENAPI_URI = "http://localhost:12000"
-    }
-
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = parseParams(params)
-
-        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-        }
-
-        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
-        val rules = parsedArgs.getValue("rules")
-        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
-        return OpenapiCommand(srcDir, rules, outputDir)
     }
 
     override fun execute(output: ColorWriter): ExitCode {
@@ -170,16 +174,13 @@ data class OpenapiCommand(
         val protosMap = allProtos.filterIsInstance<ProtocolProto>().associateBy { it.protoId.toString().untagged() }
 
         rules.ruleSet.forEach { rule ->
-            val proto = protosMap[rule.untaggedPrototypeId.toString()]
+            val proto =
+                protosMap[rule.untaggedPrototypeId.toString()]
+                    ?: error("No matching prototype found matching [" + rule.untaggedPrototypeId + "]")
 
-            if (proto == null) {
-                error("No matching prototype found matching [" + rule.untaggedPrototypeId + "]")
-            }
             PartyAssignmentRulesValidator.validateParties(rule, proto.actualType.parties)
         }
     }
-
-    private fun parseParams(args: List<String>) = CommandArgumentParser.parse(args, parameters)
 
     private fun String.removePrefix(): String = removePrefix("/")
 

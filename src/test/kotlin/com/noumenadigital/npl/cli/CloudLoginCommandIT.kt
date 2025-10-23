@@ -99,7 +99,17 @@ class CloudLoginCommandIT :
                 val refreshTokenToVerify = "success-refresh-token"
                 withTestContext(refreshTokenToVerify) {
                     runCommand(
-                        commands = listOf("cloud", "login", "--url", "${mockOidc.url("/realms/paas/")}"),
+                        commands =
+                            listOf(
+                                "cloud",
+                                "login",
+                                "--url",
+                                "${mockOidc.url("/realms/paas/")}",
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
+                            ),
                         env =
                             mapOf(
                                 NPL_CLI_BROWSER_DISABLED to "true",
@@ -125,7 +135,17 @@ class CloudLoginCommandIT :
                 val refreshTokenToVerify = "success-refresh-token"
                 withTestContext(refreshTokenToVerify) {
                     runCommand(
-                        commands = listOf("cloud", "login", "--url", "nonexistent-url"),
+                        commands =
+                            listOf(
+                                "cloud",
+                                "login",
+                                "--url",
+                                "nonexistent-url",
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
+                            ),
                         env =
                             mapOf(
                                 NPL_CLI_BROWSER_DISABLED to "true",
@@ -139,6 +159,43 @@ class CloudLoginCommandIT :
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    }
+                }
+            }
+        }
+
+        context("yaml config") {
+            test("cloud login") {
+                val refreshTokenToVerify = "success-refresh-token"
+
+                withTestContext(refreshTokenToVerify) {
+                    TestUtils.withYamlConfig(
+                        """
+                        cloud:
+                            url: ${mockOidc.url("/realms/paas/")}
+                            clientId: paas
+                            clientSecret: paas
+                        """.trimIndent(),
+                    ) {
+
+                        runCommand(
+                            commands = listOf("cloud", "login"),
+                            env =
+                                mapOf(
+                                    NPL_CLI_BROWSER_DISABLED to "true",
+                                ),
+                        ) {
+                            process.waitFor()
+                            val expectedOutput =
+                                """
+                            Please open the following URL in your browser: verification-uri-complete
+                            Successfully logged in to NOUMENA Cloud.
+                            """.normalize()
+
+                            output.normalize() shouldBe expectedOutput
+                            process.exitValue() shouldBe ExitCode.SUCCESS.code
+                            readTempFile().refreshToken shouldBe refreshTokenToVerify
+                        }
                     }
                 }
             }

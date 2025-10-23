@@ -3,45 +3,58 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.ExitCode.GENERAL_ERROR
 import com.noumenadigital.npl.cli.ExitCode.SUCCESS
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
-import com.noumenadigital.pumlgen.NplPumlObjectGenerator.generateFiles
 import java.io.File
 
-data class PumlCommand(
-    private val srcDir: String = ".",
-    private val outputDir: String = ".",
-) : CommandExecutor {
+object PumlCommandDescriptor : CommandDescriptor {
     override val commandName: String = "puml"
     override val description: String = "Generate a puml diagram from source in the given directory"
+    override val supportsMcp: Boolean = true
+
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedSrcDir = parsedArguments["source-dir"] as? String ?: "."
+        val parsedOutputDir = parsedArguments["output-dir"] as? String ?: "."
+        return PumlCommand(
+            srcDir = parsedSrcDir,
+            outputDir = parsedOutputDir,
+        )
+    }
 
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.outputDir,
             ),
         )
+}
 
+data class PumlCommand(
+    private val srcDir: String,
+    private val outputDir: String,
+) : CommandExecutor {
     override fun execute(output: ColorWriter): ExitCode {
         try {
             File(srcDir).let {
@@ -53,13 +66,13 @@ data class PumlCommand(
             }
 
             val outputDirFile = File(outputDir).resolve("puml")
-            val protosMap = CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
+            val protosMap =
+                CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
+                    ?: throw CommandExecutionException("No user defined types found, check sources and try again.")
 
-            if (protosMap == null) {
-                throw CommandExecutionException("No user defined types found, check sources and try again.")
-            }
-
-            val pumlFiles = generateFiles(protosMap)
+            val pumlFiles =
+                com.noumenadigital.pumlgen.NplPumlObjectGenerator
+                    .generateFiles(protosMap)
 
             outputDirFile.mkdirs()
             output.info("Writing Puml files to ${outputDirFile.relativeOrAbsolute()}\n")
@@ -80,21 +93,5 @@ data class PumlCommand(
         } catch (e: Exception) {
             throw CommandExecutionException("Failed to run NPL puml: ${e.message}", e)
         }
-    }
-
-    override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
-
-        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-        }
-
-        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
-        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
-        return PumlCommand(srcDir = srcDir, outputDir = outputDir)
-    }
-
-    companion object {
-        private const val CURRENT_DIRECTORY = "."
     }
 }

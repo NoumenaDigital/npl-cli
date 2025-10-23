@@ -133,8 +133,12 @@ class CloudServiceAccountDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -173,8 +177,12 @@ class CloudServiceAccountDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -210,8 +218,12 @@ class CloudServiceAccountDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -248,8 +260,12 @@ class CloudServiceAccountDeployNplCommandIT :
                                 "src/test/resources/npl-sources/deploy-success/main/migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -286,8 +302,12 @@ class CloudServiceAccountDeployNplCommandIT :
                                 "other-migration.yml",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                         env =
                             mapOf(
@@ -297,7 +317,7 @@ class CloudServiceAccountDeployNplCommandIT :
                         process.waitFor()
                         val expectedOutput =
                             """
-                            Command cloud deploy failed: Migration file does not exist - other-migration.yml
+                            Command cloud deploy npl failed: Migration file does not exist - other-migration.yml
                             """.normalize()
 
                         output.normalize() shouldBe expectedOutput

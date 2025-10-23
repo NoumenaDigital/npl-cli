@@ -1,45 +1,28 @@
 package com.noumenadigital.npl.cli.commands
 
-import com.noumenadigital.npl.cli.commands.registry.CheckCommand
-import com.noumenadigital.npl.cli.commands.registry.CloudCommand
-import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
-import com.noumenadigital.npl.cli.commands.registry.DeployCommand
-import com.noumenadigital.npl.cli.commands.registry.HelpCommand
-import com.noumenadigital.npl.cli.commands.registry.InitCommand
-import com.noumenadigital.npl.cli.commands.registry.McpCommand
-import com.noumenadigital.npl.cli.commands.registry.OpenapiCommand
-import com.noumenadigital.npl.cli.commands.registry.PumlCommand
-import com.noumenadigital.npl.cli.commands.registry.TestCommand
-import com.noumenadigital.npl.cli.commands.registry.VersionCommand
-import com.noumenadigital.npl.cli.exception.CommandNotFoundException
+import com.noumenadigital.npl.cli.commands.registry.CheckCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.CloudCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.DeployCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.HelpCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.InitCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.McpCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.OpenapiCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.PumlCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.TestCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.VersionCommandDescriptor
 
 enum class Commands(
-    override val commandExecutorFactory: () -> CommandExecutor,
+    override val commandDescriptor: () -> CommandDescriptor,
 ) : CommandsRegistry {
-    VERSION({ VersionCommand }),
-    HELP({ HelpCommand() }),
-    INIT({ InitCommand() }),
-    CHECK({ CheckCommand() }),
-    TEST({ TestCommand() }),
-    OPENAPI({ OpenapiCommand() }),
-    PUML({ PumlCommand() }),
-    DEPLOY({ DeployCommand() }),
-    CLOUD({ CloudCommand() }),
-    MCP({ McpCommand }),
-    ;
-
-    companion object {
-        fun commandFromString(
-            command: String,
-            params: List<String> = emptyList(),
-        ): CommandExecutor {
-            val normalizedCommand = command.lowercase()
-            val matchedCommand =
-                Commands.entries.find { it.commandName.equals(normalizedCommand, ignoreCase = true) }
-                    ?: throw CommandNotFoundException(normalizedCommand)
-
-            val baseExecutor = matchedCommand.getBaseExecutor()
-            return baseExecutor.createInstance(params)
-        }
-    }
+    VERSION({ VersionCommandDescriptor }),
+    HELP({ HelpCommandDescriptor }),
+    INIT({ InitCommandDescriptor }),
+    CHECK({ CheckCommandDescriptor }),
+    TEST({ TestCommandDescriptor }),
+    OPENAPI({ OpenapiCommandDescriptor }),
+    PUML({ PumlCommandDescriptor }),
+    DEPLOY({ DeployCommandDescriptor }),
+    CLOUD({ CloudCommandDescriptor }),
+    MCP({ McpCommandDescriptor }),
 }
