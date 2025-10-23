@@ -1,12 +1,11 @@
 package com.noumenadigital.npl.cli.commands.registry.cloud.deploy
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.EnvironmentVariable
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.commands.registry.CommandExecutor
 import com.noumenadigital.npl.cli.exception.CloudCommandException
-import com.noumenadigital.npl.cli.exception.CommandExecutionException
+import com.noumenadigital.npl.cli.exception.RequiredParameterMissing
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthClient
 import com.noumenadigital.npl.cli.http.NoumenaCloudAuthConfig
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
@@ -15,13 +14,9 @@ import com.noumenadigital.npl.cli.service.CloudAuthManager
 import com.noumenadigital.npl.cli.service.CloudDeployService
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.isRegularFile
-import kotlin.streams.asSequence
-import kotlin.use
+import com.noumenadigital.npl.cli.settings.CloudSettings
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
+import com.noumenadigital.npl.cli.settings.StructureSettings
 
 class CloudDeployNplCommand(
     private val sourcesManager: SourcesManager = SourcesManager("."),
@@ -33,7 +28,6 @@ class CloudDeployNplCommand(
 ) : CommandExecutor {
     override val commandName: String = "cloud deploy npl"
     override val description: String = "Deploy NPL sources to a NOUMENA Cloud Application"
-    private val migrationFileName = "migration.yml"
 
     override val parameters: List<NamedParameter> =
         listOf(
@@ -64,25 +58,25 @@ class CloudDeployNplCommand(
                 valuePlaceholder = "<url>",
             ),
             NamedParameter(
-                name = "clientId",
+                name = "client-id",
                 description = "OAuth2 Client ID",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientId>",
             ),
             NamedParameter(
-                name = "clientSecret",
+                name = "client-secret",
                 description = "OAuth2 Client Secret",
                 isRequired = false,
                 isHidden = true,
                 valuePlaceholder = "<clientSecret>",
             ),
             NamedParameter(
-                name = "authUrl",
+                name = "auth-url",
                 description = "NOUMENA Cloud Auth URL",
                 isRequired = false,
                 isHidden = true,
-                valuePlaceholder = "<authUrl>",
+                valuePlaceholder = "<auth-url>",
             ),
         )
 
@@ -96,28 +90,44 @@ class CloudDeployNplCommand(
         )
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
-        val app = parsedArgs.getRequiredValue("app")
-        val tenant = parsedArgs.getRequiredValue("tenant")
-        val migration = parsedArgs.getValue("migration") ?: findSingleFile(migrationFileName).toString()
-        val migrationFile = File(migration)
+        val settings = DefaultSettingsProvider(params, parameters)
+        val cloudSettings: CloudSettings = settings.cloud
+        val structureSettings: StructureSettings = settings.structure
+        val migrationFile =
+            structureSettings.migrationDescriptorFile
+                ?: throw RequiredParameterMissing(
+                    parameterName = "migration",
+                    yamlExample = "structure:\n  migration: <path>",
+                )
         if (!migrationFile.exists()) {
             throw CloudCommandException(
-                message = "Migration file does not exist - $migration",
-                commandName = "cloud deploy",
+                message = "Migration file does not exist - $migrationFile",
+                commandName = "cloud deploy npl",
             )
         }
-        val clientId = parsedArgs.getValue("clientId")
-        val clientSecret = parsedArgs.getValue("clientSecret")
-        val authUrl = parsedArgs.getValue("authUrl")
-        val url = parsedArgs.getValue("url")
-        val sourcesManager = SourcesManager(migrationFile.parent.toString())
-        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
+
+        val sourcesManager = SourcesManager(migrationFile.parentFile?.absolutePath ?: ".")
+        val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(cloudSettings.clientId, cloudSettings.clientSecret, cloudSettings.authUrl)
         val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
         val cloudDeployService =
             CloudDeployService(
                 CloudAuthManager(noumenaCloudAuthClient),
-                NoumenaCloudClient(NoumenaCloudConfig.get(app, tenant, url)),
+                NoumenaCloudClient(
+                    config =
+                        NoumenaCloudConfig.get(
+                            appSlug =
+                                cloudSettings.app ?: throw RequiredParameterMissing(
+                                    parameterName = "app",
+                                    yamlExample = "cloud:\n  app: <app>",
+                                ),
+                            tenantSlug =
+                                cloudSettings.tenant ?: throw RequiredParameterMissing(
+                                    parameterName = "tenant",
+                                    yamlExample = "cloud:\n  tenant: <tenant>",
+                                ),
+                            url = cloudSettings.url,
+                        ),
+                ),
             )
         return CloudDeployNplCommand(sourcesManager, cloudDeployService)
     }
@@ -126,12 +136,14 @@ class CloudDeployNplCommand(
         try {
             val saClientId = cloudDeployService.noumenaCloudClient.config.tenantSlug
             val saClientSecret =
-                System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET") ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
+                System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
+                    ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
             val archive = sourcesManager.getArchivedSources()
 
             if (!saClientSecret.isNullOrBlank()) {
                 output.info("Preparing to deploy NPL application to NOUMENA Cloud using service account...")
-                val accessToken = cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
+                val accessToken =
+                    cloudDeployService.cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
                 output.success("Successfully authenticated with service account credentials")
                 cloudDeployService.deployNplApplicationWithToken(archive, accessToken)
             } else {
@@ -142,34 +154,6 @@ class CloudDeployNplCommand(
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
             throw CloudCommandException(ex.message, ex, "cloud deploy npl")
-        }
-    }
-
-    private fun findSingleFile(
-        fileName: String,
-        searchDir: String = ".",
-    ): File {
-        val srcDir = Paths.get(searchDir).toFile()
-
-        if (!srcDir.exists() || !srcDir.isDirectory) {
-            throw CommandExecutionException("Source path '$srcDir' does not exist or is not a directory.")
-        }
-        val matchedFiles =
-            Files.walk(Paths.get(srcDir.toURI())).use { paths ->
-                paths
-                    .asSequence()
-                    .filter { it.isRegularFile() && it.fileName.toString() == fileName }
-                    .map(Path::toFile)
-                    .toList()
-            }
-
-        return when {
-            matchedFiles.isEmpty() -> throw CommandExecutionException("No '$fileName' file found in $srcDir")
-            matchedFiles.size > 1 -> throw CommandExecutionException(
-                "Multiple '$fileName' files found:\n${matchedFiles.joinToString("\n")}",
-            )
-
-            else -> matchedFiles.first()
         }
     }
 }

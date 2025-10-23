@@ -138,7 +138,7 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env =
@@ -178,7 +178,7 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env =
@@ -215,7 +215,7 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env =
@@ -253,7 +253,7 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "src/test/resources/frontend-sources/deploy-success/build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env =
@@ -291,7 +291,7 @@ class CloudServiceAccountDeployFrontendCommandIT :
                                 "other-build",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                         env =

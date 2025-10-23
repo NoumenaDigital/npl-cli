@@ -34,32 +34,19 @@ fun DeployConfigException.buildOutputMessage(): String {
             .filter { it.isNotBlank() }
             .joinToString("\n") { "  $it" }
 
-    val helpText =
-        """
-
-        Please create or check the configuration file at .npl/deploy.yml
-        (in the current directory or your home directory ~/.npl/deploy.yml)
-        with the following format:
-
-        schemaVersion: v1
-        targets:
-          <your-target-name>:
-            type: engine
-            engineManagementUrl: <URL of the Noumena Engine API>
-            authUrl: <URL of the authentication endpoint>
-            username: <username for authentication>
-            password: <password for authentication>
-            clientId: <client ID for authentication>
-            clientSecret: <client secret for authentication>
-        """.trimIndent()
-
-    return "Configuration errors:\n$errorLines\n$helpText"
+    return "Configuration errors:\n$errorLines"
 }
 
 fun ClientSetupException.buildOutputMessage(): String = "Client setup error: ${this.message}"
+
+fun ArgumentParsingException.buildOutputMessage(): String = this.message
 
 fun AuthorizationFailedException.buildOutputMessage(): String = this.message
 
 fun CloudCommandException.buildOutputMessage(): String = "Command ${this.commandName} failed: ${this.message}"
 
-fun RequiredParameterMissing.buildOutputMessage(): String = "Command parsing failed: required parameter ${this.parameterName} is missing"
+fun RequiredParameterMissing.buildOutputMessage(): String =
+    "Missing required parameter: ${this.parameterName}\n" +
+        "Either pass it as a command line argument in the following form:\n\n" +
+        "\t--${this.parameterName} <value>\n\n" +
+        "or define it in npl.yml, e.g.:\n\n${this.yamlExample}"

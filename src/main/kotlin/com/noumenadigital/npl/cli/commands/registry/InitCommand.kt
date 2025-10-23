@@ -1,12 +1,12 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.NO_SAMPLES
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
 import com.noumenadigital.npl.cli.service.ColorWriter
+import com.noumenadigital.npl.cli.settings.SettingsResolver
 import com.noumenadigital.npl.cli.util.ZipExtractor
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
@@ -24,9 +24,9 @@ class InitCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "projectDir",
+                name = "project-dir",
                 description = "Directory where project files will be stored. Created if it doesn’t exist",
-                valuePlaceholder = "<projectDir>",
+                valuePlaceholder = "<project-dir>",
             ),
             NamedParameter(
                 name = "bare",
@@ -35,17 +35,18 @@ class InitCommand(
                 isRequired = false,
             ),
             NamedParameter(
-                name = "templateUrl",
+                name = "template-url",
                 description = "URL of a repository containing a ZIP archive of the project template. Overrides the default template",
                 isRequired = false,
-                valuePlaceholder = "<templateUrl>",
+                valuePlaceholder = "<template-url>",
             ),
         )
 
     override fun execute(output: ColorWriter): ExitCode {
         fun ColorWriter.displayError(message: String) = error("npl init: $message")
 
-        val parsedArgs = CommandArgumentParser.parse(args, parameters)
+        val init = SettingsResolver.resolveInitFrom(args, parameters)
+        val parsedArgs = SettingsResolver.parseArgs(args, parameters)
 
         if (parsedArgs.unexpectedArgs.isNotEmpty()) {
             if (parsedArgs.unexpectedArgs.contains("name")) {
@@ -56,15 +57,14 @@ class InitCommand(
             return ExitCode.GENERAL_ERROR
         }
 
-        if (parsedArgs.getValue("templateUrl") != null && parsedArgs.hasFlag("bare")) {
-            output.displayError("Cannot use --bare and --templateUrl together.")
+        if (init.templateUrl != null && init.bare) {
+            output.displayError("Cannot use --bare and --template-url together.")
             return ExitCode.USAGE_ERROR
         }
 
-        val projectPath = parsedArgs.getValue("projectDir")
         val projectDir =
-            projectPath?.let {
-                File(it).apply {
+            init.projectDir?.let {
+                it.apply {
                     if (exists()) {
                         output.displayError("Directory ${relativeOrAbsolute()} already exists.")
                         return ExitCode.GENERAL_ERROR
@@ -76,10 +76,13 @@ class InitCommand(
                 }
             } ?: File(".")
 
-        val archiveFile = projectDir.resolve("project${UUID.randomUUID()}.zip")
+        val archiveFile =
+            projectDir.resolve("project${UUID.randomUUID()}.zip").also {
+                it.deleteOnExit()
+            }
 
         try {
-            val templateUrl = parsedArgs.getValue("templateUrl") ?: repoClient.getDefaultUrl(parsedArgs)
+            val templateUrl = init.templateUrl ?: repoClient.getDefaultUrl(init.bare)
             repoClient.downloadTemplateArchive(templateUrl, archiveFile)
             output.info("Successfully downloaded project files")
         } catch (e: Exception) {
@@ -109,8 +112,8 @@ class InitCommand(
 
     override fun createInstance(params: List<String>): CommandExecutor = InitCommand(params)
 
-    private fun NoumenaGitRepoClient.getDefaultUrl(parsedArgs: CommandArgumentParser.ParsedArguments): String =
-        if (parsedArgs.hasFlag("bare")) {
+    private fun NoumenaGitRepoClient.getDefaultUrl(isBare: Boolean): String =
+        if (isBare) {
             getBranchUrl(NO_SAMPLES)
         } else {
             getBranchUrl(SAMPLES)

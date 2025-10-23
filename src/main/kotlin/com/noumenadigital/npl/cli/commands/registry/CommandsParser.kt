@@ -8,6 +8,6 @@ object CommandsParser {
 
         val arguments = if (command.size > 1) command.drop(1) else emptyList()
 
-        return Commands.Companion.commandFromString(commandName, arguments)
+        return Commands.commandFromString(commandName, arguments)
     }
 }

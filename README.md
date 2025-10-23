@@ -126,64 +126,19 @@ The old CLI is still available under the GitHub releases, and is documented in t
 
 ## Deploy Command
 
-The `deploy` command allows you to deploy NPL sources to a Noumena Engine instance.
+The `deploy` command allows you to deploy NPL sources to a Noumena Engine instance. In order to use the command, you
+need to configure appropriate settings in the [npl.yml file](docs/runtime/tools/build-tools/cli.md#configuration-file).
 
 ### Usage
 
 ```bash
-npl deploy --target <target> --sourceDir <directory> [--clear]
+npl deploy --source-dir <directory> [--clear]
 ```
 
 Where:
 
-- `[target]` (required, unless `defaultTarget` is present in the config) is the named target from the configuration file
 - `[directory]` (required) is the path to the directory containing NPL sources
 - `[--clear]` (optional) clears the application contents before deployment
-
-### Configuration
-
-The deploy command requires configuration settings that are read from a YAML file. The CLI looks for configuration in
-the following locations (in order):
-
-1. `./.npl/deploy.yml` (current directory)
-2. `~/.npl/deploy.yml` (user's home directory)
-
-The configuration file contains multiple named deployment targets, allowing you to quickly switch between different
-environments (dev, test, prod, etc.) without changing the command.
-
-#### Configuration Schema (YAML)
-
-```yaml
-schemaVersion: v1
-defaultTarget: target-name # Optional
-targets:
-  target-name:
-    type: engine # Currently only 'engine' type is supported
-    engineManagementUrl: http://server:port
-    authUrl: http://auth-server:port/realms/your-realm # Include the realm in the URL
-    username: your-username
-    password: your-password
-    clientId: client-id
-    clientSecret: client-secret
-  another-target:
-    # Another target configuration
-    ...
-```
-
-#### Properties for Each Target
-
-| Property              | Description                              | Default Value                             |
-| --------------------- | ---------------------------------------- | ----------------------------------------- |
-| `engineManagementUrl` | URL of the Noumena Engine Management API | `"http://localhost:12400/realms/noumena"` |
-| `authUrl`             | URL of the authentication endpoint       | `"http://localhost:11000"`                |
-| `username`            | Username for authentication              | (Required)                                |
-| `password`            | Password for authentication              | (Required)                                |
-| `clientId`            | Client ID for authentication             | `"foo"`                                   |
-| `clientSecret`        | Client secret for authentication         | `"bar"`                                   |
-
-#### Example Configuration
-
-A sample configuration file is available at `
 
 ## Cloud login command
 
@@ -210,7 +165,7 @@ The `cloud deploy` command allows you to deploy NPL sources to a NOUMENA cloud a
 ### Usage
 
 ```bash
-npl cloud deploy --appId <applicationUUID> --sourceDir <directory>
+npl cloud deploy --appId <applicationUUID> --source-dir <directory>
 ```
 
 That command will deploy your sources to the NOUMENA cloud application.

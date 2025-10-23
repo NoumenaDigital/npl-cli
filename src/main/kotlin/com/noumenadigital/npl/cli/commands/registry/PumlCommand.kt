@@ -3,19 +3,20 @@ package com.noumenadigital.npl.cli.commands.registry
 import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.ExitCode.GENERAL_ERROR
 import com.noumenadigital.npl.cli.ExitCode.SUCCESS
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.CompilerService
 import com.noumenadigital.npl.cli.service.SourcesManager
+import com.noumenadigital.npl.cli.settings.DefaultSettingsProvider
+import com.noumenadigital.npl.cli.settings.SettingsProvider
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
-import com.noumenadigital.pumlgen.NplPumlObjectGenerator.generateFiles
 import java.io.File
 
 data class PumlCommand(
     private val srcDir: String = ".",
     private val outputDir: String = ".",
+    private val settings: SettingsProvider? = null,
 ) : CommandExecutor {
     override val commandName: String = "puml"
     override val description: String = "Generate a puml diagram from source in the given directory"
@@ -23,7 +24,7 @@ data class PumlCommand(
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL source files",
                 defaultValue = ".",
                 isRequired = false,
@@ -32,7 +33,7 @@ data class PumlCommand(
                 isRequiredForMcp = true,
             ),
             NamedParameter(
-                name = "outputDir",
+                name = "output-dir",
                 description = "Directory to place generated output files (optional)",
                 defaultValue = ".",
                 isRequired = false,
@@ -53,13 +54,13 @@ data class PumlCommand(
             }
 
             val outputDirFile = File(outputDir).resolve("puml")
-            val protosMap = CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
+            val protosMap =
+                CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
+                    ?: throw CommandExecutionException("No user defined types found, check sources and try again.")
 
-            if (protosMap == null) {
-                throw CommandExecutionException("No user defined types found, check sources and try again.")
-            }
-
-            val pumlFiles = generateFiles(protosMap)
+            val pumlFiles =
+                com.noumenadigital.pumlgen.NplPumlObjectGenerator
+                    .generateFiles(protosMap)
 
             outputDirFile.mkdirs()
             output.info("Writing Puml files to ${outputDirFile.relativeOrAbsolute()}\n")
@@ -83,18 +84,12 @@ data class PumlCommand(
     }
 
     override fun createInstance(params: List<String>): CommandExecutor {
-        val parsedArgs = CommandArgumentParser.parse(params, parameters)
-
-        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            throw CommandExecutionException("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-        }
-
-        val srcDir = parsedArgs.getValue("sourceDir") ?: CURRENT_DIRECTORY
-        val outputDir = parsedArgs.getValue("outputDir") ?: CURRENT_DIRECTORY
-        return PumlCommand(srcDir = srcDir, outputDir = outputDir)
-    }
-
-    companion object {
-        private const val CURRENT_DIRECTORY = "."
+        val settings = DefaultSettingsProvider(params, parameters)
+        val structureSettings = settings.structure
+        return PumlCommand(
+            srcDir = structureSettings.nplSourceDir?.absolutePath ?: srcDir,
+            outputDir = structureSettings.outputDir?.absolutePath ?: outputDir,
+            settings = settings,
+        )
     }
 }

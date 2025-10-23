@@ -67,6 +67,38 @@ To see a description of how to use each command, run `npl help`
 | `npl cloud deploy frontend` | Deploys frontend build sources to a NOUMENA Cloud Application                                 |
 | `npl cloud clear`           | Deletes NPL sources and clears protocols from the database from the NOUMENA Cloud Application |
 
+## Configuration file
+
+The NPL CLI uses a per-project configuration file named `npl.yml` to store project-specific settings. Below is an
+example configuration file:
+
+```yaml
+runtime: # Configuration for the Noumena Platform runtime
+  version: 2025.2.2 # Specify the Noumena Platform runtime version
+
+cloud: # Configuration for NOUMENA Cloud deployment
+  tenant: my-tenant # Slug of the NOUMENA Cloud tenant
+  app: my-npl-app # Slug of the NOUMENA Cloud application
+  clear: false # Whether to clear existing protocols and data before deployment
+
+local: # Configuration for deploying to a local NOUMENA Engine instance
+  managementUrl: http://localhost:12400 # URL of the local NOUMENA Engine management API
+  authUrl: http://localhost:11000 # URL of IAM service for authentication
+  username: my-user # Username for authentication
+  password: my-pass # Password for authentication
+  clientId: npl-cli # Client ID for authentication
+  clientSecret: secret # Client secret for authentication
+
+structure: # Configuration for project structure
+  sourceDir: src/main/npl # Directory containing NPL source files
+  testSourceDir: src/test/npl # Directory containing NPL test source files
+  outputDir: output/ # Directory for generated files (e.g., OpenAPI specs, PUML diagrams)
+  frontend: frontend/output # Directory containing frontend build files (must contain an index.html file)
+  migration: src/main/migration.yml # Migration file – required for cloud deployments
+  rules: src/main/rules/rules.yml # Rules file for party automation (used by openapi command if present)
+  coverage: true # Whether to generate code coverage reports when running tests
+```
+
 ## Supported Operating Systems and architectures
 
 |         | ARM 64 | AMD 64 |
