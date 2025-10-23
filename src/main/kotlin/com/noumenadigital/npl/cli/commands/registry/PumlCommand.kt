@@ -52,8 +52,8 @@ object PumlCommandDescriptor : CommandDescriptor {
 }
 
 data class PumlCommand(
-    private val srcDir: String = ".",
-    private val outputDir: String = ".",
+    private val srcDir: String,
+    private val outputDir: String,
 ) : CommandExecutor {
     override fun execute(output: ColorWriter): ExitCode {
         try {

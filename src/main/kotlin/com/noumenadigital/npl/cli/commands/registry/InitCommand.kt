@@ -60,15 +60,6 @@ class InitCommand(
     override fun execute(output: ColorWriter): ExitCode {
         fun ColorWriter.displayError(message: String) = error("npl init: $message")
 
-        /*        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-                    if (parsedArgs.unexpectedArgs.contains("name")) {
-                        output.displayError("Project name cannot be empty.")
-                        return ExitCode.GENERAL_ERROR
-                    }
-                    output.displayError("Unknown arguments found: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-                    return ExitCode.GENERAL_ERROR
-                }*/
-
         if (templateUrl != null && bare == true) {
             output.displayError("Cannot use --bare and --template-url together.")
             return ExitCode.USAGE_ERROR
