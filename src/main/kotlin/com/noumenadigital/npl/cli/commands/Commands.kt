@@ -4,7 +4,7 @@ import com.noumenadigital.npl.cli.commands.registry.CheckCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CloudCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.DeployCommandDescriptor
-import com.noumenadigital.npl.cli.commands.registry.HeloCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.HelpCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.InitCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.McpCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.OpenapiCommandDescriptor
@@ -16,7 +16,7 @@ enum class Commands(
     override val commandDescriptor: () -> CommandDescriptor,
 ) : CommandsRegistry {
     VERSION({ VersionCommandDescriptor }),
-    HELP({ HeloCommandDescriptor }),
+    HELP({ HelpCommandDescriptor }),
     INIT({ InitCommandDescriptor }),
     CHECK({ CheckCommandDescriptor }),
     TEST({ TestCommandDescriptor }),

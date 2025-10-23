@@ -4,7 +4,7 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.Commands
 import com.noumenadigital.npl.cli.service.ColorWriter
 
-object HeloCommandDescriptor : CommandDescriptor {
+object HelpCommandDescriptor : CommandDescriptor {
     override val commandName: String = "help"
     override val description: String = "Display the description for npl-cli commands"
     override val supportsMcp: Boolean = false
