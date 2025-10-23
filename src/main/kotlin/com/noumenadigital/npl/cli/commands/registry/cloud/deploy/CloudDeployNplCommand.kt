@@ -127,7 +127,7 @@ class CloudDeployNplCommand(
         }
     }
 
-    val sourcesManager = SourcesManager(migration)
+    val sourcesManager = SourcesManager(File(migration).parent.toString())
     val noumenaCloudAuthConfig = NoumenaCloudAuthConfig.get(clientId, clientSecret, authUrl)
     val noumenaCloudAuthClient = NoumenaCloudAuthClient(noumenaCloudAuthConfig)
     val cloudDeployService =
