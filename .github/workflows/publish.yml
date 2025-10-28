@@ -104,6 +104,11 @@ jobs:
             arch: x86_64
             output_name: npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe
             static: false
+          - os: windows
+            runner: windows-11-arm
+            arch: aarch64
+            output_name: npl-cli-windows-aarch64-${{needs.determine-version.outputs.version}}.exe
+            static: false
 
     steps:
       - name: "Checkout"
@@ -207,15 +212,23 @@ jobs:
           retention-days: 30
 
   create-windows-installer:
-    name: "Create Windows Installer"
+    name: "Create Windows Installer (${{ matrix.arch }})"
     needs: [determine-version, build-native]
     if: needs.determine-version.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            binary_name: npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe
+            installer_name: npl-cli-installer-x86_64.exe
+          - arch: aarch64
+            binary_name: npl-cli-windows-aarch64-${{needs.determine-version.outputs.version}}.exe
+            installer_name: npl-cli-installer-aarch64.exe
     defaults:
       run:
         working-directory: windows-installer
-    env:
-      INSTALLER_NAME: npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -225,12 +238,12 @@ jobs:
       - name: "Download versioned windows executable"
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.INSTALLER_NAME }}
+          name: ${{ matrix.binary_name }}
           path: ./windows-installer/build
 
       - name: "Move exe into place"
         run: |
-          mv ./build/${{ env.INSTALLER_NAME }} .
+          mv ./build/${{ matrix.binary_name }} .
 
       - name: "Download and link EnVar plugin"
         run: |
@@ -246,12 +259,12 @@ jobs:
           -v .:/npl-cli-installer \
           -v ./EnVar_plugin/Plugins:/usr/share/nsis/Plugins \
           hp41/nsis:3.01-1 \
-          -DVERSION=${{needs.determine-version.outputs.version}} /npl-cli-installer/npl-cli.nsi
+          -DVERSION=${{needs.determine-version.outputs.version}} -DARCH=${{ matrix.arch }} /npl-cli-installer/npl-cli.nsi
 
       - name: "Upload windows installer artifact"
         uses: actions/upload-artifact@v4
         with:
-          name: npl-cli-installer.exe
+          name: ${{ matrix.installer_name }}
           path: windows-installer/dist/npl-cli-installer.exe
           if-no-files-found: error
           retention-days: 30

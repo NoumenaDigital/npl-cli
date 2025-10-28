@@ -49,6 +49,9 @@ jobs:
           - os: windows
             runner: windows-latest
             arch: x86_64
+          - os: windows
+            runner: windows-11-arm
+            arch: aarch64
     runs-on: ${{ matrix.runner }}
     steps:
       - name: "Checkout"
@@ -85,6 +88,9 @@ jobs:
           - os: windows
             runner: windows-latest
             arch: x86_64
+          - os: windows
+            runner: windows-11-arm
+            arch: aarch64
     runs-on: ${{ matrix.runner }}
     steps:
       - name: "Checkout"

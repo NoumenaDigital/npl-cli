@@ -4,10 +4,14 @@
   !define VERSION "dev"
 !endif
 
+!ifndef ARCH
+  !define ARCH "x86_64"
+!endif
+
 ; Define variables
 !define APP_NAME "NPL command line interface"
 !define APP_DIR "Npl-cli"
-!define APP_BUILD_EXE "npl-cli-windows-x86_64-${VERSION}.exe"
+!define APP_BUILD_EXE "npl-cli-windows-${ARCH}-${VERSION}.exe"
 !define APP_TARGET_EXE "npl.exe"
 !define APP_INSTALLER "npl-cli-installer.exe"
 
