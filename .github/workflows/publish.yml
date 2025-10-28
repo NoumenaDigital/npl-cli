@@ -105,16 +105,17 @@ jobs:
             output_name: npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe
             static: false
           - os: windows
-            runner: windows-11-arm
+            runner: windows-latest
             arch: aarch64
             output_name: npl-cli-windows-aarch64-${{needs.determine-version.outputs.version}}.exe
             static: false
+            native_image_target: windows-aarch64
 
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
 
-      - name: "Set up Maven"
+      - name: "Set up Maven (GraalVM)"
         uses: actions/setup-java@v4
         with:
           distribution: "graalvm"
@@ -152,8 +153,14 @@ jobs:
         run: mvn -Pnative,native-static-linux -Dstatic=true package -DskipTests
 
       - name: "Build npl-cli native binary (standard/dynamic linking)"
-        if: matrix.static == false
+        if: matrix.static == false && matrix.native_image_target == null
         run: mvn -Pnative package -DskipTests
+
+      - name: "Build npl-cli native binary (cross-compile with --target)"
+        if: matrix.native_image_target != null
+        shell: bash
+        run: |
+          mvn -Pnative package -DskipTests -Dnative-image.arg.target="--target=${{ matrix.native_image_target }}"
 
       - name: "Prepare binary for upload"
         if: matrix.os != 'windows'
