@@ -113,11 +113,14 @@ Once you've installed the CLI, you can use it in MCP mode with your local AI too
 
 ### VS Code and Cursor integration
 
+Follow one of the methods below to install NPL CLI as an MCP server in Cursor or VS Code:
+
 - [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](cursor://anysphere.cursor-deeplink/mcp/install?name=npl-cli&config=ewogICAgImNvbW1hbmQiOiAibnBsIiwKICAgICJhcmdzIjogWyJtY3AiXQp9Cg==)
 
 - [Install in VS Code](vscode:mcp/install?%7B%22name%22%3A%22NPL%20CLI%22%2C%22command%22%3A%22npl%22%2C%22args%22%3A%5B%22mcp%22%5D%7D)
+  (select `Install server`)
 
-Simply add `npl-cli` to your MCP configuration file, e.g.
+Or simply add `npl-cli` to your MCP configuration file, e.g.
 
 ```json
 {
@@ -133,7 +136,11 @@ Simply add `npl-cli` to your MCP configuration file, e.g.
 
 ### Claude Code integration
 
-Type `claude mcp add npl -- npl mcp` in the Claude Code terminal to add NPL CLI as an MCP server.
+Type the following in the Claude Code terminal to add NPL CLI as an MCP server:
+
+```shell
+claude mcp add npl -- npl mcp
+```
 
 ## Service Accounts
 
