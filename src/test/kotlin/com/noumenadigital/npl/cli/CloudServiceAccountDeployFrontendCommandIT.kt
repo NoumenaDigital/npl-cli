@@ -4,11 +4,9 @@ import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import okhttp3.mockwebserver.Dispatcher
+import java.io.File
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
-import java.io.File
 
 class CloudServiceAccountDeployFrontendCommandIT :
     FunSpec({
@@ -17,91 +15,29 @@ class CloudServiceAccountDeployFrontendCommandIT :
             var mockOidc: MockWebServer = MockWebServer()
             var mockNC: MockWebServer = MockWebServer()
 
+            val additionalNcPaths = mapOf(
+                "/api/v1/applications/$APP_ID_OK/uploadwebsite" to MockResponse()
+                    .setResponseCode(200)
+                    .setHeader("Content-Type", "application/json")
+                    .setBody(
+                        """
+                        {
+                            "id": "$APP_ID_OK",
+                            "name": "appname",
+                            "slug": "appslug",
+                            "website_deployed_at": "2025-07-11T08:23:27.339077571Z",
+                            "website_file_name": "tenantslug_appslug_20250711_082327.zip",
+                            "website_url": "https://tenantslug-appslug.noumena.cloud"
+                        }
+                        """.trimIndent(),
+                    )
+            )
+
             fun setupMockServers() {
+                mockOidc = createOidcMockServer()
+                mockNC = createNcMockServer(additionalNcPaths)
                 mockOidc.start()
                 mockNC.start()
-
-                mockOidc.dispatcher =
-                    object : Dispatcher() {
-                        override fun dispatch(request: RecordedRequest): MockResponse =
-                            when (request.path) {
-                                "/realms/paas/protocol/openid-connect/token" -> {
-                                    val body = request.body.readUtf8()
-                                    if (body.contains("client_secret=wrong")) {
-                                        MockResponse()
-                                            .setResponseCode(401)
-                                            .setBody("Client Error.")
-                                    } else if (body.contains("grant_type=client_credentials")) {
-                                        MockResponse()
-                                            .setResponseCode(200)
-                                            .setHeader("Content-Type", "application/json")
-                                            .setBody(
-                                                """
-                                                {
-                                                    "access_token": "mock-access-token",
-                                                    "token_type": "bearer",
-                                                    "expires_in": 3600
-                                                }
-                                                """.trimIndent(),
-                                            )
-                                    } else {
-                                        MockResponse().setResponseCode(400)
-                                    }
-                                }
-
-                                else -> MockResponse().setResponseCode(404)
-                            }
-                    }
-
-                mockNC.dispatcher =
-                    object : Dispatcher() {
-                        override fun dispatch(request: RecordedRequest): MockResponse =
-                            when (request.path) {
-                                "/api/v1/tenants" -> {
-                                    MockResponse()
-                                        .setResponseCode(200)
-                                        .setHeader("Content-Type", "application/json")
-                                        .setBody(
-                                            """
-                                            [
-                                              {
-                                                "id": "80031abc-641b-4330-a473-16fd6d5ae305",
-                                                "name": "tenantname",
-                                                "slug": "tenantslug",
-                                                "applications": [
-                                                  {
-                                                    "id": "$APP_ID_OK",
-                                                    "name": "appname",
-                                                    "slug": "appslug"
-                                                  }
-                                                ]
-                                              }
-                                            ]
-                                            """.trimIndent(),
-                                        )
-                                }
-
-                                "/api/v1/applications/$APP_ID_OK/uploadwebsite" -> {
-                                    MockResponse()
-                                        .setResponseCode(200)
-                                        .setHeader("Content-Type", "application/json")
-                                        .setBody(
-                                            """
-                                            {
-                                                "id": "$APP_ID_OK",
-                                                "name": "appname",
-                                                "slug": "appslug",
-                                                "website_deployed_at": "2025-07-11T08:23:27.339077571Z",
-                                                "website_file_name": "tenantslug_appslug_20250711_082327.zip",
-                                                "website_url": "https://tenantslug-appslug.noumena.cloud"
-                                            }
-                                            """.trimIndent(),
-                                        )
-                                }
-
-                                else -> MockResponse().setResponseCode(404)
-                            }
-                    }
             }
 
             fun cleanupMockServers() {
@@ -331,8 +267,4 @@ class CloudServiceAccountDeployFrontendCommandIT :
                 }
             }
         }
-    }) {
-    companion object {
-        private const val APP_ID_OK = "1a978a70-1709-40c1-82d7-30114edfc46b"
-    }
-}
+    })

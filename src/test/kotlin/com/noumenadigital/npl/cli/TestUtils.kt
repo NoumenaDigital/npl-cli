@@ -21,6 +21,10 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.nio.file.Path
 import java.nio.file.Paths
+import okhttp3.mockwebserver.Dispatcher
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 
 object TestUtils {
     data class TestContext(
@@ -371,4 +375,82 @@ object TestUtils {
             outputWriter.flush()
         }
     }
+}
+
+const val APP_ID_OK = "1a978a70-1709-40c1-82d7-30114edfc46b"
+
+fun createOidcMockServer(): MockWebServer {
+    val server = MockWebServer()
+
+    server.dispatcher =
+        object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse =
+                when (request.path) {
+                    "/realms/paas/protocol/openid-connect/token" -> {
+                        val body = request.body.readUtf8()
+                        if (body.contains("client_secret=wrong")) {
+                            MockResponse()
+                                .setResponseCode(401)
+                                .setBody("Client Error.")
+                        } else if (body.contains("grant_type=client_credentials")) {
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setHeader("Content-Type", "application/json")
+                                .setBody(
+                                    """
+                                    {
+                                        "access_token": "mock-access-token",
+                                        "token_type": "bearer",
+                                        "expires_in": 3600
+                                    }
+                                    """.trimIndent(),
+                                )
+                        } else {
+                            MockResponse().setResponseCode(400)
+                        }
+                    }
+
+                    else -> MockResponse().setResponseCode(404)
+                }
+        }
+
+    return server
+}
+
+fun createNcMockServer(additionalPaths: Map<String, MockResponse> = emptyMap()): MockWebServer {
+    val server = MockWebServer()
+
+    server.dispatcher =
+        object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse =
+                when (request.path) {
+                    "/api/v1/tenants" -> {
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setHeader("Content-Type", "application/json")
+                            .setBody(
+                                """
+                                [
+                                  {
+                                    "id": "80031abc-641b-4330-a473-16fd6d5ae305",
+                                    "name": "tenantname",
+                                    "slug": "tenantslug",
+                                    "applications": [
+                                      {
+                                        "id": "$APP_ID_OK",
+                                        "name": "appname",
+                                        "slug": "appslug"
+                                      }
+                                    ]
+                                  }
+                                ]
+                                """.trimIndent(),
+                            )
+                    }
+
+                    else -> additionalPaths[request.path] ?: MockResponse().setResponseCode(404)
+                }
+        }
+
+    return server
 }
