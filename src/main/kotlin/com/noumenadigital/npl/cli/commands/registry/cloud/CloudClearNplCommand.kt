@@ -113,7 +113,12 @@ class CloudClearNplCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            cloudDeployService.clearApp()
+            cloudDeployService.executeWithOptionalServiceAccount(
+                output,
+                "clear NPL sources to NOUMENA Cloud",
+                { token -> cloudDeployService.clearAppWithToken(token) },
+                { cloudDeployService.clearApp() },
+            )
             output.success("NPL sources successfully cleared from NOUMENA Cloud app.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {
