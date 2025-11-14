@@ -4,9 +4,9 @@ import com.noumenadigital.npl.cli.TestUtils.normalize
 import com.noumenadigital.npl.cli.TestUtils.runCommand
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import java.io.File
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import java.io.File
 
 class CloudServiceAccountDeployFrontendCommandIT :
     FunSpec({
@@ -15,23 +15,25 @@ class CloudServiceAccountDeployFrontendCommandIT :
             var mockOidc: MockWebServer = MockWebServer()
             var mockNC: MockWebServer = MockWebServer()
 
-            val additionalNcPaths = mapOf(
-                "/api/v1/applications/$APP_ID_OK/uploadwebsite" to MockResponse()
-                    .setResponseCode(200)
-                    .setHeader("Content-Type", "application/json")
-                    .setBody(
-                        """
-                        {
-                            "id": "$APP_ID_OK",
-                            "name": "appname",
-                            "slug": "appslug",
-                            "website_deployed_at": "2025-07-11T08:23:27.339077571Z",
-                            "website_file_name": "tenantslug_appslug_20250711_082327.zip",
-                            "website_url": "https://tenantslug-appslug.noumena.cloud"
-                        }
-                        """.trimIndent(),
-                    )
-            )
+            val additionalNcPaths =
+                mapOf(
+                    "/api/v1/applications/$APP_ID_OK/uploadwebsite" to
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setHeader("Content-Type", "application/json")
+                            .setBody(
+                                """
+                                {
+                                    "id": "$APP_ID_OK",
+                                    "name": "appname",
+                                    "slug": "appslug",
+                                    "website_deployed_at": "2025-07-11T08:23:27.339077571Z",
+                                    "website_file_name": "tenantslug_appslug_20250711_082327.zip",
+                                    "website_url": "https://tenantslug-appslug.noumena.cloud"
+                                }
+                                """.trimIndent(),
+                            ),
+                )
 
             fun setupMockServers() {
                 mockOidc = createOidcMockServer()

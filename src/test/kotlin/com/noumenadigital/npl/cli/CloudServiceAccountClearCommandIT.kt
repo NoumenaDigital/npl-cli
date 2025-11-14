@@ -15,28 +15,31 @@ class CloudServiceAccountClearCommandIT :
             var mockOidc: MockWebServer = MockWebServer()
             var mockNC: MockWebServer = MockWebServer()
 
-            val additionalNcPaths = mapOf(
-                "/api/v1/applications/$APP_ID_OK/deploy" to MockResponse()
-                    .setResponseCode(200)
-                    .setHeader("Content-Type", "application/json")
-                    .setBody(
-                        """
-                        {
-                          "status": "deployed"
-                        }
-                        """.trimIndent(),
-                    ),
-                "/api/v1/applications/$APP_ID_OK/clear" to MockResponse()
-                    .setResponseCode(200)
-                    .setHeader("Content-Type", "application/json")
-                    .setBody(
-                        """
-                        {
-                          "status": "removed"
-                        }
-                        """.trimIndent(),
-                    )
-            )
+            val additionalNcPaths =
+                mapOf(
+                    "/api/v1/applications/$APP_ID_OK/deploy" to
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setHeader("Content-Type", "application/json")
+                            .setBody(
+                                """
+                                {
+                                  "status": "deployed"
+                                }
+                                """.trimIndent(),
+                            ),
+                    "/api/v1/applications/$APP_ID_OK/clear" to
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setHeader("Content-Type", "application/json")
+                            .setBody(
+                                """
+                                {
+                                  "status": "removed"
+                                }
+                                """.trimIndent(),
+                            ),
+                )
 
             fun setupMockServers() {
                 mockOidc = createOidcMockServer()

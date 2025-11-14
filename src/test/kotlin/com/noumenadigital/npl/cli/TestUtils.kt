@@ -12,6 +12,10 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
+import okhttp3.mockwebserver.Dispatcher
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.intellij.lang.annotations.Language
 import java.io.File
 import java.io.PipedInputStream
@@ -21,10 +25,6 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.nio.file.Path
 import java.nio.file.Paths
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
 
 object TestUtils {
     data class TestContext(

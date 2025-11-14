@@ -1,7 +1,6 @@
 package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.http.NoumenaCloudClient
-import com.noumenadigital.npl.cli.service.ColorWriter
 
 class CloudDeployService(
     val cloudAuthManager: CloudAuthManager,
@@ -25,9 +24,7 @@ class CloudDeployService(
         noumenaCloudClient.clearApplication(token, tenants)
     }
 
-    fun clearAppWithToken(
-        accessToken: String,
-    ) {
+    fun clearAppWithToken(accessToken: String) {
         val tenants = noumenaCloudClient.fetchTenants(accessToken)
         noumenaCloudClient.clearApplication(accessToken, tenants)
     }
