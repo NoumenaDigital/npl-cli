@@ -48,8 +48,8 @@ class CloudDeployService(
     fun executeWithOptionalServiceAccount(
         output: ColorWriter,
         actionName: String,
-        actionWithToken: (String) -> Unit,
-        actionWithoutToken: () -> Unit,
+        actionWithSerAcc: (String) -> Unit,
+        actionWithUserLogin: () -> Unit,
     ) {
         val saClientId = noumenaCloudClient.config.tenantSlug
         val saClientSecret =
@@ -60,9 +60,9 @@ class CloudDeployService(
             output.info("Preparing to $actionName using service account...")
             val accessToken = cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
             output.success("Successfully authenticated with service account credentials")
-            actionWithToken(accessToken)
+            actionWithSerAcc(accessToken)
         } else {
-            actionWithoutToken()
+            actionWithUserLogin()
         }
     }
 
