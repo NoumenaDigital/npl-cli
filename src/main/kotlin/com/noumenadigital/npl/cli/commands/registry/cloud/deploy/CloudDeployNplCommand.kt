@@ -148,11 +148,10 @@ class CloudDeployNplCommand(
         try {
             val archive = sourcesManager.getArchivedSources()
 
-            cloudDeployService.executeWithOptionalServiceAccount(
-                output,
-                "deploy NPL application to NOUMENA Cloud",
-                { token -> cloudDeployService.deployNplApplicationWithToken(archive, token) },
-                { cloudDeployService.deployNplApplication(archive) },
+            cloudDeployService.deployNplApplication(
+                archive = archive,
+                output = output,
+                actionName = "deploy NPL application to NOUMENA Cloud",
             )
 
             output.success("NPL Application successfully deployed to NOUMENA Cloud.")

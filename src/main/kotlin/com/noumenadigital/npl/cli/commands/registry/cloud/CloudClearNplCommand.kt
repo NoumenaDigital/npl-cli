@@ -93,7 +93,7 @@ class CloudClearNplCommand(
     private val clientSecret: String,
     private val authUrl: String,
 ) : CommandExecutor {
-    val noumenaCloudAuthConfig =
+    private val noumenaCloudAuthConfig =
         NoumenaCloudAuthConfig.get(
             clientId = clientId,
             clientSecret = clientSecret,
@@ -113,12 +113,7 @@ class CloudClearNplCommand(
 
     override fun execute(output: ColorWriter): ExitCode {
         try {
-            cloudDeployService.executeWithOptionalServiceAccount(
-                output,
-                "clear NPL sources to NOUMENA Cloud",
-                { token -> cloudDeployService.clearAppWithToken(token) },
-                { cloudDeployService.clearApp() },
-            )
+            cloudDeployService.clearApp(output, "clear NPL sources to NOUMENA Cloud")
             output.success("NPL sources successfully cleared from NOUMENA Cloud app.")
             return ExitCode.SUCCESS
         } catch (ex: Exception) {

@@ -6,71 +6,53 @@ class CloudDeployService(
     val cloudAuthManager: CloudAuthManager,
     val noumenaCloudClient: NoumenaCloudClient,
 ) {
-    fun deployNplApplication(archive: ByteArray) {
-        val token = getAccessToken()
+    fun deployNplApplication(
+        archive: ByteArray,
+        output: ColorWriter? = null,
+        actionName: String? = null,
+    ) {
+        val token = getAccessToken(output, actionName)
         val tenants = noumenaCloudClient.fetchTenants(token)
         noumenaCloudClient.uploadApplicationArchive(token, archive, tenants)
     }
 
-    fun deployFrontend(archive: ByteArray) {
-        val token = getAccessToken()
+    fun deployFrontend(
+        archive: ByteArray,
+        output: ColorWriter? = null,
+        actionName: String? = null,
+    ) {
+        val token = getAccessToken(output, actionName)
         val tenants = noumenaCloudClient.fetchTenants(token)
         noumenaCloudClient.uploadFrontendArchive(token, archive, tenants)
     }
 
-    fun clearApp() {
-        val token = getAccessToken()
+    fun clearApp(
+        output: ColorWriter? = null,
+        actionName: String? = null,
+    ) {
+        val token = getAccessToken(output, actionName)
         val tenants = noumenaCloudClient.fetchTenants(token)
         noumenaCloudClient.clearApplication(token, tenants)
     }
 
-    fun clearAppWithToken(accessToken: String) {
-        val tenants = noumenaCloudClient.fetchTenants(accessToken)
-        noumenaCloudClient.clearApplication(accessToken, tenants)
-    }
-
-    fun deployNplApplicationWithToken(
-        archive: ByteArray,
-        accessToken: String,
-    ) {
-        val tenants = noumenaCloudClient.fetchTenants(accessToken)
-        noumenaCloudClient.uploadApplicationArchive(accessToken, archive, tenants)
-    }
-
-    fun deployFrontendWithToken(
-        archive: ByteArray,
-        accessToken: String,
-    ) {
-        val tenants = noumenaCloudClient.fetchTenants(accessToken)
-        noumenaCloudClient.uploadFrontendArchive(accessToken, archive, tenants)
-    }
-
-    fun executeWithOptionalServiceAccount(
-        output: ColorWriter,
-        actionName: String,
-        actionWithSerAcc: (String) -> Unit,
-        actionWithUserLogin: () -> Unit,
-    ) {
+    private fun getAccessToken(
+        output: ColorWriter? = null,
+        actionName: String? = null,
+    ): String {
         val saClientId = noumenaCloudClient.config.tenantSlug
         val saClientSecret =
             System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
                 ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
 
         if (!saClientSecret.isNullOrBlank()) {
-            output.info("Preparing to $actionName using service account...")
-            val accessToken = cloudAuthManager.getServiceAccountAccessToken(saClientId, saClientSecret)
-            output.success("Successfully authenticated with service account credentials")
-            actionWithSerAcc(accessToken)
+            output?.info("Preparing to $actionName using service account...")
+            return cloudAuthManager.getServiceAccountAccessToken(output, saClientId, saClientSecret)
         } else {
-            actionWithUserLogin()
+            val token = cloudAuthManager.getToken()
+            if (token.accessToken == null) {
+                throw IllegalStateException("Access token is not available. Please authenticate with `npl cloud login` command first.")
+            }
+            return token.accessToken
         }
-    }
-
-    private fun getAccessToken(): String {
-        val token = cloudAuthManager.getToken()
-        if (token.accessToken == null) {
-            throw IllegalStateException("Access token is not available. Please authenticate with `npl cloud login` command first.")
-        }
-        return token.accessToken
     }
 }

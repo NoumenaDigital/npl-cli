@@ -135,11 +135,10 @@ class CloudDeployFrontendCommand(
         try {
             val archive = sourcesManager.getArchivedSources()
 
-            cloudDeployService.executeWithOptionalServiceAccount(
-                output,
-                "deploy frontend to NOUMENA Cloud",
-                { token -> cloudDeployService.deployFrontendWithToken(archive, token) },
-                { cloudDeployService.deployFrontend(archive) },
+            cloudDeployService.deployFrontend(
+                archive = archive,
+                output = output,
+                actionName = "deploy frontend to NOUMENA Cloud",
             )
 
             output.success("Frontend successfully deployed to NOUMENA Cloud.")
