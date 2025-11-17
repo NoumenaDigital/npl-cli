@@ -109,7 +109,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: ${mockEngine.url("/")}
@@ -148,7 +148,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: $engineUrl
@@ -198,7 +198,7 @@ class DeployCommandIT :
                       managementUrl: ${mockEngine.url("/")}
                       username: user1
                       password: password1
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clear: true
 
                     structure:
@@ -233,7 +233,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       managementUrl: ${mockEngine.url("/")}
                       username: user2
                       password: password2
@@ -279,7 +279,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       managementUrl: ${mockEngine.url("/")}
                       username: user2
                       password: password2
@@ -350,7 +350,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clear: true
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
@@ -413,7 +413,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clear: true
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
@@ -486,7 +486,7 @@ class DeployCommandIT :
                     TestUtils.withYamlConfig(
                         """
                         local:
-                          authUrl: ${oidcUrl}realms/noumena
+                          authUrl: $oidcUrl/realms/noumena
                           clientId: nm-platform-service-client
                           clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                           managementUrl: $engineUrl
@@ -548,7 +548,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: $engineUrl
@@ -562,7 +562,7 @@ class DeployCommandIT :
                     val (output, exitCode) = executeDeployCommand()
 
                     output.normalize() shouldBe
-                        buildExpectedErrorMessage("${oidcUrl}realms/noumena", engineUrl, "Error deploying NPL sources")
+                        buildExpectedErrorMessage("$oidcUrl/realms/noumena", engineUrl, "Error deploying NPL sources")
                     exitCode shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -577,7 +577,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: $engineUrl
@@ -591,7 +591,7 @@ class DeployCommandIT :
                     val (output, exitCode) = executeDeployCommand()
 
                     output.normalize() shouldBe
-                        buildExpectedErrorMessage("${oidcUrl}realms/noumena", engineUrl, "Error deploying NPL sources")
+                        buildExpectedErrorMessage("$oidcUrl/realms/noumena", engineUrl, "Error deploying NPL sources")
                     exitCode shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -612,7 +612,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: $engineUrl
@@ -626,7 +626,7 @@ class DeployCommandIT :
                     val (output, exitCode) = executeDeployCommand()
 
                     output.normalize() shouldBe
-                        buildExpectedErrorMessage("${oidcUrl}realms/noumena", engineUrl, "Error deploying NPL sources")
+                        buildExpectedErrorMessage("$oidcUrl/realms/noumena", engineUrl, "Error deploying NPL sources")
                     exitCode shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -641,7 +641,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: $engineUrl
@@ -656,7 +656,7 @@ class DeployCommandIT :
                     val (output, exitCode) = executeDeployCommand()
 
                     output.normalize() shouldBe
-                        buildExpectedErrorMessage("${oidcUrl}realms/noumena", engineUrl, "Failed to clear application contents")
+                        buildExpectedErrorMessage("$oidcUrl/realms/noumena", engineUrl, "Failed to clear application contents")
                     exitCode shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
