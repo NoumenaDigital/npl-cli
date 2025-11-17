@@ -8,8 +8,8 @@ class CloudDeployService(
 ) {
     fun deployNplApplication(
         archive: ByteArray,
-        output: ColorWriter? = null,
-        actionName: String? = null,
+        output: ColorWriter,
+        actionName: String,
     ) {
         val token = getAccessToken(output, actionName)
         val tenants = noumenaCloudClient.fetchTenants(token)
@@ -18,8 +18,8 @@ class CloudDeployService(
 
     fun deployFrontend(
         archive: ByteArray,
-        output: ColorWriter? = null,
-        actionName: String? = null,
+        output: ColorWriter,
+        actionName: String,
     ) {
         val token = getAccessToken(output, actionName)
         val tenants = noumenaCloudClient.fetchTenants(token)
@@ -27,8 +27,8 @@ class CloudDeployService(
     }
 
     fun clearApp(
-        output: ColorWriter? = null,
-        actionName: String? = null,
+        output: ColorWriter,
+        actionName: String,
     ) {
         val token = getAccessToken(output, actionName)
         val tenants = noumenaCloudClient.fetchTenants(token)
@@ -36,8 +36,8 @@ class CloudDeployService(
     }
 
     private fun getAccessToken(
-        output: ColorWriter? = null,
-        actionName: String? = null,
+        output: ColorWriter,
+        actionName: String,
     ): String {
         val saClientId = noumenaCloudClient.config.tenantSlug
         val saClientSecret =
@@ -45,7 +45,7 @@ class CloudDeployService(
                 ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
 
         if (!saClientSecret.isNullOrBlank()) {
-            output?.info("Preparing to $actionName using service account...")
+            output.info("Preparing to $actionName using service account...")
             return cloudAuthManager.getServiceAccountAccessToken(output, saClientId, saClientSecret)
         } else {
             val token = cloudAuthManager.getToken()

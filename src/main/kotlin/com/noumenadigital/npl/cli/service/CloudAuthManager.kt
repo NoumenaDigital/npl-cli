@@ -71,7 +71,7 @@ class CloudAuthManager(
     }
 
     fun getServiceAccountAccessToken(
-        output: ColorWriter? = null,
+        output: ColorWriter,
         clientId: String,
         clientSecret: String,
     ): String {
@@ -84,7 +84,7 @@ class CloudAuthManager(
         if (accessToken.isNullOrBlank()) {
             throw CloudCommandException("Access token is not available for the provided service account credentials.")
         }
-        output?.info("Successfully authenticated with service account credentials")
+        output.info("Successfully authenticated with service account credentials")
         return accessToken
     }
 
