@@ -30,6 +30,7 @@ data class DeployConfigException(
 data class ClientSetupException(
     override val message: String,
     override val cause: Throwable? = null,
+    val isConnectionError: Boolean = false,
 ) : InternalException()
 
 class RequiredParameterMissing(

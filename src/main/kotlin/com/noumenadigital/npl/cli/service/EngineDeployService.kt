@@ -7,6 +7,25 @@ import com.noumenadigital.platform.client.auth.AuthorizationFailedAuthTokenExcep
 import com.noumenadigital.platform.client.auth.TokenAuthorizationProvider
 import com.noumenadigital.platform.client.auth.UserConfiguration
 import com.noumenadigital.platform.client.engine.ManagementHttpClient
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+
+private object ConnectionErrorPatterns {
+    const val CONNECTION_REFUSED = "connection refused"
+    const val CONNECTION_RESET = "connection reset"
+    const val CONNECTION_TIMED_OUT = "connection timed out"
+    const val FAILED_TO_CONNECT = "failed to connect"
+    const val NO_ROUTE_TO_HOST = "no route to host"
+
+    val PATTERNS =
+        listOf(
+            CONNECTION_REFUSED,
+            CONNECTION_RESET,
+            CONNECTION_TIMED_OUT,
+            FAILED_TO_CONNECT,
+            NO_ROUTE_TO_HOST,
+        )
+}
 
 sealed class DeployResult {
     data object Success : DeployResult()
@@ -44,8 +63,8 @@ class DeployService(
             DeployResult.ClearFailed(wrapException(e))
         }
 
-    fun deploySourcesAndMigrations(srcDir: String): DeployResult =
-        try {
+    fun deploySourcesAndMigrations(srcDir: String): DeployResult {
+        return try {
             val context = setupClientContextInternal()
             context.managementClient.deploySourcesWithMigrations(
                 sourceDirectory = srcDir,
@@ -53,6 +72,7 @@ class DeployService(
             )
             DeployResult.Success
         } catch (e: AuthorizationFailedAuthTokenException) {
+            if (isConnectionError(e)) return DeployResult.DeploymentFailed(wrapException(e))
             throw AuthorizationFailedException(
                 message =
                     e.message
@@ -62,6 +82,7 @@ class DeployService(
         } catch (e: Exception) {
             DeployResult.DeploymentFailed(wrapException(e))
         }
+    }
 
     private fun setupClientContextInternal(): ClientContext {
         try {
@@ -77,19 +98,77 @@ class DeployService(
 
             return ClientContext(managementClient, authProvider)
         } catch (e: Exception) {
-            throw ClientSetupException("Client setup failed: ${e.message}", e)
+            if (isConnectionError(e)) {
+                throw ClientSetupException(
+                    message = buildConnectionErrorMessage(),
+                    cause = e,
+                    isConnectionError = true,
+                )
+            } else {
+                throw ClientSetupException("Client setup failed: ${e.message}", e)
+            }
         }
     }
 
     private fun wrapException(e: Exception): Exception =
         when (e) {
-            is AuthorizationFailedAuthTokenException ->
-                AuthorizationFailedException(
-                    message = e.message ?: "Authorization failed for $managementUrl",
-                    cause = e,
-                )
+            is AuthorizationFailedAuthTokenException -> {
+                if (isConnectionError(e)) {
+                    ClientSetupException(
+                        message = buildConnectionErrorMessage(),
+                        cause = e,
+                        isConnectionError = true,
+                    )
+                } else {
+                    AuthorizationFailedException(
+                        message = e.message ?: "Authorization failed for $managementUrl",
+                        cause = e,
+                    )
+                }
+            }
 
             is ClientSetupException -> e
-            else -> e
+            else -> {
+                if (isConnectionError(e)) {
+                    ClientSetupException(
+                        message = buildConnectionErrorMessage(),
+                        cause = e,
+                        isConnectionError = true,
+                    )
+                } else {
+                    e
+                }
+            }
         }
+
+    private fun buildConnectionErrorMessage(): String {
+        val urlList = formatServiceUrls()
+        return "Engine or authorization service not found at $urlList. Please check that the service is running, healthy and accessible."
+    }
+
+    private fun formatServiceUrls(): String {
+        val urls = getServiceUrls()
+        return urls.joinToString(" or ") { "`$it`" }
+    }
+
+    private fun getServiceUrls(): List<String> = listOfNotNull(authUrl, managementUrl).distinct()
+
+    private fun isConnectionError(e: Exception): Boolean {
+        fun isConnectionException(ex: Throwable?): Boolean {
+            if (ex == null) return false
+
+            return when (ex) {
+                is ConnectException -> true
+                is SocketTimeoutException -> true
+                else -> {
+                    val message = ex.message ?: ""
+                    ConnectionErrorPatterns.PATTERNS.any { pattern ->
+                        message.contains(pattern, ignoreCase = true)
+                    }
+                }
+            }
+        }
+
+        return isConnectionException(e) || isConnectionException(e.cause)
+    }
 }
