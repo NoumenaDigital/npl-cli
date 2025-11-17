@@ -597,8 +597,14 @@ class DeployCommandIT :
             }
 
             test("both services not running - connection refused") {
-                val engineUrl = "http://localhost:${getUnusedPort()}"
-                val oidcUrl = "http://localhost:${getUnusedPort()}"
+                // Ensure two distinct unused ports
+                var port1 = getUnusedPort()
+                var port2 = getUnusedPort()
+                while (port1 == port2) {
+                    port2 = getUnusedPort()
+                }
+                val engineUrl = "http://localhost:$port1"
+                val oidcUrl = "http://localhost:$port2"
 
                 val testDirPath =
                     getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString().toYamlSafePath()
