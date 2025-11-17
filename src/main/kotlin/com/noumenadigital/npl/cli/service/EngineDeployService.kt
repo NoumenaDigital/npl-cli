@@ -99,11 +99,7 @@ class DeployService(
             return ClientContext(managementClient, authProvider)
         } catch (e: Exception) {
             if (isConnectionError(e)) {
-                throw ClientSetupException(
-                    message = buildConnectionErrorMessage(),
-                    cause = e,
-                    isConnectionError = true,
-                )
+                throw createConnectionErrorException(e)
             } else {
                 throw ClientSetupException("Client setup failed: ${e.message}", e)
             }
@@ -114,11 +110,7 @@ class DeployService(
         when (e) {
             is AuthorizationFailedAuthTokenException -> {
                 if (isConnectionError(e)) {
-                    ClientSetupException(
-                        message = buildConnectionErrorMessage(),
-                        cause = e,
-                        isConnectionError = true,
-                    )
+                    createConnectionErrorException(e)
                 } else {
                     AuthorizationFailedException(
                         message = e.message ?: "Authorization failed for $managementUrl",
@@ -130,16 +122,19 @@ class DeployService(
             is ClientSetupException -> e
             else -> {
                 if (isConnectionError(e)) {
-                    ClientSetupException(
-                        message = buildConnectionErrorMessage(),
-                        cause = e,
-                        isConnectionError = true,
-                    )
+                    createConnectionErrorException(e)
                 } else {
                     e
                 }
             }
         }
+
+    private fun createConnectionErrorException(e: Exception): ClientSetupException =
+        ClientSetupException(
+            message = buildConnectionErrorMessage(),
+            cause = e,
+            isConnectionError = true,
+        )
 
     private fun buildConnectionErrorMessage(): String {
         val urlList = formatServiceUrls()
