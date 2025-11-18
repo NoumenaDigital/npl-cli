@@ -103,7 +103,7 @@ class CloudLoginCommandIT :
                             listOf(
                                 "cloud",
                                 "login",
-                                "--url",
+                                "--auth-url",
                                 "${mockOidc.url("/realms/paas/")}",
                                 "--client-id",
                                 "paas",
@@ -139,7 +139,7 @@ class CloudLoginCommandIT :
                             listOf(
                                 "cloud",
                                 "login",
-                                "--url",
+                                "--auth-url",
                                 "nonexistent-url",
                                 "--client-id",
                                 "paas",
@@ -172,7 +172,7 @@ class CloudLoginCommandIT :
                     TestUtils.withYamlConfig(
                         """
                         cloud:
-                            url: ${mockOidc.url("/realms/paas/")}
+                            authUrl: ${mockOidc.url("/realms/paas/")}
                             clientId: paas
                             clientSecret: paas
                         """.trimIndent(),

@@ -200,7 +200,7 @@ class CloudClearCommandIT :
                         listOf(
                             "cloud",
                             "login",
-                            "--url",
+                            "--auth-url",
                             context.mockOidc.url("/realms/paas/").toString(),
                             "--client-id",
                             "client-id-ok",

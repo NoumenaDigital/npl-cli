@@ -103,7 +103,7 @@ class CloudLogoutCommandIT :
                             listOf(
                                 "cloud",
                                 "login",
-                                "--url",
+                                "--auth-url",
                                 "${mockOidc.url("/realms/paas/")}",
                                 "--client-id",
                                 "paas",
