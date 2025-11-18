@@ -88,7 +88,7 @@ jobs:
             output_name: npl-cli-linux-aarch64-${{needs.determine-version.outputs.version}}
             static: false
           - os: macos
-            runner: macos-13
+            runner: macos-15-intel
             arch: x86_64
             output_name: npl-cli-macos-x86_64-${{needs.determine-version.outputs.version}}
             sign_and_notarize: true
