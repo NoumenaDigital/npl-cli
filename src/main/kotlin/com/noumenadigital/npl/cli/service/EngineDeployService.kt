@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
+import com.noumenadigital.npl.cli.exception.ConnectionErrorPatterns
 import com.noumenadigital.platform.client.auth.AuthConfiguration
 import com.noumenadigital.platform.client.auth.AuthorizationFailedAuthTokenException
 import com.noumenadigital.platform.client.auth.TokenAuthorizationProvider
@@ -9,23 +10,6 @@ import com.noumenadigital.platform.client.auth.UserConfiguration
 import com.noumenadigital.platform.client.engine.ManagementHttpClient
 import java.net.ConnectException
 import java.net.SocketTimeoutException
-
-private object ConnectionErrorPatterns {
-    const val CONNECTION_REFUSED = "connection refused"
-    const val CONNECTION_RESET = "connection reset"
-    const val CONNECTION_TIMED_OUT = "connection timed out"
-    const val FAILED_TO_CONNECT = "failed to connect"
-    const val NO_ROUTE_TO_HOST = "no route to host"
-
-    val PATTERNS =
-        listOf(
-            CONNECTION_REFUSED,
-            CONNECTION_RESET,
-            CONNECTION_TIMED_OUT,
-            FAILED_TO_CONNECT,
-            NO_ROUTE_TO_HOST,
-        )
-}
 
 sealed class DeployResult {
     data object Success : DeployResult()
