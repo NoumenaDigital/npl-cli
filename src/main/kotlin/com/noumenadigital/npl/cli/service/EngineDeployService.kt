@@ -59,7 +59,10 @@ class DeployService(
             if (isConnectionError(e)) return DeployResult.DeploymentFailed(wrapException(e))
             throw AuthorizationFailedException(
                 message =
-                    e.message?.removePrefix("Authorization exception: ")?.trim()
+                    e.message
+                        ?.removePrefix("Authorization exception: ")
+                        ?.trim()
+                        ?.takeIf { it.isNotBlank() }
                         ?: "Authorization failed for clientId: $clientId, authUrl: $authUrl, username: $username",
                 cause = e,
             )
@@ -98,7 +101,10 @@ class DeployService(
                 } else {
                     AuthorizationFailedException(
                         message =
-                            e.message?.removePrefix("Authorization exception: ")?.trim()
+                            e.message
+                                ?.removePrefix("Authorization exception: ")
+                                ?.trim()
+                                ?.takeIf { it.isNotBlank() }
                                 ?: "Authorization failed for $managementUrl",
                         cause = e,
                     )
