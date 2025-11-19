@@ -2,11 +2,14 @@ package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.exception.AuthorizationFailedException
 import com.noumenadigital.npl.cli.exception.ClientSetupException
+import com.noumenadigital.npl.cli.exception.ConnectionErrorPatterns
 import com.noumenadigital.platform.client.auth.AuthConfiguration
 import com.noumenadigital.platform.client.auth.AuthorizationFailedAuthTokenException
 import com.noumenadigital.platform.client.auth.TokenAuthorizationProvider
 import com.noumenadigital.platform.client.auth.UserConfiguration
 import com.noumenadigital.platform.client.engine.ManagementHttpClient
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 
 sealed class DeployResult {
     data object Success : DeployResult()
@@ -44,8 +47,8 @@ class DeployService(
             DeployResult.ClearFailed(wrapException(e))
         }
 
-    fun deploySourcesAndMigrations(srcDir: String): DeployResult =
-        try {
+    fun deploySourcesAndMigrations(srcDir: String): DeployResult {
+        return try {
             val context = setupClientContextInternal()
             context.managementClient.deploySourcesWithMigrations(
                 sourceDirectory = srcDir,
@@ -53,15 +56,20 @@ class DeployService(
             )
             DeployResult.Success
         } catch (e: AuthorizationFailedAuthTokenException) {
+            if (isConnectionError(e)) return DeployResult.DeploymentFailed(wrapException(e))
             throw AuthorizationFailedException(
                 message =
                     e.message
+                        ?.removePrefix("Authorization exception: ")
+                        ?.trim()
+                        ?.takeIf { it.isNotBlank() }
                         ?: "Authorization failed for clientId: $clientId, authUrl: $authUrl, username: $username",
                 cause = e,
             )
         } catch (e: Exception) {
             DeployResult.DeploymentFailed(wrapException(e))
         }
+    }
 
     private fun setupClientContextInternal(): ClientContext {
         try {
@@ -77,19 +85,77 @@ class DeployService(
 
             return ClientContext(managementClient, authProvider)
         } catch (e: Exception) {
-            throw ClientSetupException("Client setup failed: ${e.message}", e)
+            if (isConnectionError(e)) {
+                throw createConnectionErrorException(e)
+            } else {
+                throw ClientSetupException("Client setup failed: ${e.message}", e)
+            }
         }
     }
 
     private fun wrapException(e: Exception): Exception =
         when (e) {
-            is AuthorizationFailedAuthTokenException ->
-                AuthorizationFailedException(
-                    message = e.message ?: "Authorization failed for $managementUrl",
-                    cause = e,
-                )
+            is AuthorizationFailedAuthTokenException -> {
+                if (isConnectionError(e)) {
+                    createConnectionErrorException(e)
+                } else {
+                    AuthorizationFailedException(
+                        message =
+                            e.message
+                                ?.removePrefix("Authorization exception: ")
+                                ?.trim()
+                                ?.takeIf { it.isNotBlank() }
+                                ?: "Authorization failed for $managementUrl",
+                        cause = e,
+                    )
+                }
+            }
 
             is ClientSetupException -> e
-            else -> e
+            else -> {
+                if (isConnectionError(e)) {
+                    createConnectionErrorException(e)
+                } else {
+                    e
+                }
+            }
         }
+
+    private fun createConnectionErrorException(e: Exception): ClientSetupException =
+        ClientSetupException(
+            message = buildConnectionErrorMessage(),
+            cause = e,
+            isConnectionError = true,
+        )
+
+    private fun buildConnectionErrorMessage(): String {
+        val urlList = formatServiceUrls()
+        return "Engine or authorization service not found at $urlList. Please check that the service is running, healthy and accessible."
+    }
+
+    private fun formatServiceUrls(): String {
+        val urls = getServiceUrls()
+        return urls.joinToString(" or ") { "`$it`" }
+    }
+
+    private fun getServiceUrls(): List<String> = listOfNotNull(authUrl, managementUrl).distinct()
+
+    private fun isConnectionError(e: Exception): Boolean {
+        fun isConnectionException(ex: Throwable?): Boolean {
+            if (ex == null) return false
+
+            return when (ex) {
+                is ConnectException -> true
+                is SocketTimeoutException -> true
+                else -> {
+                    val message = ex.message ?: ""
+                    ConnectionErrorPatterns.PATTERNS.any { pattern ->
+                        message.contains(pattern, ignoreCase = true)
+                    }
+                }
+            }
+        }
+
+        return isConnectionException(e) || isConnectionException(e.cause)
+    }
 }

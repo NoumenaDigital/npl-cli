@@ -27,7 +27,7 @@ fun CommandNotFoundException.buildOutputMessage(): String {
 fun Exception.buildOutputMessage(inputArgs: List<String>): String =
     "Executing command: [${inputArgs.joinToString(" ")}] FAILED. Error: ${stackTraceToString().trim()}"
 
-fun CommandValidationException.buildOutputMessage(inputArgs: List<String>): String = this.message
+fun CommandValidationException.buildOutputMessage(): String = this.message
 
 fun DeployConfigException.buildOutputMessage(): String {
     val errorLines =
@@ -39,7 +39,12 @@ fun DeployConfigException.buildOutputMessage(): String {
     return "Configuration errors:\n$errorLines"
 }
 
-fun ClientSetupException.buildOutputMessage(): String = "Client setup error: ${this.message}"
+fun ClientSetupException.buildOutputMessage(): String =
+    if (this.isConnectionError) {
+        this.message
+    } else {
+        "Client setup error: ${this.message}"
+    }
 
 fun ArgumentParsingException.buildOutputMessage(): String = this.message
 

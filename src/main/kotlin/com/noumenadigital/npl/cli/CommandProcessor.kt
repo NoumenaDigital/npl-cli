@@ -45,7 +45,7 @@ class CommandProcessor(
                     }
 
                     is CommandValidationException -> {
-                        output.error(ex.buildOutputMessage(inputArgs))
+                        output.error(ex.buildOutputMessage())
                         return ExitCode.GENERAL_ERROR
                     }
 

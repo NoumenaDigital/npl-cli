@@ -30,6 +30,7 @@ data class DeployConfigException(
 data class ClientSetupException(
     override val message: String,
     override val cause: Throwable? = null,
+    val isConnectionError: Boolean = false,
 ) : InternalException()
 
 class RequiredParameterMissing(
@@ -42,3 +43,20 @@ data class AuthorizationFailedException(
     override val message: String,
     override val cause: Throwable? = null,
 ) : InternalException()
+
+internal object ConnectionErrorPatterns {
+    const val CONNECTION_REFUSED = "connection refused"
+    const val CONNECTION_RESET = "connection reset"
+    const val CONNECTION_TIMED_OUT = "connection timed out"
+    const val FAILED_TO_CONNECT = "failed to connect"
+    const val NO_ROUTE_TO_HOST = "no route to host"
+
+    val PATTERNS =
+        listOf(
+            CONNECTION_REFUSED,
+            CONNECTION_RESET,
+            CONNECTION_TIMED_OUT,
+            FAILED_TO_CONNECT,
+            NO_ROUTE_TO_HOST,
+        )
+}

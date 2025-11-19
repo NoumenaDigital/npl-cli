@@ -12,6 +12,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import java.io.File
+import java.net.ServerSocket
 import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 
@@ -197,7 +198,7 @@ class DeployCommandIT :
                       managementUrl: ${mockEngine.url("/")}
                       username: user1
                       password: password1
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clear: true
 
                     structure:
@@ -349,7 +350,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clear: true
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
@@ -412,7 +413,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: ${oidcUrl}realms/noumena
+                      authUrl: $oidcUrl/realms/noumena
                       clear: true
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
@@ -501,7 +502,7 @@ class DeployCommandIT :
 
                         val expectedOutput =
                             """
-                            Authorization exception: Invalid client credentials
+                            Invalid client credentials
                             """.trimIndent()
 
                         output.normalize() shouldBe expectedOutput
@@ -510,6 +511,153 @@ class DeployCommandIT :
                 } finally {
                     tempDir.deleteRecursively()
                     cleanupMockServers()
+                }
+            }
+        }
+
+        context("connection errors") {
+            fun getUnusedPort(): Int {
+                ServerSocket(0).use { socket ->
+                    return socket.localPort
+                }
+            }
+
+            fun buildExpectedErrorMessage(
+                authUrl: String,
+                engineUrl: String,
+                prefix: String = "",
+            ): String {
+                val baseMessage =
+                    """
+                    Engine or authorization service not found at `$authUrl` or `$engineUrl`. Please check that the service is running, healthy and accessible.
+                    """.trimIndent()
+                return if (prefix.isBlank()) {
+                    baseMessage
+                } else {
+                    "$prefix: $baseMessage"
+                }
+            }
+
+            test("engine not running - connection refused") {
+                val engineUrl = "http://localhost:${getUnusedPort()}"
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val testDirPath =
+                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString().toYamlSafePath()
+
+                TestUtils.withYamlConfig(
+                    """
+                    local:
+                      authUrl: ${oidcUrl}realms/noumena
+                      clientId: nm-platform-service-client
+                      clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
+                      managementUrl: $engineUrl
+                      username: user1
+                      password: password1
+
+                    structure:
+                      sourceDir: $testDirPath
+                    """.trimIndent(),
+                ) {
+                    val (output, exitCode) = executeDeployCommand()
+
+                    output.normalize() shouldBe
+                        buildExpectedErrorMessage("${oidcUrl}realms/noumena", engineUrl, "Error deploying NPL sources")
+                    exitCode shouldBe ExitCode.GENERAL_ERROR.code
+                }
+            }
+
+            test("auth service not running - connection refused") {
+                val engineUrl = mockEngine.url("/").toString()
+                val oidcUrl = "http://localhost:${getUnusedPort()}"
+
+                val testDirPath =
+                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString().toYamlSafePath()
+
+                TestUtils.withYamlConfig(
+                    """
+                    local:
+                      authUrl: $oidcUrl/realms/noumena
+                      clientId: nm-platform-service-client
+                      clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
+                      managementUrl: $engineUrl
+                      username: user1
+                      password: password1
+
+                    structure:
+                      sourceDir: $testDirPath
+                    """.trimIndent(),
+                ) {
+                    val (output, exitCode) = executeDeployCommand()
+
+                    output.normalize() shouldBe
+                        buildExpectedErrorMessage("$oidcUrl/realms/noumena", engineUrl, "Error deploying NPL sources")
+                    exitCode shouldBe ExitCode.GENERAL_ERROR.code
+                }
+            }
+
+            test("both services not running - connection refused") {
+                // Ensure two distinct unused ports
+                var port1 = getUnusedPort()
+                var port2 = getUnusedPort()
+                while (port1 == port2) {
+                    port2 = getUnusedPort()
+                }
+                val engineUrl = "http://localhost:$port1"
+                val oidcUrl = "http://localhost:$port2"
+
+                val testDirPath =
+                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString().toYamlSafePath()
+
+                TestUtils.withYamlConfig(
+                    """
+                    local:
+                      authUrl: $oidcUrl/realms/noumena
+                      clientId: nm-platform-service-client
+                      clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
+                      managementUrl: $engineUrl
+                      username: user1
+                      password: password1
+
+                    structure:
+                      sourceDir: $testDirPath
+                    """.trimIndent(),
+                ) {
+                    val (output, exitCode) = executeDeployCommand()
+
+                    output.normalize() shouldBe
+                        buildExpectedErrorMessage("$oidcUrl/realms/noumena", engineUrl, "Error deploying NPL sources")
+                    exitCode shouldBe ExitCode.GENERAL_ERROR.code
+                }
+            }
+
+            test("connection error during clear operation") {
+                val engineUrl = "http://localhost:${getUnusedPort()}"
+                val oidcUrl = mockOidc.url("/").toString()
+
+                val testDirPath =
+                    getTestResourcesPath(listOf("deploy-success", "main")).toAbsolutePath().toString().toYamlSafePath()
+
+                TestUtils.withYamlConfig(
+                    """
+                    local:
+                      authUrl: ${oidcUrl}realms/noumena
+                      clientId: nm-platform-service-client
+                      clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
+                      managementUrl: $engineUrl
+                      username: user1
+                      password: password1
+                      clear: true
+
+                    structure:
+                      sourceDir: $testDirPath
+                    """.trimIndent(),
+                ) {
+                    val (output, exitCode) = executeDeployCommand()
+
+                    output.normalize() shouldBe
+                        buildExpectedErrorMessage("${oidcUrl}realms/noumena", engineUrl, "Failed to clear application contents")
+                    exitCode shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
         }
