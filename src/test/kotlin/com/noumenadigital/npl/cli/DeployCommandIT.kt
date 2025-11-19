@@ -562,7 +562,7 @@ class DeployCommandIT :
                     val (output, exitCode) = executeDeployCommand()
 
                     output.normalize() shouldBe
-                        buildExpectedErrorMessage("$oidcUrl/realms/noumena", engineUrl, "Error deploying NPL sources")
+                        buildExpectedErrorMessage("${oidcUrl}realms/noumena", engineUrl, "Error deploying NPL sources")
                     exitCode shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
@@ -656,7 +656,7 @@ class DeployCommandIT :
                     val (output, exitCode) = executeDeployCommand()
 
                     output.normalize() shouldBe
-                        buildExpectedErrorMessage("$oidcUrl/realms/noumena", engineUrl, "Failed to clear application contents")
+                        buildExpectedErrorMessage("${oidcUrl}realms/noumena", engineUrl, "Failed to clear application contents")
                     exitCode shouldBe ExitCode.GENERAL_ERROR.code
                 }
             }
