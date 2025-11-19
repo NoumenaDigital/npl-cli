@@ -109,7 +109,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: $oidcUrl/realms/noumena
+                      authUrl: ${oidcUrl}realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: ${mockEngine.url("/")}
@@ -148,7 +148,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: $oidcUrl/realms/noumena
+                      authUrl: ${oidcUrl}realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: $engineUrl
@@ -233,7 +233,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: $oidcUrl/realms/noumena
+                      authUrl: ${oidcUrl}realms/noumena
                       managementUrl: ${mockEngine.url("/")}
                       username: user2
                       password: password2
@@ -279,7 +279,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: $oidcUrl/realms/noumena
+                      authUrl: ${oidcUrl}realms/noumena
                       managementUrl: ${mockEngine.url("/")}
                       username: user2
                       password: password2
@@ -486,7 +486,7 @@ class DeployCommandIT :
                     TestUtils.withYamlConfig(
                         """
                         local:
-                          authUrl: $oidcUrl/realms/noumena
+                          authUrl: ${oidcUrl}realms/noumena
                           clientId: nm-platform-service-client
                           clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                           managementUrl: $engineUrl
@@ -548,7 +548,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: $oidcUrl/realms/noumena
+                      authUrl: ${oidcUrl}realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: $engineUrl
@@ -641,7 +641,7 @@ class DeployCommandIT :
                 TestUtils.withYamlConfig(
                     """
                     local:
-                      authUrl: $oidcUrl/realms/noumena
+                      authUrl: ${oidcUrl}realms/noumena
                       clientId: nm-platform-service-client
                       clientSecret: 87ff12ca-cf29-4719-bda8-c92faa78e3c4
                       managementUrl: $engineUrl
