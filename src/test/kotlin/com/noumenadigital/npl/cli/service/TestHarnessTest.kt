@@ -47,8 +47,8 @@ class TestHarnessTest :
                     """
                     package test
                     @test
-                    function mylovely(test: Test) -> {
-                        test.assertEquals(101, 100, "Should be true");
+                    function test(test: Test) -> {
+                        test.assertEquals(100, 100, "Should be true");
                     };
                     """.trimIndent(),
             ) {
