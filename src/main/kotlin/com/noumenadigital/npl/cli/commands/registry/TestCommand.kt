@@ -13,6 +13,7 @@ import com.noumenadigital.npl.testing.coverage.CoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.LineCoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.NoCoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.SonarQubeReporter
+import org.tap4j.model.Comment
 import org.tap4j.util.StatusValues
 import java.io.File
 import java.time.Duration
@@ -97,24 +98,34 @@ data class TestCommand(
 
             val start = System.nanoTime()
             val testResults = testHarness.runTest()
-            handleResults(testResults, output)
+            val failedTests = handleResults(testResults, output)
             val isResultSuccess = testResults.all { !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut() }
+            val summary = "\nTests run: ${testResults.sumOf { it.tapResult.testResults.size }}, Failures: ${failedTests?.size}"
             if (!isResultSuccess) {
-                output.error("\nNPL test failed with errors.")
+                output.error(summary)
+                output.error(failedTests?.joinToString("\n").toString())
+                output.info("\n------------------------------------------------")
+                output.error("NPL test failed with errors.")
+                output.info("------------------------------------------------")
                 return ExitCode.DATA_ERROR
             }
             if (testResults.all { it.tapResult.testResults.isEmpty() }) {
+                output.info(summary)
+                output.info("\n------------------------------------------------")
                 output.error("No NPL tests found.")
+                output.info("------------------------------------------------")
                 return ExitCode.DATA_ERROR
             }
 
             coverageAnalyzer.writeSummary(output::info)
-
+            output.success(summary)
+            output.info("\n------------------------------------------------")
             output.success(
-                "\nNPL test completed successfully in ${
+                "NPL test completed successfully in ${
                     Duration.ofNanos(System.nanoTime() - start).toMillis()
                 } ms.",
             )
+            output.info("------------------------------------------------")
             return ExitCode.SUCCESS
         } catch (e: CommandExecutionException) {
             output.error(e.message)
@@ -141,24 +152,26 @@ data class TestCommand(
     private fun handleResults(
         testResults: List<TestHarness.TestHarnessResults>,
         output: ColorWriter,
-    ) {
+    ): Set<String>? {
         val paddingResult =
             maxOf(testResults.maxOfOrNull { it.description.normalizeWindowsPath().length } ?: 0, MIN_PADDING)
+        val failedResultsSet: MutableSet<String> = mutableSetOf()
         testResults.forEach {
             val success = !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut()
             if (success) {
                 handleSuccessResult(it, paddingResult, output)
             } else {
-                handleFailedResult(it, paddingResult, output)
+                failedResultsSet.addAll(handleFailedResult(it, paddingResult, output))
             }
         }
+        return failedResultsSet
     }
 
     private fun handleFailedResult(
         it: TestHarness.TestHarnessResults,
         paddingResult: Int,
         output: ColorWriter,
-    ) {
+    ): Set<String> {
         val failed = it.tapResult.testResults.filter { result -> result.status == StatusValues.NOT_OK }
         val summary =
             formatDetailedSummary(
@@ -176,10 +189,62 @@ data class TestCommand(
             )
         output.error(summary)
 
-        failed.map { tr ->
-            val failedTest = formatSummary(tr.description, false, padding = paddingResult)
+        val failedResults: MutableSet<String> = mutableSetOf()
+        val strings =
+            it.tapResult.comments
+                .map { it -> it as Comment }
+                .map { it.text }
+                .splitBy("ERROR: at <root>(<root>:0)")
+        strings.map { tr ->
+            val fileName =
+                it.description
+                    .split("/")
+                    .takeLast(2)
+                    .joinToString("/")
+            val testNameWithReference =
+                tr
+                    .asReversed()
+                    .find {
+                        it
+                            .split("/")
+                            .takeLast(2)
+                            .joinToString("/")
+                            .split(":")
+                            .first() == fileName
+                    }?.split("at ")
+                    ?.last()
+            val testName = testNameWithReference?.split("(")?.first()
+            val last = testNameWithReference?.split("(")?.last()?.dropLast(1)
+            val errorLineLocation = last?.split(":")?.last()
+            val urlToFileFailureLocation = "file://" + it.description + ":" + errorLineLocation
+            failedResults.add(urlToFileFailureLocation)
+            val failedTest = formatSummary(testName ?: it.description, false, padding = paddingResult)
             output.error(failedTest)
+            output.error("Stacktrace: ${tr.joinToString("\n")}")
         }
+        return failedResults
+    }
+
+    fun List<String>.splitBy(delimiter: String): List<List<String>> {
+        val result = mutableListOf<MutableList<String>>()
+        var current = mutableListOf<String>()
+
+        for (item in this) {
+            if (item == delimiter) {
+                if (current.isNotEmpty()) {
+                    result.add(current)
+                    current = mutableListOf()
+                }
+            } else {
+                current.add(item)
+            }
+        }
+
+        if (current.isNotEmpty()) {
+            result.add(current)
+        }
+
+        return result
     }
 
     private fun handleSuccessResult(
