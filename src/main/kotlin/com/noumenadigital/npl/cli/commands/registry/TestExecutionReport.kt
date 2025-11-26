@@ -136,8 +136,11 @@ data class TestExecutionReport(
                     padding = paddingResult,
                 )
 
-            val comments = result.tapResult.comments.map { (it as Comment).text }
-            val stackTraces = splitBy(comments, "ERROR: at <root>(<root>:0)")
+            val comments =
+                result.tapResult.comments
+                    .map { (it as Comment).text }
+                    .map { it.replace("ERROR: ", "") }
+            val stackTraces = splitBy(comments, "at <root>(<root>:0)")
 
             val fileLinks = mutableListOf<String>()
             val formattedStackTraces = mutableListOf<String>()
@@ -169,9 +172,9 @@ data class TestExecutionReport(
                     fileLinks.add("file://" + result.description + ":" + errorLineLocation)
                 }
 
-                val failedTestSummary = formatSummary(testName ?: result.description, false, padding = paddingResult)
+                val failedTestSummary = formatFileSummary(testName ?: result.description, false, padding = paddingResult)
                 formattedStackTraces.add(failedTestSummary)
-                formattedStackTraces.add("Stacktrace: " + tr.joinToString("\n"))
+                formattedStackTraces.add("ERROR: " + tr.joinToString("\n"))
             }
 
             return Failure(summary, formattedStackTraces, fileLinks)
@@ -210,11 +213,11 @@ data class TestExecutionReport(
             failed: Int = 0,
             explanation: String? = null,
             padding: Int,
-        ) = "${formatSummary(description, success, failed, padding)} ${
+        ) = "${formatFileSummary(description, success, failed, padding)} ${
             numTests.toString().padEnd(4, ' ')
         } tests in ${executionTime.toMillis()} ms${if (explanation != null) " ($explanation)" else ""}"
 
-        private fun formatSummary(
+        private fun formatFileSummary(
             description: String,
             success: Boolean,
             failed: Int = 0,
