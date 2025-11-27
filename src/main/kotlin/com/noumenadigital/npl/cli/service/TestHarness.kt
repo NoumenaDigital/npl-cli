@@ -22,9 +22,7 @@ class TestHarness(
     private val sourcesManager: SourcesManager,
     private val analyzer: CoverageAnalyzer = NoCoverageAnalyzer,
 ) {
-    companion object {
-        private val localeLock = Any()
-    }
+    private val localeLock = Any()
 
     fun runTest(): List<TestHarnessResults> {
         val sources = sourcesManager.getNplSources()
