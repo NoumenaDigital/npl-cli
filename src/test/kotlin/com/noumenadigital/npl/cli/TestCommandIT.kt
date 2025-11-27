@@ -9,6 +9,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import org.intellij.lang.annotations.Language
 import java.io.File
+import java.util.Locale
 import kotlin.io.path.pathString
 
 class TestCommandIT :
@@ -291,6 +292,33 @@ class TestCommandIT :
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
+            }
+
+            context("locale independence") {
+                listOf(
+                    "en-001" to "English - World",
+                    "en-150" to "English - Europe",
+                    "de-DE" to "German",
+                    "ja-JP" to "Japanese",
+                ).forEach { (languageTag, description) ->
+                    test("works with $description locale ($languageTag)") {
+                        val originalLocale = Locale.getDefault()
+                        try {
+                            Locale.setDefault(Locale.forLanguageTag(languageTag))
+
+                            val testDirPath =
+                                getTestResourcesPath(listOf("success", "both_sources")).toAbsolutePath().toString()
+                            runCommand(
+                                commands = listOf("test", "--test-source-dir", testDirPath),
+                            ) {
+                                process.waitFor()
+                                process.exitValue() shouldBe ExitCode.SUCCESS.code
+                            }
+                        } finally {
+                            Locale.setDefault(originalLocale)
+                        }
                     }
                 }
             }

@@ -14,6 +14,7 @@ import java.io.File
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.time.Duration
+import java.util.Locale
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
@@ -75,10 +76,12 @@ class TestHarness(
         val result: R? = runnable(listener)
         listener.testingFinished()
 
-        val consumer = TapConsumerFactory.makeTap13Consumer()
         val (tapResult, duration) =
-            ByteArrayInputStream(output.toByteArray()).use { input ->
-                consumer.load(input.reader()) to Duration.ofNanos(System.nanoTime() - start)
+            withRootLocale {
+                val consumer = TapConsumerFactory.makeTap13Consumer()
+                ByteArrayInputStream(output.toByteArray()).use { input ->
+                    consumer.load(input.reader()) to Duration.ofNanos(System.nanoTime() - start)
+                }
             }
         return TestResult(result, tapResult, duration, description)
     }
@@ -113,4 +116,14 @@ class TestHarness(
         val duration: Duration,
         val description: String,
     )
+
+    private inline fun <T> withRootLocale(block: () -> T): T {
+        val original = Locale.getDefault()
+        return try {
+            Locale.setDefault(Locale.ROOT)
+            block()
+        } finally {
+            Locale.setDefault(original)
+        }
+    }
 }
