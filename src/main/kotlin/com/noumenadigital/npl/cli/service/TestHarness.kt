@@ -22,6 +22,10 @@ class TestHarness(
     private val sourcesManager: SourcesManager,
     private val analyzer: CoverageAnalyzer = NoCoverageAnalyzer,
 ) {
+    companion object {
+        private val localeLock = Any()
+    }
+
     fun runTest(): List<TestHarnessResults> {
         val sources = sourcesManager.getNplSources()
         val compilationResult =
@@ -117,13 +121,14 @@ class TestHarness(
         val description: String,
     )
 
-    private inline fun <T> withRootLocale(block: () -> T): T {
-        val original = Locale.getDefault()
-        return try {
-            Locale.setDefault(Locale.ROOT)
-            block()
-        } finally {
-            Locale.setDefault(original)
+    private inline fun <T> withRootLocale(block: () -> T): T =
+        synchronized(localeLock) {
+            val original = Locale.getDefault()
+            try {
+                Locale.setDefault(Locale.ROOT)
+                block()
+            } finally {
+                Locale.setDefault(original)
+            }
         }
-    }
 }
