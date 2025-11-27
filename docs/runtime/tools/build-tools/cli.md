@@ -40,11 +40,7 @@ offers several useful commands for interacting with your NPL projects.
     curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
     ```
 
-    You will need to manually add the `npl` executable to your PATH. The script above will not do that for you.
-
-=== "Windows without WSL"
-
-    Download and install the latest `.exe` executable [here](https://github.com/NoumenaDigital/npl-cli/releases).
+    You may have to restart the WSL terminal to ensure the CLI is available in your PATH after installing the NPL CLI.
 
 ## Commands
 
