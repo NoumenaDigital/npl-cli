@@ -195,7 +195,6 @@ class TestCommandIT :
 
                         Tests run: 0, Failures: 0
 
-
                         ------------------------------------------------
                         NPL test failed with errors.
                         ------------------------------------------------
@@ -313,7 +312,6 @@ No NPL tests found.
                         'compilation' ............... FAIL           0    tests in XXX ms ($testDirPath/src/main/npl/objects/car/car.npl: (7, 1) E0001: Syntax error: rule statement failed predicate: {quirksMode}?)
 
                         Tests run: 0, Failures: 0
-
 
                         ------------------------------------------------
                         NPL test failed with errors.

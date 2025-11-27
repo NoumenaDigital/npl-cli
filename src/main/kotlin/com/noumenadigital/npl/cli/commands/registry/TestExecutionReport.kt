@@ -2,7 +2,6 @@ package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.service.TestHarness
 import com.noumenadigital.npl.cli.util.normalizeWindowsPath
-import org.tap4j.model.Comment
 import org.tap4j.util.StatusValues
 import java.time.Duration
 
@@ -31,19 +30,17 @@ data class TestExecutionReport(
         override val lines: List<String> = listOf(summary) + stackTraces
     }
 
-    fun getAllFileLinks(): List<String> = results.filterIsInstance<Failure>().flatMap { it.fileLinks }
+    fun allFileLinks(): List<String> = results.filterIsInstance<Failure>().flatMap { it.fileLinks }
 
-    fun getAllResultLines(): List<Pair<TestResultItem, String>> =
+    fun allResultLines(): List<Pair<TestResultItem, String>> =
         results.flatMap { result ->
             result.lines.map { line -> result to line }
         }
 
     fun getSuccessSummaryLines(): List<String> =
         listOf(
-            "",
-            "Tests run: $totalTestsCount, Failures: $failedTestsCount",
-            "",
-            "------------------------------------------------",
+            "\nTests run: $totalTestsCount, Failures: $failedTestsCount",
+            "\n------------------------------------------------",
             "NPL test completed successfully in $executionTimeMs ms.",
             "------------------------------------------------",
         )
@@ -51,18 +48,16 @@ data class TestExecutionReport(
     fun getErrorSummaryLines(): List<String> =
         listOf(
             "\nTests run: $totalTestsCount, Failures: $failedTestsCount",
-            getAllFileLinks().joinToString("\n"),
-            "",
-            "------------------------------------------------",
+            allFileLinks().joinToString("\n"),
+            "\n------------------------------------------------",
             "NPL test failed with errors.",
             "------------------------------------------------",
-        )
+        ).filter { it.isNotEmpty() }
 
     fun getNoTestsSummaryLines(): List<String> =
         listOf(
-            "Tests run: 0, Failures: 0",
-            "",
-            "------------------------------------------------",
+            "\nTests run: 0, Failures: 0",
+            "\n------------------------------------------------",
             "No NPL tests found.",
             "------------------------------------------------",
         )
@@ -87,7 +82,6 @@ data class TestExecutionReport(
                     }
                 }
 
-            val allFileLinks = resultItems.filterIsInstance<Failure>().flatMap { it.fileLinks }.toSet()
             val totalTests = testResults.sumOf { it.tapResult.testResults.size }
 
             val isResultSuccess = testResults.all { !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut() }
@@ -96,7 +90,13 @@ data class TestExecutionReport(
                 results = resultItems,
                 executionTimeMs = executionTimeMs,
                 isSuccess = isResultSuccess,
-                failedTestsCount = allFileLinks.size,
+                failedTestsCount =
+                    testResults.sumOf {
+                        it.tapResult.testResults.count { testResult ->
+                            testResult.status ==
+                                StatusValues.NOT_OK
+                        }
+                    },
                 totalTestsCount = totalTests,
             )
         }
@@ -120,65 +120,112 @@ data class TestExecutionReport(
             result: TestHarness.TestHarnessResults,
             paddingResult: Int,
         ): Failure {
-            val failed = result.tapResult.testResults.filter { it.status == StatusValues.NOT_OK }
-            val summary =
-                formatDetailedSummary(
-                    description = result.description,
-                    success = false,
-                    numTests = result.tapResult.numberOfTestResults,
-                    executionTime = result.duration,
-                    failed = failed.size,
-                    explanation =
-                        result.tapResult.bailOuts
-                            .firstOrNull()
-                            ?.reason
-                            ?.normalizeWindowsPath(),
-                    padding = paddingResult,
-                )
-
-            val comments =
-                result.tapResult.comments
-                    .map { (it as Comment).text }
-                    .map { it.replace("ERROR: ", "") }
-            val stackTraces = splitBy(comments, "at <root>(<root>:0)")
+            val comments = extractComments(result)
+            val stackTraces = extractStackTraces(comments)
 
             val fileLinks = mutableListOf<String>()
             val formattedStackTraces = mutableListOf<String>()
 
-            stackTraces.forEach { tr ->
-                val fileName =
-                    result.description
-                        .split("/")
-                        .takeLast(2)
-                        .joinToString("/")
-                val testNameWithReference =
-                    tr
-                        .asReversed()
-                        .find { line ->
+            stackTraces
+                .filter { it.isNotEmpty() }
+                .forEach { tr ->
+                    val (testName, errorLine) = extractTestInfo(result.description, tr)
+                    fileLinks += buildFileLink(result.description, errorLine)
+                    formattedStackTraces += formatFileSummary(testName, false, padding = paddingResult)
+                    formattedStackTraces += formatErrorStack(tr)
+                }
+
+            val summary = buildSummary(result, paddingResult)
+            return Failure(summary, formattedStackTraces, fileLinks)
+        }
+
+        private fun extractComments(result: TestHarness.TestHarnessResults): List<String> =
+            result.tapResult.comments
+                ?.mapNotNull { it?.text }
+                ?.map { it.replace("ERROR: ", "") }
+                .orEmpty()
+
+        private fun extractStackTraces(comments: List<String>): List<List<String>> =
+            runCatching {
+                splitBy(comments, "at <root>(<root>:0)")
+            }.getOrElse { emptyList() }
+
+        private fun extractTestInfo(
+            description: String,
+            trace: List<String>,
+        ): Pair<String, String?> {
+            val fileName = description.split("/").takeLast(2).joinToString("/")
+
+            val testNameWithReference =
+                trace
+                    .asReversed()
+                    .find { line ->
+                        val tail =
                             line
                                 .split("/")
                                 .takeLast(2)
                                 .joinToString("/")
                                 .split(":")
-                                .first() == fileName
-                        }?.split("at ")
-                        ?.last()
+                                .firstOrNull()
+                        tail == fileName
+                    }?.split("at ")
+                    ?.lastOrNull()
 
-                val testName = testNameWithReference?.split("(")?.first()
-                val last = testNameWithReference?.split("(")?.last()?.dropLast(1)
-                val errorLineLocation = last?.split(":")?.last()
+            val testName =
+                testNameWithReference
+                    ?.substringBefore("(")
+                    ?.takeIf { it.isNotBlank() }
+                    ?: description
 
-                if (errorLineLocation != null) {
-                    fileLinks.add("file://" + result.description + ":" + errorLineLocation)
-                }
+            val lastPart =
+                testNameWithReference
+                    ?.substringAfter("(")
+                    ?.dropLast(1)
+                    ?.takeIf { it.contains(":") }
 
-                val failedTestSummary = formatFileSummary(testName ?: result.description, false, padding = paddingResult)
-                formattedStackTraces.add(failedTestSummary)
-                formattedStackTraces.add("ERROR: " + tr.joinToString("\n"))
+            val errorLine =
+                lastPart
+                    ?.substringAfterLast(":")
+                    ?.takeIf { it.all(Char::isDigit) }
+
+            return testName to errorLine
+        }
+
+        private fun buildFileLink(
+            description: String,
+            line: String?,
+        ): String =
+            if (!line.isNullOrBlank() &&
+                description.isNotBlank() &&
+                (description.startsWith("/") || description.startsWith("\\"))
+            ) {
+                "file://".normalizeWindowsPath() + description + ":" + line
+            } else {
+                description
             }
 
-            return Failure(summary, formattedStackTraces, fileLinks)
+        private fun formatErrorStack(trace: List<String>): String {
+            val body = trace.joinToString("\n")
+            return "ERROR: " + body.ifBlank { "ERROR: Unknown" }
         }
+
+        private fun buildSummary(
+            result: TestHarness.TestHarnessResults,
+            padding: Int,
+        ): String =
+            formatDetailedSummary(
+                description = result.description,
+                success = false,
+                numTests = result.tapResult.numberOfTestResults,
+                executionTime = result.duration,
+                failed = result.tapResult.testResults.count { it.status == StatusValues.NOT_OK },
+                explanation =
+                    result.tapResult.bailOuts
+                        .firstOrNull()
+                        ?.reason
+                        ?.normalizeWindowsPath(),
+                padding = padding,
+            )
 
         private fun splitBy(
             list: List<String>,

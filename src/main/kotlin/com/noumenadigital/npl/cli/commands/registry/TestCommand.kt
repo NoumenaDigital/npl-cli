@@ -69,7 +69,6 @@ data class TestCommand(
     private val coverage: Boolean = false,
 ) : CommandExecutor {
     companion object {
-        const val MIN_PADDING = 25
         const val COVERAGE_FILE = "coverage.xml"
     }
 
@@ -98,7 +97,7 @@ data class TestCommand(
             val executionTime = Duration.ofNanos(System.nanoTime() - start).toMillis()
             val report = TestExecutionReport.from(testResults, executionTime)
 
-            report.getAllResultLines().forEach { (result, line) ->
+            report.allResultLines().forEach { (result, line) ->
                 when (result) {
                     is TestExecutionReport.Success -> output.success(line)
                     is TestExecutionReport.Failure -> output.error(line)
