@@ -7,13 +7,11 @@ import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.SourcesManager
 import com.noumenadigital.npl.cli.service.TestHarness
-import com.noumenadigital.npl.cli.util.normalizeWindowsPath
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import com.noumenadigital.npl.testing.coverage.CoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.LineCoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.NoCoverageAnalyzer
 import com.noumenadigital.npl.testing.coverage.SonarQubeReporter
-import org.tap4j.util.StatusValues
 import java.io.File
 import java.time.Duration
 
@@ -71,7 +69,6 @@ data class TestCommand(
     private val coverage: Boolean = false,
 ) : CommandExecutor {
     companion object {
-        const val MIN_PADDING = 25
         const val COVERAGE_FILE = "coverage.xml"
     }
 
@@ -97,24 +94,26 @@ data class TestCommand(
 
             val start = System.nanoTime()
             val testResults = testHarness.runTest()
-            handleResults(testResults, output)
-            val isResultSuccess = testResults.all { !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut() }
-            if (!isResultSuccess) {
-                output.error("\nNPL test failed with errors.")
-                return ExitCode.DATA_ERROR
-            }
-            if (testResults.all { it.tapResult.testResults.isEmpty() }) {
-                output.error("No NPL tests found.")
-                return ExitCode.DATA_ERROR
+            val executionTime = Duration.ofNanos(System.nanoTime() - start).toMillis()
+            val report = TestExecutionReport.from(testResults, executionTime)
+
+            report.allResultLines().forEach { (result, line) ->
+                when (result) {
+                    is TestExecutionReport.Success -> output.success(line)
+                    is TestExecutionReport.Failure -> output.error(line)
+                }
             }
 
-            coverageAnalyzer.writeSummary(output::info)
-
-            output.success(
-                "\nNPL test completed successfully in ${
-                    Duration.ofNanos(System.nanoTime() - start).toMillis()
-                } ms.",
-            )
+            if (!report.isSuccess) {
+                report.getErrorSummaryLines().forEach { output.error(it) }
+                return ExitCode.DATA_ERROR
+            } else if (report.totalTestsCount == 0) {
+                report.getNoTestsSummaryLines().forEach { output.info(it) }
+                return ExitCode.DATA_ERROR
+            } else {
+                coverageAnalyzer.writeSummary(output::info)
+                report.getSuccessSummaryLines().forEach { output.success(it) }
+            }
             return ExitCode.SUCCESS
         } catch (e: CommandExecutionException) {
             output.error(e.message)
@@ -137,100 +136,4 @@ data class TestCommand(
         } else {
             NoCoverageAnalyzer
         }
-
-    private fun handleResults(
-        testResults: List<TestHarness.TestHarnessResults>,
-        output: ColorWriter,
-    ) {
-        val paddingResult =
-            maxOf(testResults.maxOfOrNull { it.description.normalizeWindowsPath().length } ?: 0, MIN_PADDING)
-        testResults.forEach {
-            val success = !it.tapResult.containsNotOk() && !it.tapResult.containsBailOut()
-            if (success) {
-                handleSuccessResult(it, paddingResult, output)
-            } else {
-                handleFailedResult(it, paddingResult, output)
-            }
-        }
-    }
-
-    private fun handleFailedResult(
-        it: TestHarness.TestHarnessResults,
-        paddingResult: Int,
-        output: ColorWriter,
-    ) {
-        val failed = it.tapResult.testResults.filter { result -> result.status == StatusValues.NOT_OK }
-        val summary =
-            formatDetailedSummary(
-                description = it.description,
-                success = false,
-                numTests = it.tapResult.numberOfTestResults,
-                executionTime = it.duration,
-                failed = failed.size,
-                explanation =
-                    it.tapResult.bailOuts
-                        .firstOrNull()
-                        ?.reason
-                        ?.normalizeWindowsPath(),
-                padding = paddingResult,
-            )
-        output.error(summary)
-
-        failed.map { tr ->
-            val failedTest = formatSummary(tr.description, false, padding = paddingResult)
-            output.error(failedTest)
-        }
-    }
-
-    private fun handleSuccessResult(
-        it: TestHarness.TestHarnessResults,
-        paddingResult: Int,
-        output: ColorWriter,
-    ) {
-        val summary =
-            formatDetailedSummary(
-                description = it.description,
-                success = true,
-                numTests = it.tapResult.numberOfTestResults,
-                executionTime = it.duration,
-                padding = paddingResult,
-            )
-
-        output.success(summary)
-    }
-
-    private fun formatDetailedSummary(
-        description: String,
-        success: Boolean,
-        numTests: Int,
-        executionTime: Duration,
-        failed: Int = 0,
-        explanation: String? = null,
-        padding: Int,
-    ) = "${formatSummary(description, success, failed, padding)} ${
-        numTests.toString().padEnd(
-            4,
-            ' ',
-        )
-    } tests in ${executionTime.toMillis()} ms${if (explanation != null) " ($explanation)" else ""}"
-
-    private fun formatSummary(
-        description: String,
-        success: Boolean,
-        failed: Int = 0,
-        padding: Int,
-    ) = "${formatDescription(description, success, padding)} ${formatSuccess(success)}${formatFailed(failed)}"
-
-    private fun formatDescription(
-        description: String,
-        success: Boolean,
-        padding: Int,
-    ) = "'${description.normalizeWindowsPath()}' ".padEnd(
-        padding + (if (success) 5 else 4),
-        '.',
-    )
-
-    private fun formatFailed(failed: Int) = (if (failed > 0) "($failed)" else "").padEnd(10, ' ')
-
-    private fun formatSuccess(success: Boolean) = if (success) "PASS" else "FAIL"
 }
