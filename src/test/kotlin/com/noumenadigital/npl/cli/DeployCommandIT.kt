@@ -429,7 +429,7 @@ class DeployCommandIT :
                     output.normalize() shouldBe
                         """
                         Application contents cleared for $engineUrl
-                        Error deploying NPL sources: Unknown exception: 'Could not locate `migration.yml` in zip:file:/tmp/npl-deployment-${mockEngine.hostName}.zip'
+                        Error deploying NPL sources: Unknown exception: 'Could not locate `migration.yml` in zip:file/tmp/npl-deployment-${mockEngine.hostName}.zip'
                         """.trimIndent()
 
                     exitCode shouldBe ExitCode.GENERAL_ERROR.code

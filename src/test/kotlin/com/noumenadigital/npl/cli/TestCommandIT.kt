@@ -43,7 +43,11 @@ class TestCommandIT :
                             """
                         '$testDirPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
 
+                        Tests run: 2, Failures: 0
+
+                        ------------------------------------------------
                         NPL test completed successfully in XXX ms.
+                        ------------------------------------------------
                         """.normalize()
 
                         coverageFile.exists() shouldBe false
@@ -74,7 +78,11 @@ class TestCommandIT :
                         Overall                            XXX%
 
 
+                        Tests run: 2, Failures: 0
+
+                        ------------------------------------------------
                         NPL test completed successfully in XXX ms.
+                        ------------------------------------------------
                         """.normalize()
 
                         coverageFile.exists() shouldBe true
@@ -132,7 +140,11 @@ class TestCommandIT :
                         Overall                            XXX%
 
 
+                        Tests run: 2, Failures: 0
+
+                        ------------------------------------------------
                         NPL test completed successfully in XXX ms.
+                        ------------------------------------------------
                         """.normalize()
 
                         coverageFile.exists() shouldBe true
@@ -181,8 +193,12 @@ class TestCommandIT :
                             """
                         'compilation' ............... FAIL           0    tests in XXX ms ($testDirPath/src/test/npl/objects/test_iou_error.npl: (12, 5) E0003: Unknown member 'undefinedMethod')
 
+                        Tests run: 0, Failures: 0
+
+                        ------------------------------------------------
                         NPL test failed with errors.
-                    """.normalize()
+                        ------------------------------------------------
+                        """.normalize()
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.DATA_ERROR.code
@@ -202,9 +218,17 @@ class TestCommandIT :
                         val expectedOutput =
                             """
                         '$testDirPath/src/test/npl/objects/test_iou_failed.npl' . FAIL(1)        2    tests in XXX ms
-                        'Amount owed should reflect payment ==> Expect '112300', got '50'.' .......................................................................... FAIL
+                        '/objects/test_amount_owed_after_pay_failed' ............ FAIL
+                        ERROR: Error caused by 'Amount owed should reflect payment ==> Expect '112300', got '50'.'
+                        at /Test::lang/test/assertEquals(<builtin>:0)
+                        at /objects/test_amount_owed_after_pay_failed(/objects/test_iou_failed.npl:20)
 
+                        Tests run: 2, Failures: 1
+                        file://$testDirPath/src/test/npl/objects/test_iou_failed.npl:20
+
+                        ------------------------------------------------
                         NPL test failed with errors.
+                        ------------------------------------------------
                     """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -221,14 +245,34 @@ class TestCommandIT :
 
                         val expectedOutput =
                             """
-                        '$testDirPath/src/test/npl/objects/test_iou_failed.npl' ... FAIL(2)        2    tests in XXX ms
-                        'Amount owed should equal initial value ==> Expect '999', got '100'.' ................................................................ FAIL
-                        'Amount owed should reflect payment ==> Expect '777', got '50'.' ..................................................................... FAIL
+                        '$testDirPath/src/test/npl/objects/test_iou_failed.npl' .......... FAIL(2)        2    tests in XXX ms
+                        '/objects/test_initial_amount_owed_failed' .......... FAIL
+                        ERROR: Error caused by 'Amount owed should equal initial value ==> Expect '999', got '100'.'
+                        at /Test::lang/test/assertEquals(<builtin>:0)
+                        at /objects/test_initial_amount_owed_failed(/objects/test_iou_failed.npl:12)
+                        '/objects/test_amount_owed_after_pay_failed' .......... FAIL
+                        ERROR: Error caused by 'Amount owed should reflect payment ==> Expect '777', got '50'.'
+                        at /Test::lang/test/assertEquals(<builtin>:0)
+                        at /objects/test_amount_owed_after_pay_failed(/objects/test_iou_failed.npl:20)
                         '$testDirPath/src/test/npl/objects/test_iou_failed_2.npl' . FAIL(2)        2    tests in XXX ms
-                        'Amount owed should equal initial value ==> Expect '999', got '100'.' ................................................................ FAIL
-                        'Amount owed should reflect payment ==> Expect '777', got '50'.' ..................................................................... FAIL
+                        '/objects/test_initial_amount_owed_failed_2' ...... FAIL
+                        ERROR: Error caused by 'Amount owed should equal initial value ==> Expect '999', got '100'.'
+                        at /Test::lang/test/assertEquals(<builtin>:0)
+                        at /objects/test_initial_amount_owed_failed_2(/objects/test_iou_failed_2.npl:12)
+                        '/objects/test_amount_owed_after_pay_failed_2' .......... FAIL
+                        ERROR: Error caused by 'Amount owed should reflect payment ==> Expect '777', got '50'.'
+                        at /Test::lang/test/assertEquals(<builtin>:0)
+                        at /objects/test_amount_owed_after_pay_failed_2(/objects/test_iou_failed_2.npl:20)
 
+                        Tests run: 4, Failures: 4
+                        file://$testDirPath/src/test/npl/objects/test_iou_failed.npl:12
+                        file://$testDirPath/src/test/npl/objects/test_iou_failed.npl:20
+                        file://$testDirPath/src/test/npl/objects/test_iou_failed_2.npl:12
+                        file://$testDirPath/src/test/npl/objects/test_iou_failed_2.npl:20
+
+                        ------------------------------------------------
                         NPL test failed with errors.
+                        ------------------------------------------------
                     """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -244,9 +288,12 @@ class TestCommandIT :
                         process.waitFor()
 
                         val expectedOutput =
-                            """
-                        No NPL tests found.
-                    """.normalize()
+                            """Tests run: 0, Failures: 0
+
+------------------------------------------------
+No NPL tests found.
+------------------------------------------------
+                            """.normalize()
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.DATA_ERROR.code
@@ -264,7 +311,11 @@ class TestCommandIT :
                             """
                         'compilation' ............... FAIL           0    tests in XXX ms ($testDirPath/src/main/npl/objects/car/car.npl: (7, 1) E0001: Syntax error: rule statement failed predicate: {quirksMode}?)
 
+                        Tests run: 0, Failures: 0
+
+                        ------------------------------------------------
                         NPL test failed with errors.
+                        ------------------------------------------------
                     """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -286,7 +337,11 @@ class TestCommandIT :
                             """
                         '$testDirPath/src/test/npl/objects/test_iou.npl' .. PASS           2    tests in XXX ms
 
+                        Tests run: 2, Failures: 0
+
+                        ------------------------------------------------
                         NPL test completed successfully in XXX ms.
+                        ------------------------------------------------
                     """.normalize()
 
                         output.normalize() shouldBe expectedOutput
@@ -322,7 +377,11 @@ class TestCommandIT :
                         Overall                            XXX%
 
 
+                        Tests run: 2, Failures: 0
+
+                        ------------------------------------------------
                         NPL test completed successfully in XXX ms.
+                        ------------------------------------------------
                         """.normalize()
 
                             coverageFile.exists() shouldBe testWithCoverage
