@@ -200,3 +200,32 @@ That command will remove your application from the NOUMENA cloud.
 | authUrl      | https://keycloak.noumena.cloud/realms/paas | Yes               |
 | clientId     | paas                                       | Yes               |
 | clientSecret | paas                                       | Yes               |
+
+## Cloud status command
+
+The `cloud status` command allows you to list all your tenants and applications in NOUMENA cloud with their current
+status.
+
+### Usage
+
+```bash
+npl cloud status
+```
+
+That command will display a tree of your tenants and their applications with status indicators.
+
+Example output:
+
+```
+📂 My Tenant (my-tenant) [active] 🟢
+  ├── 📦 My App (my-app) [active] 🟢
+  └── 📦 Another App (another-app) [pending] 🟡
+📂 Other Tenant (other-tenant) [deactivated] 🔴
+```
+
+| Args         | Default values                             | Can be overridden |
+| ------------ | ------------------------------------------ | ----------------- |
+| url          | https://portal.noumena.cloud               | Yes               |
+| authUrl      | https://keycloak.noumena.cloud/realms/paas | Yes               |
+| clientId     | paas                                       | Yes               |
+| clientSecret | paas                                       | Yes               |
