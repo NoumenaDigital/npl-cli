@@ -1,142 +1,162 @@
 package com.noumenadigital.npl.cli.commands.registry
 
 import com.noumenadigital.npl.cli.ExitCode
-import com.noumenadigital.npl.cli.commands.CommandArgumentParser
 import com.noumenadigital.npl.cli.commands.NamedParameter
-import com.noumenadigital.npl.cli.config.DeployConfig
-import com.noumenadigital.npl.cli.config.EngineTargetConfig
-import com.noumenadigital.npl.cli.exception.DeployConfigException
+import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.service.DeployResult
 import com.noumenadigital.npl.cli.service.DeployService
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
 import java.io.File
 
-class DeployCommand(
-    private val args: List<String> = emptyList(),
-    private val deployService: DeployService = DeployService(),
-) : CommandExecutor {
+object DeployCommandDescriptor : CommandDescriptor {
     override val commandName: String = "deploy"
     override val description: String = "Deploy NPL sources to a Noumena Engine instance"
+    override val usageInstruction: String =
+        """
+        deploy --source-dir <directory> [--clear]
+
+        Deploys NPL sources to a Noumena Engine instance.
+
+        Arguments:
+          --source-dir <directory>   Directory containing NPL sources (required).
+                             IMPORTANT: The directory must contain a valid NPL source structure, including
+                             migrations. E.g.:
+                              main
+                              ├── npl-1.0
+                              └── migration.yml
+
+        Options:
+          --clear             Clear application contents before deployment.
+
+        Configuration is read from npl.yml (current dir).
+        """.trimIndent()
 
     override val parameters: List<NamedParameter> =
         listOf(
             NamedParameter(
-                name = "target",
-                description = "Named target from deploy.yml to deploy to. Required unless defaultTarget is set in config.",
-                isRequired = false,
-                valuePlaceholder = "<name>",
-            ),
-            NamedParameter(
-                name = "sourceDir",
+                name = "source-dir",
                 description = "Directory containing NPL sources",
                 isRequired = true,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = true,
-            ),
-            NamedParameter(
-                name = "configFile",
-                description = "Path to deploy.yml configuration file",
-                isRequired = false,
-                valuePlaceholder = "<path>",
-                takesPath = true,
-                isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
                 name = "clear",
                 description = "Clear application contents before deployment",
                 isRequired = false,
+                configFilePath = YamlConfig.Local.clear,
+            ),
+            NamedParameter(
+                name = "username",
+                description = "Username for deployment to Noumena Engine instance",
+                isRequired = true,
+                valuePlaceholder = "<username>",
+                isHidden = true,
+                configFilePath = YamlConfig.Local.username,
+            ),
+            NamedParameter(
+                name = "password",
+                description = "Password for deployment to Noumena Engine instance",
+                isRequired = true,
+                isHidden = true,
+                valuePlaceholder = "<password>",
+                configFilePath = YamlConfig.Local.password,
+            ),
+            NamedParameter(
+                name = "management-url",
+                description = "Url of the Noumena Engine management endpoint",
+                isRequired = false,
+                isHidden = true,
+                valuePlaceholder = "<url>",
+                configFilePath = YamlConfig.Local.managementUrl,
+            ),
+            NamedParameter(
+                name = "client-id",
+                description = "Client ID for deployment to Noumena Engine instance",
+                isRequired = false,
+                isHidden = true,
+                valuePlaceholder = "<client-id>",
+                configFilePath = YamlConfig.Local.clientId,
+            ),
+            NamedParameter(
+                name = "client-secret",
+                description = "Client secret for deployment to Noumena Engine instance",
+                isRequired = false,
+                isHidden = true,
+                valuePlaceholder = "<secret>",
+                configFilePath = YamlConfig.Local.clientSecret,
+            ),
+            NamedParameter(
+                name = "auth-url",
+                description = "Authentication URL of the Noumena Engine instance",
+                isRequired = false,
+                isHidden = true,
+                valuePlaceholder = "<url>",
+                configFilePath = YamlConfig.Local.authUrl,
             ),
         )
 
-    override fun createInstance(params: List<String>): CommandExecutor = DeployCommand(params)
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
+        val parsedSourceDir = parsedArguments["source-dir"] as String
+        val parsedClear = !(parsedArguments["clear"] == null || parsedArguments["clear"] as? Boolean == false)
+        val parsedUsername = parsedArguments["username"] as String
+        val parsedPassword = parsedArguments["password"] as String
+        val parsedManagementUrl = parsedArguments["management-url"] as? String ?: "http://localhost:12400/realms/noumena"
+        val parsedClientSecret = parsedArguments["client-secret"] as? String ?: "paas"
+        val parsedClientId = parsedArguments["client-id"] as? String ?: "paas"
+        val parsedAuthUrl = parsedArguments["auth-url"] as? String ?: "http://localhost:11000"
+        return DeployCommand(
+            sourceDir = parsedSourceDir,
+            clear = parsedClear,
+            username = parsedUsername,
+            password = parsedPassword,
+            managementUrl = parsedManagementUrl,
+            clientSecret = parsedClientSecret,
+            clientId = parsedClientId,
+            authUrl = parsedAuthUrl,
+        )
+    }
+}
+
+class DeployCommand(
+    private val sourceDir: String,
+    private val clear: Boolean? = false,
+    private val username: String,
+    private val password: String,
+    private val managementUrl: String,
+    private val clientSecret: String,
+    private val clientId: String,
+    private val authUrl: String,
+) : CommandExecutor {
+    val deployService =
+        DeployService(
+            username = username,
+            password = password,
+            managementUrl = managementUrl,
+            clientId = clientId,
+            clientSecret = clientSecret,
+            authUrl = authUrl,
+        )
 
     override fun execute(output: ColorWriter): ExitCode {
-        // Parse arguments using the simpler parameter-based parser
-        val parser = CommandArgumentParser
-        val parsedArgs = parser.parse(args, parameters)
-
-        if (parsedArgs.unexpectedArgs.isNotEmpty()) {
-            output.error("Unknown arguments: ${parsedArgs.unexpectedArgs.joinToString(" ")}")
-            displayUsage(output)
-            return ExitCode.GENERAL_ERROR
-        }
-
-        val clearFlag = parsedArgs.hasFlag("clear")
-        val targetValue = parsedArgs.getValue("target")
-        val sourceDirValue = parsedArgs.getValue("sourceDir")
-        val configFileValue = parsedArgs.getValue("configFile")
-
-        if (sourceDirValue == null) {
-            output.error("Missing required parameter: --sourceDir <directory>")
-            displayUsage(output)
-            return ExitCode.GENERAL_ERROR
-        }
-
-        val sourceDirFile = File(sourceDirValue)
+        val sourceDirFile = File(sourceDir)
         if (!sourceDirFile.exists()) {
             output.error("Source directory does not exist: ${sourceDirFile.relativeOrAbsolute()}")
             return ExitCode.GENERAL_ERROR
         }
+
         if (!sourceDirFile.isDirectory) {
             output.error("Source path is not a directory: ${sourceDirFile.relativeOrAbsolute()}")
             return ExitCode.GENERAL_ERROR
         }
 
-        val targetConfig: EngineTargetConfig
-        val config =
-            if (configFileValue != null) {
-                val configFile = File(configFileValue)
-                if (!configFile.exists()) {
-                    output.error("Configuration file does not exist: $configFileValue")
-                    return ExitCode.GENERAL_ERROR
-                }
-                try {
-                    DeployConfig.load(configFile)
-                } catch (e: DeployConfigException) {
-                    output.error("Configuration error: ${e.message}")
-                    return ExitCode.CONFIG_ERROR
-                }
-            } else {
-                DeployConfig.load()
-            }
-
-        when {
-            targetValue != null -> {
-                // --target specified: Load and validate from config
-                try {
-                    targetConfig = loadAndValidateTargetConfig(config, targetValue) // Pass loaded config
-                } catch (e: DeployConfigException) {
-                    output.error("Configuration error: ${e.message}")
-                    // Optionally display full usage or config help here
-                    return ExitCode.CONFIG_ERROR
-                }
-            }
-
-            config.defaultTarget != null -> {
-                // No --target, but defaultTarget exists in config
-                output.info("Using default target '${config.defaultTarget}' from configuration.")
-                try {
-                    targetConfig = loadAndValidateTargetConfig(config, config.defaultTarget)
-                } catch (e: DeployConfigException) {
-                    output.error("Configuration error for default target '${config.defaultTarget}': ${e.message}")
-                    return ExitCode.CONFIG_ERROR
-                }
-            }
-
-            else -> {
-                // Neither --target provided, nor defaultTarget in config
-                output.error("Missing required parameter: --target <name> or set defaultTarget in deploy.yml")
-                displayUsage(output)
-                return ExitCode.GENERAL_ERROR
-            }
-        }
-
-        if (clearFlag) {
-            when (val clearResult = deployService.clearApplication(targetConfig)) {
+        if (clear == true) {
+            when (val clearResult = deployService.clearApplication()) {
                 is DeployResult.ClearSuccess -> {
-                    output.info("Application contents cleared for ${targetConfig.engineManagementUrl}")
+                    output.info("Application contents cleared for $managementUrl")
                 }
 
                 is DeployResult.ClearFailed -> {
@@ -151,9 +171,9 @@ class DeployCommand(
             }
         }
 
-        return when (val deployResult = deployService.deploySourcesAndMigrations(targetConfig, sourceDirValue)) {
+        return when (val deployResult = deployService.deploySourcesAndMigrations(sourceDirFile.absolutePath)) {
             is DeployResult.Success -> {
-                output.success("Successfully deployed NPL sources and migrations to ${targetConfig.engineManagementUrl}.")
+                output.success("Successfully deployed NPL sources and migrations to $managementUrl.")
                 ExitCode.SUCCESS
             }
 
@@ -167,47 +187,5 @@ class DeployCommand(
                 ExitCode.INTERNAL_ERROR
             }
         }
-    }
-
-    private fun loadAndValidateTargetConfig(
-        config: DeployConfig,
-        targetLabel: String,
-    ): EngineTargetConfig { // Accept config as parameter
-        DeployConfig.validateTarget(config, targetLabel)
-        return config.targets[targetLabel] as EngineTargetConfig
-    }
-
-    private fun displayUsage(writer: ColorWriter) {
-        writer.info(USAGE_STRING)
-    }
-
-    companion object {
-        val USAGE_STRING =
-            """
-            Usage: deploy --sourceDir <directory> [--target <name>] [--configFile <path>] [--clear]
-
-            Deploys NPL sources to a Noumena Engine instance.
-
-            Arguments:
-              --sourceDir <directory>   Directory containing NPL sources (required).
-                                 IMPORTANT: The directory must contain a valid NPL source structure, including
-                                 migrations. E.g.:
-                                  main
-                                  ├── npl-1.0
-                                  │   └── processes
-                                  │       └── demo.npl
-                                  └── migration.yml
-
-            Target Specification (one required):
-              --target <name>     Named target from deploy.yml to deploy to.
-                                If --target is omitted, the 'defaultTarget' from deploy.yml is used if set.
-
-            Options:
-              --configFile <path> Path to deploy.yml configuration file.
-                                  If not specified, looks for .npl/deploy.yml in current directory or home directory.
-              --clear             Clear application contents before deployment.
-
-            Configuration for --target is read from .npl/deploy.yml (current dir or home dir) unless --configFile is specified.
-            """.trimIndent()
     }
 }

@@ -40,11 +40,7 @@ offers several useful commands for interacting with your NPL projects.
     curl -s https://documentation.noumenadigital.com/get-npl-cli.sh | bash
     ```
 
-    You will need to manually add the `npl` executable to your PATH. The script above will not do that for you.
-
-=== "Windows without WSL"
-
-    Download and install the latest `.exe` executable [here](https://github.com/NoumenaDigital/npl-cli/releases).
+    You may have to restart the WSL terminal to ensure the CLI is available in your PATH after installing the NPL CLI.
 
 ## Commands
 
@@ -67,6 +63,38 @@ To see a description of how to use each command, run `npl help`
 | `npl cloud deploy frontend` | Deploys frontend build sources to a NOUMENA Cloud Application                                 |
 | `npl cloud clear`           | Deletes NPL sources and clears protocols from the database from the NOUMENA Cloud Application |
 
+## Configuration file
+
+The NPL CLI uses a per-project configuration file named `npl.yml` to store project-specific settings. Below is an
+example configuration file:
+
+```yaml
+runtime: # Configuration for the Noumena Platform runtime
+  version: 2025.2.2 # Specify the Noumena Platform runtime version
+
+cloud: # Configuration for NOUMENA Cloud deployment
+  tenant: my-tenant # Slug of the NOUMENA Cloud tenant
+  app: my-npl-app # Slug of the NOUMENA Cloud application
+  clear: false # Whether to clear existing protocols and data before deployment
+
+local: # Configuration for deploying to a local NOUMENA Engine instance
+  managementUrl: http://localhost:12400 # URL of the local NOUMENA Engine management API
+  authUrl: http://localhost:11000 # URL of IAM service for authentication
+  username: my-user # Username for authentication
+  password: my-pass # Password for authentication
+  clientId: npl-cli # Client ID for authentication
+  clientSecret: secret # Client secret for authentication
+
+structure: # Configuration for project structure
+  sourceDir: src/main/npl # Directory containing NPL source files
+  testSourceDir: src/test/npl # Directory containing NPL test source files
+  outputDir: output/ # Directory for generated files (e.g., OpenAPI specs, PUML diagrams)
+  frontend: frontend/output # Directory containing frontend build files (must contain an index.html file)
+  migration: src/main/migration.yml # Migration file – required for cloud deployments
+  rules: src/main/rules/rules.yml # Rules file for party automation (used by openapi command if present)
+  coverage: true # Whether to generate code coverage reports when running tests
+```
+
 ## Supported Operating Systems and architectures
 
 |         | ARM 64 | AMD 64 |
@@ -79,11 +107,16 @@ To see a description of how to use each command, run `npl help`
 
 Once you've installed the CLI, you can use it in MCP mode with your local AI tools.
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](cursor://anysphere.cursor-deeplink/mcp/install?name=npl-cli&config=ewogICAgImNvbW1hbmQiOiAibnBsIiwKICAgICJhcmdzIjogWyJtY3AiXQp9Cg==)
+### VS Code and Cursor integration
 
-[Install in VS Code](vscode:mcp/install?%7B%22name%22%3A%22NPL%20CLI%22%2C%22command%22%3A%22npl%22%2C%22args%22%3A%5B%22mcp%22%5D%7D)
+Follow one of the methods below to install NPL CLI as an MCP server in Cursor or VS Code:
 
-Simply add `npl-cli` to your MCP configuration file, e.g.
+- [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](cursor://anysphere.cursor-deeplink/mcp/install?name=npl-cli&config=ewogICAgImNvbW1hbmQiOiAibnBsIiwKICAgICJhcmdzIjogWyJtY3AiXQp9Cg==)
+
+- [Install in VS Code](vscode:mcp/install?%7B%22name%22%3A%22NPL%20CLI%22%2C%22command%22%3A%22npl%22%2C%22args%22%3A%5B%22mcp%22%5D%7D)
+  (select `Install server`)
+
+Or simply add `npl-cli` to your MCP configuration file, e.g.
 
 ```json
 {
@@ -96,3 +129,24 @@ Simply add `npl-cli` to your MCP configuration file, e.g.
   }
 }
 ```
+
+### Claude Code integration
+
+Type the following in the Claude Code terminal to add NPL CLI as an MCP server:
+
+```shell
+claude mcp add npl -- npl mcp
+```
+
+## Service Accounts
+
+The NPL CLI supports the use of service accounts for authentication and authorization when interacting with NOUMENA
+Cloud. Service accounts are special accounts that belong to your application, instead of to an individual end user. They
+are used for machine-to-machine communication.
+
+To create a secret key for a service account, log in to your NOUMENA Cloud account and navigate to the "Settings" page
+of your tenant. You will find the "Service Accounts" section where you can generate a secret key. Note that this option
+is only available to the tenant's owner(s).
+
+The NPL CLI checks if the `NPL_SERVICE_ACCOUNT_CLIENT_SECRET` environment variable is set. If it is, the CLI uses it for
+the deployment, otherwise it will fall back to the user authentication and prompt for login.

@@ -56,7 +56,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--projectDir", "npl-app", "--templateUrl", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--project-dir", "npl-app", "--template-url", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val projectDir = workingDirectory.resolve("npl-app")
@@ -90,7 +90,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--projectDir", "npl-app", "--templateUrl", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--project-dir", "npl-app", "--template-url", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val projectDir = workingDirectory.resolve("npl-app")
@@ -110,7 +110,7 @@ class InitCommandIT :
             mockRepo.shutdown()
         }
 
-        test("Init command: Happy path with no --projectDir arg") {
+        test("Init command: Happy path with no --project-dir arg") {
             var mockRepo = MockWebServer()
             val resourceDir = Paths.get("src/test/resources/test-files").toAbsolutePath().normalize()
             val repoArchive = resourceDir.resolve("samples.zip").toFile()
@@ -164,7 +164,7 @@ class InitCommandIT :
             withInitTestContext(testDir = listOf("success"), cleanFunction = customClean) {
                 backup(projectDir.parentFile)
 
-                runCommand(commands = listOf("init", "--templateUrl", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--template-url", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val expectedOutput =
@@ -194,7 +194,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--projectDir", projectDir.name, "--templateUrl", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--project-dir", projectDir.name, "--template-url", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val expectedOutput =
@@ -222,7 +222,7 @@ class InitCommandIT :
             )
 
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--templateUrl", mockRepo.url("/").toString())) {
+                runCommand(commands = listOf("init", "--template-url", mockRepo.url("/").toString())) {
                     process.waitFor()
 
                     val expectedOutput =
@@ -239,16 +239,16 @@ class InitCommandIT :
 
         test("Init command: Fail if unexpected arguments are given") {
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--projectDir", projectDir.name, "--unexpected")) {
+                runCommand(commands = listOf("init", "--project-dir", projectDir.name, "--unexpected")) {
                     process.waitFor()
 
                     val expectedOutput =
                         """
-                    npl init: Unknown arguments found: --unexpected
+                    Unexpected arguments: --unexpected
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
                 }
             }
         }
@@ -256,7 +256,7 @@ class InitCommandIT :
         test("Init command: Fail if directory with project name already exists") {
             withInitTestContext(listOf("success")) {
                 projectDir.canonicalFile.mkdir()
-                runCommand(commands = listOf("init", "--projectDir", projectDir.name)) {
+                runCommand(commands = listOf("init", "--project-dir", projectDir.name)) {
                     process.waitFor()
 
                     val expectedOutput =
@@ -270,14 +270,14 @@ class InitCommandIT :
             }
         }
 
-        test("Init command: --bare and --templateUrl options are mutually exclusive") {
+        test("Init command: --bare and --template-url options are mutually exclusive") {
             withInitTestContext(testDir = listOf("success")) {
-                runCommand(commands = listOf("init", "--projectDir", projectDir.name, "--bare", "--templateUrl", "https://example.com")) {
+                runCommand(commands = listOf("init", "--project-dir", projectDir.name, "--bare", "--template-url", "https://example.com")) {
                     process.waitFor()
 
                     val expectedOutput =
                         """
-                    npl init: Cannot use --bare and --templateUrl together.
+                    npl init: Cannot use --bare and --template-url together.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput

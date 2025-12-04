@@ -10,6 +10,7 @@ import com.noumenadigital.npl.cli.model.TokenResponse
 import com.noumenadigital.npl.cli.util.IOUtils
 import com.noumenadigital.npl.cli.util.IOUtils.readObjectFromFile
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.nio.file.Path
 import kotlin.io.path.Path
 
@@ -22,6 +23,10 @@ class CloudAuthManager(
         openBrowser(deviceCode.verificationUriComplete, output)
         val token = pollForToken(deviceCode)
         IOUtils.writeObjectToFile(noumenaConfigFilePath.toFile(), token)
+    }
+
+    fun loginBlocking(output: ColorWriter) {
+        runBlocking { login(output) }
     }
 
     fun logout() {
@@ -37,8 +42,8 @@ class CloudAuthManager(
         while (true) {
             try {
                 return noumenaCloudAuthClient.requestToken(deviceCode)
-            } catch (e: CloudAuthorizationPendingException) {
-            } catch (e: CloudSlowDownException) {
+            } catch (_: CloudAuthorizationPendingException) {
+            } catch (_: CloudSlowDownException) {
                 currentInterval += 1000
             } catch (e: RuntimeException) {
                 throw CloudCommandException(e.message, e)
@@ -63,6 +68,24 @@ class CloudAuthManager(
         val updatedToken = noumenaCloudAuthClient.getAccessTokenByRefreshToken(storedToken.refreshToken)
         IOUtils.writeObjectToFile(noumenaConfigFilePath.toFile(), updatedToken)
         return updatedToken
+    }
+
+    fun getServiceAccountAccessToken(
+        output: ColorWriter,
+        clientId: String,
+        clientSecret: String,
+    ): String {
+        val token =
+            noumenaCloudAuthClient.getAccessTokenByClientCredentials(
+                serviceClientId = clientId,
+                serviceClientSecret = clientSecret,
+            )
+        val accessToken = token.accessToken
+        if (accessToken.isNullOrBlank()) {
+            throw CloudCommandException("Access token is not available for the provided service account credentials.")
+        }
+        output.info("Successfully authenticated with service account credentials")
+        return accessToken
     }
 
     private fun openBrowser(

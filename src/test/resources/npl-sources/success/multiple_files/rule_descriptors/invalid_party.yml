@@ -1,6 +1,6 @@
 objects.iou.Iou:
   unknown:
     set:
-      entity:
+      claims:
         email:
           - unknown@example.com

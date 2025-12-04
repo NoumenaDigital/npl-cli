@@ -12,6 +12,11 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
+import okhttp3.mockwebserver.Dispatcher
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
+import org.intellij.lang.annotations.Language
 import java.io.File
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -55,6 +60,20 @@ object TestUtils {
     // Determines how to run the tests based on the test.mode system property
     private fun getTestMode(): String = System.getenv().getOrDefault("TEST_MODE", "direct")
 
+    fun withYamlConfig(
+        @Language("yaml") yaml: String,
+        test: () -> Unit,
+    ): File =
+        File("npl.yml").apply {
+            createNewFile()
+            writeText(yaml)
+            try {
+                test()
+            } finally {
+                delete()
+            }
+        }
+
     fun getTestResourcesPath(subPath: List<String> = emptyList()): Path {
         // Use the standard resources directory location
         val rootDir = File("src/test/resources").canonicalFile
@@ -64,10 +83,13 @@ object TestUtils {
             .normalize()
     }
 
+    fun String.toYamlSafePath(): String = replace('\\', '/')
+
     fun String.normalize(withPadding: Boolean = true): String =
         replace("\r\n", "\n")
             // Normalize path separators to forward slashes
             .replace('\\', '/')
+            .replace(Regex("file:/+"), "file/")
             // Normalize windows drive letters
             .replace(Regex("[A-Z]:/"), "/")
             // Normalize durations
@@ -90,7 +112,7 @@ object TestUtils {
             when (testMode) {
                 "binary" -> runWithBinary(commands, env)
                 "jar" -> runWithJar(commands, env)
-                else -> runDirect(commands)
+                else -> runDirect(commands, env)
             }
 
         testContext.apply(test)
@@ -171,7 +193,12 @@ object TestUtils {
         )
     }
 
-    private fun runDirect(commands: List<String>): TestContext {
+    private fun runDirect(
+        commands: List<String>,
+        env: Map<String, String>,
+    ): TestContext {
+        env.forEach { (k, v) -> System.setProperty(k, v) }
+
         val stringWriter = ColorWriter(StringWriter(), false)
 
         val exitCode = CommandProcessor().process(commands, stringWriter)
@@ -349,4 +376,82 @@ object TestUtils {
             outputWriter.flush()
         }
     }
+}
+
+const val APP_ID_OK = "1a978a70-1709-40c1-82d7-30114edfc46b"
+
+fun createOidcMockServer(): MockWebServer {
+    val server = MockWebServer()
+
+    server.dispatcher =
+        object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse =
+                when (request.path) {
+                    "/realms/paas/protocol/openid-connect/token" -> {
+                        val body = request.body.readUtf8()
+                        if (body.contains("client_secret=wrong")) {
+                            MockResponse()
+                                .setResponseCode(401)
+                                .setBody("Client Error.")
+                        } else if (body.contains("grant_type=client_credentials")) {
+                            MockResponse()
+                                .setResponseCode(200)
+                                .setHeader("Content-Type", "application/json")
+                                .setBody(
+                                    """
+                                    {
+                                        "access_token": "mock-access-token",
+                                        "token_type": "bearer",
+                                        "expires_in": 3600
+                                    }
+                                    """.trimIndent(),
+                                )
+                        } else {
+                            MockResponse().setResponseCode(400)
+                        }
+                    }
+
+                    else -> MockResponse().setResponseCode(404)
+                }
+        }
+
+    return server
+}
+
+fun createNcMockServer(additionalPaths: Map<String, MockResponse> = emptyMap()): MockWebServer {
+    val server = MockWebServer()
+
+    server.dispatcher =
+        object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse =
+                when (request.path) {
+                    "/api/v1/tenants" -> {
+                        MockResponse()
+                            .setResponseCode(200)
+                            .setHeader("Content-Type", "application/json")
+                            .setBody(
+                                """
+                                [
+                                  {
+                                    "id": "80031abc-641b-4330-a473-16fd6d5ae305",
+                                    "name": "tenantname",
+                                    "slug": "tenantslug",
+                                    "applications": [
+                                      {
+                                        "id": "$APP_ID_OK",
+                                        "name": "appname",
+                                        "slug": "appslug"
+                                      }
+                                    ]
+                                  }
+                                ]
+                                """.trimIndent(),
+                            )
+                    }
+
+                    else -> additionalPaths[request.path] ?: MockResponse().setResponseCode(404)
+                }
+        }
+
+    return server
 }

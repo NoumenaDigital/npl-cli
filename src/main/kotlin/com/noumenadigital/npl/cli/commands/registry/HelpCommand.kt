@@ -4,26 +4,29 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.Commands
 import com.noumenadigital.npl.cli.service.ColorWriter
 
-open class HelpCommand : CommandExecutor {
+object HelpCommandDescriptor : CommandDescriptor {
     override val commandName: String = "help"
     override val description: String = "Display the description for npl-cli commands"
     override val supportsMcp: Boolean = false
 
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor = HelpCommand()
+}
+
+open class HelpCommand : CommandExecutor {
     override fun execute(output: ColorWriter): ExitCode {
-        printHelp(Commands.entries.map { it.commandExecutorFactory() }, output)
+        printHelp(Commands.entries.map { it.commandDescriptor() }, output)
         return ExitCode.SUCCESS
     }
 
     protected fun printHelp(
-        entries: List<CommandExecutor>,
+        entries: List<CommandDescriptor>,
         output: ColorWriter,
     ) {
         val commandPadding = entries.maxOf { it.commandName.length } + 4
         entries.forEach { command ->
             val name = command.commandName.padEnd(commandPadding)
             output.info("$name${command.description}")
-            val executor = command
-            executor.parameters
+            command.parameters
                 .filter { !it.isHidden }
                 .forEach { param ->
                     val paramIndent = " ".repeat(commandPadding + 2)
@@ -43,6 +46,14 @@ open class HelpCommand : CommandExecutor {
                         }
                     output.info("$paramIndent$formattedName$requiredMark  ${param.description}$defaultText")
                 }
+
+            if (command.envVariables.isNotEmpty()) {
+                val envIndent = " ".repeat(commandPadding + 2)
+                command.envVariables.forEach { envVar ->
+                    val requiredMark = if (envVar.isRequired) " (required)" else ""
+                    output.info("$envIndent${envVar.name}  ${envVar.type}$requiredMark: ${envVar.description}")
+                }
+            }
         }
     }
 }

@@ -88,7 +88,7 @@ jobs:
             output_name: npl-cli-linux-aarch64-${{needs.determine-version.outputs.version}}
             static: false
           - os: macos
-            runner: macos-13
+            runner: macos-15-intel
             arch: x86_64
             output_name: npl-cli-macos-x86_64-${{needs.determine-version.outputs.version}}
             sign_and_notarize: true
@@ -206,9 +206,59 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  create-windows-installer:
+    name: "Create Windows Installer"
+    needs: [determine-version, build-native]
+    if: needs.determine-version.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: windows-installer
+    env:
+      INSTALLER_NAME: npl-cli-windows-x86_64-${{needs.determine-version.outputs.version}}.exe
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Download versioned windows executable"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.INSTALLER_NAME }}
+          path: ./windows-installer/build
+
+      - name: "Move exe into place"
+        run: |
+          mv ./build/${{ env.INSTALLER_NAME }} .
+
+      - name: "Download and link EnVar plugin"
+        run: |
+          curl -LO https://nsis.sourceforge.io/mediawiki/images/7/7f/EnVar_plugin.zip
+          unzip -d EnVar_plugin EnVar_plugin.zip
+
+      - name: "Copy LICENSE.md"
+        run: cp ../LICENSE.md .
+
+      - name: "Build installer"
+        run: |
+          docker run \
+          -v .:/npl-cli-installer \
+          -v ./EnVar_plugin/Plugins:/usr/share/nsis/Plugins \
+          hp41/nsis:3.01-1 \
+          -DVERSION=${{needs.determine-version.outputs.version}} /npl-cli-installer/npl-cli.nsi
+
+      - name: "Upload windows installer artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: npl-cli-installer.exe
+          path: windows-installer/dist/npl-cli-installer.exe
+          if-no-files-found: error
+          retention-days: 30
+
   create-release:
     name: "Create GitHub Release"
-    needs: [determine-version, build-native]
+    needs: [determine-version, build-native, create-windows-installer]
     if: needs.determine-version.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:

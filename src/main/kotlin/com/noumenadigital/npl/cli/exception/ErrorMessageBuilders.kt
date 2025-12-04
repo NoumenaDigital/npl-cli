@@ -27,6 +27,8 @@ fun CommandNotFoundException.buildOutputMessage(): String {
 fun Exception.buildOutputMessage(inputArgs: List<String>): String =
     "Executing command: [${inputArgs.joinToString(" ")}] FAILED. Error: ${stackTraceToString().trim()}"
 
+fun CommandValidationException.buildOutputMessage(): String = this.message
+
 fun DeployConfigException.buildOutputMessage(): String {
     val errorLines =
         this.message
@@ -34,32 +36,43 @@ fun DeployConfigException.buildOutputMessage(): String {
             .filter { it.isNotBlank() }
             .joinToString("\n") { "  $it" }
 
-    val helpText =
-        """
-
-        Please create or check the configuration file at .npl/deploy.yml
-        (in the current directory or your home directory ~/.npl/deploy.yml)
-        with the following format:
-
-        schemaVersion: v1
-        targets:
-          <your-target-name>:
-            type: engine
-            engineManagementUrl: <URL of the Noumena Engine API>
-            authUrl: <URL of the authentication endpoint>
-            username: <username for authentication>
-            password: <password for authentication>
-            clientId: <client ID for authentication>
-            clientSecret: <client secret for authentication>
-        """.trimIndent()
-
-    return "Configuration errors:\n$errorLines\n$helpText"
+    return "Configuration errors:\n$errorLines"
 }
 
-fun ClientSetupException.buildOutputMessage(): String = "Client setup error: ${this.message}"
+fun ClientSetupException.buildOutputMessage(): String =
+    if (this.isConnectionError) {
+        this.message
+    } else {
+        "Client setup error: ${this.message}"
+    }
+
+fun ArgumentParsingException.buildOutputMessage(): String = this.message
 
 fun AuthorizationFailedException.buildOutputMessage(): String = this.message
 
 fun CloudCommandException.buildOutputMessage(): String = "Command ${this.commandName} failed: ${this.message}"
 
-fun RequiredParameterMissing.buildOutputMessage(): String = "Command parsing failed: required parameter ${this.parameterName} is missing"
+fun RequiredParameterMissing.buildOutputMessage(): String {
+    val params = parameterNames.joinToString(", ")
+
+    val yamlExamplesFormatted =
+        yamlExamples
+            .filterNotNull()
+            .joinToString("\n") { "  $it" }
+
+    val usagePart = usageInstruction?.let { "\nUsage:\n  $it\n" } ?: ""
+
+    return """
+        |Missing required parameter(s): $params
+        |
+        |You can provide them in one of the following ways:
+        |
+        |  • As command-line arguments:
+        |${parameterNames.joinToString("\n") { "      --$it <value>" }}
+        |
+        |  • In your npl.yml configuration file:
+        |
+        |$yamlExamplesFormatted
+        |$usagePart
+        """.trimMargin()
+}

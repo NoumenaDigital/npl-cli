@@ -7,11 +7,15 @@ import java.util.Properties
 
 val logger = logger {}
 
-data object VersionCommand : CommandExecutor {
+object VersionCommandDescriptor : CommandDescriptor {
     override val commandName: String = "version"
     override val description: String = "Display the current version of the NPL CLI"
     override val supportsMcp: Boolean = false
 
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor = VersionCommand
+}
+
+data object VersionCommand : CommandExecutor {
     override fun execute(output: ColorWriter): ExitCode {
         val version = getVersionFromPom()
         if (version == null) {

@@ -93,4 +93,40 @@ class CloudAuthManagerTest :
                 }
             }
         }
+
+        test("getServiceAccountAccessToken returns access token from client credentials without storing") {
+            withTestContext {
+                val stubClient =
+                    object : NoumenaCloudAuthClient(NoumenaCloudAuthConfig("id", "secret", "http://localhost:8080")) {
+                        override fun getAccessTokenByClientCredentials(
+                            serviceClientId: String,
+                            serviceClientSecret: String,
+                        ): TokenResponse {
+                            serviceClientId shouldBe "svc-id"
+                            serviceClientSecret shouldBe "svc-secret"
+                            return TokenResponse(refreshToken = null, accessToken = "svc-access")
+                        }
+                    }
+                val manager = CloudAuthManager(stubClient)
+                val token = manager.getServiceAccountAccessToken(colorWriter, "svc-id", "svc-secret")
+                token shouldBe "svc-access"
+                writer.toString() shouldBe "Successfully authenticated with service account credentials\n"
+            }
+        }
+
+        test("getServiceAccountAccessToken throws when access token is missing") {
+            withTestContext {
+                val stubClient =
+                    object : NoumenaCloudAuthClient(NoumenaCloudAuthConfig("id", "secret", "http://localhost:8080")) {
+                        override fun getAccessTokenByClientCredentials(
+                            serviceClientId: String,
+                            serviceClientSecret: String,
+                        ): TokenResponse = TokenResponse(refreshToken = null, accessToken = null)
+                    }
+                val manager = CloudAuthManager(stubClient)
+                shouldThrow<CloudCommandException> {
+                    manager.getServiceAccountAccessToken(colorWriter, "svc-id", "svc-secret")
+                }
+            }
+        }
     })

@@ -1,0 +1,19 @@
+package processes;
+
+@api
+protocol[account_holder, bank] Balance(var obs: Map<Text, Map<Text, Set<Text>>>) {
+
+    init {
+        var obsParty = mapOf<Text, Party>();
+        for (kv in obs) {
+            obsParty = obsParty.with(kv.first, partyOf(kv.second));
+        }
+        observers = obsParty;
+    }
+
+    var balance: Number = 0;
+
+    permission[bank] loadFunds(amount: Number) {
+        balance = balance + amount;
+    }
+}

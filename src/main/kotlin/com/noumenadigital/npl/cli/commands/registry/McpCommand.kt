@@ -6,6 +6,7 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.CloudCommands
 import com.noumenadigital.npl.cli.commands.CloudDeployCommands
 import com.noumenadigital.npl.cli.commands.Commands
+import com.noumenadigital.npl.cli.config.ConfigResolver
 import com.noumenadigital.npl.cli.service.ColorWriter
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
@@ -31,19 +32,23 @@ import java.io.PrintStream
 import java.io.PrintWriter
 import java.io.StringWriter
 
-object McpCommand : CommandExecutor {
-    private val logger = LoggerFactory.getLogger(McpCommand::class.java)
+object McpCommandDescriptor : CommandDescriptor {
     override val commandName: String = "mcp"
     override val description: String = "Start an MCP server exposing NPL CLI functionality over stdio"
     override val supportsMcp: Boolean = false
+
+    override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor = McpCommand
+}
+
+object McpCommand : CommandExecutor {
+    private val logger = LoggerFactory.getLogger(McpCommand::class.java)
 
     override fun execute(output: ColorWriter): ExitCode {
         // Only for MCP: reconfigure Logback to log to System.err
         try {
             val loggerFactory = LoggerFactory.getILoggerFactory()
             if (loggerFactory is LoggerContext) {
-                val context = loggerFactory
-                val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
+                val rootLogger = loggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
                 val appenders = rootLogger.iteratorForAppenders()
                 while (appenders.hasNext()) {
                     val appender = appenders.next()
@@ -127,7 +132,7 @@ object McpCommand : CommandExecutor {
 
     private fun addAllTools(server: Server) {
         (Commands.entries + CloudCommands.entries + CloudDeployCommands.entries).forEach { command ->
-            val executor = command.getBaseExecutor()
+            val executor = command.getCommandDescriptor()
             if (executor.supportsMcp) {
                 val toolName = command.commandName.replace(" ", "_")
                 addTool(server, toolName, executor)
@@ -138,13 +143,13 @@ object McpCommand : CommandExecutor {
     private fun addTool(
         server: Server,
         toolName: String,
-        executor: CommandExecutor,
+        commandDescriptor: CommandDescriptor,
     ) {
-        val schema = executor.toMcpToolInput()
+        val schema = commandDescriptor.toMcpToolInput()
 
         server.addTool(
             name = toolName,
-            description = executor.description,
+            description = commandDescriptor.description,
             inputSchema = schema,
         ) { req ->
             logger.info("MCP tool called: $toolName with args: ${req.arguments}")
@@ -153,9 +158,11 @@ object McpCommand : CommandExecutor {
             val colorWriter = ColorWriter(PrintWriter(outputBuffer))
 
             try {
-                val cmdArgs = buildCommandArgs(args, executor)
+                val cmdArgs = buildCommandArgs(args, commandDescriptor)
                 logger.info("Built command args: $cmdArgs")
-                val commandInstance = executor.createInstance(cmdArgs)
+                val default = ConfigResolver(cmdArgs, commandDescriptor)
+                val parsedArguments = default.getParsedCommandArgumentsWithBasicValidation()
+                val commandInstance = commandDescriptor.createCommandExecutorInstance(parsedArguments)
                 val exitCode = commandInstance.execute(colorWriter)
 
                 logger.info("Tool execution completed with exit code: $exitCode")
@@ -179,7 +186,7 @@ object McpCommand : CommandExecutor {
                             TextContent(
                                 text =
                                     buildJsonObject {
-                                        put("error", "Error running ${executor.commandName}: ${e.message}")
+                                        put("error", "Error running ${commandDescriptor.commandName}: ${e.message}")
                                         put("success", false)
                                     }.toString(),
                             ),
@@ -191,11 +198,11 @@ object McpCommand : CommandExecutor {
 
     private fun buildCommandArgs(
         args: Map<String, JsonElement>,
-        executor: CommandExecutor,
+        commandDescriptor: CommandDescriptor,
     ): List<String> {
         val cmdArgs = mutableListOf<String>()
 
-        executor.parameters.filter { !it.isHidden }.forEach { parameter ->
+        commandDescriptor.parameters.filter { !it.isHidden }.forEach { parameter ->
             val jsonElement = args[parameter.name]
 
             if (jsonElement != null) {

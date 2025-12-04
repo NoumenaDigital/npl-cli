@@ -25,6 +25,9 @@
       "type": "[Lcom.fasterxml.jackson.databind.ser.Serializers;"
     },
     {
+      "type": "[Lcom.noumenadigital.npl.cli.commands.CommandsRegistry;"
+    },
+    {
       "type": "[Ljava.lang.Object;"
     },
     {
@@ -234,9 +237,6 @@
       "type": "com.noumenadigital.npl.cli.config.DeployConfig$Companion"
     },
     {
-      "type": "com.noumenadigital.npl.cli.config.DeploymentTargetConfig"
-    },
-    {
       "type": "com.noumenadigital.npl.cli.config.EngineTargetConfig",
       "allDeclaredFields": true,
       "allDeclaredMethods": true,
@@ -258,6 +258,58 @@
             "java.lang.String",
             "java.lang.String"
           ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "com.noumenadigital.npl.cli.config.YamlConfig$Runtime",
+            "com.noumenadigital.npl.cli.config.YamlConfig$Cloud",
+            "com.noumenadigital.npl.cli.config.YamlConfig$Local",
+            "com.noumenadigital.npl.cli.config.YamlConfig$Structure",
+            "int",
+            "kotlin.jvm.internal.DefaultConstructorMarker"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig$Cloud",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig$Local",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig$Runtime",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.noumenadigital.npl.cli.config.YamlConfig$Structure",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
         }
       ]
     },
@@ -1269,6 +1321,10 @@
     },
     {
       "type": "io.swagger.v3.oas.models.media.DateSchema",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.swagger.v3.oas.models.media.DateTimeSchema",
       "allDeclaredFields": true
     },
     {
@@ -3180,7 +3236,8 @@
       "locales": [
         "en",
         "en-CH",
-        "en-US"
+        "en-US",
+        "und"
       ]
     },
     {
@@ -3188,7 +3245,8 @@
       "locales": [
         "en",
         "en-CH",
-        "en-US"
+        "en-US",
+        "und"
       ]
     },
     {

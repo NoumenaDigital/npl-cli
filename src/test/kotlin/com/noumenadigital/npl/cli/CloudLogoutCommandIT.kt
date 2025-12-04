@@ -99,7 +99,17 @@ class CloudLogoutCommandIT :
                 val refreshTokenToVerify = "success-refresh-token"
                 withTestContext(refreshTokenToVerify) {
                     runCommand(
-                        commands = listOf("cloud", "login", "--url", "${mockOidc.url("/realms/paas/")}"),
+                        commands =
+                            listOf(
+                                "cloud",
+                                "login",
+                                "--auth-url",
+                                "${mockOidc.url("/realms/paas/")}",
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
+                            ),
                         env =
                             mapOf(
                                 NPL_CLI_BROWSER_DISABLED to "true",

@@ -1,6 +1,6 @@
 unknown.pkg.Iou:
   issuer:
     set:
-      entity:
+      claims:
         email:
           - issuer@example.com

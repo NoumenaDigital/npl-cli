@@ -191,13 +191,22 @@ class CloudClearCommandIT :
         }
 
         fun withTestContext(test: TestContext.() -> Unit) {
-            val context =
-                TestContext()
+            val context = TestContext()
             try {
                 System.setProperty("NPL_CLI_BROWSER_DISABLED", "true")
                 context.setupMockServers()
                 runCommand(
-                    commands = listOf("cloud", "login", "--url", context.mockOidc.url("/realms/paas/").toString()),
+                    commands =
+                        listOf(
+                            "cloud",
+                            "login",
+                            "--auth-url",
+                            context.mockOidc.url("/realms/paas/").toString(),
+                            "--client-id",
+                            "client-id-ok",
+                            "--client-secret",
+                            "client-secret-ok",
+                        ),
                     env = mapOf("NPL_CLI_BROWSER_DISABLED" to "true"),
                 ) {
                     process.waitFor()
@@ -225,8 +234,12 @@ class CloudClearCommandIT :
                                 "tenantslug",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "client-id-ok",
+                                "--client-secret",
+                                "client-secret-ok",
                             ),
                     ) {
                         process.waitFor()
@@ -250,15 +263,17 @@ class CloudClearCommandIT :
                             listOf(
                                 "cloud",
                                 "clear",
-                                "--clientId",
+                                "--client-id",
                                 "wrong",
+                                "--client-secret",
+                                "good",
                                 "--app",
                                 "appslug",
                                 "--tenant",
                                 "tenantslug",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
                             ),
                     ) {
@@ -287,8 +302,12 @@ class CloudClearCommandIT :
                                 "non-existing",
                                 "--url",
                                 mockNC.url("/").toString(),
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -316,8 +335,12 @@ class CloudClearCommandIT :
                                 "default_tenant",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -346,8 +369,12 @@ class CloudClearCommandIT :
                                 "default_tenant",
                                 "--url",
                                 "non-url",
-                                "--authUrl",
+                                "--auth-url",
                                 mockOidc.url("/realms/paas/").toString(),
+                                "--client-id",
+                                "paas",
+                                "--client-secret",
+                                "paas",
                             ),
                     ) {
                         process.waitFor()
@@ -358,6 +385,40 @@ class CloudClearCommandIT :
 
                         output.normalize() shouldBe expectedOutput
                         process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    }
+                }
+            }
+        }
+
+        context("Yaml config") {
+            withTestContext {
+                TestUtils.withYamlConfig(
+                    """
+                    cloud:
+                      app: appslug
+                      tenant: tenantslug
+                      url: ${mockNC.url("/")}
+                      authUrl: "http://localhost:${mockOidc.port}/realms/paas/"
+                      clientId: paas
+                      clientSecret: paas
+                    """.trimIndent(),
+                ) {
+
+                    runCommand(
+                        commands =
+                            listOf(
+                                "cloud",
+                                "clear",
+                            ),
+                    ) {
+                        process.waitFor()
+                        val expectedOutput =
+                            """
+                        NPL sources successfully cleared from NOUMENA Cloud app.
+                        """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
                     }
                 }
             }
