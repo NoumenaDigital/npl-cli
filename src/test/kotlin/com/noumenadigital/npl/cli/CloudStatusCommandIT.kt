@@ -260,35 +260,37 @@ class CloudStatusCommandIT :
         }
 
         context("Yaml config") {
-            withTestContext {
-                TestUtils.withYamlConfig(
-                    """
-                    cloud:
-                      url: ${mockNC.url("/")}
-                      authUrl: "http://localhost:${mockOidc.port}/realms/paas/"
-                      clientId: paas
-                      clientSecret: paas
-                    """.trimIndent(),
-                ) {
-
-                    runCommand(
-                        commands =
-                            listOf(
-                                "cloud",
-                                "status",
-                            ),
+            test("cloud status uses yaml config") {
+                withTestContext {
+                    TestUtils.withYamlConfig(
+                        """
+                        cloud:
+                          url: ${mockNC.url("/")}
+                          authUrl: "http://localhost:${mockOidc.port}/realms/paas/"
+                          clientId: paas
+                          clientSecret: paas
+                        """.trimIndent(),
                     ) {
-                        process.waitFor()
-                        val expectedOutput =
-                            """
-                            📂 My Tenant (my-tenant) [active] 🟢
-                              ├── 📦 My App (my-app) [active] 🟢
-                              └── 📦 Another App (another-app) [pending] 🟡
-                            📂 Other Tenant (other-tenant) [deactivated] 🔴
-                            """.normalize()
 
-                        output.normalize() shouldBe expectedOutput
-                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        runCommand(
+                            commands =
+                                listOf(
+                                    "cloud",
+                                    "status",
+                                ),
+                        ) {
+                            process.waitFor()
+                            val expectedOutput =
+                                """
+                                📂 My Tenant (my-tenant) [active] 🟢
+                                  ├── 📦 My App (my-app) [active] 🟢
+                                  └── 📦 Another App (another-app) [pending] 🟡
+                                📂 Other Tenant (other-tenant) [deactivated] 🔴
+                                """.normalize()
+
+                            output.normalize() shouldBe expectedOutput
+                            process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        }
                     }
                 }
             }
