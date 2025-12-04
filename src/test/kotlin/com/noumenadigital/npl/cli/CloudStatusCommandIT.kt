@@ -110,7 +110,7 @@ class CloudStatusCommandIT :
                                                 "state": "active"
                                               },
                                               {
-                                                "id": "90041def-752c-5441-b584-27ge7f6bf416",
+                                                "id": "90041def-752c-5441-b584-27fe7f6bf416",
                                                 "name": "Other Tenant",
                                                 "slug": "other-tenant",
                                                 "external_id": null,
