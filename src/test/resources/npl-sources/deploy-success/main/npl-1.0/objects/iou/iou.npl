@@ -95,3 +95,285 @@ protocol[issuer, payee] Iou(var description: Text, var forAmount: Number) {
         return getAmountOwed();
     };
 }
+
+/**
+ * Represents a seed variety with its characteristics
+ * @param name The name of the seed variety
+ * @param species The plant species
+ * @param variety The specific variety name
+ * @param description Optional description of the seed
+ * @param plantingSeason The recommended planting season
+ * @param daysToMaturity Number of days from planting to maturity
+ * @param seedType Type of seed (heirloom, hybrid, open-pollinated)
+ */
+struct SeedVariety {
+    name: Text,
+    species: Text,
+    variety: Text,
+    description: Text,
+    plantingSeason: Text,
+    daysToMaturity: Number,
+    seedType: Text
+};
+
+/**
+ * Represents a seed batch with storage information
+ * @param variety The seed variety information
+ * @param quantity The number of seeds in this batch
+ * @param purchaseDate When the seeds were purchased
+ * @param expirationDate When the seeds expire
+ * @param source Where the seeds were purchased from
+ * @param storageLocation Physical location where seeds are stored
+ * @param storageConditions Storage conditions (temperature, humidity, etc.)
+ */
+struct SeedBatch {
+    variety: SeedVariety,
+    quantity: Number,
+    purchaseDate: LocalDate,
+    expirationDate: LocalDate,
+    source: Text,
+    storageLocation: Text,
+    storageConditions: Text
+};
+
+/**
+ * Represents a seed usage record
+ * @param batchId The ID of the seed batch used
+ * @param quantityUsed Number of seeds used
+ * @param plantingDate When the seeds were planted
+ * @param location Where they were planted
+ * @param notes Additional notes about the planting
+ */
+struct SeedUsage {
+    batchId: Text,
+    quantityUsed: Number,
+    plantingDate: LocalDate,
+    location: Text,
+    notes: Text
+};
+
+/**
+ * Represents inventory adjustment information
+ * @param reason Reason for the adjustment
+ * @param quantityChange The change in quantity (positive for additions, negative for removals)
+ * @param notes Additional notes about the adjustment
+ */
+struct InventoryAdjustment {
+    reason: Text,
+    quantityChange: Number,
+    notes: Text
+};
+
+/**
+ * Plant seed storage and inventory management protocol
+ * @param owner The owner of the seed collection
+ * @param collectionName Name of the seed collection
+ * @param description Description of the collection
+ */
+@api
+protocol[owner] SeedStorage(var collectionName: Text, var description: Text) {
+    require(collectionName.length() > 0, "Collection name cannot be empty");
+
+    initial state active;
+    final state archived;
+
+    private var seedBatches = listOf<SeedBatch>();
+    private var seedUsages = listOf<SeedUsage>();
+    private var nextBatchId: Number = 1;
+
+    /**
+     * Add a new seed batch to the inventory
+     * @param variety The seed variety information
+     * @param quantity The number of seeds
+     * @param purchaseDate When the seeds were purchased
+     * @param expirationDate When the seeds expire
+     * @param source Where the seeds were purchased from
+     * @param storageLocation Physical location where seeds are stored
+     * @param storageConditions Storage conditions
+     */
+    @api
+    permission[owner] addSeedBatch(
+        variety: SeedVariety,
+        quantity: Number,
+        purchaseDate: LocalDate,
+        expirationDate: LocalDate,
+        source: Text,
+        storageLocation: Text,
+        storageConditions: Text
+    ) | active {
+        require(quantity > 0, "Quantity must be positive");
+        require(expirationDate.isAfter(purchaseDate, false), "Expiration date must be after purchase date");
+
+        var newBatch = SeedBatch(
+            variety = variety,
+            quantity = quantity,
+            purchaseDate = purchaseDate,
+            expirationDate = expirationDate,
+            source = source,
+            storageLocation = storageLocation,
+            storageConditions = storageConditions
+        );
+
+        seedBatches = seedBatches.with(newBatch);
+        nextBatchId = nextBatchId + 1;
+    };
+
+    /**
+     * Record seed usage (planting)
+     * @param batchId The ID of the seed batch
+     * @param quantityUsed Number of seeds used
+     * @param plantingDate When the seeds were planted
+     * @param location Where they were planted
+     * @param notes Additional notes
+     */
+    @api
+    permission[owner] recordSeedUsage(
+        batchId: Text,
+        quantityUsed: Number,
+        plantingDate: LocalDate,
+        location: Text,
+        notes: Text
+    ) | active {
+        require(quantityUsed > 0, "Quantity used must be positive");
+
+        var batch = findBatchById(batchId);
+        require(batch.isPresent(), "Seed batch not found");
+        require(batch.getOrFail().quantity >= quantityUsed, "Insufficient seeds in batch");
+
+        var usage = SeedUsage(
+            batchId = batchId,
+            quantityUsed = quantityUsed,
+            plantingDate = plantingDate,
+            location = location,
+            notes = notes
+        );
+
+        seedUsages = seedUsages.with(usage);
+
+        // Update batch quantity
+        var updatedBatch = SeedBatch(
+            variety = batch.getOrFail().variety,
+            quantity = batch.getOrFail().quantity - quantityUsed,
+            purchaseDate = batch.getOrFail().purchaseDate,
+            expirationDate = batch.getOrFail().expirationDate,
+            source = batch.getOrFail().source,
+            storageLocation = batch.getOrFail().storageLocation,
+            storageConditions = batch.getOrFail().storageConditions
+        );
+
+        seedBatches = seedBatches.without(batch.getOrFail()).with(updatedBatch);
+    };
+
+    /**
+     * Adjust inventory quantities
+     * @param batchId The ID of the seed batch
+     * @param adjustment The adjustment details
+     */
+    @api
+    permission[owner] adjustInventory(batchId: Text, adjustment: InventoryAdjustment) | active {
+        var batch = findBatchById(batchId);
+        require(batch.isPresent(), "Seed batch not found");
+
+        var newQuantity = batch.getOrFail().quantity + adjustment.quantityChange;
+        require(newQuantity >= 0, "Resulting quantity cannot be negative");
+
+        var updatedBatch = SeedBatch(
+            variety = batch.getOrFail().variety,
+            quantity = newQuantity,
+            purchaseDate = batch.getOrFail().purchaseDate,
+            expirationDate = batch.getOrFail().expirationDate,
+            source = batch.getOrFail().source,
+            storageLocation = batch.getOrFail().storageLocation,
+            storageConditions = batch.getOrFail().storageConditions
+        );
+
+        seedBatches = seedBatches.without(batch.getOrFail()).with(updatedBatch);
+    };
+
+    /**
+     * Get all seed batches
+     * @return List of all seed batches
+     */
+    @api
+    permission[owner] getAllBatches() returns List<SeedBatch> | active {
+        return seedBatches;
+    };
+
+    /**
+     * Get seed batches by variety
+     * @param species The plant species to filter by
+     * @return List of seed batches for the specified species
+     */
+    @api
+    permission[owner] getBatchesBySpecies(species: Text) returns List<SeedBatch> | active {
+        return seedBatches.filter(function(batch: SeedBatch) -> batch.variety.species == species);
+    };
+
+    /**
+     * Get seed usage history
+     * @return List of all seed usage records
+     */
+    @api
+    permission[owner] getUsageHistory() returns List<SeedUsage> | active {
+        return seedUsages;
+    };
+
+    /**
+     * Get expired seed batches
+     * @return List of seed batches that have expired
+     */
+    @api
+    permission[owner] getExpiredBatches() returns List<SeedBatch> | active {
+        var today = now().toLocalDate();
+        return seedBatches.filter(function(batch: SeedBatch) -> batch.expirationDate.isBefore(today, false));
+    };
+
+    /**
+     * Get batches expiring soon (within specified days)
+     * @param days Number of days to check ahead
+     * @return List of seed batches expiring within the specified days
+     */
+    @api
+    permission[owner] getBatchesExpiringSoon(daysLeft: Number) returns List<SeedBatch> | active {
+        var today = now().toLocalDate();
+        return seedBatches.filter(function(batch: SeedBatch) ->
+        batch.expirationDate.isAfter(today, false) &&
+            batch.expirationDate.isBefore(today.plus(days(daysLeft)), false)
+        );
+    };
+
+    /**
+     * Get total inventory value by species
+     * @return Map of species to total seed count
+     */
+    @api
+    permission[owner] getInventorySummary() returns Map<Text, Number> | active {
+        var summary = mapOf<Text, Number>();
+
+        for (batch in seedBatches) {
+            var currentCount = summary.getOrNone(batch.variety.species).getOrElse(0);
+            summary = summary.with(batch.variety.species, currentCount + batch.quantity);
+        };
+
+        return summary;
+    };
+
+    /**
+     * Archive the seed collection
+     */
+    @api
+    permission[owner] archiveCollection() | active {
+        become archived;
+    };
+
+    /**
+     * Helper function to find a batch by ID
+     * @param batchId The batch ID to search for
+     * @return Optional containing the batch if found
+     */
+    function findBatchById(batchId: Text) returns Optional<SeedBatch> -> {
+        return seedBatches.findFirstOrNone(function(batch: SeedBatch) ->
+        "BATCH-" + (seedBatches.indexOfOrNone(batch).getOrElse(0) + 1).toText() == batchId
+        );
+    };
+}

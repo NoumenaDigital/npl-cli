@@ -1366,6 +1366,10 @@
       "allDeclaredFields": true
     },
     {
+      "type": "io.swagger.v3.oas.models.media.DateTimeSchema",
+      "allDeclaredFields": true
+    },
+    {
       "type": "io.swagger.v3.oas.models.media.IntegerSchema",
       "allDeclaredFields": true
     },
