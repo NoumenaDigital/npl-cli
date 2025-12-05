@@ -6,6 +6,7 @@ import com.noumenadigital.npl.cli.commands.registry.cloud.CloudDeployCommandDesc
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudHelpCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLoginCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudLogoutCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.cloud.CloudStatusCommandDescriptor
 
 enum class CloudCommands(
     override val commandDescriptor: () -> CommandDescriptor,
@@ -15,4 +16,5 @@ enum class CloudCommands(
     CLOUD_HELP({ CloudHelpCommandDescriptor }),
     CLOUD_CLEAR_NPL({ CloudClearNplCommandDescriptor }),
     CLOUD_DEPLOY({ CloudDeployCommandDescriptor }),
+    CLOUD_STATUS({ CloudStatusCommandDescriptor }),
 }

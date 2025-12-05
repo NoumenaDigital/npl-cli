@@ -7,4 +7,5 @@ data class Application(
     val id: String,
     val name: String,
     val slug: String,
+    val state: String? = null,
 )

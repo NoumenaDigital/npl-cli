@@ -59,6 +59,7 @@ To see a description of how to use each command, run `npl help`
 | `npl cloud help`            | Displays help information for the NPL CLI cloud commands                                      |
 | `npl cloud login`           | Handles the NPL CLI login to NOUMENA Сloud                                                    |
 | `npl cloud logout`          | Handles the NPL CLI logout from NOUMENA Cloud                                                 |
+| `npl cloud status`          | Lists tenants and applications with their status from NOUMENA Cloud                           |
 | `npl cloud deploy npl`      | Deploys NPL sources to a NOUMENA Cloud Application                                            |
 | `npl cloud deploy frontend` | Deploys frontend build sources to a NOUMENA Cloud Application                                 |
 | `npl cloud clear`           | Deletes NPL sources and clears protocols from the database from the NOUMENA Cloud Application |
