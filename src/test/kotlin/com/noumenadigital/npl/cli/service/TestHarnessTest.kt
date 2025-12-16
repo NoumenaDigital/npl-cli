@@ -22,7 +22,7 @@ class TestHarnessTest :
             val tempDir: File = tempdir(),
             val withCoverage: Boolean,
         ) {
-            val sourcesManager = SourcesManager(tempDir.absolutePath)
+            val sourcesManager = SourcesManager(srcPath = tempDir.absolutePath, testSrcPath = tempDir.absolutePath)
             val harness =
                 if (withCoverage) {
                     val coverageFile = File(".").resolve(COVERAGE_FILE)

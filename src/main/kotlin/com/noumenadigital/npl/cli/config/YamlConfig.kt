@@ -33,6 +33,7 @@ object YamlConfig {
         val frontend: YamlConfigField = yamlPath("/structure/frontend")
         val migration: YamlConfigField = yamlPath("/structure/migration")
         val outputDir: YamlConfigField = yamlPath("/structure/outputDir")
+        val contribLibraries: YamlConfigField = yamlPath("/structure/contribLibraries")
         val rules: YamlConfigField = yamlPath("/structure/rules")
         val sourceDir: YamlConfigField = yamlPath("/structure/sourceDir")
         val testSourceDir: YamlConfigField = yamlPath("/structure/testSourceDir")
@@ -83,7 +84,7 @@ object YAMLConfigParser {
             node.isTextual -> node.asText()
             node.isNumber -> node.numberValue()
             node.isBoolean -> node.booleanValue()
-            node.isArray -> node.map { it.asText() }
+            node.isArray -> node.joinToString(",") { it.asText() }
             node.isObject -> mapper.convertValue(node, Map::class.java)
             else -> null
         }

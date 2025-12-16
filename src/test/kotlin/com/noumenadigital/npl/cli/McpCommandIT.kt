@@ -124,6 +124,7 @@ class McpCommandIT :
                             arguments =
                                 buildJsonObject {
                                     put("test-source-dir", testDirPath)
+                                    put("source-dir", testDirPath)
                                     put("coverage", false)
                                 },
                         )

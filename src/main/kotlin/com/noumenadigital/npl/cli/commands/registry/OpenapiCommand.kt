@@ -35,10 +35,17 @@ object OpenapiCommandDescriptor : CommandDescriptor {
         val parsedSrcDir = parsedArguments["source-dir"] as? String ?: "."
         val parsedRules = parsedArguments["rules"] as? String
         val parsedOutputDir = parsedArguments["output-dir"] as? String ?: "."
+        val contribLibraries =
+            parsedArguments["contrib-libraries"]
+                ?.toString()
+                ?.split(',')
+                ?.mapNotNull { it.trim().takeIf(String::isNotEmpty) }
+                ?.takeIf { it.isNotEmpty() }
         return OpenapiCommand(
             srcDir = parsedSrcDir,
             ruleDescriptorPath = parsedRules,
             outputDir = parsedOutputDir,
+            contribLibraries = contribLibraries,
         )
     }
 
@@ -74,6 +81,15 @@ object OpenapiCommandDescriptor : CommandDescriptor {
                 isRequiredForMcp = true,
                 configFilePath = YamlConfig.Structure.outputDir,
             ),
+            NamedParameter(
+                name = "contrib-libraries",
+                description = "Paths to zip archives containing NPL-Contrib libraries, comma separated wo space (optional)",
+                isRequired = false,
+                valuePlaceholder = "<contrib-libraries>",
+                takesPath = true,
+                isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.contribLibraries,
+            ),
         )
 }
 
@@ -81,8 +97,9 @@ data class OpenapiCommand(
     private val srcDir: String,
     private val ruleDescriptorPath: String?,
     private val outputDir: String,
+    val contribLibraries: List<String>?,
 ) : CommandExecutor {
-    private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir))
+    private val compilerService: CompilerService = CompilerService(SourcesManager(srcDir, contribLibraries))
 
     companion object {
         private const val DEFAULT_OPENAPI_URI = "http://localhost:12000"

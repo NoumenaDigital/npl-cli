@@ -545,6 +545,8 @@ class OpenapiCommandIT :
                         """
                         structure:
                           sourceDir: $absolutePath
+                          contribLibraries:
+                          - contrib/npl-contrib-library.zip
                         """.trimIndent(),
                     ) {
                         runCommand(commands = listOf("openapi")) {
