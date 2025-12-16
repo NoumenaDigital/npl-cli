@@ -213,7 +213,7 @@ class VerifyCommand(
             output.info("  ✓ State hash verification")
             output.info("  ✓ Signature verification")
             if (enableReplay) {
-                output.info("  ⚠ Replay verification (stub - not fully implemented)")
+                output.info("  ✓ Replay verification")
             }
         } else {
             output.error("✗ Verification failed!")

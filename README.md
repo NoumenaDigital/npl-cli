@@ -283,14 +283,20 @@ For each entry:
 - Verifies JWS payload equals `entryHashBytes` exactly
 - Verifies Ed25519 signature over "headerB64.payloadB64" using `Signature.getInstance("Ed25519")`
 
-### E) Replay Verification (Stub)
-- Currently returns a warning that replay verification is not fully implemented
-- Cryptographic checks (steps A-D) are fully functional
-- Full replay would require:
-    - Extracting protocol info from `entry.id` URN
-    - Loading and compiling NPL sources
-    - Instantiating protocol and replaying all actions
-    - Comparing computed state/notification hashes with entry values
+### E) Replay Verification
+- Executes audit actions against a live NPL runtime
+- Starts Docker runtime and deploys NPL sources (configurable)
+- Parses protocol identity from `entry.id` URN format
+- Replays constructor and action calls via REST API
+- Compares computed state hashes with audit trail after each action
+- Environment variables for configuration:
+    - `NPL_BASE_URL` - Runtime URL (default: http://localhost:12000)
+    - `NPL_SKIP_DOCKER` - Skip Docker startup (default: false)
+    - `NPL_CLEANUP` - Tear down Docker after (default: false)
+    - `NPL_DOCKER_COMPOSE_CMD` - Docker command (default: docker compose up -d --wait)
+    - `NPL_DEPLOY_CMD` - Deploy command (default: npl deploy, reads from npl.yml)
+- Deploy configuration is read from `npl.yml` in the sources directory (sourceDir, username, password)
+- See `docs/replay-verification.md` for full documentation
 
 ### JSON Canonicalization
 

@@ -251,14 +251,39 @@ class AuditVerificationService(
     private fun verifyReplay(auditResponse: AuditResponse, sourcesPath: String): List<VerificationError> {
         val errors = mutableListOf<VerificationError>()
 
-        // TODO: Implement full replay verification
-        // For now, this is a stub that indicates replay is not yet implemented
-        errors.add(
-            VerificationError(
-                "Replay",
-                "Replay verification is not yet fully implemented. Cryptographic checks passed, but state evolution has not been verified."
+        try {
+            // Configure replay
+            val config = ReplayConfig(
+                sourcesPath = sourcesPath,
+                baseUrl = System.getenv("NPL_BASE_URL") ?: "http://localhost:12000",
+                dockerComposeCmd = System.getenv("NPL_DOCKER_COMPOSE_CMD") ?: "docker compose up -d --wait",
+                deployCmd = System.getenv("NPL_DEPLOY_CMD") ?: "npl deploy",
+                skipDocker = System.getenv("NPL_SKIP_DOCKER")?.toBoolean() ?: false,
+                cleanup = System.getenv("NPL_CLEANUP")?.toBoolean() ?: false,
+                verbose = true,
             )
-        )
+
+            val replayRunner = ReplayRunner(config)
+            val result = replayRunner.runReplay(auditResponse)
+
+            // Convert replay errors to verification errors
+            result.errors.forEach { replayError ->
+                errors.add(
+                    VerificationError(
+                        "Replay",
+                        "Entry ${replayError.entryIndex}: ${replayError.message}"
+                    )
+                )
+            }
+
+        } catch (e: Exception) {
+            errors.add(
+                VerificationError(
+                    "Replay",
+                    "Replay verification failed: ${e.message}"
+                )
+            )
+        }
 
         return errors
     }
