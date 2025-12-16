@@ -101,6 +101,35 @@ class OpenapiCommandIT :
                 }
             }
 
+            test("npl contrib") {
+                withOpenapiTestContext(testDir = listOf("success", "nplcontrib")) {
+                    runCommand(
+                        commands =
+                            listOf(
+                                "openapi",
+                                "--source-dir",
+                                absolutePath,
+                                "--contrib-libraries",
+                                "main/contrib/npl-migration-test.zip",
+                            ),
+                    ) {
+                        process.waitFor()
+
+                        val expectedOutput =
+                            """
+                        Completed compilation for 2 files in XXX ms
+
+                        Generating openapi for demo
+                        NPL openapi completed successfully.
+                        """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        validateOpenapiSpec("demo-openapi.yml").messages.size shouldBe 0
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
+            }
+
             test("multiple files - relative path") {
                 withOpenapiTestContext(testDir = listOf("success", "multiple_files")) {
                     runCommand(
@@ -545,8 +574,6 @@ class OpenapiCommandIT :
                         """
                         structure:
                           sourceDir: $absolutePath
-                          contribLibraries:
-                          - contrib/npl-contrib-library.zip
                         """.trimIndent(),
                     ) {
                         runCommand(commands = listOf("openapi")) {
