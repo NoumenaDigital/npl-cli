@@ -10,6 +10,7 @@ import com.noumenadigital.npl.cli.commands.registry.McpCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.OpenapiCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.PumlCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.TestCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.VerifyCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.VersionCommandDescriptor
 
 enum class Commands(
@@ -25,4 +26,5 @@ enum class Commands(
     DEPLOY({ DeployCommandDescriptor }),
     CLOUD({ CloudCommandDescriptor }),
     MCP({ McpCommandDescriptor }),
+    VERIFY({ VerifyCommandDescriptor }),
 }

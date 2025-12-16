@@ -68,6 +68,14 @@ class BinaryCommandsIT :
                                  --clear  Clear application contents before deployment
                     cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
                     mcp        Start an MCP server exposing NPL CLI functionality over stdio
+                    verify     Verify NOUMENA verifiable protocol audit trails
+                                 --audit <file-or-url> (required)  Path to audit JSON file or HTTP(S) URL
+                                 --sources <path> (required)  Path to local NPL sources directory or zip
+                                 --did-scheme <http|https>  Scheme for DID resolution (http or https)
+                                 --did-host-override <host:port>  Override host for DID resolution (e.g., localhost:8080)
+                                 --fail-fast  Stop verification on first error
+                                 --json  Output results in JSON format
+                                 --no-replay  Disable replay verification
                     """.normalize()
 
                 output.normalize() shouldBe expectedOutput
