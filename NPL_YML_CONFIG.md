@@ -18,9 +18,68 @@ structure:
 
 local:
   managementUrl: http://localhost:12000  # NPL runtime management URL
-  username: admin                         # Runtime username
-  password: admin                         # Runtime password
+  authUrl: http://localhost:11000        # OIDC authentication server URL
+  
+  # Option 1: Multiple parties with credentials (recommended - tokens obtained automatically)
+  parties:
+    alice:
+      username: "alice"
+      password: "password123"
+    bob:
+      username: "bob"
+      password: "password456"
+    charlie:
+      username: "charlie"
+      password: "password789"
+  
+  # Option 2: Multiple parties with pre-existing JWT tokens
+  # parties:
+  #   alice: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9..."
+  #   bob: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9..."
+  
+  # Option 3: Single user credentials (legacy, tokens obtained for single user)
+  # username: admin
+  # password: admin
+  
+  # Option 4: Single authorization token (legacy, fallback for all parties)
+  # authorization: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9..."
 ```
+
+### Authentication for Replay Verification
+
+When replaying an audit trail, the system needs to authenticate as different parties to execute their actions. The replay runner intelligently determines which party should execute each action by:
+
+1. **Parsing the NPL source code** to extract permission/obligation definitions
+2. **Matching actions to parties** based on the NPL syntax: `permission[party] actionName(...)`
+3. **Using the correct token** for that party when replaying the action
+
+**Example NPL code:**
+```npl
+protocol[issuer, payee] Iou(var forAmount: Number) {
+    permission[issuer] pay(amount: Number) {
+        // Only issuer can call this
+    }
+    
+    permission[payee] forgive() {
+        // Only payee can call this
+    }
+    
+    permission[issuer|payee] getAmountOwed() {
+        // Either party can call this
+    }
+}
+```
+
+**Replay behavior:**
+- When replaying `pay` action → automatically uses `issuer` token
+- When replaying `forgive` action → automatically uses `payee` token
+- When replaying `getAmountOwed` → tries `issuer` first, then `payee`
+- Fallback: If NPL parsing fails or party not found, tries all available tokens
+
+**Token selection priority:**
+1. **NPL-defined party** for the action (highest priority)
+2. **Protocol parties** from the `@parties` field in state
+3. **All available tokens** (fallback)
 
 ## Example Directory Structure
 
