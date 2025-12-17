@@ -10,6 +10,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - `--frontend` flag to `npl init` command for initializing frontend project templates.
 
+## [2025.2.6]
+
+### Fixed
+
+- Updated to use GraalVM 24 in SDK config.
+- Made `npl test` locale-independent.
+- Removed reference to non-WSL installation from docs.
+- Improved connection error messages.
+
+### Changed
+
+- Updated test output format.
+
+## [2025.2.5]
+
+### Fixed
+
+- Renamed command parameter from `--url` to `--auth-url` for clarity.
+
+### Added
+
+- Enabled cloud clear using service accounts.
+
 ## [2025.2.4]
 
 ### Added
@@ -33,11 +56,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Support for the old party model.
 
+## [2025.1.11]
+
+### Fixed
+
+- Fixed mixedDate issue in binary.
+- Enforced all commands to support relative and absolute pathing.
+
 ## [2025.1.10]
 
 ### Added
 
 - `npl cloud deploy frontend` command.
+
+## [2025.1.9]
+
+### Added
+
+- NPL init command.
+- MCP server.
+
+### Fixed
+
+- Added configFile parameter to deploy command.
 
 ## [2025.1.8]
 
