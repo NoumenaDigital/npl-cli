@@ -38,6 +38,7 @@ class CommandProcessorServiceTest :
                     init       Initializes a new project
                                  --project-dir <project-dir>  Directory where project files will be stored. Created if it doesn’t exist
                                  --bare  Installs an empty project structure (defaults to false)
+                                 --frontend  Installs a frontend project structure (defaults to false)
                                  --template-url <template-url>  URL of a repository containing a ZIP archive of the project template. Overrides the default template
                     check      Validate the correctness of NPL sources
                                  --source-dir <directory>  Directory containing NPL source files (defaults to current directory)

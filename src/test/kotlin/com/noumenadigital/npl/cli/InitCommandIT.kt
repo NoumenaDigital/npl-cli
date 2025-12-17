@@ -277,7 +277,64 @@ class InitCommandIT :
 
                     val expectedOutput =
                         """
-                    npl init: Cannot use --bare and --template-url together.
+                    npl init: Cannot use --template-url with --bare or --frontend.
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
+                }
+            }
+        }
+
+        test("Init command: Happy path with --frontend flag") {
+            val resourceDir = Paths.get("src/test/resources/test-files").toAbsolutePath().normalize()
+            val repoArchive = resourceDir.resolve("samples.zip").toFile()
+            val buffer = Buffer().write(repoArchive.readBytes())
+
+            withInitTestContext(testDir = listOf("success")) {
+                runCommand(commands = listOf("init", "--project-dir", "npl-app", "--frontend")) {
+                    process.waitFor()
+
+                    val projectDir = workingDirectory.resolve("npl-app")
+                    val expectedOutput =
+                        """
+                    Successfully downloaded project files
+                    Project successfully saved to ${projectDir.relativeOrAbsolute()}
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    projectDir.exists() shouldBe true
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+        }
+
+        test("Init command: --bare and --frontend are mutually exclusive") {
+            withInitTestContext(testDir = listOf("success")) {
+                runCommand(commands = listOf("init", "--project-dir", projectDir.name, "--bare", "--frontend")) {
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    npl init: Cannot use --bare and --frontend together.
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
+                }
+            }
+        }
+
+        test("Init command: --frontend and --template-url are mutually exclusive") {
+            withInitTestContext(testDir = listOf("success")) {
+                runCommand(
+                    commands = listOf("init", "--project-dir", projectDir.name, "--frontend", "--template-url", "https://example.com"),
+                ) {
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    npl init: Cannot use --template-url with --bare or --frontend.
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
