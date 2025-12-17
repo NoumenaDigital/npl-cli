@@ -1,0 +1,24 @@
+package demo;
+
+use mynpl.MyFoo2;
+
+@api
+protocol[greeter] HelloWorld() {
+
+    initial state greeting;
+    final state greeted;
+
+    @api
+    permission[greeter] sayHello() returns Text | greeting {
+        var nplContribMyFoo2 = MyFoo2(first = 1, second = "text");
+        become greeted;
+        return nplContribMyFoo2.toText();
+    };
+};
+
+function getUsername(party: Party) returns Text ->
+    party.claims()
+    .getOrNone("preferred_username")
+    .getOrFail()
+    .toList()
+    .get(0);

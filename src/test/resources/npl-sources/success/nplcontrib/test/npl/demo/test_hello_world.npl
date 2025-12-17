@@ -1,0 +1,21 @@
+package demo;
+
+function getGreeter() returns Party -> partyOf(
+    mapOf(Pair("preferred_username", setOf("Alice")))
+);
+
+@test
+function initHelloWorld(test: Test) -> {
+    var greeter = getGreeter();
+    var helloWorld = HelloWorld[greeter]();
+    test.assertEquals(HelloWorld.States.greeting, helloWorld.activeState().getOrFail());
+};
+
+@test
+function testHelloWorld(test: Test) -> {
+    var greeter = getGreeter();
+    var helloWorld = HelloWorld[greeter]();
+    var greeting = helloWorld.sayHello[greeter]();
+    test.assertEquals("/mynpl/MyFoo2 { first: 1, second: text }", greeting);
+    test.assertEquals(HelloWorld.States.greeted, helloWorld.activeState().getOrFail());
+};

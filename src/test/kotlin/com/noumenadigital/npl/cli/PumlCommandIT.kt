@@ -78,6 +78,33 @@ class PumlCommandIT :
             }
         }
 
+        test("Puml command: Happy path with contrib libraries") {
+            withPumlTestContext(testDir = listOf("success", "nplcontrib")) {
+                runCommand(
+                    commands = listOf("puml", "--source-dir", absolutePath, "--contrib-libraries", "main/contrib/npl-migration-test.zip"),
+                ) {
+                    process.waitFor()
+
+                    val pumlDir = workingDirectory.resolve("puml")
+                    val expectedOutput =
+                        """
+                    Completed compilation for 2 files in XXX ms
+
+                    Writing Puml files to ${pumlDir.relativeOrAbsolute()}
+
+                    Puml diagram generated successfully.
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    with(workingDirectory.resolve("puml")) {
+                        exists() shouldBe true
+                        listAllFilesNames() shouldContainAll listOf("helloWorld.puml", "includes.puml")
+                    }
+                }
+            }
+        }
+
         test("Puml command: relative path") {
             withPumlTestContext(testDir = listOf("success", "multiple_files")) {
                 val dir = Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files")
@@ -148,6 +175,9 @@ class PumlCommandIT :
             val file =
                 Path.of("src", "test", "resources", "npl-sources", "success", "multiple_files")
 
+            val fileNplContrib =
+                Path.of("src", "test", "resources", "npl-sources", "success", "nplcontrib")
+
             fun happyPath(params: List<String>) {
                 withPumlTestContext(testDir = listOf("success", "multiple_files")) {
                     runCommand(commands = listOf("puml", *params.toTypedArray())) {
@@ -176,6 +206,31 @@ class PumlCommandIT :
                 }
             }
 
+            fun happyPathNplContrib(params: List<String>) {
+                withPumlTestContext(testDir = listOf("success", "nplContrib")) {
+                    runCommand(commands = listOf("puml", *params.toTypedArray())) {
+                        process.waitFor()
+
+                        val pumlDir = workingDirectory.resolve("puml")
+                        val expectedOutput =
+                            """
+                                Completed compilation for 2 files in XXX ms
+
+                                Writing Puml files to ${pumlDir.relativeOrAbsolute()}
+
+                                Puml diagram generated successfully.
+                            """.normalize()
+
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        with(workingDirectory.resolve("puml")) {
+                            exists() shouldBe true
+                            listAllFilesNames() shouldContainAll listOf("helloWorld.puml", "includes.puml")
+                        }
+                    }
+                }
+            }
+
             test("Use property only from yaml config") {
                 TestUtils.withYamlConfig(
                     """
@@ -184,6 +239,19 @@ class PumlCommandIT :
                     """.trimIndent(),
                 ) {
                     happyPath(params = emptyList())
+                }
+            }
+
+            test("Use property only from yaml config with npl contrib") {
+                TestUtils.withYamlConfig(
+                    """
+                    structure:
+                      sourceDir: ${fileNplContrib.absolutePathString()}
+                      contribLibraries:
+                        - main/contrib/npl-migration-test.zip
+                    """.trimIndent(),
+                ) {
+                    happyPathNplContrib(params = emptyList())
                 }
             }
 
