@@ -287,17 +287,9 @@ class InitCommandIT :
         }
 
         test("Init command: Happy path with --frontend flag") {
-            var mockRepo = MockWebServer()
             val resourceDir = Paths.get("src/test/resources/test-files").toAbsolutePath().normalize()
             val repoArchive = resourceDir.resolve("samples.zip").toFile()
             val buffer = Buffer().write(repoArchive.readBytes())
-
-            mockRepo.enqueue(
-                MockResponse()
-                    .setResponseCode(200)
-                    .setHeader("Content-Type", "application/zip")
-                    .setBody(buffer),
-            )
 
             withInitTestContext(testDir = listOf("success")) {
                 runCommand(commands = listOf("init", "--project-dir", "npl-app", "--frontend")) {
@@ -315,7 +307,6 @@ class InitCommandIT :
                     process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
-            mockRepo.shutdown()
         }
 
         test("Init command: --bare and --frontend are mutually exclusive") {
