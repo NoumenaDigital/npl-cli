@@ -38,6 +38,7 @@ object YamlConfig {
         val testSourceDir: YamlConfigField = yamlPath("/structure/testSourceDir")
         val initProjectDir: YamlConfigField = yamlPath("/structure/initProjectDir")
         val initBare: YamlConfigField = yamlPath("/structure/initBare")
+        val initFrontend: YamlConfigField = yamlPath("/structure/initFrontend")
         val initTemplateUrl: YamlConfigField = yamlPath("/structure/initTemplateUrl")
     }
 }

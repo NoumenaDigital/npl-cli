@@ -37,6 +37,7 @@ class NoumenaGitRepoClient(
         ) {
             SAMPLES("samples"),
             NO_SAMPLES("no-samples"),
+            FRONTEND("frontend"),
         }
 
         private const val GIT_REPO_URL = "https://github.com/NoumenaDigital/"

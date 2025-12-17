@@ -4,6 +4,7 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient
+import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.FRONTEND
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.NO_SAMPLES
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
 import com.noumenadigital.npl.cli.service.ColorWriter
@@ -20,8 +21,9 @@ object InitCommandDescriptor : CommandDescriptor {
     override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
         val parsedProjectDir = parsedArguments["project-dir"] as? String
         val parsedBare = !(parsedArguments["bare"] == null || parsedArguments["bare"] as? Boolean == false)
+        val parsedFrontend = !(parsedArguments["frontend"] == null || parsedArguments["frontend"] as? Boolean == false)
         val parsedTemplateUrl = parsedArguments["template-url"] as? String
-        return InitCommand(parsedProjectDir, parsedBare, parsedTemplateUrl)
+        return InitCommand(parsedProjectDir, parsedBare, parsedFrontend, parsedTemplateUrl)
     }
 
     override val parameters: List<NamedParameter> =
@@ -41,6 +43,13 @@ object InitCommandDescriptor : CommandDescriptor {
                 configFilePath = YamlConfig.Structure.initBare,
             ),
             NamedParameter(
+                name = "frontend",
+                description = "Installs a frontend project structure",
+                defaultValue = "false",
+                isRequired = false,
+                configFilePath = YamlConfig.Structure.initFrontend,
+            ),
+            NamedParameter(
                 name = "template-url",
                 description = "URL of a repository containing a ZIP archive of the project template. Overrides the default template",
                 isRequired = false,
@@ -53,6 +62,7 @@ object InitCommandDescriptor : CommandDescriptor {
 class InitCommand(
     private val projectDir: String? = null,
     private val bare: Boolean? = false,
+    private val frontend: Boolean? = false,
     private val templateUrl: String? = null,
 ) : CommandExecutor {
     private val repoClient = NoumenaGitRepoClient()
@@ -60,8 +70,13 @@ class InitCommand(
     override fun execute(output: ColorWriter): ExitCode {
         fun ColorWriter.displayError(message: String) = error("npl init: $message")
 
-        if (templateUrl != null && bare == true) {
-            output.displayError("Cannot use --bare and --template-url together.")
+        if (bare == true && frontend == true) {
+            output.displayError("Cannot use --bare and --frontend together.")
+            return ExitCode.USAGE_ERROR
+        }
+
+        if (templateUrl != null && (bare == true || frontend == true)) {
+            output.displayError("Cannot use --template-url with --bare or --frontend.")
             return ExitCode.USAGE_ERROR
         }
 
@@ -86,7 +101,7 @@ class InitCommand(
             }
 
         try {
-            val templateUrl = templateUrl ?: repoClient.getDefaultUrl(bare == true)
+            val templateUrl = templateUrl ?: repoClient.getDefaultUrl(bare == true, frontend == true)
             repoClient.downloadTemplateArchive(templateUrl, archiveFile)
             output.info("Successfully downloaded project files")
         } catch (e: Exception) {
@@ -114,11 +129,14 @@ class InitCommand(
         return ExitCode.SUCCESS
     }
 
-    private fun NoumenaGitRepoClient.getDefaultUrl(isBare: Boolean): String =
-        if (isBare) {
-            getBranchUrl(NO_SAMPLES)
-        } else {
-            getBranchUrl(SAMPLES)
+    private fun NoumenaGitRepoClient.getDefaultUrl(
+        isBare: Boolean,
+        isFrontend: Boolean,
+    ): String =
+        when {
+            isFrontend -> getBranchUrl(FRONTEND)
+            isBare -> getBranchUrl(NO_SAMPLES)
+            else -> getBranchUrl(SAMPLES)
         }
 
     private fun File.cleanUp() {
