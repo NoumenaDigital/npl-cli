@@ -18,7 +18,7 @@ class AuditVerificationService(
     private val didResolver: DidResolver,
     private val enableReplay: Boolean = true,
 ) {
-    private val objectMapper = ObjectMapper().registerKotlinModule()
+    private val objectMapper = ObjectMapper().registerKotlinModule().findAndRegisterModules()
 
     fun verify(
         auditSource: String,
@@ -155,24 +155,21 @@ class AuditVerificationService(
 
     private fun verifyStateHash(auditResponse: AuditResponse): List<VerificationError> {
         val errors = mutableListOf<VerificationError>()
-
-        if (auditResponse.auditLog.isEmpty()) {
-            return errors
-        }
+        if (auditResponse.auditLog.isEmpty()) return errors
 
         val lastEntry = auditResponse.auditLog.last()
-        val stateHashBytes = computeHash(auditResponse.state)
-        val computedStateHash = "sha256:" + bytesToHex(stateHashBytes)
 
-        if (lastEntry.stateHash != computedStateHash) {
+        val replayState = ReplayStateProjection.fromRestState(auditResponse.state)
+        val computed = "sha256:" + bytesToHex(computeHash(replayState))
+
+        if (lastEntry.stateHash != computed) {
             errors.add(
                 VerificationError(
                     "StateHash",
-                    "Last entry stateHash mismatch. Expected $computedStateHash, got ${lastEntry.stateHash}"
+                    "Last entry stateHash mismatch. Expected $computed, got ${lastEntry.stateHash}"
                 )
             )
         }
-
         return errors
     }
 

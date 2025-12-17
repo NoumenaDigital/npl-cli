@@ -220,7 +220,7 @@ class ReplayRunner(
                     // Verify state hash after each action
                     val protocolIdToUse = createdProtocolId
                     if (protocolIdToUse != null) {
-                        verifyStateHash(entry, protocolIdentity, protocolIdToUse, index, errors)
+                        verifyStateHash(entry, protocolIdentity, protocolIdToUse, index, auditResponse.state, errors)
                     }
 
                 } catch (e: Exception) {
@@ -372,7 +372,8 @@ class ReplayRunner(
                 }
 
                 httpClient.execute(request).use { response ->
-                    val responseBody = EntityUtils.toString(response.entity)
+                    // Safely handle null response entity
+                    val responseBody = response.entity?.let { EntityUtils.toString(it) } ?: ""
                     val statusCode = response.statusLine.statusCode
 
                     when {
@@ -380,6 +381,11 @@ class ReplayRunner(
                             log("    ✓ Success with party: $partyName")
 
                             // Extract @id from response
+                            if (responseBody.isEmpty()) {
+                                errors.add(ReplayError(0, "Constructor response is empty"))
+                                return null
+                            }
+
                             val responseMap: Map<String, Any> = objectMapper.readValue(responseBody)
                             val createdId = responseMap["@id"] as? String
 
@@ -452,7 +458,12 @@ class ReplayRunner(
             log("    Parameter '$key': ${value::class.simpleName} = $value")
         }
 
-        val bodyJson = objectMapper.writeValueAsString(bodyMap)
+        // Ensure bodyJson is never null or empty - use "{}" for actions with no parameters
+        val bodyJson = if (bodyMap.isEmpty()) {
+            "{}"
+        } else {
+            objectMapper.writeValueAsString(bodyMap)
+        }
         log("  Action body: $bodyJson")
 
         // Try each available token until one succeeds
@@ -469,13 +480,15 @@ class ReplayRunner(
             try {
                 log("    Trying token for party: $partyName")
                 val request = HttpPost(url).apply {
-                    entity = StringEntity(bodyJson, "UTF-8")
+                    // Ensure entity is never null by always providing a valid JSON body
+                    entity = StringEntity(bodyJson, StandardCharsets.UTF_8)
                     setHeader("Content-Type", "application/json")
                     setHeader("Authorization", "Bearer $token")
                 }
 
                 httpClient.execute(request).use { response ->
-                    val responseBody = EntityUtils.toString(response.entity)
+                    // Safely handle null response entity (some responses may not have a body)
+                    val responseBody = response.entity?.let { EntityUtils.toString(it) } ?: ""
                     val statusCode = response.statusLine.statusCode
 
                     when {
@@ -522,6 +535,7 @@ class ReplayRunner(
         identity: ProtocolIdentity,
         protocolId: String,
         index: Int,
+        auditState: Map<String, Any>,
         errors: MutableList<ReplayError>
     ) {
         val url = "$actualBaseUrl/npl/${identity.packagePath}/${identity.protocolName}/$protocolId/"
@@ -555,20 +569,44 @@ class ReplayRunner(
 
                 val stateJson = EntityUtils.toString(response.entity)
 
-                // Compute hash of the pretty state directly
-                val computedHash = computeStateHash(stateJson)
+                val restState: Map<String, Any?> = objectMapper.readValue(stateJson)
+
+                // Normalize the protocol ID in the fetched state to match the audited ID
+                // This allows comparison even when replay creates a new instance with a different UUID
+                // IMPORTANT: This ONLY normalizes @id and @actions URLs - all other fields (like @state)
+                // are left unchanged, so NPL code changes WILL be detected
+                val normalizedRestState = normalizeProtocolId(restState, protocolId, identity.protocolId)
+
+                // Apply the same projection that backend uses to compute the audit hash
+                val replayState = ReplayStateProjection.fromRestState(normalizedRestState)
+
+                val computedHash = computeStateHash(objectMapper.writeValueAsString(replayState))
+
+                // For debugging: also log the actual state representation
+                val replayStateJson = objectMapper.writeValueAsString(replayState)
+                val canonicalReplayState = JsonCanonicalizer(replayStateJson).encodedString
 
                 log("  Expected: ${entry.stateHash}")
                 log("  Computed: $computedHash")
+                log("  Replay state: @state=${restState["@state"]}, fields=${restState.filterKeys { !it.startsWith("@") }.keys}")
+
+                if (index == 0) {
+                    log("  [DEBUG] Audit state (@state from audit): ${auditState["@state"]}")
+                    log("  [DEBUG] Replay state (@state from replay): ${restState["@state"]}")
+                    log("  [DEBUG] Match: ${auditState["@state"] == restState["@state"]}")
+                }
 
                 if (entry.stateHash != computedHash) {
+                    // Enhanced debugging: show what's different
                     errors.add(
                         ReplayError(
                             index,
                             "State hash mismatch at entry $index.\n" +
                                     "    Expected: ${entry.stateHash}\n" +
                                     "    Computed: $computedHash\n" +
-                                    "    State JSON: ${stateJson.take(200)}..."
+                                    "    This likely means the NPL code has changed.\n" +
+                                    "    Replay state @state: ${restState["@state"]}\n" +
+                                    "    Canonical state (first 400 chars): ${canonicalReplayState.take(400)}..."
                         )
                     )
                 }
@@ -576,6 +614,45 @@ class ReplayRunner(
         } catch (e: Exception) {
             errors.add(ReplayError(index, "Failed to verify state hash: ${e.message}"))
         }
+    }
+
+    /**
+     * Normalize protocol IDs in the state to allow comparison between different instances.
+     * Replaces runtime protocol ID with audited protocol ID in @id and @actions fields.
+     */
+    private fun normalizeProtocolId(
+        state: Map<String, Any?>,
+        runtimeId: String,
+        auditedId: String
+    ): Map<String, Any?> {
+        if (runtimeId == auditedId) {
+            return state
+        }
+
+        val normalized = state.toMutableMap()
+
+        // Normalize @id field
+        if (normalized.containsKey("@id")) {
+            val id = normalized["@id"]
+            if (id is String) {
+                normalized["@id"] = id.replace(runtimeId, auditedId)
+            }
+        }
+
+        // Normalize @actions URLs
+        if (normalized.containsKey("@actions")) {
+            val actions = normalized["@actions"]
+            if (actions is Map<*, *>) {
+                normalized["@actions"] = actions.mapKeys { it.key.toString() }.mapValues { (_, url) ->
+                    when (url) {
+                        is String -> url.replace("/$runtimeId/", "/$auditedId/")
+                        else -> url
+                    }
+                }
+            }
+        }
+
+        return normalized
     }
 
     private fun computeStateHash(json: String): String {
