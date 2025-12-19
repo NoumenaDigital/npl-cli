@@ -28,3 +28,8 @@ replay_pid*
 /target/
 
 **/.DS_Store
+
+# IDE files
+.vscode*
+.claude
+.github/*-instructions.md
