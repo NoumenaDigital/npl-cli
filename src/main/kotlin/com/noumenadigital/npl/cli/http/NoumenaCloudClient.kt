@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.noumenadigital.npl.cli.exception.CloudRestCallException
 import com.noumenadigital.npl.cli.model.Application
+import com.noumenadigital.npl.cli.model.CreateApplicationRequest
 import com.noumenadigital.npl.cli.model.Tenant
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
@@ -39,6 +41,8 @@ open class NoumenaCloudClient(
 ) {
     private val ncBaseUrl = "${config.url}/api/v1/applications/"
     private val tenantsUrl = "${config.url}/api/v1/tenants"
+    private val engineVersionsUrl = "${config.url}/api/v1/engine/versions"
+    private val slugUtilUrl = "${config.url}/api/v1/utils/slug"
     private val client = HttpClients.createDefault()
     private val objectMapper = ObjectMapper().registerKotlinModule()
 
@@ -170,6 +174,87 @@ open class NoumenaCloudClient(
             }
         } catch (e: Exception) {
             throw CloudRestCallException("Failed to upload application archive - ${e.message ?: e.cause?.message}.", e)
+        }
+    }
+
+    fun fetchEngineVersions(accessToken: String): List<String> {
+        try {
+            val httpGet = HttpGet(engineVersionsUrl)
+            httpGet.setHeader("Accept", "application/json")
+            httpGet.setHeader("Authorization", "Bearer $accessToken")
+
+            client.execute(httpGet).use { response ->
+                val status = response.statusLine.statusCode
+                val responseText = response.entity?.let { EntityUtils.toString(it) } ?: ""
+
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Get engine versions request failed $status: $responseText")
+                }
+
+                // API returns array of strings, not objects
+                return objectMapper.readValue(responseText, object : TypeReference<List<String>>() {})
+            }
+        } catch (e: Exception) {
+            throw CloudRestCallException("Failed to fetch engine versions - ${e.message ?: e.cause?.message}.", e)
+        }
+    }
+
+    fun generateSlug(
+        accessToken: String,
+        text: String,
+    ): String {
+        try {
+            val uri =
+                URIBuilder(slugUtilUrl)
+                    .addParameter("slug", text)
+                    .build()
+            val httpGet = HttpGet(uri)
+            httpGet.setHeader("Accept", "application/json")
+            httpGet.setHeader("Authorization", "Bearer $accessToken")
+
+            client.execute(httpGet).use { response ->
+                val status = response.statusLine.statusCode
+                val responseText = response.entity?.let { EntityUtils.toString(it) } ?: ""
+
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Generate slug request failed $status: $responseText")
+                }
+
+                // API returns a plain JSON string, not an object
+                return objectMapper.readValue(responseText, String::class.java)
+            }
+        } catch (e: Exception) {
+            throw CloudRestCallException("Failed to generate slug - ${e.message ?: e.cause?.message}.", e)
+        }
+    }
+
+    fun createApplication(
+        accessToken: String,
+        tenantId: String,
+        request: CreateApplicationRequest,
+    ): Application {
+        try {
+            val createUrl = "$tenantsUrl/$tenantId/createApplication"
+            val httpPost = HttpPost(createUrl)
+            httpPost.setHeader("Accept", "application/json")
+            httpPost.setHeader("Content-Type", "application/json")
+            httpPost.setHeader("Authorization", "Bearer $accessToken")
+
+            val requestBody = objectMapper.writeValueAsString(request)
+            httpPost.entity = ByteArrayEntity(requestBody.toByteArray(StandardCharsets.UTF_8))
+
+            client.execute(httpPost).use { response ->
+                val status = response.statusLine.statusCode
+                val responseText = response.entity?.let { EntityUtils.toString(it) } ?: ""
+
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Create application request failed $status: $responseText")
+                }
+
+                return objectMapper.readValue(responseText, Application::class.java)
+            }
+        } catch (e: Exception) {
+            throw CloudRestCallException("Failed to create application - ${e.message ?: e.cause?.message}.", e)
         }
     }
 
