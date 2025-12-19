@@ -355,6 +355,28 @@
       ]
     },
     {
+      "type": "com.noumenadigital.npl.cli.model.CreateApplicationRequest",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getEngineVersion",
+          "parameterTypes": []
+        },
+        {
+          "name": "getName",
+          "parameterTypes": []
+        },
+        {
+          "name": "getProvider",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTrustedIssuers",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.noumenadigital.npl.cli.model.DeviceCodeResponse",
       "allDeclaredFields": true,
       "methods": [
@@ -469,51 +491,6 @@
         {
           "name": "getTokenType",
           "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "com.noumenadigital.npl.cli.model.EngineVersion",
-      "allDeclaredFields": true,
-      "allDeclaredMethods": true,
-      "allPublicMethods": true,
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        }
-      ]
-    },
-    {
-      "type": "com.noumenadigital.npl.cli.model.SlugResponse",
-      "allDeclaredFields": true,
-      "allDeclaredMethods": true,
-      "allPublicMethods": true,
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": [
-            "java.lang.String"
-          ]
-        }
-      ]
-    },
-    {
-      "type": "com.noumenadigital.npl.cli.model.CreateApplicationRequest",
-      "allDeclaredFields": true,
-      "allDeclaredMethods": true,
-      "allPublicMethods": true,
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": [
-            "java.lang.String",
-            "java.lang.String",
-            "java.lang.String",
-            "java.util.List"
-          ]
         }
       ]
     },
