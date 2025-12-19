@@ -96,6 +96,32 @@ class CloudApplicationService(
         }
     }
 
+    fun deleteApplication(
+        output: ColorWriter,
+        actionName: String,
+        tenant: String,
+        appSlug: String,
+    ) {
+        val token = getAccessToken(output, actionName)
+
+        output.info("Fetching tenants...")
+        val tenants = noumenaCloudClient.fetchTenants(token)
+        val targetTenant =
+            tenants.find { it.slug.equals(tenant, ignoreCase = true) }
+                ?: throw IllegalArgumentException("Tenant '$tenant' not found")
+
+        val application =
+            targetTenant.applications.find { it.slug.equals(appSlug, ignoreCase = true) }
+                ?: throw IllegalArgumentException("Application '$appSlug' not found in tenant '$tenant'")
+
+        val applicationId =
+            application.id
+                ?: throw IllegalStateException("Application ID is not available for application '$appSlug'")
+
+        output.info("Deleting application '${application.name}' from tenant '$tenant'...")
+        noumenaCloudClient.deleteApplication(token, applicationId)
+    }
+
     private fun printTenant(
         output: ColorWriter,
         tenant: Tenant,

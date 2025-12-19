@@ -258,6 +258,29 @@ open class NoumenaCloudClient(
         }
     }
 
+    fun deleteApplication(
+        accessToken: String,
+        applicationId: String,
+    ) {
+        try {
+            val deleteUrl = "$ncBaseUrl$applicationId/delete"
+            val httpDelete = HttpDelete(deleteUrl)
+            httpDelete.setHeader("Accept", "application/json")
+            httpDelete.setHeader("Authorization", "Bearer $accessToken")
+
+            client.execute(httpDelete).use { response ->
+                val status = response.statusLine.statusCode
+                val responseText = response.entity?.let { EntityUtils.toString(it) } ?: ""
+
+                if (status !in 200..299) {
+                    throw CloudRestCallException("Delete application request failed $status: $responseText")
+                }
+            }
+        } catch (e: Exception) {
+            throw CloudRestCallException("Failed to delete application - ${e.message ?: e.cause?.message}.", e)
+        }
+    }
+
     private fun findApplication(tenants: List<Tenant>): Application? =
         tenants
             .find { it.slug.equals(config.tenantSlug, ignoreCase = true) }

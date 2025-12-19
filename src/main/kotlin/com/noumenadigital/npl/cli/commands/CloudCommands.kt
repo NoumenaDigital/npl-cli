@@ -3,6 +3,7 @@ package com.noumenadigital.npl.cli.commands
 import com.noumenadigital.npl.cli.commands.registry.CommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudClearNplCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudCreateCommandDescriptor
+import com.noumenadigital.npl.cli.commands.registry.cloud.CloudDeleteCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudDeployCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudHelpCommandDescriptor
 import com.noumenadigital.npl.cli.commands.registry.cloud.CloudListCommandDescriptor
@@ -21,4 +22,5 @@ enum class CloudCommands(
     CLOUD_STATUS({ CloudStatusCommandDescriptor }),
     CLOUD_LIST({ CloudListCommandDescriptor }),
     CLOUD_CREATE({ CloudCreateCommandDescriptor }),
+    CLOUD_DELETE({ CloudDeleteCommandDescriptor }),
 }
