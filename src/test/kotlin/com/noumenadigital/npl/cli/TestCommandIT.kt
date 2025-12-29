@@ -57,6 +57,44 @@ class TestCommandIT :
                     }
                 }
 
+                test("both main and test sources with contrib libs") {
+                    coverageFile.exists() shouldBe false
+
+                    val testDirPath =
+                        getTestResourcesPath(listOf("success", "nplcontrib", "test")).toAbsolutePath().toString()
+                    val srcDirPath =
+                        getTestResourcesPath(listOf("success", "nplcontrib", "main")).toAbsolutePath().toString()
+                    runCommand(
+                        commands =
+                            listOf(
+                                "test",
+                                "--test-source-dir",
+                                testDirPath,
+                                "--contrib-libraries",
+                                "contrib/npl-migration-test.zip",
+                                "--source-dir",
+                                srcDirPath,
+                            ),
+                    ) {
+                        process.waitFor()
+
+                        val expectedOutput =
+                            """
+                        '$testDirPath/npl/demo/test_hello_world.npl' .. PASS           3    tests in XXX ms
+
+                        Tests run: 3, Failures: 0
+
+                        ------------------------------------------------
+                        NPL test completed successfully in XXX ms.
+                        ------------------------------------------------
+                        """.normalize()
+
+                        coverageFile.exists() shouldBe false
+                        output.normalize() shouldBe expectedOutput
+                        process.exitValue() shouldBe ExitCode.SUCCESS.code
+                    }
+                }
+
                 test("both main and test sources - with coverage using relative path") {
                     coverageFile.exists() shouldBe false
 
@@ -463,6 +501,46 @@ No NPL tests found.
                               coverage: true
                             """.trimIndent(),
                     )
+                }
+
+                test("Yaml config happy path - nplcontrib") {
+                    val testDirPath =
+                        getTestResourcesPath(listOf("success", "nplcontrib", "test")).toAbsolutePath().toString().toYamlSafePath()
+
+                    val srcDirPath =
+                        getTestResourcesPath(listOf("success", "nplcontrib", "main")).toAbsolutePath().toString().toYamlSafePath()
+
+                    val yamlConfig =
+                        """
+                        structure:
+                          testSourceDir: "$testDirPath"
+                          sourceDir: "$srcDirPath"
+                          contribLibraries:
+                            - contrib/npl-migration-test.zip
+                        """.trimIndent()
+
+                    TestUtils.withYamlConfig(yamlConfig) {
+                        runCommand(
+                            commands = listOf("test"),
+                        ) {
+                            process.waitFor()
+
+                            val expectedOutput =
+                                """
+                        '$testDirPath/npl/demo/test_hello_world.npl' .. PASS           3    tests in XXX ms
+
+                        Tests run: 3, Failures: 0
+
+                        ------------------------------------------------
+                        NPL test completed successfully in XXX ms.
+                        ------------------------------------------------
+                        """.normalize()
+
+                            output.normalize() shouldBe expectedOutput
+
+                            process.exitValue() shouldBe ExitCode.SUCCESS.code
+                        }
+                    }
                 }
 
                 test("Yaml config happy path - no coverage - implicit") {
