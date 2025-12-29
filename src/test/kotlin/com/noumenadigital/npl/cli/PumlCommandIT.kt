@@ -207,7 +207,7 @@ class PumlCommandIT :
             }
 
             fun happyPathNplContrib(params: List<String>) {
-                withPumlTestContext(testDir = listOf("success", "nplContrib")) {
+                withPumlTestContext(testDir = listOf("success", "nplсontrib")) {
                     runCommand(commands = listOf("puml", *params.toTypedArray())) {
                         process.waitFor()
 

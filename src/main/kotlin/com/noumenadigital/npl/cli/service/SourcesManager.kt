@@ -88,6 +88,7 @@ class SourcesManager(
     fun getFileObjectFromByteArray(): FileObject {
         val archivedSources = getArchivedSources()
         val tempFile = Files.createTempFile("vfs-archive", ".zip")
+        tempFile.toFile().deleteOnExit()
         Files.write(tempFile, archivedSources)
         val archiveUri = "zip:${tempFile.toUri()}!/"
         val archiveRoot = VFS.getManager().resolveFile(archiveUri)

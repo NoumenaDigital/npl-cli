@@ -53,22 +53,22 @@ class BinaryCommandsIT :
                                  --template-url <template-url>  URL of a repository containing a ZIP archive of the project template. Overrides the default template
                     check      Validate the correctness of NPL sources
                                  --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
-                                 --contrib-libraries <contrib-libraries>  Paths to zip archives containing NPL-Contrib libraries, comma separated wo space (optional)
+                                 --contrib-libraries <contrib-libraries>  Paths (relative to source-dir) to zip archives containing NPL-Contrib libraries, comma separated without spaces (optional)
                     test       Run the NPL tests
                                  --test-source-dir <directory>  Source directory containing NPL tests to run. Must be a parent directory of all required sources (both production and test).
                                  --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
                                  --coverage  Report test coverage details (printed to console as well as coverage.xml)
                                  --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
-                                 --contrib-libraries <contrib-libraries>  Paths to zip archives containing NPL-Contrib libraries, comma separated wo space (optional)
+                                 --contrib-libraries <contrib-libraries>  Paths (relative to source-dir) to zip archives containing NPL-Contrib libraries, comma separated without spaces (optional)
                     openapi    Generate the openapi specifications of NPL api
                                  --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
                                  --rules <rules descriptor path>  Path to the party automation rules descriptor. If omitted, generated document will not reflect the current system
                                  --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
-                                 --contrib-libraries <contrib-libraries>  Paths to zip archives containing NPL-Contrib libraries, comma separated wo space (optional)
+                                 --contrib-libraries <contrib-libraries>  Paths (relative to source-dir) to zip archives containing NPL-Contrib libraries, comma separated without spaces (optional)
                     puml       Generate a puml diagram from source in the given directory
                                  --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
                                  --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
-                                 --contrib-libraries <contrib-libraries>  Paths to zip archives containing NPL-Contrib libraries, comma separated wo space (optional)
+                                 --contrib-libraries <contrib-libraries>  Paths (relative to source-dir) to zip archives containing NPL-Contrib libraries, comma separated without spaces (optional)
                     deploy     Deploy NPL sources to a Noumena Engine instance
                                  --source-dir <directory> (required)  Directory containing NPL sources
                                  --clear  Clear application contents before deployment

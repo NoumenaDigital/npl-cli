@@ -57,7 +57,8 @@ object PumlCommandDescriptor : CommandDescriptor {
             ),
             NamedParameter(
                 name = "contrib-libraries",
-                description = "Paths to zip archives containing NPL-Contrib libraries, comma separated wo space (optional)",
+                description =
+                    "Paths (relative to source-dir) to zip archives containing NPL-Contrib libraries, comma separated without spaces (optional)",
                 isRequired = false,
                 valuePlaceholder = "<contrib-libraries>",
                 takesPath = true,
