@@ -229,3 +229,149 @@ Example output:
 | authUrl      | https://keycloak.noumena.cloud/realms/paas | Yes               |
 | clientId     | paas                                       | Yes               |
 | clientSecret | paas                                       | Yes               |
+
+# NPL CLI Verify Command Implementation
+
+## Overview
+
+The `npl verify` command has been implemented to verify NOUMENA verifiable protocol audit trails according to the NOUMENA Network whitepaper.
+
+## Command Usage
+
+```bash
+npl verify --audit <file-or-url> --sources <path> [options]
+```
+
+### Required Arguments
+- `--audit <file-or-url>` - Path to audit JSON file or HTTP(S) URL
+- `--sources <path>` - Path to local NPL sources directory or zip
+
+### Optional Arguments
+- `--did-scheme <http|https>` - Scheme for DID resolution (default: https)
+- `--did-host-override <host:port>` - Override host for DID resolution (e.g., localhost:8080 for testing)
+- `--fail-fast` - Stop verification on first error
+- `--json` - Output results in JSON format
+- `--no-replay` - Disable replay verification
+
+## Verification Steps
+
+The implementation performs the following verification steps according to the whitepaper:
+
+### A) Structure Validation
+- Validates that `audit_log` array and `state` object exist
+- Checks that each entry has all required fields
+- Validates proof fields exist
+
+### B) Hash-Chain Completeness
+- Recomputes unsigned entry (entry with `proof` removed)
+- Computes `entryHashBytes = SHA-256(JCS(unsignedEntry))`
+- Verifies `previousHash` chain:
+    - First entry: `previousHash` must be null
+    - Subsequent entries: `previousHash` must equal `"sha256:" + hex(entryHashBytes)` of previous entry
+
+### C) State Hash Verification
+- Computes `computedStateHash = "sha256:" + hex(SHA-256(JCS(state)))`
+- Verifies it matches `audit_log.last().stateHash`
+
+### D) DID Resolution + Signature Verification
+For each entry:
+- Resolves `proof.verificationMethod` as did:web
+    - Example: `did:web:example.com` => GET `{scheme}://example.com/.well-known/did.json`
+    - Supports `--did-host-override` for development/testing
+- Extracts Ed25519 public key from DID document's `publicKeyJwk` (kty=OKP, crv=Ed25519)
+- Parses compact JWS into 3 parts (header.payload.signature)
+- Verifies JWS payload equals `entryHashBytes` exactly
+- Verifies Ed25519 signature over "headerB64.payloadB64" using `Signature.getInstance("Ed25519")`
+
+### E) Replay Verification
+- Executes audit actions against a live NPL runtime
+- Starts Docker runtime and deploys NPL sources (configurable)
+- Parses protocol identity from `entry.id` URN format
+- Replays constructor and action calls via REST API
+- Compares computed state hashes with audit trail after each action
+- Environment variables for configuration:
+    - `NPL_BASE_URL` - Runtime URL (default: http://localhost:12000)
+    - `NPL_SKIP_DOCKER` - Skip Docker startup (default: false)
+    - `NPL_CLEANUP` - Tear down Docker after (default: false)
+    - `NPL_DOCKER_COMPOSE_CMD` - Docker command (default: docker compose up -d --wait)
+    - `NPL_DEPLOY_CMD` - Deploy command (default: npl deploy, reads from npl.yml)
+- Deploy configuration is read from `npl.yml` in the sources directory (sourceDir, username, password)
+- See `docs/replay-verification.md` for full documentation
+
+### JSON Canonicalization
+
+Custom JCS implementation following RFC 8785:
+- Lexicographic sorting of object keys
+- Specific number formatting rules
+- Proper string escaping
+- Deterministic output for hashing
+
+### Ed25519 Signature Verification
+
+- Uses Java's built-in `Signature.getInstance("Ed25519")`
+- Extracts public key from JWK format
+- Verifies compact JWS signatures
+- Base64url decoding/encoding support
+
+## Exit Codes
+
+- `0` - Verification successful
+- `1` - Verification failed (DATA_ERROR)
+- `2` - General error (file not found, invalid arguments, etc.)
+
+## Examples
+
+### Basic Verification
+```bash
+npl verify --audit audit.json --sources ./npl-sources
+```
+
+### With DID Host Override (for local testing)
+```bash
+npl verify \
+  --audit audit.json \
+  --sources ./npl-sources \
+  --did-scheme http \
+  --did-host-override localhost:8080
+```
+
+### JSON Output
+```bash
+npl verify --audit audit.json --sources ./npl-sources --json
+```
+
+Output:
+```json
+{
+  "success": false,
+  "errors": [
+    {
+      "step": "Signature",
+      "message": "Entry 0: Signature verification failed"
+    }
+  ]
+}
+```
+
+### Fail-Fast Mode
+```bash
+npl verify --audit audit.json --sources ./npl-sources --fail-fast
+```
+
+### Using YAML Configuration
+
+You can also configure the verify command in `npl.yml`:
+
+```yaml
+verify:
+  audit: ./audit.json
+  sources: ./api/src/main
+  didScheme: https
+  didHostOverride: localhost:8080
+  failFast: false
+```
+
+Then run:
+```bash
+npl verify
+```

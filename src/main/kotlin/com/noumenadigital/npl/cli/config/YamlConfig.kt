@@ -40,6 +40,16 @@ object YamlConfig {
         val initBare: YamlConfigField = yamlPath("/structure/initBare")
         val initTemplateUrl: YamlConfigField = yamlPath("/structure/initTemplateUrl")
     }
+
+    object Verify {
+        val audit: YamlConfigField = yamlPath("/verify/audit")
+        val sources: YamlConfigField = yamlPath("/verify/sources")
+        val didScheme: YamlConfigField = yamlPath("/verify/didScheme")
+        val didHostOverride: YamlConfigField = yamlPath("/verify/didHostOverride")
+        val failFast: YamlConfigField = yamlPath("/verify/failFast")
+        val json: YamlConfigField = yamlPath("/verify/json")
+        val noReplay: YamlConfigField = yamlPath("/verify/noReplay")
+    }
 }
 
 class YamlConfigField private constructor(
