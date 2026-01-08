@@ -14,6 +14,7 @@ class ConfigResolver(
         YAMLConfigParser.reload()
         val configFileParsedValues =
             commandDescriptor.parameters
+                .filter { it.configFilePath != null }
                 .mapNotNull { parameter ->
                     val value = YAMLConfigParser.getValue(parameter.configFilePath.toString())
                     value?.let { parameter.name to it }
