@@ -88,6 +88,30 @@ class CloudAuthManager(
         return accessToken
     }
 
+    fun getAccessToken(
+        output: ColorWriter,
+        actionName: String,
+        tenantSlug: String,
+    ): String {
+        val saClientId = tenantSlug
+        val saClientSecret =
+            System.getenv("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
+                ?: System.getProperty("NPL_SERVICE_ACCOUNT_CLIENT_SECRET")
+
+        if (!saClientSecret.isNullOrBlank()) {
+            output.info("Preparing to $actionName using service account...")
+            return getServiceAccountAccessToken(output, saClientId, saClientSecret)
+        } else {
+            val token = getToken()
+            if (token.accessToken == null) {
+                throw IllegalStateException(
+                    "Access token is not available. Please authenticate with `npl cloud login` command first.",
+                )
+            }
+            return token.accessToken
+        }
+    }
+
     private fun openBrowser(
         url: String,
         output: ColorWriter,

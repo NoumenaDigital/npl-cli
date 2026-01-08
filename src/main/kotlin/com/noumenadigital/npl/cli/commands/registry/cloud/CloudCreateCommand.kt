@@ -24,7 +24,7 @@ object CloudCreateCommandDescriptor : CommandDescriptor {
                 description = "Tenant slug where the application will be created",
                 isRequired = true,
                 valuePlaceholder = "<tenant-slug>",
-                configFilePath = null,
+                configFilePath = YamlConfig.Cloud.tenant,
             ),
             NamedParameter(
                 name = "app-name",
