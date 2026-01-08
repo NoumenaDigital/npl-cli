@@ -24,7 +24,7 @@ object CloudDeleteCommandDescriptor : CommandDescriptor {
                 description = "Tenant slug where the application is located",
                 isRequired = true,
                 valuePlaceholder = "<tenant-slug>",
-                configFilePath = null,
+                configFilePath = YamlConfig.Cloud.tenant,
             ),
             NamedParameter(
                 name = "app",
