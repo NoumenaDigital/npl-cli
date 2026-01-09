@@ -358,6 +358,28 @@
       ]
     },
     {
+      "type": "com.noumenadigital.npl.cli.model.CreateApplicationRequest",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getEngineVersion",
+          "parameterTypes": []
+        },
+        {
+          "name": "getName",
+          "parameterTypes": []
+        },
+        {
+          "name": "getProvider",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTrustedIssuers",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.noumenadigital.npl.cli.model.DeviceCodeResponse",
       "allDeclaredFields": true,
       "methods": [
