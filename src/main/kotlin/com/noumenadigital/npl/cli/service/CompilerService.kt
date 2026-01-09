@@ -3,19 +3,29 @@ package com.noumenadigital.npl.cli.service
 import com.google.common.collect.Multimap
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.util.normalizeWindowsPath
-import com.noumenadigital.npl.contrib.NplContribConfiguration
 import com.noumenadigital.npl.lang.CompileFailure
 import com.noumenadigital.npl.lang.CompilerConfiguration
 import com.noumenadigital.npl.lang.Loader
 import com.noumenadigital.npl.lang.Proto
 import com.noumenadigital.npl.lang.Source
+import com.noumenadigital.npl.lang.TestValue
 import com.noumenadigital.npl.lang.Type
+import com.noumenadigital.npl.testing.TestExecutor
+import com.noumenadigital.npl.testing.coverage.CoverageAnalyzer
+import java.io.File
 import java.net.URL
 import java.time.Duration
 
 data class CompilerService(
     private val sourcesManager: SourcesManager,
 ) {
+    val compilerConfiguration =
+        CompilerConfiguration(
+            tag = null,
+            quirksMode = false, // TODO: is this what we want?
+            nplContribConfiguration = sourcesManager.getNplContribLibConfiguration(),
+        )
+
     fun compileAndReport(output: ColorWriter): CompilationResult {
         val nplSources = sourcesManager.getNplSources()
         val compileResult = compileSource(nplSources, output)
@@ -24,12 +34,29 @@ data class CompilerService(
         return compileResult
     }
 
+    fun compileForTest(
+        listener: TestValue.Listener,
+        analyzer: CoverageAnalyzer,
+    ): TestExecutor.Output? {
+        val sources = sourcesManager.getNplSources()
+        val testSources = sourcesManager.getNplTestSources()
+        return TestExecutor
+            .compile(
+                listener,
+                (sources + testSources).distinct(),
+                compilerConfiguration,
+            )?.also {
+                analyzer.registerSources(sources.map { File(it.location.path) })
+                analyzer.registerCodeToCover(it.protoMap)
+            }
+    }
+
     private fun compileSource(
         sources: List<Source>,
         output: ColorWriter,
     ): CompilationResult {
         val startTime = System.nanoTime()
-        val compileResult = compile(sources, sourcesManager.nplContribLibrary, output)
+        val compileResult = compile(sources, output)
         val duration = Duration.ofNanos(System.nanoTime() - startTime).toMillis()
 
         compileResult.duration = duration
@@ -64,7 +91,6 @@ data class CompilerService(
 
     private fun compile(
         sources: List<Source>,
-        nplContribLibrary: String,
         output: ColorWriter,
     ): CompilationResult {
         if (sources.isEmpty()) {
@@ -73,7 +99,7 @@ data class CompilerService(
         }
 
         val compilerConfiguration =
-            compilerConfiguration(nplContribLibrary)
+            compilerConfiguration
 
         val compileResult =
             try {
@@ -141,14 +167,4 @@ data class CompilerService(
         val hasWarnings: Boolean
             get() = warningCount > 0
     }
-}
-
-fun compilerConfiguration(nplContribLibrary: String): CompilerConfiguration {
-    val compilerConfiguration =
-        CompilerConfiguration(
-            tag = null,
-            quirksMode = false, // TODO: is this what we want?
-            nplContribConfiguration = NplContribConfiguration(nplContribPath = nplContribLibrary),
-        )
-    return compilerConfiguration
 }
