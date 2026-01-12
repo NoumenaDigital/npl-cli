@@ -4,9 +4,9 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient
-import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.FRONTEND
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.NO_SAMPLES
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
+import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedRepos.FRONTEND
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.util.ZipExtractor
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
@@ -134,7 +134,7 @@ class InitCommand(
         isFrontend: Boolean,
     ): String =
         when {
-            isFrontend -> getBranchUrl(FRONTEND)
+            isFrontend -> getRepoUrl(FRONTEND)
             isBare -> getBranchUrl(NO_SAMPLES)
             else -> getBranchUrl(SAMPLES)
         }
