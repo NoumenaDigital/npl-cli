@@ -9,9 +9,7 @@ import java.net.URI
 class NoumenaGitRepoClient {
     private val client = HttpClients.createDefault()
 
-    fun getBranchUrl(branch: SupportedBranches) = "${GIT_REPO_URL}npl-init/archive/refs/heads/${branch.branchName}.zip"
-
-    fun getRepoUrl(repo: SupportedRepos) = "$GIT_REPO_URL${repo.repoName}/archive/refs/heads/master.zip"
+    fun getTemplateUrl(template: Template) = "${GIT_REPO_URL}${template.repo}/archive/refs/heads/${template.branch}.zip"
 
     fun downloadTemplateArchive(
         url: String,
@@ -32,17 +30,13 @@ class NoumenaGitRepoClient {
     }
 
     companion object {
-        enum class SupportedBranches(
-            val branchName: String,
+        enum class Template(
+            val repo: String,
+            val branch: String,
         ) {
-            SAMPLES("samples"),
-            NO_SAMPLES("no-samples"),
-        }
-
-        enum class SupportedRepos(
-            val repoName: String,
-        ) {
-            FRONTEND("npl-frontend-starter"),
+            SAMPLES("npl-init", "samples"),
+            NO_SAMPLES("npl-init", "no-samples"),
+            FRONTEND("npl-frontend-starter", "master"),
         }
 
         private const val GIT_REPO_URL = "https://github.com/NoumenaDigital/"

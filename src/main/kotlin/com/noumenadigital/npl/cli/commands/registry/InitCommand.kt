@@ -4,9 +4,9 @@ import com.noumenadigital.npl.cli.ExitCode
 import com.noumenadigital.npl.cli.commands.NamedParameter
 import com.noumenadigital.npl.cli.config.YamlConfig
 import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient
-import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.NO_SAMPLES
-import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedBranches.SAMPLES
-import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.SupportedRepos.FRONTEND
+import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.Template.FRONTEND
+import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.Template.NO_SAMPLES
+import com.noumenadigital.npl.cli.http.NoumenaGitRepoClient.Companion.Template.SAMPLES
 import com.noumenadigital.npl.cli.service.ColorWriter
 import com.noumenadigital.npl.cli.util.ZipExtractor
 import com.noumenadigital.npl.cli.util.relativeOrAbsolute
@@ -133,11 +133,13 @@ class InitCommand(
         isBare: Boolean,
         isFrontend: Boolean,
     ): String =
-        when {
-            isFrontend -> getRepoUrl(FRONTEND)
-            isBare -> getBranchUrl(NO_SAMPLES)
-            else -> getBranchUrl(SAMPLES)
-        }
+        getTemplateUrl(
+            when {
+                isFrontend -> FRONTEND
+                isBare -> NO_SAMPLES
+                else -> SAMPLES
+            },
+        )
 
     private fun File.cleanUp() {
         walk().filter { f -> f.isFile && (f.name in filesToCleanup) }.forEach { f -> f.delete() }
