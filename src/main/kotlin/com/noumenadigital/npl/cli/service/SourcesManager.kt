@@ -2,6 +2,7 @@ package com.noumenadigital.npl.cli.service
 
 import com.noumenadigital.npl.cli.exception.CommandExecutionException
 import com.noumenadigital.npl.cli.util.normalizeWindowsPath
+import com.noumenadigital.npl.contrib.DefaultNplContribLoader
 import com.noumenadigital.npl.contrib.NplContribConfiguration
 import com.noumenadigital.npl.lang.Source
 import org.apache.commons.vfs2.FileObject
@@ -28,8 +29,6 @@ class SourcesManager(
     fun getNplContribLibConfiguration(): NplContribConfiguration =
         NplContribConfiguration(
             nplContribPath = nplContribLibrary,
-            nplContribPaths = contribLibraries ?: emptyList(),
-            archive = getFileObjectFromByteArray(),
         )
 
     fun getNplSources(): List<Source> {
@@ -37,7 +36,12 @@ class SourcesManager(
             if (sources.isEmpty()) {
                 throw CommandExecutionException("No NPL source files found")
             }
-            return sources
+            val contribSources =
+                DefaultNplContribLoader.extractNplContribLibSources(
+                    contribLibraries ?: emptyList(),
+                    getFileObjectFromByteArray(),
+                )
+            return sources + contribSources
         }
     }
 

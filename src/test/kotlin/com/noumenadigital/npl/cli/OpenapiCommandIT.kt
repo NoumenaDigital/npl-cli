@@ -117,7 +117,7 @@ class OpenapiCommandIT :
 
                         val expectedOutput =
                             """
-                        Completed compilation for 2 files in XXX ms
+                        Completed compilation for 3 files in XXX ms
 
                         Generating openapi for demo
                         NPL openapi completed successfully.

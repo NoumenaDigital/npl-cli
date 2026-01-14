@@ -41,7 +41,7 @@ class CheckCommandIT :
 
                     val expectedOutput =
                         """
-                    Completed compilation for 2 files in XXX ms
+                    Completed compilation for 3 files in XXX ms
 
                     NPL check completed successfully.
                     """.normalize()
