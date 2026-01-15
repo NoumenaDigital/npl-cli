@@ -51,7 +51,6 @@ object OpenapiCommandDescriptor : CommandDescriptor {
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
-                isRequiredForMcp = true,
                 configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
@@ -71,7 +70,6 @@ object OpenapiCommandDescriptor : CommandDescriptor {
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
-                isRequiredForMcp = true,
                 configFilePath = YamlConfig.Structure.outputDir,
             ),
         )

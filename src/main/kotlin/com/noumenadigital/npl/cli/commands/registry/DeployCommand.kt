@@ -40,7 +40,7 @@ object DeployCommandDescriptor : CommandDescriptor {
                 isRequired = true,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
-                isRequiredForMcp = true,
+                isRequiredForMcp = false,
                 configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
