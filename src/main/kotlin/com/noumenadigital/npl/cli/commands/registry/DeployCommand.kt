@@ -37,7 +37,7 @@ object DeployCommandDescriptor : CommandDescriptor {
             NamedParameter(
                 name = "source-dir",
                 description = "Directory containing NPL sources",
-                isRequired = true,
+                isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 isRequiredForMcp = false,

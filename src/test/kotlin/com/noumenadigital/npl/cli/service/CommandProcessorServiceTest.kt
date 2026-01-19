@@ -54,7 +54,7 @@ class CommandProcessorServiceTest :
                                  --source-dir <directory>  Directory containing NPL source files (defaults to current directory)
                                  --output-dir <output directory>  Directory to place generated output files (optional) (defaults to current directory)
                     deploy     Deploy NPL sources to a Noumena Engine instance
-                                 --source-dir <directory> (required)  Directory containing NPL sources
+                                 --source-dir <directory>  Directory containing NPL sources
                                  --clear  Clear application contents before deployment
                     cloud      Subset of commands for NOUMENA Cloud; for the full list of sub-commands, run `npl cloud help`
                     mcp        Start an MCP server exposing NPL CLI functionality over stdio
