@@ -67,7 +67,7 @@ interface CommandDescriptor {
                 parameter.description
             }
 
-        // A do not defer message is put on all tool parameter descriptions, in order to prefer npl.yml settings
+        // A do not infer message is put on all tool parameter descriptions, in order to prefer npl.yml settings
         val finalDesc = "$baseDesc$doNotInferMsg"
 
         put("description", finalDesc)
