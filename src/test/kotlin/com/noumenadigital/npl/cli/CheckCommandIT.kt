@@ -31,6 +31,26 @@ class CheckCommandIT :
                 }
             }
 
+            test("nplcontrib") {
+                val testDirPath =
+                    getTestResourcesPath(listOf("success", "nplcontrib")).toAbsolutePath().toString()
+                runCommand(
+                    commands = listOf("check", "--source-dir", testDirPath, "--contrib-libraries", "main/contrib/npl-migration-test.zip"),
+                ) {
+                    process.waitFor()
+
+                    val expectedOutput =
+                        """
+                    Completed compilation for 3 files in XXX ms
+
+                    NPL check completed successfully.
+                    """.normalize()
+
+                    output.normalize() shouldBe expectedOutput
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
+                }
+            }
+
             test("single file - relative path") {
                 val testDirPath =
                     getTestResourcesPath(listOf("success", "single_file"))

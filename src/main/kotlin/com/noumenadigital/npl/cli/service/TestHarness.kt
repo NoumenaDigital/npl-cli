@@ -10,36 +10,28 @@ import org.tap4j.consumer.TapConsumerFactory
 import org.tap4j.model.TestSet
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.time.Duration
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
+import kotlin.math.max
 
 class TestHarness(
     private val sourcesManager: SourcesManager,
     private val analyzer: CoverageAnalyzer = NoCoverageAnalyzer,
 ) {
     fun runTest(): List<TestHarnessResults> {
-        val sources = sourcesManager.getNplSources()
+        val compilerService = CompilerService(sourcesManager)
         val compilationResult =
             runTest("compilation") { listener ->
-                TestExecutor
-                    .compile(
-                        listener,
-                        sources,
-                        compilerConfiguration(sourcesManager.nplContribLibrary),
-                    )?.also {
-                        analyzer.registerSources(sources.map { File(it.location.path) })
-                        analyzer.registerCodeToCover(it.protoMap)
-                    }
+                compilerService.compileForTest(listener, analyzer)
             }
         val isCompilationSuccess =
             !compilationResult.tapResult.containsNotOk() && !compilationResult.tapResult.containsBailOut()
         if (isCompilationSuccess) {
             val result =
-                Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime().availableProcessors() - 1)).run {
+                Executors.newFixedThreadPool(max(1, Runtime.getRuntime().availableProcessors() - 1)).run {
                     compilationResult.result?.let { compilationOutput ->
                         val results = invokeAll(createCallables(compilationOutput, analyzer)).map { c -> c.get() }
                         shutdown()
@@ -86,8 +78,8 @@ class TestHarness(
     private fun createCallables(
         compilationOutput: TestExecutor.Output,
         analyzer: CoverageAnalyzer,
-    ) = sourcesManager
-        .getNplSources()
+    ) = (sourcesManager.getNplTestSources() + sourcesManager.getNplSources())
+        .distinct()
         .map { source ->
             Callable {
                 runTest(source.location.path) { listener ->
