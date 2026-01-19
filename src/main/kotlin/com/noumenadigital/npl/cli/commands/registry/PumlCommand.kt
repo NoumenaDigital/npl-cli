@@ -35,7 +35,6 @@ object PumlCommandDescriptor : CommandDescriptor {
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
-                isRequiredForMcp = true,
                 configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
@@ -45,7 +44,6 @@ object PumlCommandDescriptor : CommandDescriptor {
                 isRequired = false,
                 valuePlaceholder = "<output directory>",
                 takesPath = true,
-                isRequiredForMcp = true,
                 configFilePath = YamlConfig.Structure.outputDir,
             ),
         )

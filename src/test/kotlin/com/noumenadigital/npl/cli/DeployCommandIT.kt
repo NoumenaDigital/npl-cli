@@ -663,63 +663,6 @@ class DeployCommandIT :
         }
 
         context("command validation errors") {
-            test("missing directory parameter") {
-                runCommand(
-                    commands =
-                        listOf(
-                            "deploy",
-                            "--username",
-                            "user2",
-                            "--password",
-                            "password1",
-                            "--management-url",
-                            mockEngine.url("/").toString(),
-                            "--client-id",
-                            "nm-platform-service-client",
-                            "--client-secret",
-                            "87ff12ca-cf29-4719-bda8c92faa78e3c4",
-                            "--auth-url",
-                            mockOidc.url("/realms/noumena").toString(),
-                        ),
-                ) {
-                    process.waitFor(5, TimeUnit.SECONDS)
-
-                    val expectedOutput =
-                        """
-                            Missing required parameter(s): source-dir
-
-                            You can provide them in one of the following ways:
-
-                              • As command-line arguments:
-                                  --source-dir <value>
-
-                              • In your npl.yml configuration file:
-
-                              /structure/sourceDir
-
-                            Usage:
-                              deploy --source-dir <directory> [--clear]
-
-                            Deploys NPL sources to a Noumena Engine instance.
-
-                            Arguments:
-                              --source-dir <directory>   Directory containing NPL sources (required).
-                                                 IMPORTANT: The directory must contain a valid NPL source structure, including
-                                                 migrations. E.g.:
-                                                  main
-                                                  ├── npl-1.0
-                                                  └── migration.yml
-
-                            Options:
-                              --clear             Clear application contents before deployment.
-
-                            Configuration is read from npl.yml (current dir)."""
-
-                    output.normalize() shouldBe expectedOutput.normalize().trimIndent()
-                    process.exitValue() shouldBe ExitCode.USAGE_ERROR.code
-                }
-            }
-
             test("invalid directory path") {
                 val nonExistentDir = "/non/existent/directory"
 

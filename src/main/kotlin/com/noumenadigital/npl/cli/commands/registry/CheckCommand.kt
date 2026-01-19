@@ -30,7 +30,6 @@ object CheckCommandDescriptor : CommandDescriptor {
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
-                isRequiredForMcp = true,
                 configFilePath = YamlConfig.Structure.sourceDir,
             ),
         )
