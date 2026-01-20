@@ -41,7 +41,6 @@ object TestCommandDescriptor : CommandDescriptor {
                 isRequired = false,
                 valuePlaceholder = "<directory>",
                 takesPath = true,
-                isRequiredForMcp = true,
                 configFilePath = YamlConfig.Structure.testSourceDir,
             ),
             NamedParameter(
