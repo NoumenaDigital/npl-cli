@@ -37,10 +37,13 @@ class SourcesManager(
                 throw CommandExecutionException("No NPL source files found")
             }
             val contribSources =
-                DefaultNplContribLoader.extractNplContribLibSources(
-                    contribLibraries ?: emptyList(),
-                    getFileObjectFromByteArray(),
-                )
+                getFileObjectFromByteArray().use {
+                    DefaultNplContribLoader.extractNplContribLibSources(
+                        contribLibraries ?: emptyList(),
+                        it,
+                    )
+                }
+
             return sources + contribSources
         }
     }
