@@ -18,7 +18,13 @@ object CheckCommandDescriptor : CommandDescriptor {
 
     override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
         val parsedSrcDir = parsedArguments["source-dir"] as? String ?: "."
-        return CheckCommand(srcDir = parsedSrcDir)
+        val contribLibraries =
+            parsedArguments["contrib-libraries"]
+                ?.toString()
+                ?.split(',')
+                ?.mapNotNull { it.trim().takeIf(String::isNotEmpty) }
+                ?.takeIf { it.isNotEmpty() }
+        return CheckCommand(srcDir = parsedSrcDir, contribLibraries = contribLibraries)
     }
 
     override val parameters: List<NamedParameter> =
@@ -32,17 +38,28 @@ object CheckCommandDescriptor : CommandDescriptor {
                 takesPath = true,
                 configFilePath = YamlConfig.Structure.sourceDir,
             ),
+            NamedParameter(
+                name = "contrib-libraries",
+                description =
+                    "Paths (relative to source-dir) to zip archives containing NPL-Contrib libraries, comma separated without spaces (optional)",
+                isRequired = false,
+                valuePlaceholder = "<contrib-libraries>",
+                takesPath = true,
+                isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.contribLibraries,
+            ),
         )
 }
 
 data class CheckCommand(
     private val srcDir: String,
+    val contribLibraries: List<String>?,
 ) : CommandExecutor {
     init {
         checkDirectory(srcDir)
     }
 
-    private val sourcesManager = SourcesManager(srcDir)
+    private val sourcesManager = SourcesManager(srcPath = srcDir, contribLibraries = contribLibraries)
     private val compilerService = CompilerService(sourcesManager)
 
     override fun execute(output: ColorWriter): ExitCode {

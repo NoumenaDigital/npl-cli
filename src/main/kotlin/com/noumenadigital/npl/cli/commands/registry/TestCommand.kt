@@ -24,10 +24,19 @@ object TestCommandDescriptor : CommandDescriptor {
         val parsedTestSrcDir = parsedArguments["test-source-dir"] as? String ?: "."
         val parsedCoverage = !(parsedArguments["coverage"] == null || parsedArguments["coverage"] as? Boolean == false)
         val parsedOutputDir = parsedArguments["output-dir"] as? String ?: "."
+        val parsedSrcDir = parsedArguments["source-dir"] as? String
+        val contribLibraries =
+            parsedArguments["contrib-libraries"]
+                ?.toString()
+                ?.split(',')
+                ?.mapNotNull { it.trim().takeIf(String::isNotEmpty) }
+                ?.takeIf { it.isNotEmpty() }
         return TestCommand(
             testSrcDir = parsedTestSrcDir,
             outputDir = parsedOutputDir,
+            srcDir = parsedSrcDir,
             coverage = parsedCoverage,
+            contribLibraries = contribLibraries,
         )
     }
 
@@ -42,6 +51,16 @@ object TestCommandDescriptor : CommandDescriptor {
                 valuePlaceholder = "<directory>",
                 takesPath = true,
                 configFilePath = YamlConfig.Structure.testSourceDir,
+            ),
+            NamedParameter(
+                name = "source-dir",
+                description = "Directory containing NPL source files",
+                defaultValue = ".",
+                isRequired = false,
+                valuePlaceholder = "<directory>",
+                takesPath = true,
+                isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.sourceDir,
             ),
             NamedParameter(
                 name = "coverage",
@@ -59,13 +78,25 @@ object TestCommandDescriptor : CommandDescriptor {
                 isRequiredForMcp = false,
                 configFilePath = YamlConfig.Structure.outputDir,
             ),
+            NamedParameter(
+                name = "contrib-libraries",
+                description =
+                    "Paths (relative to source-dir) to zip archives containing NPL-Contrib libraries, comma separated without spaces (optional)",
+                isRequired = false,
+                valuePlaceholder = "<contrib-libraries>",
+                takesPath = true,
+                isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.contribLibraries,
+            ),
         )
 }
 
 data class TestCommand(
     private val testSrcDir: String = ".",
+    private val srcDir: String? = testSrcDir,
     private val outputDir: String = ".",
     private val coverage: Boolean = false,
+    private val contribLibraries: List<String>?,
 ) : CommandExecutor {
     companion object {
         const val COVERAGE_FILE = "coverage.xml"
@@ -74,6 +105,11 @@ data class TestCommand(
     override fun execute(output: ColorWriter): ExitCode {
         try {
             val testSourceDir = File(testSrcDir)
+            var sourceDir: File? = null
+            if (srcDir != null) {
+                sourceDir = File(srcDir)
+            }
+
             if (!testSourceDir.isDirectory) {
                 output.error("Given NPL source directory is not a directory: ${testSourceDir.relativeOrAbsolute()}")
                 return ExitCode.GENERAL_ERROR
@@ -89,7 +125,15 @@ data class TestCommand(
                     sourceDir = testSourceDir,
                     outputDir = outputDir,
                 )
-            val testHarness = TestHarness(SourcesManager(testSourceDir.absolutePath), coverageAnalyzer)
+            val testHarness =
+                TestHarness(
+                    SourcesManager(
+                        testSrcPath = testSourceDir.absolutePath,
+                        srcPath = sourceDir?.absolutePath ?: testSourceDir.absolutePath,
+                        contribLibraries = contribLibraries,
+                    ),
+                    coverageAnalyzer,
+                )
 
             val start = System.nanoTime()
             val testResults = testHarness.runTest()
