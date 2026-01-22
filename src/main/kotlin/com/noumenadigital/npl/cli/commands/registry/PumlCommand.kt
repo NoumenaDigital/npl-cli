@@ -20,9 +20,16 @@ object PumlCommandDescriptor : CommandDescriptor {
     override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
         val parsedSrcDir = parsedArguments["source-dir"] as? String ?: "."
         val parsedOutputDir = parsedArguments["output-dir"] as? String ?: "."
+        val contribLibraries =
+            parsedArguments["contrib-libraries"]
+                ?.toString()
+                ?.split(',')
+                ?.mapNotNull { it.trim().takeIf(String::isNotEmpty) }
+                ?.takeIf { it.isNotEmpty() }
         return PumlCommand(
             srcDir = parsedSrcDir,
             outputDir = parsedOutputDir,
+            contribLibraries = contribLibraries,
         )
     }
 
@@ -46,12 +53,23 @@ object PumlCommandDescriptor : CommandDescriptor {
                 takesPath = true,
                 configFilePath = YamlConfig.Structure.outputDir,
             ),
+            NamedParameter(
+                name = "contrib-libraries",
+                description =
+                    "Paths (relative to source-dir) to zip archives containing NPL-Contrib libraries, comma separated without spaces (optional)",
+                isRequired = false,
+                valuePlaceholder = "<contrib-libraries>",
+                takesPath = true,
+                isRequiredForMcp = true,
+                configFilePath = YamlConfig.Structure.contribLibraries,
+            ),
         )
 }
 
 data class PumlCommand(
     private val srcDir: String,
     private val outputDir: String,
+    val contribLibraries: List<String>?,
 ) : CommandExecutor {
     override fun execute(output: ColorWriter): ExitCode {
         try {
@@ -65,7 +83,7 @@ data class PumlCommand(
 
             val outputDirFile = File(outputDir).resolve("puml")
             val protosMap =
-                CompilerService(SourcesManager(srcDir)).compileAndReport(output = output).userDefinedMap
+                CompilerService(SourcesManager(srcDir, contribLibraries)).compileAndReport(output = output).userDefinedMap
                     ?: throw CommandExecutionException("No user defined types found, check sources and try again.")
 
             val pumlFiles =

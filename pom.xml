@@ -31,7 +31,7 @@
     </scm>
 
     <properties>
-        <platform.version>2025.2.7</platform.version>
+        <platform.version>2025.2.8</platform.version>
         <kotlin.version>2.1.20</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

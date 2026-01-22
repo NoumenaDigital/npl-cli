@@ -218,6 +218,9 @@
       "type": "com.google.protobuf.ProtocolStringList"
     },
     {
+      "type": "com.jcraft.jsch.JSch"
+    },
+    {
       "type": "com.noumenadigital.npl.cli.config.DeployConfig",
       "allDeclaredFields": true,
       "methods": [
@@ -2016,6 +2019,9 @@
       ]
     },
     {
+      "type": "javax.crypto.Cipher"
+    },
+    {
       "type": "javax.security.auth.x500.X500Principal",
       "fields": [
         {
@@ -2350,6 +2356,136 @@
     },
     {
       "type": "libcore.io.Memory"
+    },
+    {
+      "type": "org.apache.commons.compress.archivers.tar.TarArchiveOutputStream"
+    },
+    {
+      "type": "org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream"
+    },
+    {
+      "type": "org.apache.commons.httpclient.HttpClient"
+    },
+    {
+      "type": "org.apache.commons.net.ftp.FTPFile"
+    },
+    {
+      "type": "org.apache.commons.vfs2.impl.DefaultFileSystemManager"
+    },
+    {
+      "type": "org.apache.commons.vfs2.impl.StandardFileSystemManager",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "init",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.gzip.GzipFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.http4.Http4FileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.http4s.Http4sFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.jar.JarFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.local.DefaultLocalFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.ram.RamFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.res.ResourceFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.temp.TemporaryFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.url.UrlFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.commons.vfs2.provider.zip.ZipFileProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.apache.hadoop.fs.FileSystem"
+    },
+    {
+      "type": "org.apache.hc.client5.http.classic.HttpClient"
+    },
+    {
+      "type": "org.apache.http.client.HttpClient"
+    },
+    {
+      "type": "org.apache.jackrabbit.webdav.client.methods.BaseDavRequest"
     },
     {
       "type": "org.apache.logging.log4j.spi.ExtendedLogger"
@@ -3091,6 +3227,9 @@
       "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
     },
     {
+      "glob": "META-INF/vfs-providers.xml"
+    },
+    {
       "glob": "jsv-messages.properties"
     },
     {
@@ -3203,6 +3342,12 @@
     },
     {
       "glob": "npl-instructions.md"
+    },
+    {
+      "glob": "org/apache/commons/vfs2/Resources.properties"
+    },
+    {
+      "glob": "org/apache/commons/vfs2/impl/providers.xml"
     },
     {
       "glob": "org/apache/http/client/version.properties"
