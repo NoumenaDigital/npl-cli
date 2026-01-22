@@ -122,6 +122,7 @@ object McpCommand : CommandExecutor {
                                         subscribe = false,
                                         listChanged = false,
                                     ),
+                                logging = null,
                             ),
                     ),
             )
