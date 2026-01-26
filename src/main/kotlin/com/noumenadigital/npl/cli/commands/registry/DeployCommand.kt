@@ -97,6 +97,14 @@ object DeployCommandDescriptor : CommandDescriptor {
                 valuePlaceholder = "<url>",
                 configFilePath = YamlConfig.Local.authUrl,
             ),
+            NamedParameter(
+                name = "audience",
+                description = "OAuth2 audience parameter for the token request",
+                isRequired = false,
+                isHidden = true,
+                valuePlaceholder = "<audience>",
+                configFilePath = YamlConfig.Local.audience,
+            ),
         )
 
     override fun createCommandExecutorInstance(parsedArguments: Map<String, Any>): CommandExecutor {
@@ -108,6 +116,7 @@ object DeployCommandDescriptor : CommandDescriptor {
         val parsedClientSecret = parsedArguments["client-secret"] as? String ?: "paas"
         val parsedClientId = parsedArguments["client-id"] as? String ?: "paas"
         val parsedAuthUrl = parsedArguments["auth-url"] as? String ?: "http://localhost:11000"
+        val parsedAudience = parsedArguments["audience"] as? String
         return DeployCommand(
             sourceDir = parsedSourceDir,
             clear = parsedClear,
@@ -117,6 +126,7 @@ object DeployCommandDescriptor : CommandDescriptor {
             clientSecret = parsedClientSecret,
             clientId = parsedClientId,
             authUrl = parsedAuthUrl,
+            audience = parsedAudience,
         )
     }
 }
@@ -130,6 +140,7 @@ class DeployCommand(
     private val clientSecret: String,
     private val clientId: String,
     private val authUrl: String,
+    private val audience: String? = null,
 ) : CommandExecutor {
     val deployService =
         DeployService(
@@ -139,6 +150,7 @@ class DeployCommand(
             clientId = clientId,
             clientSecret = clientSecret,
             authUrl = authUrl,
+            audience = audience,
         )
 
     override fun execute(output: ColorWriter): ExitCode {
