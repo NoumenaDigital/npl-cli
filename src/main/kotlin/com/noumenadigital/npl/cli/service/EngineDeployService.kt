@@ -37,6 +37,7 @@ class DeployService(
     val managementUrl: String,
     val username: String,
     val password: String,
+    val audience: String? = null,
 ) {
     fun clearApplication(): DeployResult =
         try {
@@ -79,6 +80,7 @@ class DeployService(
                     clientId = clientId,
                     clientSecret = clientSecret,
                     authUrl = authUrl,
+                    audience = audience,
                 )
             val authProvider = TokenAuthorizationProvider(userConfig, authConfig)
             val managementClient = ManagementHttpClient(managementUrl)

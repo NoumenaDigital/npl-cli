@@ -85,6 +85,7 @@ local: # Configuration for deploying to a local NOUMENA Engine instance
   password: my-pass # Password for authentication
   clientId: npl-cli # Client ID for authentication
   clientSecret: secret # Client secret for authentication
+  audience: http://localhost:12400 # Optional: OAuth2 audience parameter for token requests
 
 structure: # Configuration for project structure
   sourceDir: src/main/npl # Directory containing NPL source files

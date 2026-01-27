@@ -26,6 +26,7 @@ object YamlConfig {
         val username: YamlConfigField = yamlPath("/local/username")
         val password: YamlConfigField = yamlPath("/local/password")
         val clear: YamlConfigField = yamlPath("/local/clear")
+        val audience: YamlConfigField = yamlPath("/local/audience")
     }
 
     object Structure {
