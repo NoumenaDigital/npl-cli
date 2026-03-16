@@ -74,7 +74,7 @@ data class CheckCommand(
 
                 result.hasWarnings -> {
                     output.warning("NPL check completed with warnings.")
-                    ExitCode.GENERAL_ERROR
+                    ExitCode.SUCCESS
                 }
 
                 else -> {
