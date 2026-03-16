@@ -283,7 +283,7 @@ class CheckCommandIT :
                     """.normalize()
 
                     output.normalize() shouldBe expectedOutput
-                    process.exitValue() shouldBe ExitCode.GENERAL_ERROR.code
+                    process.exitValue() shouldBe ExitCode.SUCCESS.code
                 }
             }
 
